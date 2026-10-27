@@ -165,7 +165,7 @@ Opportunity Score:
 ```
 
 # Repository structuur
-.
+```text
 ├── apps
 │   ├── dashboard
 │   └── api
