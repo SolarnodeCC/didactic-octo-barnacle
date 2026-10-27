@@ -1,0 +1,9 @@
+---
+description: Defaults for JSON files
+globs: "**/*.json"
+alwaysApply: false
+---
+
+- Commit strict JSON: no comments and no trailing commas.
+- Do not put secrets, snapshot IDs, or machine-local paths in committed JSON.
+- `.cursor/environment.json` holds `install` and, when a server exists, `start`. Dependency installs stay in `install`. Long-running processes stay in `start`.

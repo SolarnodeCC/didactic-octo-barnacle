@@ -17,6 +17,7 @@ Do not invent credentials, commit secrets, or add a second license. Open a pull 
 
 - The Cloud Agent base is Cursor's default image. There is no Dockerfile and no `start` command, because nothing needs to stay running.
 - `install` in `.cursor/environment.json` checks that `README.md` and `LICENSE` are present and that `git`, `node`, and `python3` are on `PATH`. Run that same command from the repository root to confirm the workspace. It is safe to run more than once.
+- `.cursor/worktrees.json` runs the same file check when Cursor creates a worktree. `.cursor/mcp.json` has no project MCP servers. There is no `hooks.json` until a hook script exists.
 - There is no dev server, test suite, or package install yet. Reading `README.md` is the product check.
 - When a lockfile arrives, add its package-manager install to `install` and keep the command idempotent. Start dev servers from `start`.
 - Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environment Secrets tab. Do not write them into this file or into `environment.json`.
