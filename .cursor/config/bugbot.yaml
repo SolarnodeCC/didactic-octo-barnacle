@@ -1,0 +1,18 @@
+# Reviewed from the pull request base branch. See Cursor Bugbot repository config.
+version: 1
+
+triggers:
+  drafts: false
+  frequency: everyPush
+
+review:
+  effort: default
+  smartPrompt: ""
+  incremental: true
+
+prSummary:
+  mode: comment
+  riskScore: true
+
+autofix:
+  mode: disabled

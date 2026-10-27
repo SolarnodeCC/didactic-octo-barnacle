@@ -1,0 +1,9 @@
+---
+description: Defaults for YAML files
+globs: "**/*.{yml,yaml}"
+alwaysApply: false
+---
+
+- Do not put secret values in YAML. Name the GitHub Actions secret or Cursor environment secret instead.
+- Keep `.cursor/config/bugbot.yaml` to the documented Bugbot keys: `version`, `triggers`, `review`, `prSummary`, and `autofix`.
+- Quote YAML values that contain `:`, `#`, or leading wildcard characters.

@@ -1,0 +1,10 @@
+---
+description: Defaults for Cursor rule files
+globs: ".cursor/rules/**/*.mdc"
+alwaysApply: false
+---
+
+- A project rule is an `.mdc` file with YAML frontmatter.
+- Set `alwaysApply` to true only when the rule belongs in every session.
+- For a file-specific rule, set `alwaysApply` to false and set `globs`.
+- For a rule the agent should pull in by topic, set `alwaysApply` to false, set `description`, and omit `globs`.

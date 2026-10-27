@@ -1,0 +1,6 @@
+.env
+.env.*
+!.env.example
+CLAUDE.local.md
+.cursor/local/
+*.pem
