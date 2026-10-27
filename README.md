@@ -182,7 +182,7 @@ Opportunity Score:
 │
 └── infrastructure
     └── cloudflare
-
+```
 ---
 
 # Technology Stack
