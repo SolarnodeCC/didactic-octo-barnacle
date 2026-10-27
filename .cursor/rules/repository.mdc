@@ -1,0 +1,10 @@
+---
+description: Conventions for working in this repository
+alwaysApply: true
+---
+
+- Treat `README.md` as the product source of truth. The repository currently contains that specification and the MIT license, not the planned apps or agents.
+- Keep credentials out of git. Put API keys and Cloudflare tokens in Cursor environment secrets or GitHub Actions secrets.
+- The license is MIT. Keep `LICENSE` and the License section of `README.md` in agreement.
+- Open a pull request for changes. Do not commit directly to `main`.
+- When application code arrives, extend the `install` command in `.cursor/environment.json` with that package manager's lockfile install. Put long-running dev servers in `start`, not `install`.
