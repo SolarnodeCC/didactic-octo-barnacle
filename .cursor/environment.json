@@ -1,4 +1,4 @@
 {
   "name": "didactic-octo-barnacle",
-  "install": "set -euo pipefail\ntest -s README.md\ntest -s LICENSE\ngit rev-parse --is-inside-work-tree >/dev/null\ncommand -v git >/dev/null\ncommand -v node >/dev/null\ncommand -v python3 >/dev/null\n"
+  "install": "set -euo pipefail\ntest -s README.md\ntest -s LICENSE\ngit rev-parse --is-inside-work-tree >/dev/null\ncommand -v git >/dev/null\ncommand -v node >/dev/null\ncommand -v python3 >/dev/null\npython3 -m pip install --disable-pip-version-check -q -r scripts/requirements.txt\n"
 }

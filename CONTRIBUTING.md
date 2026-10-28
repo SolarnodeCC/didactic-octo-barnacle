@@ -6,4 +6,4 @@
 - Keep credentials out of git. Use Cursor environment secrets or GitHub Actions secrets.
 - The license is MIT. Keep `LICENSE` and the License section of `README.md` in agreement.
 - When you add an application, extend the `install` command in `.cursor/environment.json` and the `setup-worktree` commands in `.cursor/worktrees.json`.
-- Run `python3 scripts/check-config.py` before opening a pull request. CI runs the same check.
+- Run the `install` command from `.cursor/environment.json`, then `python3 scripts/check-config.py`, before opening a pull request. CI runs the same check.
