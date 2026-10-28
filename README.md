@@ -19,7 +19,7 @@ Scientific Research → Problem Discovery → Market Analysis → Competitive An
 | Topic | KT document |
 |---|---|
 | Problem, vision, target industries | [Overview](docs/kt/overview.md) |
-| Architecture and technology stack | [Architecture](docs/kt/architecture/README.md) |
+| Architecture, data model, orchestration, security | [Architecture](docs/kt/architecture/README.md) |
 | Academic data sources | [Data sources](docs/kt/data-sources/README.md) |
 | Multi-agent framework | [Agents](docs/kt/agents/README.md) |
 | Opportunity scoring | [Scoring](docs/kt/scoring.md) |
@@ -28,6 +28,7 @@ Scientific Research → Problem Discovery → Market Analysis → Competitive An
 | Test strategy | [Test strategy](docs/kt/test/README.md) |
 | Checks, CI, secrets | [Operations](docs/kt/operations.md) |
 | Decisions | [ADRs](docs/kt/decisions/README.md) |
+| Open questions | [Open questions](docs/kt/open-questions.md) |
 
 ## Technology stack
 

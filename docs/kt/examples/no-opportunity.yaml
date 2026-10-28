@@ -1,0 +1,18 @@
+# A publication that yields no opportunity. The publication and IDs are
+# illustrative and do not refer to a real record. Golden sets include entries
+# like this one (REQ-TEST-005).
+Publication:
+  Id: pub-example-0002
+  Title: A tighter bound for a combinatorial identity
+  Source: arxiv
+  SourceId: "0000.00000v1"
+  PublicationDate: "2026-09-20"
+  InputMode: abstract
+Triage:
+  Accepted: true
+  TriageScore: 0.31
+Extraction:
+  Candidates: []
+  Confidence: 0.8
+  Notes: The result is a theoretical proof with no stated application or user problem.
+Opportunity: null

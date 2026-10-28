@@ -3,11 +3,12 @@ title: Operations
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-10-28
+related: [REQ-NFR-001, REQ-NFR-005, REQ-NFR-008]
 ---
 
 # Operations
 
-The repository is specification-only. There is no deployed service, dev server, or application package yet.
+The repository is specification-only. There is no deployed service, dev server, or application package yet. Sections marked *planned* describe how operations will work once code exists; they follow ADR 0004, which is still proposed.
 
 ## Checks
 
@@ -25,9 +26,55 @@ python3 -m pip install -r scripts/requirements.txt
 
 CI is defined in `.github/workflows/config.yml` and runs on every pull request and on pushes to `main`.
 
+## Environments (planned)
+
+| Environment | Purpose | Deployed from | Data |
+|---|---|---|---|
+| local | Development and tests | a developer's machine or a Cloud Agent | local bindings and fixtures |
+| preview | Check a change before merge | a pull request branch, on request | a small fixed corpus |
+| production | The running platform | `main`, after CI passes | full ingestion scope |
+
+Each environment has its own D1 database, R2 bucket, Vectorize index, Queues, AI Gateway, budget (REQ-NFR-005), and Cloudflare API token.
+
+## Deployment (planned)
+
+A GitHub Actions job deploys with Wrangler after a merge to `main`. Database migrations run before the Worker that needs them. A rollback redeploys the previous version; migrations are written so the previous version still works with the new schema.
+
+## Schedules (planned)
+
+| Job | Schedule | Requirement |
+|---|---|---|
+| OpenAlex ingestion | daily | REQ-DATA-009 |
+| arXiv ingestion | daily, after the arXiv announcement | REQ-DATA-009 |
+| Retraction check | weekly | REQ-DATA-008 |
+| Nightly evals | nightly | REQ-TEST-004 |
+
+## Monitoring (planned)
+
+- Every ingestion and pipeline run writes a run report with counts and failures (REQ-NFR-008).
+- A failed scheduled run, a run that exceeds its time window, or a budget stop raises an alert.
+- AI Gateway shows tokens, cost, and latency per agent (REQ-NFR-003).
+
+## Runbooks (planned)
+
+| Situation | First steps |
+|---|---|
+| A source rate-limits or is down | Check the run report; the next run picks up failed items. Lower the request rate if limits changed. |
+| A model provider is down | Pipeline steps retry and then fail; rerun failed candidates when the provider recovers, or switch the model in configuration. |
+| The daily budget is reached | Check cost per opportunity in AI Gateway before raising the budget. |
+| Bad output reached the dashboard | Hide the opportunity, add the case to the golden set, and fix the prompt through a pull request with evals. |
+
+## Backup and recovery (planned)
+
+D1 Time Travel restores the database to an earlier point. R2 objects can be rebuilt from the sources. Vectors can be rebuilt from stored publications (REQ-PROC-001).
+
 ## Secrets
 
-Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environment Secrets tab or in GitHub Actions secrets. Never commit them. When a secret is introduced, add its name and purpose to this document, not its value.
+Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environment Secrets tab or in GitHub Actions secrets. Never commit them. When a secret is introduced, add its name and purpose to the table below, not its value.
+
+| Secret name | Purpose | Stored in | Environments |
+|---|---|---|---|
+| none yet | | | |
 
 ## Branches
 
