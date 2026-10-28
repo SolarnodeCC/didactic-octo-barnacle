@@ -21,7 +21,7 @@ Cursor and Claude Code can do the same work. Pick the tier by the task, not by t
 |---|---|---|
 | Cost | Claude Code Haiku (effort low), or Cursor Composer 2.5 selected explicitly | Small changes, documentation, configuration, explanations, and simple tasks. Avoid Cursor Auto when you want to control the Claude pool, because Auto can route to Claude without showing it. |
 | Balance | Claude Code Sonnet (effort medium), or Cursor Composer Auto | New features, refactors, multi-file changes, and medium-sized development tasks. |
-| Intelligence | Claude Code Opus, Sonnet 5.5 (effort high), Grok 4.7, or GPT-5.6 | Architecture design, complex debugging, migrations, root-cause analysis, and strategic technical decisions. |
+| Intelligence | Claude Code Opus, Sonnet 5.5 (effort high), Grok 4.7, or GPT-5.6 Sol | Architecture design, complex debugging, migrations, root-cause analysis, and strategic technical decisions. |
 
 - `.claude/settings.json` sets Claude Code to the Balance tier. Switch per session with `/model` and `/effort`, for example `/model haiku` with `/effort low`, or `/model opus`.
 - Claude Pro limits are shared with claude.ai chat. Cursor's Other Models pool is the fallback for Claude models when they run out.
