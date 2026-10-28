@@ -126,7 +126,7 @@ Opportunity Score:
 
 ---
 
-# Architecture
+## Architecture
 
 ```text
           ┌──────────────────────┐
@@ -164,7 +164,8 @@ Opportunity Score:
           └──────────────────────┘
 ```
 
-# Repository structuur
+## Repository Structure
+
 ```text
 ├── apps
 │   ├── dashboard
@@ -183,16 +184,17 @@ Opportunity Score:
 └── infrastructure
     └── cloudflare
 ```
+
 ---
 
-# Technology Stack
+## Technology Stack
 
-## Development
+### Development
 - Cursor
 - GitHub
 - GitHub Actions
 
-## Cloud Platform
+### Cloud Platform
 - Cloudflare Workers
 - Cloudflare Workflows
 - Cloudflare Queues
@@ -201,24 +203,24 @@ Opportunity Score:
 - Cloudflare Vectorize
 - Cloudflare AI Gateway
 
-## AI & Agents
+### AI & Agents
 - LangGraph
 - OpenAI
 - Anthropic
 - CrewAI (optional)
 
-## Frontend
+### Frontend
 - Next.js
 - Cloudflare Pages
 - TailwindCSS
 
 ---
 
-# Data Sources
+## Data Sources
 
-## Academic Sources
+### Academic Sources
 
-### OpenAlex
+#### OpenAlex
 
 Used for:
 - publications
@@ -226,14 +228,14 @@ Used for:
 - institutions
 - citations
 
-### ArXiv
+#### arXiv
 
 Used for:
 - Artificial Intelligence
 - Software Engineering
 - Computer Science
 
-### Semantic Scholar
+#### Semantic Scholar
 
 Used for:
 - paper metadata
@@ -242,16 +244,16 @@ Used for:
 
 ---
 
-# Multi-Agent Framework
+## Multi-Agent Framework
 
-## Research Analyst Agent
+### Research Analyst Agent
 
 Responsible for:
 - paper understanding
 - novelty analysis
 - trend discovery
 
-### Output
+#### Output
 
 ```yaml
 Novelty:
@@ -262,7 +264,7 @@ Confidence:
 
 ---
 
-## Problem Discovery Agent
+### Problem Discovery Agent
 
 Responsible for:
 
@@ -270,7 +272,7 @@ Responsible for:
 - target audience discovery
 - business relevance
 
-### Output
+#### Output
 
 ```yaml
 Problem:
@@ -280,14 +282,14 @@ PainLevel:
 
 ---
 
-## Market Analysis Agent
+### Market Analysis Agent
 
 Responsible for:
 - market sizing
 - industry analysis
 - growth estimation
 
-### Output
+#### Output
 
 ```yaml
 TAM:
@@ -297,14 +299,14 @@ GrowthRate:
 
 ---
 
-## Competition Agent
+### Competition Agent
 
 Responsible for:
 - competitor discovery
 - differentiation analysis
 - market saturation scoring
 
-### Output
+#### Output
 
 ```yaml
 Competitors:
@@ -314,7 +316,7 @@ Differentiation:
 
 ---
 
-## Startup Generator Agent
+### Startup Generator Agent
 
 Responsible for:
 
@@ -323,7 +325,7 @@ Responsible for:
 - AI opportunities
 - enterprise products
 
-### Output
+#### Output
 
 ```yaml
 StartupName:
@@ -334,7 +336,7 @@ USP:
 
 ---
 
-## Relevance Agent
+### Relevance Agent
 
 Responsible for:
 - public sector fit
@@ -342,17 +344,17 @@ Responsible for:
 - healthcare fit
 - implementation feasibility
 
-### Output
+#### Output
 
 ```yaml
-CapgeminiScore:
+StrategicRelevanceScore:
 IndustryFit:
 ImplementationEffort:
 ```
 
 ---
 
-# Opportunity Scoring
+## Opportunity Scoring
 
 Opportunity score consists of:
 
@@ -370,31 +372,31 @@ Final score:
 0 - 39   Low
 40 - 69  Medium
 70 - 89  High
-90 -100  Exceptional
+90 - 100 Exceptional
 ```
 
 ---
 
-# MVP Roadmap
+## MVP Roadmap
 
-## Phase 1
+### Phase 1
 
 Research ingestion
 
-### Deliverables
+#### Deliverables
 
 - OpenAlex integration
-- ArXiv integration
+- arXiv integration
 - PDF storage
 - Metadata extraction
 
 ---
 
-## Phase 2
+### Phase 2
 
 Research understanding
 
-### Deliverables
+#### Deliverables
 
 - Embeddings
 - Vector database
@@ -403,11 +405,11 @@ Research understanding
 
 ---
 
-## Phase 3
+### Phase 3
 
 AI opportunity generation
 
-### Deliverables
+#### Deliverables
 
 - Startup Generator
 - Market Analyzer
@@ -415,11 +417,11 @@ AI opportunity generation
 
 ---
 
-## Phase 4
+### Phase 4
 
 Business intelligence
 
-### Deliverables
+#### Deliverables
 
 - Scoring engine
 - Dashboard
@@ -428,7 +430,7 @@ Business intelligence
 
 ---
 
-# Future Vision
+## Future Vision
 
 The long-term objective is to create an autonomous platform that continuously answers:
 
@@ -436,13 +438,13 @@ The long-term objective is to create an autonomous platform that continuously an
 
 ---
 
-# License
+## License
 
 MIT License
 
 ---
 
-# Contributors
+## Contributors
 
 Built with:
 
@@ -450,6 +452,7 @@ Built with:
 - GitHub
 - Cloudflare
 - OpenAI
+- Anthropic
 - LangGraph
 
 Contributions are welcome.
