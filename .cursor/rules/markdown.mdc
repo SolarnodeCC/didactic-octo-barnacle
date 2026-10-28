@@ -1,9 +1,0 @@
----
-description: Defaults for Markdown files
-globs: "**/*.md"
-alwaysApply: false
----
-
-- Keep `README.md` as the product source of truth. Other Markdown files may add instructions, and they must not contradict it.
-- Use a fenced code block with a language tag for commands, JSON, YAML, and diagrams.
-- Do not put secrets, tokens, or local machine paths in Markdown.

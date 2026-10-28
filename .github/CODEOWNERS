@@ -1,2 +1,5 @@
 .cursor/** @SolarnodeCC
 .github/** @SolarnodeCC
+/AGENTS.md @SolarnodeCC
+/CLAUDE.md @SolarnodeCC
+.claude/** @SolarnodeCC
