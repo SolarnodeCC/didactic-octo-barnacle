@@ -13,6 +13,20 @@ The intended stack is Cloudflare Workers, Workflows, Queues, D1, R2, Vectorize, 
 
 Do not invent credentials, commit secrets, or add a second license. Open a pull request instead of committing to `main`.
 
+## Model tiers
+
+Cursor and Claude Code can do the same work. Pick the tier by the task, not by the tool. Start at Balance and step up only when the task needs it.
+
+| Tier | Model | Use for |
+|---|---|---|
+| Cost | Claude Code Haiku (effort low), or Cursor Composer 2.5 selected explicitly | Small changes, documentation, configuration, explanations, and simple tasks. Avoid Cursor Auto when you want to control the Claude pool, because Auto can route to Claude without showing it. |
+| Balance | Claude Code Sonnet (effort medium), or Cursor Composer Auto | New features, refactors, multi-file changes, and medium-sized development tasks. |
+| Intelligence | Claude Code Opus, Sonnet 5.5 (effort high), Grok 4.7, or GPT-5.6 | Architecture design, complex debugging, migrations, root-cause analysis, and strategic technical decisions. |
+
+- `.claude/settings.json` sets Claude Code to the Balance tier. Switch per session with `/model` and `/effort`, for example `/model haiku` with `/effort low`, or `/model opus`.
+- Claude Pro limits are shared with claude.ai chat. Cursor's Other Models pool is the fallback for Claude models when they run out.
+- Keep Cursor on-demand usage and Claude usage credits off unless you turn them on deliberately.
+
 ## Cursor Cloud specific instructions
 
 - The Cloud Agent base is Cursor's default image. There is no Dockerfile and no `start` command, because nothing needs to stay running.
