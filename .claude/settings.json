@@ -5,7 +5,7 @@
       "Read(.env.*)",
       "Read(!.env.example)",
       "Read(*.pem)",
-      "Read(/secrets/**)"
+      "Read(secrets/**)"
     ]
   }
 }

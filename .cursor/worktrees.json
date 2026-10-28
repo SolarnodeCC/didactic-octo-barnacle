@@ -1,6 +1,10 @@
 {
   "setup-worktree": [
     "test -s README.md",
-    "test -s LICENSE"
+    "test -s LICENSE",
+    "git rev-parse --is-inside-work-tree >/dev/null",
+    "command -v git >/dev/null",
+    "command -v node >/dev/null",
+    "command -v python3 >/dev/null"
   ]
 }

@@ -191,6 +191,7 @@ Opportunity Score:
 
 ### Development
 - Cursor
+- Claude Code
 - GitHub
 - GitHub Actions
 
@@ -449,6 +450,7 @@ MIT License
 Built with:
 
 - Cursor
+- Claude Code
 - GitHub
 - Cloudflare
 - OpenAI
