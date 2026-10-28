@@ -1,0 +1,17 @@
+# Research finding: context switching causes significant productivity loss
+# among knowledge workers. This is the platform output for that finding.
+Problem: Knowledge workers lose focus when switching tasks.
+TargetMarket: Enterprise organizations
+ExistingSolutions:
+  - Todoist
+  - Motion
+  - Asana
+MarketGap: >-
+  No solution dynamically optimizes based on energy level,
+  meetings and productivity patterns.
+GeneratedStartup: AI Focus Planner
+BusinessModel:
+  Type: SaaS
+  Pricing: "€15/user/month"
+ImplementationComplexity: Medium
+OpportunityScore: 87
