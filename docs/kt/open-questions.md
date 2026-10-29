@@ -32,7 +32,8 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-010 | Who are the users, and is the MVP multi-tenant? | One internal team behind Cloudflare Access; organization profiles later (REQ-DASH-005) | phase 4 |
 | OQ-011 | Which default currency and geography do market figures use? | EUR and the EU, with global figures allowed when stated | phase 3 |
 | OQ-012 | What is the ingestion scope: OpenAlex filters, arXiv categories, backfill window, daily volume? | arXiv categories in [arXiv](data-sources/arxiv.md); OpenAlex works of the last 30 days filtered by topics that match the target industries; measure the daily volume in phase 1 | phase 1 |
-| OQ-013 | What is the daily model budget? | Set after measuring cost per opportunity on the golden set in phase 3; a low fixed budget before that | phase 2 |
+| OQ-013 | What provisional daily model budget applies before calibration? | A low fixed daily budget per environment, enough for triage and extraction on the configured daily volume (REQ-NFR-005) | phase 2 |
+| OQ-021 | What calibrated daily model budget applies in production? | Measure cost per opportunity on the phase 3 golden set; lock the calibrated budget before scoring goes live | phase 4 |
 | OQ-016 | Build layer by layer, or a thin end-to-end slice first? | One publication through every layer with stubbed agents by the end of phase 2, so the value of the output can be judged early | phase 1 |
 | OQ-017 | When do organization profiles and feedback come? | After the MVP (REQ-DASH-004, REQ-DASH-005) | later |
 

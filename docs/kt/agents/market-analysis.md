@@ -27,7 +27,7 @@ Requirement: REQ-AGENT-003. Feeds the Market Potential category (see [scoring](.
 ```yaml
 TAM: MarketFigure                           # evidence required when Basis is sourced
 SAM: MarketFigure                           # evidence required when Basis is sourced
-GrowthRate:
+GrowthRate:                                 # evidence required when Basis is sourced
   CagrPercent: number -50..100
   Period: string                            # for example "2026-2031"
   Basis: enum [sourced, estimated]

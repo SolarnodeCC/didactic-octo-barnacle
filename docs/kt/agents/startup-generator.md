@@ -12,20 +12,20 @@ Requirement: REQ-AGENT-005. Covers the Startup Generation and Business Case Crea
 
 ## Responsible for
 
-- SaaS, platform, AI, and enterprise product concepts
+- SaaS, AI, digital-service, and enterprise product concepts
 - business model and pricing
 - a short business case and the next steps
 
 ## Inputs
 
-- Problem Discovery, Market Analysis, and Competition outputs.
+- Problem Discovery, Market Analysis, Competition, and Relevance outputs.
 - Research Analyst output: technologies and maturity.
 
 ## Output contract
 
 ```yaml
 StartupName: string(max 40)                 # a working title, not checked for trademarks
-OpportunityType: enum [saas, platform, ai-solution, enterprise-software, digital-service]
+OpportunityType: enum [saas, ai-solution, enterprise-software, digital-service]
 ValueProposition: string(max 280)
 TargetCustomer: string(max 120)             # consistent with Problem Discovery Customer
 BusinessModel: enum [subscription, usage-based, license, services, marketplace]
@@ -47,7 +47,9 @@ Notes: string(max 400)?
 ## Rules
 
 - NextSteps are concrete actions a team can start this quarter, for example "interview five HR leads about focus time".
+- Relevance `Constraints` and `ImplementationEffort` must shape `KeyRisks` and `NextSteps` (for example consent, regulation, or specialist skills).
 - The concept stays within the research finding; features that the publication does not support are listed as assumptions.
+- `OpportunityType` values match the types in the [overview](../overview.md) goal.
 
 ## Evals
 

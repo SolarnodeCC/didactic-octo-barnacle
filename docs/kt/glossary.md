@@ -34,7 +34,7 @@ last_reviewed: 2026-10-28
 | Output contract | The fields an agent must return, with their types and ranges. |
 | Pain level | How severe the problem is for the customer, from 1 to 5, returned by the Problem Discovery Agent. |
 | Phase | A roadmap phase from 1 to 4, or `later`. See [roadmap](roadmap.md). |
-| Pipeline run | One run of triage, extraction, the agents, and scoring for one candidate (REQ-AGENT-007). |
+| Pipeline run | Durable work for one unit: a publication through triage and extraction, or one candidate through the agents and scoring (REQ-AGENT-007). |
 | Preprint | A paper published on arXiv before or without peer review. |
 | Publication | The canonical record of one paper, possibly found in several sources. See [data model](architecture/data-model.md). |
 | REQ-ID | A requirement identifier in the form `REQ-<AREA>-<NNN>`, for example `REQ-DATA-001`. |

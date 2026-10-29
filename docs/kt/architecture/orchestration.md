@@ -23,7 +23,7 @@ This document describes how one publication becomes zero or more scored opportun
 | Business Case Creation | Startup Generator (BusinessCase) | REQ-AGENT-005 |
 | Opportunity Scoring | Relevance, then the scoring engine | REQ-AGENT-006, REQ-SCORE-001 |
 
-In the running pipeline, extraction comes first: it turns a publication into candidates, and the agents analyze each candidate.
+In the running pipeline, extraction comes first: it turns a publication into candidates, and the agents analyze each candidate. The extraction output contract is in [opportunity extraction](../agents/opportunity-extraction.md).
 
 ## Pipeline
 
@@ -41,7 +41,7 @@ publication
               scoring engine (plain code)           REQ-SCORE-001
 ```
 
-Market Analysis, Competition, and Relevance depend only on the Research Analyst and Problem Discovery outputs, so they run in parallel. The Startup Generator waits for all three.
+Market Analysis, Competition, and Relevance depend only on the Research Analyst and Problem Discovery outputs, so they run in parallel. The Startup Generator waits for Market Analysis, Competition, and Relevance because it uses all three (constraints and effort from Relevance shape NextSteps and KeyRisks).
 
 ## State and durability
 

@@ -77,10 +77,10 @@ Generates a startup concept and a short business case for an opportunity.
 - Priority: must
 - Status: planned
 - Source: README Multi-Agent Framework, roadmap phase 3 (Startup Generator), and Core Workflow (Business Case Creation)
-- Depends on: REQ-AGENT-002, REQ-AGENT-003, REQ-AGENT-004
+- Depends on: REQ-AGENT-002, REQ-AGENT-003, REQ-AGENT-004, REQ-AGENT-006
 - Acceptance criteria:
   1. The output matches the contract, including StartupName, BusinessModel, Pricing, USP, NextSteps, and BusinessCase.
-  2. NextSteps holds three to five concrete actions.
+  2. NextSteps holds three to five concrete actions and reflects Relevance constraints and effort when present.
   3. The agent meets its eval threshold on the golden set.
 - Verification: contract test and eval
 

@@ -1,6 +1,7 @@
 # A publication that yields no opportunity. The publication and IDs are
-# illustrative and do not refer to a real record. Golden sets include entries
-# like this one (REQ-TEST-005).
+# illustrative and do not refer to a real record. Extraction fields follow
+# docs/kt/agents/opportunity-extraction.md. Golden sets include entries like
+# this one (REQ-TEST-005).
 Publication:
   Id: pub-example-0002
   Title: A tighter bound for a combinatorial identity
