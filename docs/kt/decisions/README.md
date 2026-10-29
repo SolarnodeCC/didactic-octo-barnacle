@@ -2,7 +2,7 @@
 title: Decisions index
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-28
+last_reviewed: 2026-10-29
 ---
 
 # Architecture decision records
@@ -31,6 +31,11 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0018](0018-separate-auth-and-admin-api.md) | Separate the auth and admin API from the read API | Accepted |
 | [0019](0019-organization-key-from-the-start.md) | Carry an organization key on user-owned records from the start | Accepted |
 | [0020](0020-foundation-tooling.md) | Foundation tooling: lint, migrations, infrastructure bootstrap, accounts | Accepted |
+| [0021](0021-data-api-two-writes.md) | Data API writes are score review and opportunity status | Accepted |
+| [0022](0022-search-provider-candidates.md) | Benchmark Brave Search and Tavily for the search tool | Accepted |
+| [0023](0023-daily-model-budget-formula.md) | Calibrate the daily model budget from measured cost | Accepted |
+| [0024](0024-design-system-foundation.md) | Dashboard design system foundation | Accepted |
+| [0025](0025-export-policy-mvp.md) | MVP export policy | Accepted |
 
 ## When an ADR is needed
 

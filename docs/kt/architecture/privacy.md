@@ -1,7 +1,7 @@
 ---
 title: Privacy and data retention
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-10-29
 related: [REQ-NFR-009, REQ-NFR-015, REQ-NFR-016, REQ-ACC-008, REQ-ACC-009, REQ-ACC-011]
 ---
@@ -60,4 +60,4 @@ A scheduled job applies these periods and writes a run report (REQ-NFR-015). The
 
 ## Data subject requests
 
-Access and portability requests from users are served by an admin export of the user's name, email, role, sign-in records, and reviews. Requests from authors are handled as erasure or as a copy of the author record. The support contact receives and answers both within one month.
+Access and portability requests from users are served by an admin through `GET /admin/dsar/:userId` (ADR 0025, [api routes](api-routes.md)), which returns the user's name, email, role, sign-in records, and reviews as JSON. Requests from authors are handled as erasure (`POST /admin/authors/:id/erase`) or as a copy of the author record. The support contact receives and answers both within one month.

@@ -1,8 +1,8 @@
 ---
 title: Test strategy
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-10-28
+status: approved
+last_reviewed: 2026-10-29
 related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-TEST-005]
 ---
 
@@ -26,6 +26,7 @@ related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-TEST-005]
 
 - [Test levels](levels.md): unit, integration, contract, and end-to-end tests, and the tools for each.
 - [AI evals](ai-evals.md): golden sets, scoring of model output, thresholds, and prompt regression.
+- [Golden sets](golden-sets.md): reviewer slots (OQ-015), sizes, item format, and threshold files.
 - [Test data](test-data.md): fixtures, golden sets, and privacy rules.
 - [CI gates](ci-gates.md): which checks block a merge in each roadmap phase.
 

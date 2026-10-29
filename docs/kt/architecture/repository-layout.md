@@ -38,7 +38,7 @@ The planned layout once code exists:
 | Directory | Holds | Requirements |
 |---|---|---|
 | `apps/dashboard` | Next.js dashboard on Workers (OpenNext, ADR 0012) | REQ-DASH-001, REQ-DASH-002, REQ-DASH-003 |
-| `apps/api` | Data API (read-only plus score review), auth and admin routes, and the global-limits Durable Object (ADR 0017, ADR 0018) | REQ-API-001, REQ-API-002, REQ-API-003, REQ-API-004, REQ-API-005, REQ-ADM-001 |
+| `apps/api` | Data API (read-only plus score review and opportunity status), auth and admin routes, and the global-limits Durable Object (ADR 0017, ADR 0018, ADR 0021) | REQ-API-001, REQ-API-002, REQ-API-003, REQ-API-004, REQ-API-005, REQ-DASH-004, REQ-ADM-001 |
 | `apps/pipeline` | Collector, document processing, pipeline workflow (it composes the agents and `packages/scoring`) | REQ-DATA-001, REQ-DATA-002, REQ-DATA-004, REQ-DATA-006, REQ-AGENT-007 |
 | `agents/extraction` | Triage and opportunity extraction | REQ-PROC-005, REQ-PROC-006, REQ-PROC-004 |
 | `agents/analysis` | Research Analyst, Problem Discovery, Relevance | REQ-AGENT-001, REQ-AGENT-002, REQ-AGENT-006 |

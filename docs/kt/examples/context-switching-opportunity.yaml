@@ -23,6 +23,17 @@ Agents:
     Industry: [enterprise, government]
     Technology: [activity sensing, scheduling optimization]
     Confidence: 0.6
+    Evidence:
+      - Field: NoveltyRationale
+        Kind: publication-quote
+        Quote: Frequent switching between tasks reduced sustained focus.
+        Url: null
+        RetrievedAt: "2026-10-01T12:00:00Z"
+      - Field: RelatedPublicationIds
+        Kind: related-publication
+        Quote: null
+        Url: https://openalex.org/W0000000102
+        RetrievedAt: "2026-10-01T12:00:00Z"
   ProblemDiscovery:
     Problem: Knowledge workers lose focus and output when they switch between tasks and meetings.
     Customer:
@@ -32,6 +43,17 @@ Agents:
     PainLevel: 4
     PainRationale: Lost focus time costs measurable output, and employers already pay for productivity tools.
     Confidence: 0.6
+    Evidence:
+      - Field: Problem
+        Kind: publication-quote
+        Quote: Frequent switching between tasks reduced sustained focus.
+        Url: null
+        RetrievedAt: "2026-10-01T12:00:00Z"
+      - Field: PainRationale
+        Kind: none-found
+        Quote: null
+        Url: null
+        RetrievedAt: "2026-10-01T12:00:00Z"
   MarketAnalysis:
     TAM:
       Low: { Amount: 8000000000, Currency: EUR }
@@ -53,6 +75,12 @@ Agents:
     Assumptions:
       - Productivity software spend per knowledge worker stays stable.
     Confidence: 0.4
+    Evidence:
+      - Field: TAM
+        Kind: none-found
+        Quote: null
+        Url: null
+        RetrievedAt: "2026-10-01T12:00:00Z"
   Competition:
     Competitors:
       - { Name: Todoist, Kind: indirect, Description: Task manager, Verified: false }
@@ -63,6 +91,12 @@ Agents:
     GapStrength: 3
     Differentiation: Plans focus blocks from measured switching patterns instead of static rules.
     Confidence: 0.5
+    Evidence:
+      - Field: Competitors
+        Kind: none-found
+        Quote: null
+        Url: null
+        RetrievedAt: "2026-10-01T12:00:00Z"
   Relevance:
     IndustryFit: { government: 60, healthcare: 55, financial-services: 50, enterprise: 80 }
     FocusMatch: { government: none, healthcare: none, financial-services: none, enterprise: clear }

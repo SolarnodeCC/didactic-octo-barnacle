@@ -1,14 +1,14 @@
 ---
 title: Pipeline orchestration
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-10-28
+status: approved
+last_reviewed: 2026-10-29
 related: [REQ-AGENT-007, REQ-AGENT-009, REQ-AGENT-011, REQ-AGENT-012, REQ-AGENT-013, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-SCORE-007, REQ-ADM-002]
 ---
 
 # Pipeline orchestration
 
-This document describes how one publication becomes zero or more scored opportunities. The runtime is decided in ADR 0003 and the service mapping in ADR 0004.
+This document describes how one publication becomes zero or more scored opportunities. The runtime is decided in ADR 0003 and the service mapping in ADR 0004. Numeric defaults and queue types are in [defaults](defaults.md).
 
 ## Core workflow mapping
 
@@ -43,11 +43,34 @@ publication
 
 Market Analysis, Competition, and Relevance depend only on the Research Analyst and Problem Discovery outputs, so they run in parallel. The Startup Generator waits for Market Analysis, Competition, and Relevance because it uses all three (constraints and effort from Relevance shape NextSteps and KeyRisks).
 
+## Choreography
+
+```text
+Cron (OpenAlex / arXiv)
+  → collector Workflow (pagination, dedup, source_record)
+      → queue document.ingest (license-gated PDF) and/or publication.embed
+          → document-processing Queue consumer (optional)
+          → embedding Worker
+          → queue publication.triage
+              → Triage Worker (rules, then cheap model)
+                  → if accepted: queue publication.extract
+                      → Extraction Worker → 0..N candidates
+                          → for each candidate: queue candidate.run
+                              → one Cloudflare Workflow per candidate
+                                 (agents + scoring; see diagram above)
+```
+
+- Publication-level steps (triage, extraction) are Queue consumers in `apps/pipeline`, not the per-candidate Workflow.
+- Extraction enqueues at most `extraction.max_candidates_per_publication` `candidate.run` messages.
+- The Workflow step names match `pipeline_step.step_name` in [schema migration 0001](schema-migration-0001.md): `research_analyst`, `problem_discovery`, `market_analysis`, `competition`, `relevance`, `startup_generator`, `scoring`.
+- Idempotency key for a queue message is `message_id` in `queue_message_log`. Idempotency key for a Workflow step is `(pipeline_run_id, step_name)`.
+
 ## State and durability
 
 - Each step is a durable step: its output is stored with the run ID before the next step starts (REQ-AGENT-007). A resumed run skips completed steps.
 - Steps pass record IDs, not large payloads. Each step loads its inputs from storage.
 - The candidate is the unit of work. One failed candidate does not stop the other candidates of the same publication.
+- `pipeline_step` rows record per-step completion so resume does not invent state.
 
 ## Retries and failure
 
