@@ -56,17 +56,17 @@ Only authenticated users can use the dashboard and the API.
 Every authenticated user has exactly one role: viewer, analyst, or admin.
 
 - Phase: 4
-- Priority: should
+- Priority: must
 - Status: planned
-- Source: REQ-SCORE-007 and REQ-DASH-008. Roles are chosen on the invitation and changed by an admin (REQ-ACC-002, REQ-ACC-006)
+- Source: REQ-SCORE-007, REQ-DASH-004, REQ-DASH-008, REQ-ACC-002, REQ-ACC-006, REQ-ADM-001, REQ-ADM-002, REQ-ADM-003. Roles are chosen on the invitation and changed by an admin
 - Depends on: REQ-NFR-007
 - Acceptance criteria:
-  1. A viewer can read opportunities, scores, and explanations, and export a brief.
-  2. An analyst can do everything a viewer can and also review scores (REQ-SCORE-007).
-  3. An admin can do everything an analyst can and also open the usage and cost view (REQ-DASH-008).
-  4. The API enforces the role. A request outside the role gets a forbidden error, whatever the dashboard shows.
+  1. A viewer can read opportunities, scores, and explanations, open trends and the matrix, and export a brief (REQ-DASH-009). A viewer cannot write score reviews, opportunity status, or any admin action.
+  2. An analyst can do everything a viewer can, review scores (REQ-SCORE-007), and set opportunity status (REQ-DASH-004).
+  3. An admin can do everything an analyst can and also: invite and revoke invitations (REQ-ACC-002); change roles and deactivate users (REQ-ACC-006); open usage and cost (REQ-DASH-008); open pipeline health (REQ-DASH-012); hide, unhide, rerun, and rescore (REQ-ADM-001, REQ-ADM-002, REQ-ADM-003); choose the active score model (REQ-ADM-003); read the audit log (REQ-ACC-009); and run author erasure and user DSAR export from privacy ([privacy](../../architecture/privacy.md)).
+  4. The API enforces the role on every route. A request outside the role gets a forbidden error, whatever the dashboard shows. The role matrix is the fixture of REQ-ADM-004 and matches [api routes](../../architecture/api-routes.md).
   5. A user's role can change without a deployment.
-- Verification: integration test and end-to-end test
+- Verification: integration test and end-to-end test of the role matrix
 
 ### REQ-NFR-013: Safe rendering of model and source content
 

@@ -1,8 +1,8 @@
 ---
 title: Security and data protection
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-10-28
+status: approved
+last_reviewed: 2026-10-29
 related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-NFR-009, REQ-NFR-011, REQ-NFR-012, REQ-NFR-013, REQ-NFR-014, REQ-NFR-015, REQ-NFR-016, REQ-DATA-010, REQ-AGENT-013]
 ---
 
@@ -29,6 +29,8 @@ related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-N
 
 Accounts exist by invitation only (ADR 0011). An administrator invites an email address; the invited person opens the emailed link, creates an account, and later signs in with one-time links sent through Resend. No passwords and no third-party identity providers are used.
 
+Threat notes for the custom magic-link path (no auth library): token guessing is mitigated by 128-bit entropy and hashing; mail-scanner prefetch is mitigated by Continue (REQ-ACC-004); session fixation is mitigated by rotating the session on Continue; CSRF uses double-submit cookie plus Origin (REQ-NFR-014, [api routes](api-routes.md)). MFA and SSO are out of MVP scope and need a new ADR if required.
+
 | Control | Requirement |
 |---|---|
 | Account only from a valid invitation | REQ-ACC-001, REQ-ACC-002 |
@@ -41,7 +43,17 @@ Accounts exist by invitation only (ADR 0011). An administrator invites an email 
 | Links survive mail scanners: the token is consumed on an explicit Continue | REQ-ACC-004 |
 | Terms, privacy policy, and named processors | REQ-ACC-011 |
 
-Users have one of three roles, viewer, analyst, or admin, set on the invitation and enforced by the API (REQ-NFR-012). The data API is read-only apart from the score review; sign-in, account, and admin routes are separate and each declares its roles (ADR 0018, REQ-API-005, REQ-ADM-004). Rate limits and global limits live in a Durable Object (ADR 0017). Multi-tenancy and organization profiles are later work (REQ-DASH-005, OQ-010). User-owned records carry an organization ID from the start so that later work does not need a migration (ADR 0019, REQ-NFR-018).
+Users have one of three roles, viewer, analyst, or admin, set on the invitation and enforced by the API (REQ-NFR-012). The data API is read-only apart from score review and opportunity status (ADR 0021); sign-in, account, and admin routes are separate and each declares its roles (ADR 0018, REQ-API-005, REQ-ADM-004). Route paths and the CSRF issuance endpoint are in [api routes](api-routes.md). Rate limits and global limits live in a Durable Object (ADR 0017). Multi-tenancy and organization profiles are later work (REQ-DASH-005). User-owned records carry an organization ID from the start so that later work does not need a migration (ADR 0019, REQ-NFR-018).
+
+## Content Security Policy
+
+The dashboard sends this CSP (REQ-NFR-013, ADR 0016):
+
+```text
+default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+```
+
+`unsafe-inline` for style is allowed only while the design system (ADR 0024) has no extracted CSS nonce path; scripts never use inline. Also send `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Permissions-Policy` disabling camera, microphone, and geolocation.
 
 ## Personal data
 

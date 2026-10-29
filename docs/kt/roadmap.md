@@ -33,9 +33,9 @@ The Research Analyst, Problem Discovery, and Relevance agents are in phase 3 bec
 A phase starts when:
 
 1. The requirement files for its requirements are `approved` (see [requirements review](requirements/README.md#review)).
-2. The open questions marked for that phase in [open questions](open-questions.md) are answered or have an accepted ADR.
+2. The open questions marked for that phase in [open questions](open-questions.md) are answered or have an accepted ADR. OQ-005 is closed (ADR 0010); OQ-014 remains the legal gate for phase 2; OQ-015 remains the reviewer-naming gate for phase 3.
 3. The previous phase meets its exit criteria.
-4. Phase 2 also needs the written legal answer of OQ-014 and a measured cost per publication from phase 1 (REQ-NFR-005).
+4. Phase 2 also needs the written legal answer of OQ-014 ([review brief](legal/review-brief.md)) and a measured cost per publication from phase 1 (REQ-NFR-005).
 
 ## Exit criteria
 

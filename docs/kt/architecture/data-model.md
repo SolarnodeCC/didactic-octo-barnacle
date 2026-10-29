@@ -1,14 +1,14 @@
 ---
 title: Data model
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-10-28
+status: approved
+last_reviewed: 2026-10-29
 related: [REQ-DATA-005, REQ-DATA-007, REQ-DATA-011, REQ-SCORE-001, REQ-SCORE-007, REQ-AGENT-007, REQ-NFR-011, REQ-ADM-001]
 ---
 
 # Data model
 
-The logical records the platform stores. Table and column names are decided with the first migration, written as plain SQL (ADR 0020, REQ-NFR-020); the storage service for each record is proposed in ADR 0004.
+The logical records the platform stores. Physical table and column names for the first migration are in [schema migration 0001](schema-migration-0001.md) (ADR 0020, REQ-NFR-020). Storage services per record are decided in ADR 0004.
 
 ```mermaid
 erDiagram
@@ -46,7 +46,7 @@ erDiagram
 | Agent output | Envelope and output (see [contract conventions](../agents/contract-conventions.md)) | REQ-AGENT-007, REQ-AGENT-008 |
 | Model call | Run ID, step, agent, model, prompt version, attempt, input and output tokens, latency, cost, estimated flag, outcome; no prompt or publication text | REQ-NFR-011 |
 | Evidence | Agent output, field, kind (`publication-quote`, `related-publication`, `external-url`, `none-found`), quote, URL, retrieval date | REQ-AGENT-008 |
-| Opportunity | Exactly one candidate, status (`complete`, `incomplete`, `hidden`), hidden reason, current score | REQ-SCORE-005, REQ-ADM-001 |
+| Opportunity | Exactly one candidate, pipeline status (`complete`, `incomplete`, `hidden`), hidden reason, current score; user decision status lives in opportunity status entry | REQ-SCORE-005, REQ-ADM-001, REQ-DASH-004 |
 | Admin action | Actor, action (`hide`, `unhide`, `rerun`, `rescore`), opportunity, reason, time | REQ-ADM-001, REQ-ADM-002, REQ-ADM-003 |
 | Queue message log | Message ID, type, schema version, status, attempts, dead-letter flag | REQ-DATA-011 |
 | Score | Five category values, explanation, final score, band, score model version | REQ-SCORE-001, REQ-SCORE-004 |
