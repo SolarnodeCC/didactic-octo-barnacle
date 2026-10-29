@@ -21,6 +21,8 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-006 | How is text extracted from PDFs within Worker limits? | Evaluate a JavaScript PDF library and a Cloudflare-hosted conversion on the fixture PDFs; fall back to the abstract on failure (REQ-DATA-006) | phase 2 |
 | OQ-009 | How is the Next.js dashboard hosted? | Verify Cloudflare's current guidance; prefer the OpenNext adapter on Workers if Pages is no longer recommended for Next.js | phase 4 |
 | OQ-020 | Which model runs each agent, and which model judges evals? | Pick per agent on the golden set by quality and cost; the judge uses a different provider than the agent it grades | phase 3 |
+| OQ-022 | Who may invite, and what limits apply? | Administrators only; a cap on pending invitations; an optional allowlist of email domains (REQ-ACC-002) | phase 4 |
+| OQ-023 | Build the invitation and magic-link flow directly, or use an authentication library? | Evaluate a maintained library that supports invitation-gated magic links on Workers and D1; build directly if none fits (ADR 0007) | phase 4 |
 | OQ-018 | Toolchain: package manager, monorepo tooling, language versions, schema library, test tools | pnpm workspaces, TypeScript, Zod, Vitest with the Workers pool, Playwright; record in one ADR with the first package | phase 1 |
 
 ## Product and data
@@ -29,7 +31,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 |---|---|---|---|
 | OQ-007 | Where do market figures come from? | Start with model estimates labeled as estimates; evaluate a market data source or a web search tool in phase 3 | phase 3 |
 | OQ-008 | How are competitors found? | Connect a web search API as an agent tool, behind AI Gateway or a Worker; until then competitors are unverified | phase 3 |
-| OQ-010 | Who are the users, and is the MVP multi-tenant? | One internal team behind Cloudflare Access; organization profiles later (REQ-DASH-005) | phase 4 |
+| OQ-010 | Who are the users, and is the MVP multi-tenant? | External users by invitation only, one shared workspace (ADR 0007); organization profiles later (REQ-DASH-005) | phase 4 |
 | OQ-011 | Which default currency and geography do market figures use? | EUR and the EU, with global figures allowed when stated | phase 3 |
 | OQ-012 | What is the ingestion scope: OpenAlex filters, arXiv categories, backfill window, daily volume? | arXiv categories in [arXiv](data-sources/arxiv.md); OpenAlex works of the last 30 days filtered by topics that match the target industries; measure the daily volume in phase 1 | phase 1 |
 | OQ-013 | What provisional daily model budget applies before calibration? | A low fixed daily budget per environment, enough for triage and extraction on the configured daily volume (REQ-NFR-005) | phase 2 |

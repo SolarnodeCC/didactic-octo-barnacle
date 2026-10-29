@@ -24,7 +24,8 @@ These proposals are not decisions yet. The table above changes when the ADR is a
 | Topic | Proposal | Record |
 |---|---|---|
 | Agent runtime | LangGraph.js in TypeScript inside Cloudflare Workflows; drop CrewAI, which only exists for Python | ADR 0003 |
-| Service per layer | Mapping of each architecture layer to a Cloudflare service, with Cloudflare Access for authentication | ADR 0004 |
+| Service per layer | Mapping of each architecture layer to a Cloudflare service | ADR 0004 |
+| Authentication | Invitation-only accounts; one-time sign-in links sent through Resend; no passwords and no third-party identity providers | ADR 0007 |
 | Dashboard hosting | Choose between Cloudflare Pages and the OpenNext adapter on Workers, which Cloudflare currently recommends for Next.js; verify before the first dashboard code | OQ-009 |
 
 ## Not chosen yet

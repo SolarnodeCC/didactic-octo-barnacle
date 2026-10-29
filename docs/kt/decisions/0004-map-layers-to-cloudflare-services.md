@@ -35,7 +35,7 @@ The second option, if accepted:
 | API | Worker in `apps/api`, reading D1 |
 | Dashboard | Next.js; the hosting adapter is OQ-009 |
 | Storage | D1 is the system of record, R2 holds files, Vectorize holds vectors |
-| Cross-cutting | AI Gateway for all model and embedding calls; Workers logs for structured logs; Cloudflare Access in front of the dashboard and the API |
+| Cross-cutting | AI Gateway for all model and embedding calls; Workers logs for structured logs; authentication through invitation-only accounts (ADR 0007) |
 
 Each environment (see [operations](../operations.md)) has its own D1 database, R2 bucket, Vectorize index, Queue, and AI Gateway.
 
@@ -43,4 +43,4 @@ Each environment (see [operations](../operations.md)) has its own D1 database, R
 
 - Integration tests run Workers, Workflows, Queues, D1, R2, and Vectorize bindings locally (see [test levels](../test/levels.md)).
 - D1 has a maximum database size. Large text stays in R2 and D1 holds keys to it.
-- Cloudflare Access handles authentication, so the platform stores no passwords (REQ-NFR-007).
+- Authentication is decided in ADR 0007 (invitation-only accounts with one-time email links); the platform stores no passwords (REQ-NFR-007).

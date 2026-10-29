@@ -17,6 +17,7 @@ Every requirement has a unique ID and testable acceptance criteria. Pull request
 | SCORE | [scoring.md](scoring.md) | Opportunity scoring |
 | DASH | [dashboard.md](dashboard.md) | Dashboard, ranking, and trends |
 | API | [api.md](api.md) | Read API for the dashboard |
+| ACC | [accounts.md](accounts.md) | Invitations, sign-in links, roles, and account deletion |
 | NFR | [non-functional.md](non-functional.md) | Platform, security, and documentation constraints |
 | TEST | [testing.md](testing.md) | Test strategy obligations |
 

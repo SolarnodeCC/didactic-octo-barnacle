@@ -23,7 +23,7 @@ The `Phase` field of each requirement refers to these phases. `later` means afte
 | 1 | REQ-DATA-001, REQ-DATA-002, REQ-DATA-004, REQ-DATA-005, REQ-DATA-007, REQ-DATA-009, REQ-DATA-010, REQ-NFR-001, REQ-NFR-002, REQ-NFR-004, REQ-NFR-008, REQ-NFR-009, REQ-TEST-001, REQ-TEST-003 |
 | 2 | REQ-DATA-006, REQ-DATA-008, REQ-PROC-001, REQ-PROC-002, REQ-PROC-003, REQ-PROC-004, REQ-PROC-005, REQ-NFR-003, REQ-NFR-005, REQ-NFR-010, REQ-TEST-002 |
 | 3 | REQ-AGENT-001, REQ-AGENT-002, REQ-AGENT-003, REQ-AGENT-004, REQ-AGENT-005, REQ-AGENT-006, REQ-AGENT-007, REQ-AGENT-008, REQ-AGENT-009, REQ-NFR-006, REQ-TEST-004, REQ-TEST-005 |
-| 4 | REQ-SCORE-001, REQ-SCORE-002, REQ-SCORE-003, REQ-SCORE-004, REQ-SCORE-005, REQ-SCORE-006, REQ-API-001, REQ-API-002, REQ-API-003, REQ-DASH-001, REQ-DASH-002, REQ-DASH-003, REQ-DASH-006, REQ-NFR-007 |
+| 4 | REQ-SCORE-001, REQ-SCORE-002, REQ-SCORE-003, REQ-SCORE-004, REQ-SCORE-005, REQ-SCORE-006, REQ-API-001, REQ-API-002, REQ-API-003, REQ-DASH-001, REQ-DASH-002, REQ-DASH-003, REQ-DASH-006, REQ-NFR-007, REQ-ACC-001, REQ-ACC-002, REQ-ACC-003, REQ-ACC-004, REQ-ACC-005, REQ-ACC-006, REQ-ACC-007, REQ-ACC-008, REQ-ACC-009 |
 | later | REQ-DATA-003, REQ-DASH-004, REQ-DASH-005 |
 
 The Research Analyst, Problem Discovery, and Relevance agents are in phase 3 because the phase 3 agents need their output and the phase 4 scoring engine needs Scientific Novelty, Technical Feasibility, and Strategic Relevance. Semantic Scholar stays `later`: OpenAlex already provides citation counts, and Semantic Scholar adds citation graphs and recommendations on top.

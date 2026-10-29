@@ -17,6 +17,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0004](0004-map-layers-to-cloudflare-services.md) | Map architecture layers to Cloudflare services | Proposed |
 | [0005](0005-derive-category-scores.md) | Derive score categories from agent output | Proposed |
 | [0006](0006-evals-in-pull-requests.md) | Run live evals only for pull requests from this repository | Proposed |
+| [0007](0007-invitation-only-accounts-with-magic-links.md) | Invitation-only accounts with magic links sent through Resend | Proposed |
 
 ## When an ADR is needed
 

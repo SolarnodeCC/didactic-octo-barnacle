@@ -74,7 +74,7 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 
 | Secret name | Purpose | Stored in | Environments |
 |---|---|---|---|
-| none yet | | | |
+| `RESEND_API_KEY` | Sends invitation and sign-in emails (REQ-ACC-007) | Cloudflare Worker secret; GitHub Actions secret for deployment | preview, production |
 
 ## Branches
 

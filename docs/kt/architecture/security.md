@@ -3,7 +3,7 @@ title: Security and data protection
 owner: "@SolarnodeCC"
 status: draft
 last_reviewed: 2026-10-28
-related: [REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-NFR-009, REQ-DATA-010]
+related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-NFR-009, REQ-DATA-010]
 ---
 
 # Security and data protection
@@ -15,19 +15,32 @@ related: [REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-NFR-009, REQ-DATA-010]
 | Instructions hidden in a paper steer an agent (prompt injection) | Paper text is delimited data; agents have no write tools; output is validated against the contract; injection fixtures in tests | REQ-NFR-006 |
 | A leaked API key or Cloudflare token | Secrets only in Cursor environment secrets or GitHub Actions secrets; secret scanning with push protection; least-privilege tokens per environment | REQ-NFR-001 |
 | Model spending runs away | Daily budget and per-run cost reporting through AI Gateway | REQ-NFR-005 |
-| Unauthorized access to opportunities | Authentication in front of the dashboard and the API | REQ-NFR-007 |
+| Unauthorized access to opportunities | Invitation-only accounts and authentication in front of the dashboard and the API | REQ-NFR-007, REQ-ACC-001 |
+| Mass signup or token guessing | No public registration; rate limits; 128-bit tokens stored as hashes | REQ-ACC-002, REQ-ACC-005 |
 | Secrets exposed to untrusted code in CI | Pull request jobs run without secrets; live evals only for branches in this repository (ADR 0006) | REQ-TEST-003, REQ-TEST-004 |
 | Redistribution of copyrighted papers | License recorded per document; PDFs stored and served only when the license allows it | REQ-DATA-010 |
 | Vulnerable dependencies | Dependabot, pinned versions, and a dependency review gate in CI | see [CI gates](../test/ci-gates.md) |
 
 ## Authentication
 
-The MVP has one group of internal users. ADR 0004 proposes Cloudflare Access in front of the dashboard and the API, so no user passwords are stored. Multi-tenancy and organization profiles are later work (REQ-DASH-005, OQ-010).
+Accounts exist by invitation only (ADR 0007, proposed). An administrator invites an email address; the invited person opens the emailed link, creates an account, and later signs in with one-time links sent through Resend. No passwords and no third-party identity providers are used.
+
+| Control | Requirement |
+|---|---|
+| Account only from a valid invitation | REQ-ACC-001, REQ-ACC-002 |
+| Random tokens, stored as hashes, short expiry, single use | REQ-ACC-002, REQ-ACC-004 |
+| Same response for known and unknown email addresses | REQ-ACC-004 |
+| Rate limits on link requests and token use | REQ-ACC-005 |
+| Roles and immediate revocation | REQ-ACC-006 |
+| Verified sending domain, bounce handling, no link tracking | REQ-ACC-007 |
+| Audit log without tokens | REQ-ACC-009 |
+
+Multi-tenancy and organization profiles are later work (REQ-DASH-005, OQ-010). Records carry a user ID from the start so that later work does not need a migration.
 
 ## Personal data
 
 - **Authors**: names, ORCIDs, and affiliations come from public scholarly records. They are stored to show provenance and are not used to profile people (REQ-NFR-009).
-- **Users**: the identity from authentication and, later, their feedback (REQ-DASH-004).
+- **Users**: name and email address, sign-in records, and later their feedback (REQ-DASH-004). Users can delete their account (REQ-ACC-008). Resend processes email addresses to deliver invitations and sign-in links (ADR 0007).
 - **Model providers**: publication text and agent prompts are sent to model providers. No user data is sent. Check the provider's data retention terms before going live (OQ-014).
 
 ## Model providers
