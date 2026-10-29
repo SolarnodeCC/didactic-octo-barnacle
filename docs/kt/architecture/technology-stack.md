@@ -18,6 +18,7 @@ related: [REQ-NFR-002, REQ-NFR-003]
 | Package manager | pnpm workspaces (ADR 0007) |
 | Contract schemas | Zod in `packages/models` (ADR 0007) |
 | Tests | Vitest, `@cloudflare/vitest-plugin`, Playwright (ADR 0007) |
+| Embedding model | Workers AI `bge-base-en-v1.5` as the reference; final choice by benchmark (ADR 0009, OQ-005) |
 | PDF text extraction | unpdf in the document-processing Queue consumer (ADR 0008) |
 
 Adding a runtime service, package manifest, or infrastructure component that this table does not list requires an update to this document in the same pull request, and an ADR when it replaces a listed technology.
@@ -36,7 +37,7 @@ These proposals are not decisions yet. The table above changes when the ADR is a
 
 Each of these is chosen with the first code that needs it, in an ADR, and added to the table:
 
-- Embedding model (OQ-005).
+- The final embedding model (OQ-005), chosen by the benchmark in ADR 0009.
 
 ## Platform limits to design for
 

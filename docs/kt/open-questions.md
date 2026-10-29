@@ -17,7 +17,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-002 | Which Cloudflare service implements each layer? | ADR 0004 | phase 1 |
 | OQ-003 | How is each score category derived from agent output? | ADR 0005 | phase 4 |
 | OQ-004 | How do live evals run for pull requests without exposing secrets? | ADR 0006 | phase 3 |
-| OQ-005 | Which embedding model? | Compare a Workers AI model, a provider model, and Semantic Scholar SPECTER2 vectors on the search fixture corpus (REQ-PROC-003) | phase 2 |
+| OQ-005 | Which embedding model? | Reference model `bge-base-en-v1.5`; compare the candidates in ADR 0009 on the search fixture corpus (REQ-PROC-003) and select by benchmark | phase 2 |
 | OQ-009 | How is the Next.js dashboard hosted? | Verify Cloudflare's current guidance; prefer the OpenNext adapter on Workers if Pages is no longer recommended for Next.js | phase 4 |
 | OQ-020 | Which model runs each agent, and which model judges evals? | Pick per agent on the golden set by quality and cost; the judge uses a different provider than the agent it grades | phase 3 |
 

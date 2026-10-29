@@ -19,6 +19,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0006](0006-evals-in-pull-requests.md) | Run live evals only for pull requests from this repository | Proposed |
 | [0007](0007-toolchain.md) | Toolchain: Node 24, pnpm, TypeScript, Zod, Vitest, Playwright | Accepted |
 | [0008](0008-pdf-extraction-unpdf.md) | Extract PDF text with unpdf inside the Queue consumer | Accepted |
+| [0009](0009-embedding-model-benchmark.md) | Choose the embedding model by benchmark, starting from bge-base-en-v1.5 | Accepted |
 
 ## When an ADR is needed
 
