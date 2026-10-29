@@ -10,10 +10,10 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "pnpm -r run typecheck",
+    "typecheck": "pnpm --filter @roi/models run build && pnpm -r run typecheck",
     "build": "pnpm -r run build",
     "test": "pnpm -r run test",
-    "test:unit": "pnpm -r run test:unit",
+    "test:unit": "pnpm --filter @roi/models run build && pnpm -r run test:unit",
     "check:traceability": "python3 scripts/check-traceability.py"
   },
   "devDependencies": {

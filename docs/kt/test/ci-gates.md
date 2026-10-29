@@ -45,11 +45,13 @@ It also runs the `install` command from `.cursor/environment.json` twice to prov
 ```bash
 pnpm lint
 pnpm format:check
-pnpm typecheck
 pnpm build
+pnpm typecheck
 pnpm test:unit
 pnpm check:traceability
 ```
+
+`pnpm typecheck` builds `@roi/models` first so workspace packages can resolve its declaration files.
 
 ## Rules
 
