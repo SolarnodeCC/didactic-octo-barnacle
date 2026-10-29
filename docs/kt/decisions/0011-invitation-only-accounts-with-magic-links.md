@@ -1,14 +1,14 @@
 ---
 title: "0011: Invitation-only accounts with magic links sent through Resend"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-10-29
 related: [REQ-NFR-007, REQ-NFR-009, REQ-NFR-012, REQ-ACC-001, REQ-ACC-002, REQ-ACC-003, REQ-ACC-004]
 ---
 
 # 0011: Invitation-only accounts with magic links sent through Resend
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-10-29
 
 ## Context
@@ -25,7 +25,7 @@ Each opportunity costs model spend and the source licenses limit redistribution 
 
 ## Decision
 
-Option 3, if accepted:
+Option 3:
 
 - An administrator creates an invitation. Resend sends the invitation email with a link that holds a random token (REQ-ACC-002).
 - Opening the link verifies the email address and signs the person in. A person without an account sees the create-account screen, where they enter a name and accept the terms. Submitting it creates the user and consumes the invitation (REQ-ACC-003).

@@ -1,14 +1,14 @@
 ---
 title: "0007: A score review annotates the score and never changes it"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-10-29
 related: [REQ-SCORE-001, REQ-SCORE-003, REQ-SCORE-006, REQ-SCORE-007, REQ-API-004]
 ---
 
 # 0007: A score review annotates the score and never changes it
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-10-29
 
 ## Context
@@ -23,7 +23,7 @@ Scores come from plain code over agent output (REQ-SCORE-003), and they are chec
 
 ## Decision
 
-Option 3, if accepted. A review has a state (`confirmed` or `disputed`), a user, a date, and a reason, and applies to one score. A new score starts unreviewed. Revisit option 2 in a new ADR if calibration shows that analysts disagree systematically in one category.
+Option 3. A review has a state (`confirmed` or `disputed`), a user, a date, and a reason, and applies to one score. A new score starts unreviewed. Revisit option 2 in a new ADR if calibration shows that analysts disagree systematically in one category.
 
 ## Consequences
 

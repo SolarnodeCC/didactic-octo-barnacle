@@ -27,7 +27,7 @@ related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-N
 
 ## Authentication
 
-Accounts exist by invitation only (ADR 0011, proposed). An administrator invites an email address; the invited person opens the emailed link, creates an account, and later signs in with one-time links sent through Resend. No passwords and no third-party identity providers are used.
+Accounts exist by invitation only (ADR 0011). An administrator invites an email address; the invited person opens the emailed link, creates an account, and later signs in with one-time links sent through Resend. No passwords and no third-party identity providers are used.
 
 | Control | Requirement |
 |---|---|

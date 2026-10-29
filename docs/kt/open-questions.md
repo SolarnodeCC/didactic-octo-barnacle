@@ -13,13 +13,13 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
-| OQ-005 | Which embedding model? | Reference model `bge-base-en-v1.5`; compare the candidates in ADR 0010 on the search fixture corpus (REQ-PROC-003) and select by benchmark | phase 2 |
+| OQ-005 | Which embedding model? | Build against `bge-base-en-v1.5`; run the ADR 0010 benchmark on the fixture corpus at the start of phase 2, require recall at 10 of at least 0.8, and record the result in a superseding ADR | start of phase 2 |
 
 ## Product and data
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
-| OQ-021 | What calibrated daily model budget applies in production? | Measure cost per opportunity on the phase 3 golden set; lock the calibrated budget before scoring goes live | phase 4 |
+| OQ-021 | What calibrated daily model budget applies in production? | Measure cost per complete opportunity on the phase 3 golden set; daily budget = expected daily volume × that cost × 1.25, locked before scoring goes live and reviewed monthly | phase 4 |
 | OQ-034 | Who is the named owner per role once the team is staffed? | The MVP has one owner, `@SolarnodeCC`, for all areas; split the owner roles of the [KT README](README.md#ownership) and `.github/CODEOWNERS` when more people join | before launch |
 | OQ-017 | When do organization profiles and organization-wide feedback come? | After the MVP (REQ-DASH-005) | later |
 
