@@ -8,7 +8,7 @@ related: [REQ-NFR-001, REQ-NFR-005, REQ-NFR-008, REQ-NFR-015, REQ-NFR-017, REQ-A
 
 # Operations
 
-The repository holds the KT documents and the phase 1 foundation toolchain (`packages/models`, pnpm workspace, lint, and CI). Runtime Workers and deployment are still planned; sections marked *planned* describe how they will work once those packages exist (ADR 0004, ADR 0020).
+The repository holds the KT documents, the phase 1 foundation toolchain (`packages/models`, pnpm workspace, lint, and CI), and Cloudflare infrastructure scaffolding (`infrastructure/cloudflare`: Wrangler config, D1 migrations, bootstrap planner). Runtime collector Workers and live deploy are still planned; sections marked *planned* describe how they will work once those packages exist (ADR 0004, ADR 0020).
 
 ## Checks
 
@@ -44,7 +44,7 @@ CI is defined in `.github/workflows/config.yml` and `.github/workflows/ci.yml` a
 | staging | Launch checklist, load test, restore drill, email checks | `main`, before production | a smaller ingestion scope, production-like volume |
 | production | The running platform | `main`, after CI passes | full ingestion scope |
 
-A bootstrap script in `infrastructure/cloudflare` creates the resources of an environment when they are missing and reports drift; running it twice changes nothing (REQ-NFR-020). Each environment has its own D1 database, R2 bucket, Vectorize index, Queues with dead-letter queues, Durable Object namespace, AI Gateway, budget (REQ-NFR-005), and Cloudflare API token. A staging environment is a production-like copy: its own D1 database, R2 bucket, Vectorize index, Queues, Durable Object namespace, AI Gateway, budget, and the production Resend sending domain, fed by a smaller ingestion scope. It is deployed from `main` before production and is where the load test, the restore drill, and the email checks of the launch checklist run. Preview stays for pull requests.
+The bootstrap planner in `infrastructure/cloudflare` (`pnpm --filter @roi/cloudflare-infra bootstrap -- --env <name>`) lists the D1, R2, Queues with dead-letter queues, Vectorize, Durable Object namespace, and AI Gateway for an environment and reports drift (REQ-NFR-020). `--apply` creates missing resources when `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are set; running it twice creates nothing. Each environment has its own resources, budget (REQ-NFR-005), and Cloudflare API token. A staging environment is a production-like copy: its own D1 database, R2 bucket, Vectorize index, Queues, Durable Object namespace, AI Gateway, budget, and the production Resend sending domain, fed by a smaller ingestion scope. It is deployed from `main` before production and is where the load test, the restore drill, and the email checks of the launch checklist run. Preview stays for pull requests. Wrangler configuration and numbered SQL migrations live under `infrastructure/cloudflare`.
 
 ## Deployment (planned)
 

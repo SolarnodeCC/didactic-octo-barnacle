@@ -76,7 +76,7 @@ Database changes and environment resources are created by versioned, repeatable 
 
 - Phase: 1
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: Readiness assessment; ADR 0020
 - Depends on: REQ-NFR-002
 - Acceptance criteria:

@@ -1,13 +1,13 @@
 # Research Opportunity Intelligence Platform
 
-This repository specifies a platform that turns scientific publications into scored software opportunities. The knowledge transfer (KT) documents in `docs/kt/` are the product source of truth; `README.md` is a summary that links to them (see `docs/kt/decisions/0002-kt-documents-are-source-of-truth.md`). The checked-in tree is that specification, the MIT `LICENSE`, and the phase 1 foundation (`packages/models` and the pnpm workspace). The apps, agents, remaining packages, and Cloudflare infrastructure described in the KT documents are not implemented yet.
+This repository specifies a platform that turns scientific publications into scored software opportunities. The knowledge transfer (KT) documents in `docs/kt/` are the product source of truth; `README.md` is a summary that links to them (see `docs/kt/decisions/0002-kt-documents-are-source-of-truth.md`). The checked-in tree is that specification, the MIT `LICENSE`, the phase 1 foundation (`packages/models` and the pnpm workspace), and Cloudflare infrastructure scaffolding (`infrastructure/cloudflare`). The apps, agents, and remaining packages described in the KT documents are not implemented yet.
 
 Planned layout:
 
 - `apps/dashboard`, `apps/api`, and `apps/pipeline`
 - `agents/extraction`, `agents/analysis`, `agents/market`, and `agents/startup`
 - `packages/vector-store`, `packages/prompts`, `packages/scoring`, and `packages/models` (present)
-- `infrastructure/cloudflare`
+- `infrastructure/cloudflare` (present)
 
 The intended stack is Cloudflare Workers, Workflows, Queues, D1, R2, Vectorize, and AI Gateway; Next.js on Workers (OpenNext) with Tailwind CSS; and plain TypeScript agents with OpenAI or Anthropic through AI Gateway. Academic sources named in the KT documents are OpenAlex, arXiv, and Semantic Scholar.
 

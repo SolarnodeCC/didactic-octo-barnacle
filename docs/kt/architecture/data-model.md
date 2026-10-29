@@ -8,7 +8,7 @@ related: [REQ-DATA-005, REQ-DATA-007, REQ-DATA-011, REQ-SCORE-001, REQ-SCORE-007
 
 # Data model
 
-The logical records the platform stores. Zod schemas for the phase 1 ingestion records live in `packages/models` (ADR 0008). Table and column names are decided with the first migration, written as plain SQL (ADR 0020, REQ-NFR-020); the storage service for each record is proposed in ADR 0004.
+The logical records the platform stores. Zod schemas for the phase 1 ingestion records live in `packages/models` (ADR 0008). Table and column names for phase 1 are set in `infrastructure/cloudflare/migrations/0001_phase1_ingestion.sql` (snake_case in D1; PascalCase in Zod). The storage service for each record is decided in ADR 0004.
 
 ```mermaid
 erDiagram

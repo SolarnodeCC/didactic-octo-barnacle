@@ -1,0 +1,27 @@
+{
+  "name": "@roi/cloudflare-infra",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "roi-bootstrap": "./dist/bootstrap-cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "bootstrap": "node ./dist/bootstrap-cli.js",
+    "migrations:list": "node ./dist/list-migrations.js"
+  },
+  "dependencies": {
+    "@roi/models": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^11.10.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.45.3"
+  }
+}
