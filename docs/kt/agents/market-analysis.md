@@ -21,6 +21,7 @@ Requirement: REQ-AGENT-003. Feeds the Market Potential category (see [scoring](.
 - Problem Discovery output.
 - Research Analyst output: industries and technologies.
 - The configured default currency and geography ([open questions](../open-questions.md), OQ-011).
+- Results of the search tool (REQ-AGENT-013).
 
 ## Output contract
 
@@ -51,7 +52,7 @@ Basis: enum [sourced, estimated]
 
 - SAM is not larger than TAM in the same currency and geography.
 - Figures are ranges, never a single number. Without a source, `Basis` is `estimated` and confidence is at most 0.5.
-- Models have a knowledge cutoff and no market data source is connected yet (OQ-007). Until one is, most figures are estimates, and the dashboard labels them as such (REQ-DASH-001).
+- Models have a knowledge cutoff. The agent can use the search tool (ADR 0013, REQ-AGENT-013); a figure it cannot source stays `estimated`, and the dashboard labels it as such (REQ-DASH-001).
 
 ## Evals
 

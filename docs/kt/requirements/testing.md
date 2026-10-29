@@ -24,7 +24,7 @@ Every test names the requirement it verifies.
 
 ### REQ-TEST-002: Agent contract tests
 
-Every model-backed step that exists in the current phase has a contract test for its output contract. In phase 2 that is opportunity extraction (REQ-PROC-004); the six analysis agents are added in phase 3.
+Every model-backed step that exists in the current phase has a contract test for its output contract. In phase 2 that is triage (REQ-PROC-006) and opportunity extraction (REQ-PROC-004); the six analysis agents are added in phase 3.
 
 - Phase: 2
 - Priority: must
@@ -33,7 +33,7 @@ Every model-backed step that exists in the current phase has a contract test for
 - Acceptance criteria:
   1. The test fails when a field is missing, has the wrong type, or is outside its range.
   2. The test runs without calling a live model.
-  3. By the end of phase 2, opportunity extraction has a contract test. By the end of phase 3, every analysis agent does too.
+  3. By the end of phase 2, triage and opportunity extraction have contract tests. By the end of phase 3, every analysis agent does too.
 - Verification: contract test suite in CI
 
 ### REQ-TEST-003: No live external calls in unit, integration, and contract tests
@@ -73,7 +73,8 @@ Each agent and model-backed step has a reviewed golden set.
 - Status: planned
 - Source: test strategy
 - Acceptance criteria:
-  1. The golden set holds at least 20 entries per agent, covers all four target industries, and holds at least three entries that should yield no opportunity.
+  1. The golden set holds at least 20 entries per agent, covers all four target industries, and, for triage and extraction, holds at least three entries that should yield no candidate.
   2. Each entry names its reviewer; entries for an industry are reviewed by someone with knowledge of that industry.
   3. Changes to the golden set go through a pull request with a named reviewer.
+  4. The pass threshold of each golden set is written down with a tolerance before the first eval run, and changes only through a reviewed pull request.
 - Verification: code review

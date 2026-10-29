@@ -3,7 +3,7 @@ title: Data model
 owner: "@SolarnodeCC"
 status: draft
 last_reviewed: 2026-10-28
-related: [REQ-DATA-005, REQ-DATA-007, REQ-SCORE-001, REQ-SCORE-007, REQ-AGENT-007, REQ-NFR-011]
+related: [REQ-DATA-005, REQ-DATA-007, REQ-DATA-011, REQ-SCORE-001, REQ-SCORE-007, REQ-AGENT-007, REQ-NFR-011, REQ-ADM-001]
 ---
 
 # Data model
@@ -17,13 +17,16 @@ erDiagram
   AUTHOR ||--o{ AUTHORSHIP : writes
   PUBLICATION ||--o| DOCUMENT : "full text"
   PUBLICATION ||--o| EMBEDDING : "is embedded as"
+  PUBLICATION ||--o{ TRIAGE_DECISION : "triaged as"
   PUBLICATION ||--o{ CANDIDATE : yields
   CANDIDATE ||--o{ AGENT_OUTPUT : "analyzed by"
+  AGENT_OUTPUT ||--o{ EVIDENCE : cites
   PIPELINE_RUN ||--o{ AGENT_OUTPUT : produces
   CANDIDATE ||--o| OPPORTUNITY : becomes
   OPPORTUNITY ||--o{ SCORE : "scored as"
   SCORE }o--|| SCORE_MODEL : "computed with"
   SCORE ||--o{ SCORE_REVIEW : "reviewed in"
+  OPPORTUNITY ||--o{ ADMIN_ACTION : "hidden, rerun, or rescored by"
   PIPELINE_RUN ||--o{ MODEL_CALL : makes
 ```
 
@@ -38,18 +41,23 @@ erDiagram
 | Embedding | Vector ID, model name and version, created date | REQ-PROC-001, REQ-PROC-002 |
 | Ingestion run | Source, cursor, start, end, counts, failures | REQ-DATA-009, REQ-NFR-008 |
 | Triage decision | Publication, triage score, accepted or rejected, reason | REQ-PROC-005 |
-| Candidate | Publication, finding, evidence quote | REQ-PROC-004 |
+| Candidate | Exactly one publication, finding, evidence quote | REQ-PROC-004 |
 | Pipeline run | Candidate, status, start, end, cost | REQ-AGENT-007, REQ-NFR-005 |
 | Agent output | Envelope and output (see [contract conventions](../agents/contract-conventions.md)) | REQ-AGENT-007, REQ-AGENT-008 |
 | Model call | Run ID, step, agent, model, prompt version, attempt, input and output tokens, latency, cost, estimated flag, outcome; no prompt or publication text | REQ-NFR-011 |
-| Opportunity | Candidate, status (`complete`, `incomplete`, `hidden`), current score | REQ-SCORE-005 |
+| Evidence | Agent output, field, kind (`publication-quote`, `related-publication`, `external-url`, `none-found`), quote, URL, retrieval date | REQ-AGENT-008 |
+| Opportunity | Exactly one candidate, status (`complete`, `incomplete`, `hidden`), hidden reason, current score | REQ-SCORE-005, REQ-ADM-001 |
+| Admin action | Actor, action (`hide`, `unhide`, `rerun`, `rescore`), opportunity, reason, time | REQ-ADM-001, REQ-ADM-002, REQ-ADM-003 |
+| Queue message log | Message ID, type, schema version, status, attempts, dead-letter flag | REQ-DATA-011 |
 | Score | Five category values, explanation, final score, band, score model version | REQ-SCORE-001, REQ-SCORE-004 |
-| Score model | Version, weights, derivation rule version | REQ-SCORE-003 |
+| Score model | Version, weights, derivation rule version, currency rate table, active flag | REQ-SCORE-003, REQ-ADM-003 |
 | Score review | Score ID, user, date, state (`confirmed` or `disputed`), reason | REQ-SCORE-007 |
 | User | Email, name, role, status, terms version and date accepted | REQ-ACC-003, REQ-NFR-012 |
 | Invitation | Email, role, inviting user, token hash, expiry, status | REQ-ACC-002 |
 | Session and sign-in link | Token hash, user, expiry, used flag | REQ-ACC-004 |
-| Audit event | Actor, action, time; never a token | REQ-ACC-009 |
+| Audit event | Opaque actor ID, action, time; never a token or a name | REQ-ACC-009 |
+| Delivery event | Invitation or sign-in email, provider event (`delivered`, `bounced`, `complained`), time | REQ-ACC-007 |
+| Legal document version | Terms or privacy policy, version, date | REQ-ACC-011 |
 
 ## Identity and deduplication
 
@@ -58,10 +66,14 @@ erDiagram
 - arXiv versions update the same publication; the latest version number is stored.
 - A match on title and first author only is flagged for review, never merged automatically.
 
+## Cardinality
+
+One publication yields zero or more candidates. A candidate has exactly one publication and becomes at most one opportunity (ADR 0015). Related publications from semantic search are context on the Research Analyst output, not sources of the opportunity. Every record that a user writes carries a user ID; tenant keys arrive with organization profiles (REQ-DASH-005).
+
 ## History
 
 Agent outputs, scores, and score reviews are never overwritten. A rerun creates a new pipeline run, and the opportunity points to its latest complete score. This keeps old scores explainable after a prompt, model, or score model change.
 
 ## Deletion
 
-A publication is not deleted when it is retracted; it is flagged (REQ-DATA-008). Deletion is only for records ingested by mistake or on request. It removes the vector, the stored files, and the opportunities that depend only on that publication.
+A publication is not deleted when it is retracted; it is flagged (REQ-DATA-008). Deletion is only for records ingested by mistake or on request. It removes the vector, the stored files, and the candidates and opportunities of that publication. Erasure of author data is in [privacy](privacy.md) (REQ-NFR-016).

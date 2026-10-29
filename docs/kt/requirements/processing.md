@@ -78,3 +78,19 @@ Candidate opportunities are extracted from triaged publications and passed to th
   2. A publication can yield zero, one, or at most the configured number of candidates; an empty list includes a Notes reason.
   3. The extraction meets its eval threshold on the golden set, including papers that should yield no candidate.
 - Verification: contract test and eval on the golden set
+
+### REQ-PROC-006: Triage contract and scope rules
+
+Triage has a documented scope rule, a typed decision, and a golden set.
+
+- Phase: 2
+- Priority: must
+- Status: planned
+- Source: Readiness assessment (triage was the only model-backed step without a contract)
+- Depends on: REQ-PROC-005
+- Acceptance criteria:
+  1. A publication is in scope when its OpenAlex topics or arXiv categories map to a target industry in the topic map stored in configuration ([ingestion scope](../data-sources/ingestion-scope.md)).
+  2. A triage decision is stored as `Accepted` (boolean), `TriageScore` (number 0..1), and `Reason` (enum: `accepted`, `incomplete`, `retracted`, `out-of-scope`, `low-score`, `daily-limit`), plus `Model` and `PromptVersion` when a model was used.
+  3. The model part of triage follows the [contract conventions](../agents/contract-conventions.md) and has a contract test and a golden set of at least 20 entries (REQ-TEST-005).
+  4. The daily limit and the time zone for the day boundary (UTC) are configuration.
+- Verification: unit tests on scope rules, contract test, and eval on the golden set

@@ -24,7 +24,7 @@ Used for publications, authors, institutions, topics, and citations. OpenAlex is
 
 ## Ingestion
 
-- Scope: works filtered by publication date and by topics that match the target industries (OQ-012).
+- Scope: works filtered by publication date and by the topic map of the [ingestion scope](ingestion-scope.md).
 - Incremental runs filter on publication date with an overlap window (REQ-DATA-009). Check which date filters the account tier supports; filters on update date may need a paid tier.
 - Use cursor paging for large result sets.
 - For a large backfill, consider the OpenAlex data snapshot instead of the API.

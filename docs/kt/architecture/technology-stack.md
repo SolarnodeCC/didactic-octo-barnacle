@@ -3,7 +3,7 @@ title: Technology stack
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-10-28
-related: [REQ-NFR-002, REQ-NFR-003]
+related: [REQ-NFR-002, REQ-NFR-003, REQ-AGENT-013]
 ---
 
 # Technology stack
@@ -11,9 +11,9 @@ related: [REQ-NFR-002, REQ-NFR-003]
 | Area | Technology |
 |---|---|
 | Development | Cursor, Claude Code, GitHub, GitHub Actions |
-| Cloud platform | Cloudflare Workers, Workflows, Queues, D1, R2, Vectorize, AI Gateway |
-| AI and agents | LangGraph, OpenAI, Anthropic, CrewAI (optional) |
-| Frontend | Next.js on Cloudflare Pages, Tailwind CSS |
+| Cloud platform | Cloudflare Workers, Workflows, Queues, D1, R2, Vectorize, AI Gateway, Durable Objects (ADR 0017) |
+| AI and agents | Plain TypeScript agents in Workflow steps (ADR 0003); OpenAI and Anthropic through AI Gateway; a web search provider for two agents (ADR 0013, OQ-031) |
+| Frontend | Next.js on Workers through the OpenNext adapter (ADR 0012), Tailwind CSS |
 | Language and runtime | TypeScript (strict, ES modules); Node 24 LTS for tooling (ADR 0008) |
 | Package manager | pnpm workspaces (ADR 0008) |
 | Contract schemas | Zod in `packages/models` (ADR 0008) |
@@ -29,16 +29,15 @@ These proposals are not decisions yet. The table above changes when the ADR is a
 
 | Topic | Proposal | Record |
 |---|---|---|
-| Agent runtime | LangGraph.js in TypeScript inside Cloudflare Workflows; drop CrewAI, which only exists for Python | ADR 0003 |
-| Service per layer | Mapping of each architecture layer to a Cloudflare service | ADR 0004 |
-| Authentication | Invitation-only accounts; one-time sign-in links sent through Resend; no passwords and no third-party identity providers | ADR 0011 |
-| Dashboard hosting | Choose between Cloudflare Pages and the OpenNext adapter on Workers, which Cloudflare currently recommends for Next.js; verify before the first dashboard code | OQ-009 |
+| Authentication and email | Invitation-only accounts; one-time sign-in links sent through Resend; no passwords and no third-party identity providers | ADR 0011 |
 
 ## Not chosen yet
 
 Each of these is chosen with the first code that needs it, in an ADR, and added to the table:
 
 - The final embedding model (OQ-005), chosen by the benchmark in ADR 0010.
+- The web search provider (OQ-031), chosen before phase 3.
+- Lint and format tools, chosen with the first package.
 
 ## Platform limits to design for
 

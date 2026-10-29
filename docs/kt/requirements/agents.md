@@ -50,7 +50,7 @@ Estimates market size and growth for an opportunity.
 - Depends on: REQ-AGENT-002
 - Acceptance criteria:
   1. The output matches the contract, including TAM, SAM, and GrowthRate as ranges with currency, year, geography, and basis.
-  2. A figure without a source is marked as an estimate.
+  2. A figure without a source is marked as an estimate. A figure with `Basis: sourced` cites a search result as `external-url` evidence (REQ-AGENT-013).
   3. The agent meets its eval threshold on the golden set.
 - Verification: contract test and eval
 
@@ -65,7 +65,7 @@ Finds competitors and assesses the gap, saturation, and differentiation of an op
 - Depends on: REQ-AGENT-002
 - Acceptance criteria:
   1. The output matches the contract, including Competitors, Saturation, Gap, GapStrength, and Differentiation.
-  2. Each competitor states whether it was verified against an external source.
+  2. Each competitor states whether it was verified against an external source; `Verified: true` requires a search result (REQ-AGENT-013).
   3. The agent meets its eval threshold on the golden set.
 - Verification: contract test and eval
 
@@ -123,7 +123,7 @@ Agent claims can be traced to a source.
 - Status: planned
 - Source: overview principle Reliability
 - Acceptance criteria:
-  1. Every field marked "evidence required" in a contract has at least one evidence item.
+  1. Every field marked "evidence required" in a contract has at least one evidence item. An item of kind `none-found` records that a search or comparison found nothing; it satisfies the requirement only for the fields whose contract allows it.
   2. An evidence quote from the publication is checked to occur in the publication text the agent received; an output with a quote that does not occur is rejected.
   3. External sources are stored as URLs with the date they were retrieved.
 - Verification: contract test and eval
@@ -183,8 +183,25 @@ The number of model calls in flight is limited across the whole platform, so a b
 - Source: KT review of a comparable internal governance platform (cap on concurrent model calls)
 - Depends on: REQ-AGENT-007, REQ-NFR-005
 - Acceptance criteria:
-  1. A configured maximum number of concurrent model calls per provider applies across all pipeline runs and all running instances, not per Worker instance. The mechanism is chosen in OQ-023.
+  1. A configured maximum number of concurrent model calls per provider applies across all pipeline runs and all running instances, not per Worker instance. A Durable Object semaphore with lease timeouts enforces it (ADR 0017).
   2. A call above the limit waits; it is not dropped, and waiting does not count toward the attempt limit of REQ-AGENT-009.
   3. A provider rate-limit response (HTTP 429) is retried with backoff and respects a `Retry-After` header when present. It counts toward the attempt limit like other provider errors (see [orchestration](../architecture/orchestration.md)).
   4. The run report states the highest concurrency reached and the total time calls spent waiting.
 - Verification: integration test with a stubbed gateway that records concurrent calls
+
+### REQ-AGENT-013: Search tool for Market Analysis and Competition
+
+Market Analysis and Competition can search the web for sources, under bounds and as untrusted input.
+
+- Phase: 3
+- Priority: must
+- Status: planned
+- Source: ADR 0013
+- Depends on: REQ-AGENT-003, REQ-AGENT-004, REQ-NFR-006, REQ-NFR-005
+- Acceptance criteria:
+  1. Only these two agents have the tool. It returns titles, URLs, and snippets through a Worker; the model never calls the search provider directly.
+  2. A step makes at most the configured number of tool calls and then answers in the contract. Search calls are recorded as model calls and count toward the daily budget (REQ-NFR-011, REQ-NFR-005).
+  3. Tool results are delimited as untrusted data. Fixtures with injected instructions in a search result do not change the output beyond the contract (REQ-NFR-006).
+  4. A competitor is `Verified: true` only when a result supports it. A figure is `Basis: sourced` only when it cites a result as `external-url` evidence with the retrieval date.
+  5. Eval and contract tests use recorded search results and make no live search calls (REQ-TEST-003).
+- Verification: contract tests with recorded tool results and injection fixtures, and eval

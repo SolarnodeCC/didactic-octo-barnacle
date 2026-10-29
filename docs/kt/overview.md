@@ -71,15 +71,15 @@ For a single organization, that becomes: which developments will change our mark
 
 ## Success measures
 
-Targets are set at the end of phase 3, when the first golden set results are known.
+The targets below are provisional. They are fixed before phase 1 starts and are reviewed once, with data, at the end of phase 3 (OQ-032). A baseline method is agreed with the same review.
 
-| Measure | How it is measured |
-|---|---|
-| Precision | Share of High and Exceptional opportunities that reviewers judge worth exploring |
-| Explainability | Share of opportunities whose claims all have evidence or an estimate label |
-| Time saved | Reviewer time per useful opportunity, compared with manual paper review |
-| Agreement | Rank correlation between scores and reviewer ranking (REQ-SCORE-006) |
-| Cost | Model cost per complete opportunity (REQ-NFR-005) |
+| Measure | How it is measured | Provisional target |
+|---|---|---|
+| Precision | Share of High and Exceptional opportunities that reviewers judge worth exploring | at least 50 % |
+| Explainability | Share of opportunities whose claims all have evidence or an estimate label | at least 95 % |
+| Time saved | Reviewer time per useful opportunity, compared with manual review of the same number of papers, measured with three reviewers on a sample of 20 papers | at most 25 % of the manual time |
+| Agreement | Rank correlation between scores and reviewer ranking (REQ-SCORE-006) | Spearman at least 0.6, with its 95 % interval |
+| Cost | Model cost per complete opportunity (REQ-NFR-005) | at most EUR 2 until the calibrated budget (OQ-021) |
 
 ## Non-goals for the MVP
 

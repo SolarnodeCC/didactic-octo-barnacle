@@ -20,14 +20,14 @@ Requirement: REQ-AGENT-004. Feeds the Competitive Gap category (see [scoring](..
 
 - Problem Discovery output.
 - Research Analyst output: technologies.
-- Results of a competitor search tool, when one is connected (OQ-008).
+- Results of the search tool (ADR 0013, REQ-AGENT-013).
 
 ## Output contract
 
 ```yaml
 Competitors: list<Competitor> (0..10)
 Saturation: integer 1..5
-Gap: string(max 400)                        # evidence required
+Gap: string(max 400)                        # evidence required: external-url from the search tool, or none-found (REQ-AGENT-013)
 GapStrength: integer 1..5
 Differentiation: string(max 400)
 Confidence: number 0..1
@@ -55,7 +55,7 @@ Verified: boolean                           # true only when found by the search
 | 5 | Crowded market with dominant players. | No existing solution addresses the problem. |
 
 - `GapStrength` 5 is only valid when `Competitors` has no `Kind: direct` entry. A listed direct competitor means at least one existing solution addresses the problem, so `GapStrength` is at most 4.
-- Without a search tool, competitors come from model knowledge and have `Verified: false`.
+- A competitor is `Verified: true` only when a search result supports it. A competitor from model knowledge has `Verified: false`.
 - An empty competitor list needs a note that explains why none were found.
 
 ## Evals

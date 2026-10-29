@@ -55,7 +55,7 @@ An invited person opens the invitation link, is signed in, and completes an acco
   1. Opening a valid invitation link verifies the email address and starts a session that can reach only the create-account screen.
   2. The create-account screen asks for a name and the acceptance of the terms and the privacy policy, and shows the email address read-only.
   3. Submitting it creates the user with the invited role and consumes the invitation. The person then reaches the dashboard without another email.
-  4. Until the account is created, the same invitation link works again until it expires. After the account is created, the link is refused.
+  4. The invitation token is consumed when the account is created, not when the link is opened. Until then the same link works again until it expires (7 days); after the account is created, the link is refused. Opening it never grants more than the create-account screen.
   5. A person who leaves before submitting has no user record.
 - Verification: end-to-end test
 
@@ -86,7 +86,7 @@ Link requests and invitation use are rate limited.
 - Source: KT review of security
 - Acceptance criteria:
   1. Sign-in link requests are limited per email address and per IP address.
-  2. Failed or reused tokens are limited per IP address.
+  2. Failed or reused tokens are limited per IP address. The counters are kept in a Durable Object (ADR 0017), and the IP address is taken from the `CF-Connecting-IP` header.
   3. A limited request returns the generic response of REQ-ACC-004 or a rate-limit error that does not reveal whether an account exists.
 - Verification: integration test
 
@@ -129,8 +129,9 @@ A user can delete their account.
 - Source: REQ-NFR-009 and privacy law
 - Acceptance criteria:
   1. A user can delete their own account in settings. It removes the name, the email address, and the sessions.
-  2. Records that refer to the user, such as feedback (REQ-DASH-004), are anonymized or removed.
-  3. The privacy policy states what is stored, why, and for how long.
+  2. Records that refer to the user are anonymized or removed: score reviews (REQ-SCORE-007) keep the review and replace the user with a deleted-user marker, feedback (REQ-DASH-004) is removed, invitations the user sent keep no name, and audit events (REQ-ACC-009) keep an opaque actor ID with no name or email.
+  3. The last active administrator cannot delete their account (REQ-ACC-006).
+  4. The privacy policy states what is stored, why, and for how long.
 - Verification: integration test and review of the privacy policy
 
 ### REQ-ACC-009: Audit log
@@ -142,7 +143,7 @@ Security-relevant account events are recorded.
 - Status: planned
 - Source: KT review of security
 - Acceptance criteria:
-  1. Invitation created, resent, revoked, and accepted; sign-in; role change; and deactivation are recorded with the actor and the time.
+  1. Invitation created, resent, revoked, and accepted; sign-in; role change; deactivation; account deletion; and the admin operations of REQ-ADM-001 to REQ-ADM-003 are recorded with the actor and the time.
   2. The log never holds a token or a session identifier.
   3. An administrator can read the log.
 - Verification: integration test
@@ -154,7 +155,7 @@ A user manages their own profile and sessions.
 - Phase: 4
 - Priority: must
 - Status: planned
-- Source: screen specification for the signed-in experience
+- Source: [screen specification](../ux/screens.md) for the signed-in experience
 - Depends on: REQ-ACC-003, REQ-ACC-004
 - Acceptance criteria:
   1. A user can change their name; it must have 1 to 100 characters. The email address is read-only.

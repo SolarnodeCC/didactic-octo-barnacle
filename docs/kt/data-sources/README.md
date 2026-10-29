@@ -12,6 +12,7 @@ The platform uses three academic sources. CI never calls them; tests use recorde
 - [OpenAlex](openalex.md): publications, authors, institutions, topics, and citations across all fields.
 - [arXiv](arxiv.md): preprints in computer science categories.
 - [Semantic Scholar](semantic-scholar.md): paper metadata, citation graphs, summaries, and recommendations.
+- [Ingestion scope](ingestion-scope.md): the pilot categories, window, topic map, and daily limit.
 
 ## Comparison
 

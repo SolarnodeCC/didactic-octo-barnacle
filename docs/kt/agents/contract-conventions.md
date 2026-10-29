@@ -53,14 +53,19 @@ Fields marked **evidence required** in a contract need at least one evidence ite
 ```yaml
 Evidence:
   Field: string                 # the output field the evidence supports
-  Kind: enum [publication-quote, related-publication, external-url]
+  Kind: enum [publication-quote, related-publication, external-url, none-found]
   Quote: string(max 500)?       # verbatim text; required for publication-quote
   PublicationId: string?        # for publication-quote and related-publication
-  Url: string?                  # for external-url
+  Url: string?                  # for external-url; must be https
+  Note: string(max 200)?        # for none-found: what was searched or compared
   RetrievedAt: string?          # ISO 8601 date, for external-url
 ```
 
 A publication quote must occur in the text the agent received. The pipeline checks this after validation and rejects the output if it does not.
+
+A `none-found` item records that a comparison or search was done and found nothing, for example no related publications or no competitors. A contract allows it only for the fields that say so (Research Analyst `Novelty`, Competition `Gap`).
+
+Agents that do not receive publication text, such as Relevance, cite `related-publication` evidence or state their basis in `Notes`; judgment fields that no source can support are labeled as model estimates in the dashboard instead of requiring evidence (see each agent's contract).
 
 ## Confidence
 

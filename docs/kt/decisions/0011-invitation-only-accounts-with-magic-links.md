@@ -40,6 +40,7 @@ Option 3, if accepted:
 
 - REQ-NFR-007 and the security document describe invitation-based accounts instead of Cloudflare Access.
 - ADR 0004 no longer assigns authentication to Cloudflare Access.
+- Rate limits for link requests and token use are kept in a Durable Object (ADR 0017); the invitation token is consumed when the account is created (REQ-ACC-003), the sign-in token on Continue (REQ-ACC-004).
 - The data model gains users, invitations, sessions, and audit events (see [data model](../architecture/data-model.md)).
 - Resend becomes a processor of email addresses. The privacy policy names it (REQ-ACC-008).
 - Deliverability matters: the sending domain needs SPF, DKIM, and DMARC (REQ-ACC-007).

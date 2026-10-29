@@ -7,7 +7,7 @@ last_reviewed: 2026-10-28
 
 # Multi-agent framework
 
-The multi-agent engine runs on LangGraph with OpenAI or Anthropic models (ADR 0003 proposes LangGraph.js and dropping CrewAI). Each agent has one responsibility, receives fixed inputs, and returns a typed output contract. How the agents are chained is described in [orchestration](../architecture/orchestration.md).
+The multi-agent engine runs agents as plain TypeScript steps inside Cloudflare Workflows with OpenAI or Anthropic models (ADR 0003). Each agent has one responsibility, receives fixed inputs, and returns a typed output contract. How the agents are chained is described in [orchestration](../architecture/orchestration.md).
 
 - [Contract conventions](contract-conventions.md): type notation, the envelope every output carries, evidence, and failure rules that apply to all agents.
 
@@ -20,10 +20,11 @@ The multi-agent engine runs on LangGraph with OpenAI or Anthropic models (ADR 00
 | Startup Generator | [startup-generator.md](startup-generator.md) | REQ-AGENT-005 | none (concept and business case) |
 | Relevance | [relevance.md](relevance.md) | REQ-AGENT-006 | Strategic Relevance, Technical Feasibility |
 
-Opportunity extraction (REQ-PROC-004) is a model-backed step before the agents. It follows the same contract conventions; its output contract is in [opportunity-extraction.md](opportunity-extraction.md). How it sits in the pipeline is in [orchestration](../architecture/orchestration.md).
+Triage (REQ-PROC-006) and opportunity extraction (REQ-PROC-004) are model-backed steps before the agents. They follow the same contract conventions; the extraction output contract is in [opportunity-extraction.md](opportunity-extraction.md). How it sits in the pipeline is in [orchestration](../architecture/orchestration.md).
 
 | Step | Document | Requirement | Feeds score category |
 |---|---|---|---|
+| Triage | [triage.md](triage.md) | REQ-PROC-005, REQ-PROC-006 | none (admits publications) |
 | Opportunity extraction | [opportunity-extraction.md](opportunity-extraction.md) | REQ-PROC-004 | none (produces candidates) |
 
 ## Every agent document holds

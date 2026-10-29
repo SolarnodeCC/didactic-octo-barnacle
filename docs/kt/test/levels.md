@@ -11,7 +11,7 @@ related: [REQ-TEST-002, REQ-API-003, REQ-AGENT-009]
 | Level | What it covers | Proposed tool | Runs |
 |---|---|---|---|
 | Unit | Pure functions: scoring, parsing, metadata extraction, deduplication, triage rules, mapping | Vitest | every pull request |
-| Integration | Workers with their bindings: D1, R2, Queues, Vectorize, Workflows | Vitest with `@cloudflare/vitest-plugin` (local runtime) | every pull request |
+| Integration | Workers with their bindings: D1, R2, Queues, Vectorize, Workflows, Durable Objects | Vitest with `@cloudflare/vitest-plugin` (local runtime) | every pull request |
 | Contract | Agent output against its output contract; API request and response shapes (REQ-API-003) | Schema validation (for example Zod or JSON Schema) in Vitest | every pull request |
 | End-to-end | Dashboard user flows against a local API with seeded data | Playwright | every pull request from phase 4 |
 | Eval | Quality of agent output against golden sets | Eval runner (see [AI evals](ai-evals.md)) | on prompt or model changes, and nightly |
@@ -25,7 +25,7 @@ Cover every branch of deterministic logic. Scoring (REQ-SCORE-001, REQ-SCORE-002
 
 ## Integration
 
-Run Workers in the local runtime with real local bindings, not hand-written mocks of D1 or R2. External HTTP calls are served from fixtures (see [test data](test-data.md)). Check idempotency: running an ingestion twice gives the same state. Check resumption: a pipeline stopped after a step resumes without repeating it (REQ-AGENT-007).
+Run Workers in the local runtime with real local bindings, not hand-written mocks of D1 or R2. External HTTP calls are served from fixtures (see [test data](test-data.md)). Check idempotency: running an ingestion twice, or delivering a queue message twice, gives the same state (REQ-DATA-011). Check the role matrix of the auth and admin routes (REQ-ADM-004). Check resumption: a pipeline stopped after a step resumes without repeating it (REQ-AGENT-007).
 
 ## Contract
 
