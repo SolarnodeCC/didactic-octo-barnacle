@@ -60,4 +60,5 @@ States that every screen handles the same way. All messages are plain text (REQ-
 ## Labels
 
 - Estimated market figures: "Estimate". Unverified competitors: "Unverified". Scores built on estimates: "Estimate-based". Abstract-only input: "Based on the abstract".
+- Every complete opportunity shows "Evidence-backed"; one whose current score has a confirming review also shows "Validated".
 - A band is shown as text next to any color (REQ-DASH-006).

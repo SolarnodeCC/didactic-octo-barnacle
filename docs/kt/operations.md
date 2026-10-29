@@ -32,9 +32,10 @@ CI is defined in `.github/workflows/config.yml` and runs on every pull request a
 |---|---|---|---|
 | local | Development and tests | a developer's machine or a Cloud Agent | local bindings and fixtures |
 | preview | Check a change before merge | a pull request branch, on request | a small fixed corpus |
+| staging | Launch checklist, load test, restore drill, email checks | `main`, before production | a smaller ingestion scope, production-like volume |
 | production | The running platform | `main`, after CI passes | full ingestion scope |
 
-Each environment has its own D1 database, R2 bucket, Vectorize index, Queues with dead-letter queues, Durable Object namespace, AI Gateway, budget (REQ-NFR-005), and Cloudflare API token. A staging environment with production-like data volume and the production Resend sending domain is added before launch; preview stays for pull requests.
+Each environment has its own D1 database, R2 bucket, Vectorize index, Queues with dead-letter queues, Durable Object namespace, AI Gateway, budget (REQ-NFR-005), and Cloudflare API token. A staging environment is a production-like copy: its own D1 database, R2 bucket, Vectorize index, Queues, Durable Object namespace, AI Gateway, budget, and the production Resend sending domain, fed by a smaller ingestion scope. It is deployed from `main` before production and is where the load test, the restore drill, and the email checks of the launch checklist run. Preview stays for pull requests.
 
 ## Deployment (planned)
 
@@ -53,7 +54,7 @@ A GitHub Actions job deploys with Wrangler after a merge to `main`. Database mig
 ## Monitoring (planned)
 
 - Every ingestion and pipeline run writes a run report with counts and failures (REQ-NFR-008).
-- A failed scheduled run, a run that exceeds its time window, a budget stop, a dead-lettered message, or a breach of the availability target (REQ-NFR-017) raises an alert. Alerts go to the on-call contact and the engineering channel named in the launch checklist.
+- A failed scheduled run, a run that exceeds its time window, a budget stop, a dead-lettered message, or a breach of the availability target (REQ-NFR-017) raises an alert (REQ-NFR-019). An alert sends an email to the ops address and opens a GitHub issue labeled `alert`; repeats within 24 hours comment on the open issue.
 - AI Gateway shows tokens, cost, and latency per agent (REQ-NFR-003).
 
 ## Runbooks (planned)
@@ -79,6 +80,8 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 | Secret name | Purpose | Stored in | Environments |
 |---|---|---|---|
 | `RESEND_API_KEY` | Sends invitation and sign-in emails (REQ-ACC-007) | Cloudflare Worker secret; GitHub Actions secret for deployment | preview, production |
+| `ALERT_GITHUB_TOKEN` | Opens and comments on alert issues; a fine-grained token limited to issues on this repository (REQ-NFR-019) | Cloudflare Worker secret | preview, staging, production |
+| `ALERT_EMAIL_TO` | Ops address that receives alert emails (REQ-NFR-019) | Worker variable | preview, staging, production |
 | Eval provider and AI Gateway credentials (names set when the eval job is added) | Live evals (REQ-TEST-004, ADR 0006) | GitHub environment `evals`, with required reviewer approval | evals |
 
 ## Launch checklist (planned)
@@ -89,7 +92,7 @@ Production launch needs all of these:
 - Terms, privacy policy, author notice, and support contact published (REQ-ACC-011, [privacy](architecture/privacy.md)).
 - Data processing agreements signed with Cloudflare, the model providers, Resend, and the search provider.
 - Retention job running (REQ-NFR-015) and a restore drill done (REQ-NFR-017).
-- Calibrated daily budget set (OQ-021) and alerts routed to a named on-call contact.
+- Calibrated daily budget set (OQ-021) and the alert email address and GitHub issue creation tested (REQ-NFR-019).
 - At least one active admin and a tested admin recovery path (REQ-ADM-001, REQ-ADM-002).
 - Load test on seeded data meets REQ-NFR-017.
 

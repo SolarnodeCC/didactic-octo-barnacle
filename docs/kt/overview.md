@@ -15,7 +15,7 @@ Organizations depend on individual experts, consultants, research departments, a
 
 ## Goal
 
-Transform scientific research into validated software opportunities, startup concepts, and enterprise innovation initiatives. The platform automatically analyzes scientific publications and identifies opportunities of these types:
+Transform scientific research into evidence-backed software opportunities, startup concepts, and enterprise innovation initiatives. The platform automatically analyzes scientific publications and identifies opportunities of these types:
 
 - SaaS products
 - AI solutions
@@ -24,7 +24,7 @@ Transform scientific research into validated software opportunities, startup con
 
 for these target industries: government, healthcare, financial services, and enterprise (see [Target industries](#target-industries)).
 
-In this documentation, a **validated** opportunity is one whose every claim cites a verifiable source or is labeled as an estimate, whose score can be explained category by category, and which a user has reviewed. The platform prepares the evidence; people make the final call.
+In this documentation, an **evidence-backed** opportunity is one whose every claim cites a verifiable source or is labeled as an estimate, and whose score can be explained category by category. A **validated** opportunity is an evidence-backed one that an analyst has confirmed in a score review (REQ-SCORE-007). The platform prepares the evidence; people make the final call.
 
 ## Users
 

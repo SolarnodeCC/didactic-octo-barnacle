@@ -48,8 +48,8 @@ The dashboard shows how research topics and opportunities develop over time.
 - Source: README roadmap phase 4
 - Acceptance criteria:
   1. The number of opportunities per industry is shown over time.
-  2. The number of publications per research topic is shown over time, using the OpenAlex topic of each publication.
-  3. Trends can be filtered by date range.
+  2. The number of publications is shown over time for the 20 most active OpenAlex topics in the selected date range, using the OpenAlex topic of each publication; all other topics are grouped as Other.
+  3. Trends can be filtered by date range of at most 24 months.
 - Verification: end-to-end test
 
 ### REQ-DASH-006: Accessibility
@@ -107,7 +107,7 @@ Analysts can confirm or dispute a score from the opportunity detail view.
 - Acceptance criteria:
   1. The detail view shows the review state as a text label and the review history with users, dates, and reasons.
   2. An analyst or admin can confirm or dispute the current score and must enter a reason to dispute. A viewer sees no review action.
-  3. The opportunity list can be filtered by review state.
+  3. The opportunity list can be filtered by review state. An opportunity whose current score has a confirming review is labeled Validated; every complete opportunity is labeled Evidence-backed (see the [overview](../overview.md)).
   4. A disputed opportunity stays visible and keeps its position in the ranking.
 - Verification: end-to-end test
 

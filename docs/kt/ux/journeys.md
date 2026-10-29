@@ -35,4 +35,4 @@ related: [REQ-NFR-012, REQ-DASH-001, REQ-DASH-002, REQ-DASH-007, REQ-ACC-003]
 
 ## Notes
 
-- "Validated" in the [overview](../overview.md) means the platform prepared evidence and a user reviewed it. A review is optional and annotates the score (ADR 0007); the opportunity detail shows the review state, and the list can filter by it (REQ-DASH-007).
+- "Evidence-backed" and "validated" are separate labels ([overview](../overview.md)). Every complete opportunity is evidence-backed; it is validated only when its current score has a confirming review. A review is optional and annotates the score (ADR 0007); the opportunity detail shows both labels, and the list can filter by review state (REQ-DASH-007).

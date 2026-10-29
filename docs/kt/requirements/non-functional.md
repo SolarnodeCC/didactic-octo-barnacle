@@ -79,7 +79,7 @@ Every run can be followed and every failure can be found.
 - Acceptance criteria:
   1. Logs are structured and carry a run ID and, where relevant, a publication ID and opportunity ID.
   2. Each ingestion and pipeline run produces a run report with counts and failed items.
-  3. A failed scheduled run raises an alert.
+  3. A failed scheduled run raises an alert (REQ-NFR-019).
 - Verification: integration test and code review
 
 ### REQ-NFR-010: Throughput
@@ -279,3 +279,20 @@ Records that users own carry an organization ID, so several organizations can be
   3. Publications, candidates, agent outputs, opportunities, and scores are shared by all organizations and carry no organization ID.
   4. An integration test with two organizations asserts that a user of one never reads, changes, or invites into the other, on every route that touches these records.
 - Verification: integration test with two seeded organizations
+
+### REQ-NFR-019: Alert routing
+
+Alerts reach people by email and open a GitHub issue.
+
+- Phase: 1
+- Priority: must
+- Status: planned
+- Source: Readiness assessment; operations monitoring
+- Depends on: REQ-NFR-008
+- Acceptance criteria:
+  1. An alert is raised for a failed scheduled run, a run past its time window, a budget stop, a dead-lettered message (REQ-DATA-011), and a breach of the availability target (REQ-NFR-017).
+  2. Each alert sends an email to the configured ops address and opens a GitHub issue in this repository with the label `alert`, the alert type, the environment, the run ID, and a link to the run report.
+  3. A repeated alert with the same key (type, environment, source) within 24 hours adds a comment to the open issue instead of opening another issue or email.
+  4. An alert never contains publication text, prompts, user data, or secrets.
+  5. The alert credentials are secrets listed in [operations](../operations.md); the GitHub token can only create and comment on issues.
+- Verification: integration test with stubbed email and GitHub clients
