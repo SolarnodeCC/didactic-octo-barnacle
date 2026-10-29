@@ -14,6 +14,11 @@ related: [REQ-NFR-002, REQ-NFR-003]
 | Cloud platform | Cloudflare Workers, Workflows, Queues, D1, R2, Vectorize, AI Gateway |
 | AI and agents | LangGraph, OpenAI, Anthropic, CrewAI (optional) |
 | Frontend | Next.js on Cloudflare Pages, Tailwind CSS |
+| Language and runtime | TypeScript (strict, ES modules); Node 24 LTS for tooling (ADR 0007) |
+| Package manager | pnpm workspaces (ADR 0007) |
+| Contract schemas | Zod in `packages/models` (ADR 0007) |
+| Tests | Vitest, `@cloudflare/vitest-plugin`, Playwright (ADR 0007) |
+| PDF text extraction | unpdf in the document-processing Queue consumer (ADR 0008) |
 
 Adding a runtime service, package manifest, or infrastructure component that this table does not list requires an update to this document in the same pull request, and an ADR when it replaces a listed technology.
 
@@ -31,11 +36,7 @@ These proposals are not decisions yet. The table above changes when the ADR is a
 
 Each of these is chosen with the first code that needs it, in an ADR, and added to the table:
 
-- Language versions and package manager (OQ-018).
-- Schema library for contracts, for example Zod (OQ-018).
 - Embedding model (OQ-005).
-- PDF text extraction, within Worker CPU and memory limits (OQ-006).
-- Test tools: Vitest with the Cloudflare Workers pool, and Playwright, as proposed in [test levels](../test/levels.md) (OQ-018).
 
 ## Platform limits to design for
 

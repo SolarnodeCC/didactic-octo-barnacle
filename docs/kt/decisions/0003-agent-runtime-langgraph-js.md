@@ -13,7 +13,7 @@ related: [REQ-NFR-002, REQ-AGENT-007]
 
 ## Context
 
-The stack names LangGraph and, optionally, CrewAI, and requires Cloudflare Workers and Workflows (REQ-NFR-002). LangGraph exists for Python and for JavaScript (LangGraph.js). CrewAI exists only for Python. Cloudflare Workers run JavaScript and TypeScript natively; Python Workers exist but support fewer packages. The test strategy proposes Vitest with the Cloudflare Workers pool, which is TypeScript.
+The stack names LangGraph and, optionally, CrewAI, and requires Cloudflare Workers and Workflows (REQ-NFR-002). LangGraph exists for Python and for JavaScript (LangGraph.js). CrewAI exists only for Python. Cloudflare Workers run JavaScript and TypeScript natively; Python Workers exist but support fewer packages. The test strategy proposes Vitest with `@cloudflare/vitest-plugin`, which is TypeScript.
 
 The pipeline needs durable steps that resume after a failure without repeating model calls (REQ-AGENT-007).
 

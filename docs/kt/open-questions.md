@@ -18,10 +18,8 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-003 | How is each score category derived from agent output? | ADR 0005 | phase 4 |
 | OQ-004 | How do live evals run for pull requests without exposing secrets? | ADR 0006 | phase 3 |
 | OQ-005 | Which embedding model? | Compare a Workers AI model, a provider model, and Semantic Scholar SPECTER2 vectors on the search fixture corpus (REQ-PROC-003) | phase 2 |
-| OQ-006 | How is text extracted from PDFs within Worker limits? | Evaluate a JavaScript PDF library and a Cloudflare-hosted conversion on the fixture PDFs; fall back to the abstract on failure (REQ-DATA-006) | phase 2 |
 | OQ-009 | How is the Next.js dashboard hosted? | Verify Cloudflare's current guidance; prefer the OpenNext adapter on Workers if Pages is no longer recommended for Next.js | phase 4 |
 | OQ-020 | Which model runs each agent, and which model judges evals? | Pick per agent on the golden set by quality and cost; the judge uses a different provider than the agent it grades | phase 3 |
-| OQ-018 | Toolchain: package manager, monorepo tooling, language versions, schema library, test tools | pnpm workspaces, TypeScript, Zod, Vitest with the Workers pool, Playwright; record in one ADR with the first package | phase 1 |
 
 ## Product and data
 
@@ -47,4 +45,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 
 ## Answered
 
-None yet.
+| ID | Answer | Record |
+|---|---|---|
+| OQ-006 | unpdf in the document-processing Queue consumer, with size and page caps and an abstract fallback | ADR 0008 |
+| OQ-018 | Node 24, pnpm workspaces, TypeScript, Zod, Vitest with `@cloudflare/vitest-plugin`, Playwright | ADR 0007 |
