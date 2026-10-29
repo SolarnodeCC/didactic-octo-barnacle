@@ -20,7 +20,7 @@ Requirement: REQ-AGENT-003. Feeds the Market Potential category (see [scoring](.
 
 - Problem Discovery output.
 - Research Analyst output: industries and technologies.
-- The configured default currency and geography ([open questions](../open-questions.md), OQ-011).
+- The configured default currency (EUR) and geography (EU); global figures are allowed when stated.
 - Results of the search tool (REQ-AGENT-013).
 
 ## Output contract

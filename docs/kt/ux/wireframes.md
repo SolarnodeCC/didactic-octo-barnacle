@@ -51,6 +51,7 @@ Layout only. Wording, spacing, and visual design are decided with the first dash
 
 ```text
 ┌ Opportunities ───────────────────────────────────────────────────┐
+│ Search [describe a problem or technology______] [ Search ]         │
 │ Filters: Industry [All ▾] Band [All ▾] Date [from – to] Review [All ▾] │
 │ Score  Band  Title / startup          Industry   Published  Review    │
 │  71    High  AI Focus Planner         enterprise 2026-09-15 unreviewed│

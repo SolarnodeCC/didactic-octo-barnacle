@@ -16,12 +16,12 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0003](0003-agent-runtime-typescript-workflows.md) | Run agents as plain TypeScript steps inside Cloudflare Workflows | Accepted |
 | [0004](0004-map-layers-to-cloudflare-services.md) | Map architecture layers to Cloudflare services | Accepted |
 | [0005](0005-derive-category-scores.md) | Derive score categories from agent output | Accepted |
-| [0006](0006-evals-in-pull-requests.md) | Run live evals only for pull requests from this repository | Proposed |
-| [0007](0007-score-review-annotates-score.md) | A score review annotates the score and never changes it | Proposed |
+| [0006](0006-evals-in-pull-requests.md) | Run live evals only for pull requests from this repository | Accepted |
+| [0007](0007-score-review-annotates-score.md) | A score review annotates the score and never changes it | Accepted |
 | [0008](0008-toolchain.md) | Toolchain: Node 24, pnpm, TypeScript, Zod, Vitest, Playwright | Accepted |
 | [0009](0009-pdf-extraction-unpdf.md) | Extract PDF text with unpdf inside the Queue consumer | Accepted |
 | [0010](0010-embedding-model-benchmark.md) | Choose the embedding model by benchmark, starting from bge-base-en-v1.5 | Accepted |
-| [0011](0011-invitation-only-accounts-with-magic-links.md) | Invitation-only accounts with magic links sent through Resend | Proposed |
+| [0011](0011-invitation-only-accounts-with-magic-links.md) | Invitation-only accounts with magic links sent through Resend | Accepted |
 | [0012](0012-dashboard-on-workers-with-opennext.md) | Host the Next.js dashboard on Workers with the OpenNext adapter | Accepted |
 | [0013](0013-search-tool-for-market-and-competitor-evidence.md) | Give Market Analysis and Competition a web search tool | Accepted |
 | [0014](0014-abstract-first-content-policy.md) | Abstract-first content policy | Accepted |
@@ -29,6 +29,8 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0016](0016-web-output-safety-and-request-integrity.md) | Render model output as plain text and protect state-changing requests | Accepted |
 | [0017](0017-durable-objects-for-global-limits.md) | Add Durable Objects for global limits | Accepted |
 | [0018](0018-separate-auth-and-admin-api.md) | Separate the auth and admin API from the read API | Accepted |
+| [0019](0019-organization-key-from-the-start.md) | Carry an organization key on user-owned records from the start | Accepted |
+| [0020](0020-foundation-tooling.md) | Foundation tooling: lint, migrations, infrastructure bootstrap, accounts | Accepted |
 
 ## When an ADR is needed
 

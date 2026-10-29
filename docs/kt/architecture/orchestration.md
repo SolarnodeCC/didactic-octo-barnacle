@@ -74,4 +74,4 @@ A failed or incomplete candidate is rerun by an admin from the first failed step
 
 ## Human review
 
-The pipeline has no review step. Analysts review scores after scoring, in the dashboard: a review annotates the score and never changes it or triggers a rerun (REQ-SCORE-007, ADR 0007). Feedback on what happened to an opportunity comes later (REQ-DASH-004).
+The pipeline has no review step. Analysts review scores after scoring, in the dashboard: a review annotates the score and never changes it or triggers a rerun (REQ-SCORE-007, ADR 0007). What happened to an opportunity is recorded as a status, separate from the score (REQ-DASH-004).

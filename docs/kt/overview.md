@@ -9,13 +9,13 @@ last_reviewed: 2026-10-28
 
 ## Problem
 
-Innovation teams, consultants, and venture builders spend hundreds of hours manually reviewing research papers to identify commercially viable opportunities. Most promising discoveries never reach the market because there is no scalable process for translating scientific findings into validated software concepts.
+Innovation teams, consultants, and venture builders spend hundreds of hours manually reviewing research papers to identify commercially viable opportunities. Most promising discoveries never reach the market because there is no scalable process for translating scientific findings into evidence-backed software concepts.
 
 Organizations depend on individual experts, consultants, research departments, and chance discoveries to spot what new research could mean for them. That approach does not scale, and its results are hard to compare or trace back to their sources.
 
 ## Goal
 
-Transform scientific research into validated software opportunities, startup concepts, and enterprise innovation initiatives. The platform automatically analyzes scientific publications and identifies opportunities of these types:
+Transform scientific research into evidence-backed software opportunities, startup concepts, and enterprise innovation initiatives. The platform automatically analyzes scientific publications and identifies opportunities of these types:
 
 - SaaS products
 - AI solutions
@@ -24,7 +24,7 @@ Transform scientific research into validated software opportunities, startup con
 
 for these target industries: government, healthcare, financial services, and enterprise (see [Target industries](#target-industries)).
 
-In this documentation, a **validated** opportunity is one whose every claim cites a verifiable source or is labeled as an estimate, whose score can be explained category by category, and which a user has reviewed. The platform prepares the evidence; people make the final call.
+In this documentation, an **evidence-backed** opportunity is one whose every claim cites a verifiable source or is labeled as an estimate, and whose score can be explained category by category. A **validated** opportunity is an evidence-backed one that an analyst has confirmed in a score review (REQ-SCORE-007). The platform prepares the evidence; people make the final call.
 
 ## Users
 
@@ -35,11 +35,11 @@ In this documentation, a **validated** opportunity is one whose every claim cite
 | Venture builder | Find startup concepts worth validating | Concepts with a business case and next steps |
 | Domain reviewer | Judge whether the platform's output is right | Golden sets, evidence, and a way to record feedback |
 
-The MVP serves invited users in one shared workspace (OQ-010 in [open questions](open-questions.md)).
+The MVP serves invited users of one organization who share the research corpus. User-owned records carry an organization key from the start so that several organizations can be added later (ADR 0019, REQ-NFR-018).
 
 ## Vision
 
-Thousands of scientific papers are published every day. Most never reach product teams, entrepreneurs, innovation departments, government organizations, or consulting firms. The platform continuously scans new research, extracts problems worth solving, identifies market gaps, and generates validated software concepts.
+Thousands of scientific papers are published every day. Most never reach product teams, entrepreneurs, innovation departments, government organizations, or consulting firms. The platform continuously scans new research, extracts problems worth solving, identifies market gaps, and generates evidence-backed software concepts.
 
 The platform connects scientific research with practical innovation. It replaces chance discovery with a scalable, consistent, and traceable process. It ingests new publications from OpenAlex, arXiv, and Semantic Scholar, derives software opportunities from them, and scores each opportunity on scientific novelty, market potential, competitive gap, technical feasibility, and strategic relevance (see [Opportunity scoring](scoring.md)).
 
@@ -61,7 +61,7 @@ Users do not need a research background to benefit from scientific progress. The
 
 ### Long-term objective
 
-The long-term objective is an autonomous platform. It ingests, analyzes, and scores research end to end without manual steps, and shortens the path from scientific discovery to economic and societal value. Later phases may add market signals, technology trends, and feedback on the opportunities that organizations pursued (REQ-DASH-004), so the platform can show emerging opportunities earlier than traditional market analysis does. None of these sources is in scope for the MVP (see [Roadmap](roadmap.md)).
+The long-term objective is an autonomous platform. It ingests, analyzes, and scores research end to end without manual steps, and shortens the path from scientific discovery to economic and societal value. Later phases may add market signals, technology trends, and feedback on the opportunities that organizations pursued (opportunity status, REQ-DASH-004, is in the MVP; organization-wide feedback is later), so the platform can show emerging opportunities earlier than traditional market analysis does. None of these sources is in scope for the MVP (see [Roadmap](roadmap.md)).
 
 Organizations should no longer have to ask "Which innovations exist?". Instead, the platform continuously answers:
 
@@ -88,6 +88,9 @@ The targets below are provisional. They are accepted for phase 1 and reviewed on
 - Patents, grants, and news as sources.
 - Validating opportunities with customers; the platform prepares the next steps, people carry them out.
 - Multiple organizations with separate data (later, REQ-DASH-005).
+- Billing, pricing, customer contracts, and per-customer usage limits. The MVP is an invited pilot with a fixed monthly model budget; commercial terms are decided after the pilot, using the measured cost per opportunity.
+- Languages other than English. The interface, the agent outputs, and the briefs are in English, and ingestion is limited to English papers ([ingestion scope](data-sources/ingestion-scope.md)).
+- Bulk export of opportunity data. The single-opportunity brief (REQ-DASH-009) is the only export; a list export is a later requirement.
 
 ## Core workflow
 

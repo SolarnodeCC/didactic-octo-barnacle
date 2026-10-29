@@ -27,7 +27,7 @@ related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-N
 
 ## Authentication
 
-Accounts exist by invitation only (ADR 0011, proposed). An administrator invites an email address; the invited person opens the emailed link, creates an account, and later signs in with one-time links sent through Resend. No passwords and no third-party identity providers are used.
+Accounts exist by invitation only (ADR 0011). An administrator invites an email address; the invited person opens the emailed link, creates an account, and later signs in with one-time links sent through Resend. No passwords and no third-party identity providers are used.
 
 | Control | Requirement |
 |---|---|
@@ -41,12 +41,12 @@ Accounts exist by invitation only (ADR 0011, proposed). An administrator invites
 | Links survive mail scanners: the token is consumed on an explicit Continue | REQ-ACC-004 |
 | Terms, privacy policy, and named processors | REQ-ACC-011 |
 
-Users have one of three roles, viewer, analyst, or admin, set on the invitation and enforced by the API (REQ-NFR-012). The data API is read-only apart from the score review; sign-in, account, and admin routes are separate and each declares its roles (ADR 0018, REQ-API-005, REQ-ADM-004). Rate limits and global limits live in a Durable Object (ADR 0017). Multi-tenancy and organization profiles are later work (REQ-DASH-005, OQ-010). Records carry a user ID from the start so that later work does not need a migration.
+Users have one of three roles, viewer, analyst, or admin, set on the invitation and enforced by the API (REQ-NFR-012). The data API is read-only apart from the score review; sign-in, account, and admin routes are separate and each declares its roles (ADR 0018, REQ-API-005, REQ-ADM-004). Rate limits and global limits live in a Durable Object (ADR 0017). Multi-tenancy and organization profiles are later work (REQ-DASH-005, OQ-010). User-owned records carry an organization ID from the start so that later work does not need a migration (ADR 0019, REQ-NFR-018).
 
 ## Personal data
 
 - **Authors**: names, ORCIDs, and affiliations come from public scholarly records. They are stored to show provenance and are not used to profile people (REQ-NFR-009). The lawful basis, notice, and erasure process are in [privacy](privacy.md) (REQ-NFR-016).
-- **Users**: name and email address, sign-in records, the role, the score reviews they write (REQ-SCORE-007), and, later, their feedback (REQ-DASH-004). Users can delete their account (REQ-ACC-008). Resend processes email addresses to deliver invitations and sign-in links (ADR 0011). Usage and cost records are per pipeline run and agent, never per user (REQ-NFR-011).
+- **Users**: name and email address, sign-in records, the role, the score reviews they write (REQ-SCORE-007), and the status notes they write (REQ-DASH-004). Users can delete their account (REQ-ACC-008). Resend processes email addresses to deliver invitations and sign-in links (ADR 0011). Usage and cost records are per pipeline run and agent, never per user (REQ-NFR-011).
 - **Model providers**: publication text and agent prompts are sent to model providers. No user data is sent. Check the provider's data retention terms before going live (OQ-014). Retention periods for all data classes are in [privacy](privacy.md) (REQ-NFR-015).
 
 ## Model providers

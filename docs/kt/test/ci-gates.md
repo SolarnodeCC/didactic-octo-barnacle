@@ -13,7 +13,7 @@ A gate blocks a merge when it fails. Gates add up: each phase keeps the gates of
 | Phase | Gates added |
 |---|---|
 | Now (specification only) | Configuration check, KT check, workspace install |
-| 1 | Lint, format, typecheck, build, unit tests, integration tests, traceability check (REQ-TEST-001), dependency review |
+| 1 | Lint (ESLint), format check (Prettier), typecheck, build, unit tests, integration tests, traceability check (REQ-TEST-001), dependency review |
 | 2 | Contract tests (REQ-TEST-002) |
 | 3 | Evals on prompt and model changes (REQ-TEST-004) |
 | 4 | End-to-end tests for the dashboard, including the accessibility check |
@@ -42,4 +42,4 @@ It also runs the `install` command from `.cursor/environment.json` twice to prov
 - Never skip, disable, or quarantine a failing test to get a green build. Fix the test or the code, or change the requirement through a reviewed pull request.
 - A flaky test is a defect. Make it deterministic.
 - Jobs for lint, build, unit, integration, contract, and end-to-end tests need no secrets (REQ-TEST-003).
-- Only the eval job uses secrets, from the `evals` GitHub environment, and only for branches in this repository (ADR 0006, proposed).
+- Only the eval job uses secrets, from the `evals` GitHub environment, and only for branches in this repository (ADR 0006).

@@ -1,8 +1,8 @@
 ---
 title: Agent requirements
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-10-28
+status: approved
+last_reviewed: 2026-10-29
 ---
 
 # Agent requirements
@@ -152,9 +152,10 @@ Every agent call asks the model for output that matches the agent's output contr
 - Source: KT review of a comparable internal governance platform (typed output through forced tool use)
 - Depends on: REQ-NFR-003, REQ-AGENT-009
 - Acceptance criteria:
-  1. Each agent call sends the contract schema from `packages/models` to the model through the mechanism chosen in OQ-022 (tool use or JSON-schema mode).
+  1. Each agent call sends the contract schema from `packages/models` to the model through the provider's tool-use or JSON-schema mode, through AI Gateway, where the provider offers one.
   2. The returned output is always validated against the same schema before it is stored; a provider's claim that its output conforms is never accepted in place of validation.
-  3. When a provider or model cannot enforce a schema, the call falls back to prompt instructions plus validation, and the envelope records the mode used in `OutputMode`.
+  3. The mode used per agent and model is recorded in the envelope, and the golden set checks in phase 3 that the gateway passes the mode through.
+  4. When a provider or model cannot enforce a schema, the call falls back to prompt instructions plus validation, and the envelope records the mode used in `OutputMode`.
 - Verification: contract test with stubbed provider responses for each output mode
 
 ### REQ-AGENT-011: Repair of recoverable formatting errors
@@ -205,3 +206,19 @@ Market Analysis and Competition can search the web for sources, under bounds and
   4. A competitor is `Verified: true` only when a result supports it. A figure is `Basis: sourced` only when it cites a result as `external-url` evidence with the retrieval date.
   5. Eval and contract tests use recorded search results and make no live search calls (REQ-TEST-003).
 - Verification: contract tests with recorded tool results and injection fixtures, and eval
+
+### REQ-AGENT-014: Pinned model versions
+
+Every agent uses an exact model version, and a version change goes through the evals.
+
+- Phase: 3
+- Priority: must
+- Status: planned
+- Source: Readiness assessment
+- Depends on: REQ-AGENT-010, REQ-TEST-004
+- Acceptance criteria:
+  1. The model configuration of each agent names an exact model version; floating aliases are not accepted by the configuration check.
+  2. Changing a pinned version is a pull request that runs the agent's evals (REQ-TEST-004) and records the old and new version.
+  3. The nightly eval run reports a provider deprecation or a behavior change for any pinned version, and the envelope stores the exact version used (see [contract conventions](../agents/contract-conventions.md)).
+  4. A model that the provider retires is replaced before its retirement date; the run report lists pinned versions with their announced retirement dates.
+- Verification: unit test of the configuration check and CI job

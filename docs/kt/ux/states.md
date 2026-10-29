@@ -21,6 +21,7 @@ States that every screen handles the same way. All messages are plain text (REQ-
 | Home, no scored opportunities | An explanation that the platform has not produced scored opportunities yet and when the next data update runs; no zeros (REQ-DASH-011) |
 | Opportunities, no results | "No opportunities match these filters" with a Clear filters action |
 | Matrix | Same text as the list; the table is empty too |
+| Search | "No opportunities match this description" with a suggestion to use other words |
 | Trends | "Not enough data for this range" with a suggestion to widen it |
 | Pipeline health, no runs | "No runs yet" with the schedule |
 | Invitations, none | "No invitations yet" and the Invite action |
@@ -48,12 +49,16 @@ States that every screen handles the same way. All messages are plain text (REQ-
 | Terms and privacy | Must be accepted | "Accept the terms and the privacy policy to continue" |
 | Dispute reason | Required, at most 500 characters | "Give a reason (up to 500 characters)" |
 | Confirm reason | Optional, at most 500 characters | "Keep the reason under 500 characters" |
+| Status note | Optional, at most 500 characters | "Keep the note under 500 characters" |
 | Hide reason | Required, 1 to 500 characters | "Give a reason for hiding" |
 | Invitation role | Required, one of viewer, analyst, admin | "Choose a role" |
+| Search query | 3 to 300 characters | "Enter 3 to 300 characters" |
 | Date range | Start not after end; at most 24 months | "Choose a valid date range" |
-| Pending invitation cap | Configured cap | "The limit of pending invitations is reached" |
+| Pending invitation cap | Configured cap, default 50 | "The limit of pending invitations is reached" |
+| Invitation email domain | Must be on the allowlist when one is set | "This email domain is not allowed" |
 
 ## Labels
 
 - Estimated market figures: "Estimate". Unverified competitors: "Unverified". Scores built on estimates: "Estimate-based". Abstract-only input: "Based on the abstract".
+- Every complete opportunity shows "Evidence-backed"; one whose current score has a confirming review also shows "Validated".
 - A band is shown as text next to any color (REQ-DASH-006).

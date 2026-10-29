@@ -1,7 +1,7 @@
 ---
 title: Account requirements
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-10-29
 related: [REQ-NFR-007, REQ-NFR-009, REQ-NFR-012]
 ---
@@ -39,7 +39,7 @@ An administrator invites a person by email and assigns a role.
   3. The invitation token has at least 128 bits of randomness, and only its hash is stored.
   4. Resending an invitation invalidates the earlier token. A revoked or expired invitation is refused with a message that does not reveal whether an account exists.
   5. An administrator sees each invitation as pending, accepted, expired, or revoked.
-  6. The number of pending invitations is capped by configuration.
+  6. The number of pending invitations is capped by configuration (default 50). An optional allowlist of email domains per environment restricts which addresses can be invited; when it is set, an invitation to another domain is refused with a clear message.
 - Verification: integration test and end-to-end test
 
 ### REQ-ACC-003: Create an account after opening an invitation
@@ -71,7 +71,7 @@ An existing user signs in with a link sent by email.
   1. A sign-in link works once and expires after 15 minutes. Only its hash is stored.
   2. The response to a link request is the same whether or not an account exists for the address.
   3. A link requested for an address with a pending invitation and no account leads to the create-account screen.
-  4. A session cookie is `HttpOnly`, `Secure`, and `SameSite=Lax`, and has a configured lifetime.
+  4. A session cookie is `HttpOnly`, `Secure`, and `SameSite=Lax`, and has a lifetime of 7 days absolute and 24 hours idle (24 hours absolute for the admin role), all configurable.
   5. The dashboard and the API accept the same session and refuse a request without one (REQ-NFR-007).
   6. A sign-in or invitation link opens a confirmation page, and the token is consumed only when the person presses Continue, so that mail scanners that open links do not use it up.
 - Verification: integration test and end-to-end test, including a test that opens the link with a plain GET request first
@@ -85,8 +85,8 @@ Link requests and invitation use are rate limited.
 - Status: planned
 - Source: KT review of security
 - Acceptance criteria:
-  1. Sign-in link requests are limited per email address and per IP address.
-  2. Failed or reused tokens are limited per IP address. The counters are kept in a Durable Object (ADR 0017), and the IP address is taken from the `CF-Connecting-IP` header.
+  1. Sign-in link requests are limited to 5 per hour per email address and 20 per hour per IP address.
+  2. Failed or reused tokens are limited to 10 per hour per IP address. The counters are kept in a Durable Object (ADR 0017), and the IP address is taken from the `CF-Connecting-IP` header.
   3. A limited request returns the generic response of REQ-ACC-004 or a rate-limit error that does not reveal whether an account exists.
 - Verification: integration test
 
@@ -129,7 +129,7 @@ A user can delete their account.
 - Source: REQ-NFR-009 and privacy law
 - Acceptance criteria:
   1. A user can delete their own account in settings. It removes the name, the email address, and the sessions.
-  2. Records that refer to the user are anonymized or removed: score reviews (REQ-SCORE-007) keep the review and replace the user with a deleted-user marker, feedback (REQ-DASH-004) is removed, invitations the user sent keep no name, and audit events (REQ-ACC-009) keep an opaque actor ID with no name or email.
+  2. Records that refer to the user are anonymized or removed: score reviews (REQ-SCORE-007) and status entries (REQ-DASH-004) keep the record and replace the user with a deleted-user marker, invitations the user sent keep no name, and audit events (REQ-ACC-009) keep an opaque actor ID with no name or email.
   3. The last active administrator cannot delete their account (REQ-ACC-006).
   4. The privacy policy states what is stored, why, and for how long.
 - Verification: integration test and review of the privacy policy

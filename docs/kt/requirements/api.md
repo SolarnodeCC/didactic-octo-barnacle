@@ -1,13 +1,13 @@
 ---
 title: API requirements
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-10-28
+status: approved
+last_reviewed: 2026-10-29
 ---
 
 # API requirements
 
-The data API in `apps/api` is the only way the dashboard reads data. It is read-only in the MVP, except for score reviews (REQ-API-004). Sign-in, account, and admin operations are served by separate routes (ADR 0018, REQ-API-005).
+The data API in `apps/api` is the only way the dashboard reads data. It is read-only in the MVP, except for score reviews (REQ-API-004) and opportunity status (REQ-DASH-004). Sign-in, account, and admin operations are served by separate routes (ADR 0018, REQ-API-005).
 
 ### REQ-API-001: List opportunities
 
@@ -52,7 +52,7 @@ Request and response shapes are defined once and versioned.
 
 ### REQ-API-004: Score review endpoint
 
-The API accepts reviews of scores. It is the only write operation in the MVP.
+The API accepts reviews of scores. With opportunity status (REQ-DASH-004), it is one of the two write operations of the data API in the MVP.
 
 - Phase: 4
 - Priority: should
@@ -80,3 +80,19 @@ Sign-in, account, and admin operations are served by routes separate from the da
   3. The errors use the shape of REQ-API-003. A response never reveals whether an account exists (REQ-ACC-004).
   4. The OpenAPI document generated from the schemas is committed and checked in CI for drift.
 - Verification: contract test and integration test of the role matrix
+
+### REQ-API-006: Opportunity search
+
+The API finds opportunities by the meaning of a text query.
+
+- Phase: 4
+- Priority: should
+- Status: planned
+- Source: Readiness assessment (REQ-PROC-003 had no user-facing consumer)
+- Depends on: REQ-PROC-003, REQ-API-001
+- Acceptance criteria:
+  1. `GET /api/v1/opportunities/search?q=` takes a query of 3 to 300 characters and returns the opportunities whose publication ranks highest by similarity, with the similarity score, up to the page size of REQ-API-001.
+  2. The filters and the cursor of REQ-API-001 apply to the results. Hidden and incomplete opportunities are excluded.
+  3. The query is embedded through AI Gateway (REQ-NFR-003) with the model of the current index, is never stored with the user's identity, and is rate limited per user (REQ-ACC-005).
+  4. An empty, too short, or too long query gets a validation error in the error shape of REQ-API-003.
+- Verification: integration test on the fixture corpus and contract test

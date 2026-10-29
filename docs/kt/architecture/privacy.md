@@ -8,7 +8,7 @@ related: [REQ-NFR-009, REQ-NFR-015, REQ-NFR-016, REQ-ACC-008, REQ-ACC-009, REQ-A
 
 # Privacy and data retention
 
-The baseline for the EU launch. The default market is the EU (OQ-011), so the platform treats GDPR as binding. Legal wording of the terms and the privacy policy is written by the legal owner (OQ-014); this document is the engineering input to it.
+The baseline for the EU launch. The default market is the EU, so the platform treats GDPR as binding. Legal wording of the terms and the privacy policy is written by the legal owner (OQ-014); this document is the engineering input to it.
 
 ## Personal data held
 
@@ -51,8 +51,8 @@ Authors are not users. The notice is a public page, linked from the footer, that
 | Stored PDFs and extracted text | kept while the license allows; removed with the publication |
 | Model call records | 12 months, then aggregated per day |
 | Run reports | 12 months |
-| Sign-in records and sessions | 12 months (OQ-030) |
-| Audit events | 12 months (OQ-030) |
+| Sign-in records and sessions | 6 months |
+| Audit events | 6 months |
 | Invitations | 30 days after acceptance, revocation, or expiry |
 | Backups | the D1 Time Travel window |
 

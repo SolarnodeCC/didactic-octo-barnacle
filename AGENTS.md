@@ -5,8 +5,8 @@ This repository specifies a platform that turns scientific publications into sco
 Planned layout, once code exists:
 
 - `apps/dashboard` and `apps/api`
-- `agents/research-agent`, `agents/startup-agent`, and `agents/scoring-agent`
-- `packages/vector-store`, `packages/prompts`, and `packages/models`
+- `agents/extraction`, `agents/analysis`, `agents/market`, and `agents/startup`
+- `packages/vector-store`, `packages/prompts`, `packages/scoring`, and `packages/models`
 - `infrastructure/cloudflare`
 
 The intended stack is Cloudflare Workers, Workflows, Queues, D1, R2, Vectorize, and AI Gateway; Next.js on Workers (OpenNext) with Tailwind CSS; and plain TypeScript agents with OpenAI or Anthropic through AI Gateway. Academic sources named in the KT documents are OpenAlex, arXiv, and Semantic Scholar.

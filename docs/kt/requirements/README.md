@@ -19,7 +19,7 @@ Every requirement has a unique ID and testable acceptance criteria. Pull request
 | API | [api.md](api.md) | Read API for the dashboard |
 | ACC | [accounts.md](accounts.md) | Invitations, sign-in links, roles, and account deletion |
 | ADM | [admin.md](admin.md) | Admin operations: hide, rerun, rescore, role matrix |
-| NFR | [non-functional.md](non-functional.md) | Platform, security, privacy, service levels, and documentation constraints |
+| NFR | [non-functional/](non-functional/README.md) | Platform, security, privacy, service levels, and documentation constraints |
 | TEST | [testing.md](testing.md) | Test strategy obligations |
 
 ## Format
@@ -52,7 +52,7 @@ Statement of what the platform must do.
 
 - IDs are `REQ-<AREA>-<NNN>` and are never reused, also not after a requirement is dropped. Set `Status: dropped` instead of deleting it.
 - A file holds at most 40 requirements; the check warns above 25. Split an area into a directory with its own `README.md` before it reaches the limit.
-- A new area gets a new file and a row in the table above.
+- A new area gets a new file and a row in the table above. An area that outgrows one file becomes a directory with a `README.md` index (as NFR did); its requirement IDs do not change.
 - Every REQ-ID mentioned anywhere in `docs/kt/` must be defined here.
 - A requirement does not depend on a requirement in a later phase.
 

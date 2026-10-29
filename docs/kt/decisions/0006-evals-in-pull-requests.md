@@ -1,15 +1,15 @@
 ---
 title: "0006: Run live evals only for pull requests from this repository"
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-10-28
+status: approved
+last_reviewed: 2026-10-29
 related: [REQ-TEST-003, REQ-TEST-004]
 ---
 
 # 0006: Run live evals only for pull requests from this repository
 
-- Decision status: Proposed
-- Date: 2026-10-28
+- Decision status: Accepted
+- Date: 2026-10-29
 
 ## Context
 
@@ -23,11 +23,11 @@ REQ-TEST-004 requires evals to block a pull request that changes prompts or mode
 
 ## Decision
 
-Option 3, if accepted:
+Option 3:
 
 - Unit, integration, and contract tests never need secrets (REQ-TEST-003).
 - A separate eval job runs on pull requests that change `packages/prompts`, model configuration, or an agent, only when the pull request branch is in this repository.
-- The job uses a GitHub environment named `evals` that holds the provider and AI Gateway secrets.
+- The job uses a GitHub environment named `evals` that holds the provider and AI Gateway secrets. The environment requires approval by a reviewer before a job starts, so no secret is released without a person approving that run.
 - For a pull request from a fork, a maintainer pushes the change to a branch in this repository to run the evals before merging.
 - The nightly eval run stays and reports without blocking.
 

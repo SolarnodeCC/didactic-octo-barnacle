@@ -1,8 +1,8 @@
 ---
 title: Processing requirements
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-10-28
+status: approved
+last_reviewed: 2026-10-29
 ---
 
 # Processing requirements
@@ -36,7 +36,7 @@ Embeddings are stored in a vector database.
 
 ### REQ-PROC-003: Semantic search
 
-Users and agents can search publications by meaning.
+Agents and the dashboard can search publications by meaning.
 
 - Phase: 2
 - Priority: must
@@ -47,6 +47,7 @@ Users and agents can search publications by meaning.
   1. A query returns publications ranked by similarity, with their scores.
   2. Results can be filtered by source and publication date.
   3. On the fixture corpus, recall at 10 meets the threshold stored with the corpus.
+  4. The search is exposed to users through the opportunity search of REQ-API-006 and REQ-DASH-015, and is available to agents inside the pipeline.
 - Verification: integration test on a fixture corpus with known nearest neighbors
 
 ### REQ-PROC-005: Triage before the agents
