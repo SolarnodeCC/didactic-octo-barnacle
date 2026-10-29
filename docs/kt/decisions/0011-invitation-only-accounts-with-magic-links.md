@@ -33,7 +33,7 @@ Option 3, if accepted:
 - Tokens are random, single purpose, short-lived, and stored only as hashes. Sessions are cookies that the dashboard and the API both accept. The dashboard and the API refuse requests without a session (REQ-NFR-007).
 - There is no registration form, no password, and no third-party identity provider (REQ-ACC-001).
 - A user has one role (viewer, analyst, or admin; REQ-NFR-012). The administrator chooses the role on the invitation, and the role is stored with the user in the database. Cloudflare Access groups are not used for roles.
-- Whether to use an authentication library that supports this flow or to build it directly is decided with the toolchain in OQ-029.
+- The flow is built directly on Workers and D1, with no authentication library (OQ-029). The rules for consuming tokens and for invitation-gated creation do not fit a generic library.
 - Cloudflare Access can still protect internal routes such as admin tooling.
 
 ## Consequences

@@ -40,7 +40,7 @@ The documents in `docs/kt/` are the source of truth for the Research Opportunity
 
 ## Ownership
 
-Every document has an owner in its frontmatter. The owner role per area is below; one person or team is named per role (OQ-019). Until then the code owner handle is `@SolarnodeCC`, and `.github/CODEOWNERS` requires its review for `docs/kt/`.
+Every document has an owner in its frontmatter. For the MVP one owner, `@SolarnodeCC`, holds every role below, and `.github/CODEOWNERS` requires its review for `docs/kt/`. Splitting the roles between people is OQ-034.
 
 | Area | Owner role |
 |---|---|
