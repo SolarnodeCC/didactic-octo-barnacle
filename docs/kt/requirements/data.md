@@ -17,7 +17,7 @@ The research collector fetches works from OpenAlex, with their authors, institut
 
 - Phase: 1
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: README roadmap phase 1 and Data Sources section
 - Acceptance criteria:
   1. Works that match the configured ingestion scope (see [OpenAlex](../data-sources/openalex.md)) are fetched with their authors, institutions, topics, and citation counts.
@@ -32,7 +32,7 @@ The research collector fetches preprints from arXiv in the configured categories
 
 - Phase: 1
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: README roadmap phase 1 and Data Sources section
 - Acceptance criteria:
   1. Only preprints whose primary or cross-listed category is in the configured category list are fetched.
@@ -60,7 +60,7 @@ A publication found in more than one source has one publication record.
 
 - Phase: 1
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: KT review of data sources
 - Depends on: REQ-DATA-001, REQ-DATA-002
 - Acceptance criteria:
@@ -107,7 +107,7 @@ Structured metadata from the source APIs is normalized into one publication reco
 
 - Phase: 1
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: README roadmap phase 1
 - Acceptance criteria:
   1. Title, abstract, authors, publication date, source, and source identifier are stored for every publication.
@@ -149,7 +149,7 @@ The platform records the license of each document and respects it.
 
 - Phase: 1
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: KT review of data sources
 - Acceptance criteria:
   1. The license of each stored PDF and of each source's metadata is recorded.

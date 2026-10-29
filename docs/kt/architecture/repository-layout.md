@@ -31,7 +31,7 @@ The planned layout once code exists:
 └── scripts
 ```
 
-`docs/kt`, `scripts`, `packages/models`, and `infrastructure/cloudflare` exist today. The apps and agents directories are not implemented yet. The root is a pnpm workspace (ADR 0008) with ESLint and Prettier at the root (ADR 0020). When an application is added, extend the `install` command in `.cursor/environment.json` and the `setup-worktree` commands in `.cursor/worktrees.json`.
+`docs/kt`, `scripts`, `packages/models`, `infrastructure/cloudflare`, and `apps/pipeline` (fixture-based OpenAlex/arXiv mappers) exist today. The dashboard, API, and agents directories are not implemented yet. The root is a pnpm workspace (ADR 0008) with ESLint and Prettier at the root (ADR 0020). When an application is added, extend the `install` command in `.cursor/environment.json` and the `setup-worktree` commands in `.cursor/worktrees.json`.
 
 ## What goes where
 
