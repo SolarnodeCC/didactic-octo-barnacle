@@ -39,7 +39,7 @@ The MVP serves invited users of one organization who share the research corpus. 
 
 ## Vision
 
-Thousands of scientific papers are published every day. Most never reach product teams, entrepreneurs, innovation departments, government organizations, or consulting firms. The platform continuously scans new research, extracts problems worth solving, identifies market gaps, and generates validated software concepts.
+Thousands of scientific papers are published every day. Most never reach product teams, entrepreneurs, innovation departments, government organizations, or consulting firms. The platform continuously scans new research, extracts problems worth solving, identifies market gaps, and generates evidence-backed software concepts.
 
 The platform connects scientific research with practical innovation. It replaces chance discovery with a scalable, consistent, and traceable process. It ingests new publications from OpenAlex, arXiv, and Semantic Scholar, derives software opportunities from them, and scores each opportunity on scientific novelty, market potential, competitive gap, technical feasibility, and strategic relevance (see [Opportunity scoring](scoring.md)).
 
