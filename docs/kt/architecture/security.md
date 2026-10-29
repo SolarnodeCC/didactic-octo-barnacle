@@ -41,7 +41,7 @@ Accounts exist by invitation only (ADR 0011, proposed). An administrator invites
 | Links survive mail scanners: the token is consumed on an explicit Continue | REQ-ACC-004 |
 | Terms, privacy policy, and named processors | REQ-ACC-011 |
 
-Users have one of three roles, viewer, analyst, or admin, set on the invitation and enforced by the API (REQ-NFR-012). The data API is read-only apart from the score review; sign-in, account, and admin routes are separate and each declares its roles (ADR 0018, REQ-API-005, REQ-ADM-004). Rate limits and global limits live in a Durable Object (ADR 0017). Multi-tenancy and organization profiles are later work (REQ-DASH-005, OQ-010). Records carry a user ID from the start so that later work does not need a migration.
+Users have one of three roles, viewer, analyst, or admin, set on the invitation and enforced by the API (REQ-NFR-012). The data API is read-only apart from the score review; sign-in, account, and admin routes are separate and each declares its roles (ADR 0018, REQ-API-005, REQ-ADM-004). Rate limits and global limits live in a Durable Object (ADR 0017). Multi-tenancy and organization profiles are later work (REQ-DASH-005, OQ-010). User-owned records carry an organization ID from the start so that later work does not need a migration (ADR 0019, REQ-NFR-018).
 
 ## Personal data
 

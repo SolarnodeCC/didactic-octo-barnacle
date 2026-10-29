@@ -160,7 +160,7 @@ Every authenticated user has exactly one role: viewer, analyst, or admin.
 - Phase: 4
 - Priority: should
 - Status: planned
-- Source: REQ-SCORE-007, REQ-DASH-008, and OQ-024
+- Source: REQ-SCORE-007 and REQ-DASH-008. Roles are chosen on the invitation and changed by an admin (REQ-ACC-002, REQ-ACC-006)
 - Depends on: REQ-NFR-007
 - Acceptance criteria:
   1. A viewer can read opportunities, scores, and explanations, and export a brief.
@@ -263,3 +263,19 @@ The dashboard and the API meet stated availability and latency targets.
   3. The availability target of the dashboard and the API is 99.5 % per month, and a breach raises an alert (REQ-NFR-008).
   4. The recovery point objective is 24 hours and the recovery time objective is 4 hours, tested once with a D1 restore before launch (see [operations](../operations.md)).
 - Verification: load test on seeded data and a restore drill
+
+### REQ-NFR-018: Organization key on user-owned records
+
+Records that users own carry an organization ID, so several organizations can be supported later without a migration.
+
+- Phase: 4
+- Priority: must
+- Status: planned
+- Source: OQ-010; ADR 0019
+- Depends on: REQ-NFR-007, REQ-NFR-012
+- Acceptance criteria:
+  1. Users, invitations, sessions, audit events, score reviews, and opportunity status entries (REQ-DASH-004) carry an organization ID. The MVP has one organization, created at deployment.
+  2. Every query on these records filters by the organization of the signed-in user through one shared data-access helper; no route builds its own filter.
+  3. Publications, candidates, agent outputs, opportunities, and scores are shared by all organizations and carry no organization ID.
+  4. An integration test with two organizations asserts that a user of one never reads, changes, or invites into the other, on every route that touches these records.
+- Verification: integration test with two seeded organizations

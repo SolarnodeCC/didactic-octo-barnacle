@@ -15,7 +15,7 @@ Agent output comes from language models and varies between runs. Exact assertion
 - One golden set per agent, for triage, and for opportunity extraction, of at least 20 entries each (REQ-TEST-005), stored under `evals/` in the agent's directory.
 - Each entry holds the input (paper metadata, abstract, and an extract when the license allows it), the outputs of earlier agents it depends on, and a reviewed expected outcome: required facts, acceptable ranges for numeric fields, and outcomes that must not occur.
 - Cover all four target industries and include at least three papers that should yield no opportunity.
-- Each entry names its reviewer. Entries for an industry are reviewed by someone with knowledge of that industry (OQ-015).
+- Each entry names its reviewer. Entries for an industry are reviewed by someone with knowledge of that industry, with at least one named reviewer per target industry and two reviewers on a shared sample to measure agreement (OQ-015).
 - When two reviewers label the same entries, their agreement is recorded; entries they disagree on are discussed before they enter the set.
 - Changes to a golden set need review by a code owner of `docs/kt`.
 

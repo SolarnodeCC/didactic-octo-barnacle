@@ -14,15 +14,12 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
 | OQ-005 | Which embedding model? | Reference model `bge-base-en-v1.5`; compare the candidates in ADR 0010 on the search fixture corpus (REQ-PROC-003) and select by benchmark | phase 2 |
-| OQ-022 | How is structured model output enforced across providers? | Use the provider's tool-use or JSON-schema mode through AI Gateway where available, and always validate with the schema from `packages/models`. Check on the golden set that the gateway passes the mode through, and record the mode per agent (REQ-AGENT-010) | phase 3 |
 
 ## Product and data
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
-| OQ-010 | Who are the users, and is the MVP multi-tenant? | External users by invitation only, one shared workspace (ADR 0011); organization profiles later (REQ-DASH-005) | phase 4 |
 | OQ-021 | What calibrated daily model budget applies in production? | Measure cost per opportunity on the phase 3 golden set; lock the calibrated budget before scoring goes live | phase 4 |
-| OQ-024 | How are user roles assigned? | Roles (viewer, analyst, admin) are stored with the user and chosen on the invitation (ADR 0011, REQ-ACC-002); no Cloudflare Access groups (REQ-NFR-012) | phase 4 |
 | OQ-034 | Who is the named owner per role once the team is staffed? | The MVP has one owner, `@SolarnodeCC`, for all areas; split the owner roles of the [KT README](README.md#ownership) and `.github/CODEOWNERS` when more people join | before launch |
 | OQ-017 | When do organization profiles and organization-wide feedback come? | After the MVP (REQ-DASH-005) | later |
 
@@ -32,7 +29,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 |---|---|---|---|
 | OQ-014 | May we widen full-text use (transient processing, quotes from non-redistributable papers), and do the source and model provider terms allow commercial use? | Legal review of arXiv, OpenAlex, and Semantic Scholar terms and of the provider terms, by a named legal contact, with a written answer. Phase 1 runs abstract-first and stores only license-permitted PDFs (ADR 0014, REQ-DATA-010) | before phase 2 starts |
 | OQ-033 | Which two web search providers are benchmarked for Market Analysis and Competition? | Pick two candidates before phase 3 and compare them on a competitor-recall set for recall, cost per call, terms for storing results, and data processing agreement; record the choice in an ADR (ADR 0013, REQ-AGENT-013) | phase 3 |
-| OQ-015 | Who reviews golden sets and the calibration set? | At least one reviewer per target industry, named in the golden set | phase 3 |
+| OQ-015 | Who are the named golden-set and calibration reviewers? | One named expert per target industry (government, healthcare, financial services, enterprise), plus two reviewers on a shared sample to measure agreement | before phase 3 |
 
 ## Answered
 
@@ -60,5 +57,8 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-011 | Default currency EUR and geography EU; global figures allowed when stated | [Market Analysis](agents/market-analysis.md) |
 | OQ-027 | Opportunity status and decision note move into phase 4; organization profiles stay later | REQ-DASH-004 |
 | OQ-030 | Audit log and sign-in records are kept 6 months, then deleted | [Privacy](architecture/privacy.md) |
+| OQ-010 | One organization shares the research corpus in the MVP; user-owned records carry an organization key from the start | ADR 0019, REQ-NFR-018 |
+| OQ-022 | Provider tool-use or JSON-schema mode through AI Gateway where available, always validated, mode recorded per agent | REQ-AGENT-010 |
+| OQ-024 | Roles are chosen on the invitation and changed by an admin without a deployment | REQ-ACC-002, REQ-ACC-006, REQ-NFR-012 |
 | OQ-006 | unpdf in the document-processing Queue consumer, with size and page caps and an abstract fallback | ADR 0009 |
 | OQ-018 | Node 24, pnpm workspaces, TypeScript, Zod, Vitest with `@cloudflare/vitest-plugin`, Playwright | ADR 0008 |

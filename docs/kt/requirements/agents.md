@@ -152,9 +152,10 @@ Every agent call asks the model for output that matches the agent's output contr
 - Source: KT review of a comparable internal governance platform (typed output through forced tool use)
 - Depends on: REQ-NFR-003, REQ-AGENT-009
 - Acceptance criteria:
-  1. Each agent call sends the contract schema from `packages/models` to the model through the mechanism chosen in OQ-022 (tool use or JSON-schema mode).
+  1. Each agent call sends the contract schema from `packages/models` to the model through the provider's tool-use or JSON-schema mode, through AI Gateway, where the provider offers one.
   2. The returned output is always validated against the same schema before it is stored; a provider's claim that its output conforms is never accepted in place of validation.
-  3. When a provider or model cannot enforce a schema, the call falls back to prompt instructions plus validation, and the envelope records the mode used in `OutputMode`.
+  3. The mode used per agent and model is recorded in the envelope, and the golden set checks in phase 3 that the gateway passes the mode through.
+  4. When a provider or model cannot enforce a schema, the call falls back to prompt instructions plus validation, and the envelope records the mode used in `OutputMode`.
 - Verification: contract test with stubbed provider responses for each output mode
 
 ### REQ-AGENT-011: Repair of recoverable formatting errors

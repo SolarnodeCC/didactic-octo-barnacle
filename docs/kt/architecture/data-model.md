@@ -53,7 +53,8 @@ erDiagram
 | Score model | Version, weights, derivation rule version, currency rate table, active flag | REQ-SCORE-003, REQ-ADM-003 |
 | Score review | Score ID, user, date, state (`confirmed` or `disputed`), reason | REQ-SCORE-007 |
 | Opportunity status entry | Opportunity, user, date, status (`pursued`, `parked`, `rejected`), note | REQ-DASH-004 |
-| User | Email, name, role, status, terms version and date accepted | REQ-ACC-003, REQ-NFR-012 |
+| Organization | ID, name; one record in the MVP | REQ-NFR-018 |
+| User | Organization, email, name, role, status, terms version and date accepted | REQ-ACC-003, REQ-NFR-012, REQ-NFR-018 |
 | Invitation | Email, role, inviting user, token hash, expiry, status | REQ-ACC-002 |
 | Session and sign-in link | Token hash, user, expiry, used flag | REQ-ACC-004 |
 | Audit event | Opaque actor ID, action, time; never a token or a name | REQ-ACC-009 |
@@ -69,7 +70,7 @@ erDiagram
 
 ## Cardinality
 
-One publication yields zero or more candidates. A candidate has exactly one publication and becomes at most one opportunity (ADR 0015). Related publications from semantic search are context on the Research Analyst output, not sources of the opportunity. Every record that a user writes carries a user ID; tenant keys arrive with organization profiles (REQ-DASH-005).
+One publication yields zero or more candidates. A candidate has exactly one publication and becomes at most one opportunity (ADR 0015). Related publications from semantic search are context on the Research Analyst output, not sources of the opportunity. Every record that a user writes carries a user ID and an organization ID (ADR 0019, REQ-NFR-018). The research corpus (publications to scores) is shared.
 
 ## History
 
