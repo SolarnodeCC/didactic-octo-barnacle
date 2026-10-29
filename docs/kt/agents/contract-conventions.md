@@ -3,7 +3,7 @@ title: Agent contract conventions
 owner: "@SolarnodeCC"
 status: draft
 last_reviewed: 2026-10-28
-related: [REQ-AGENT-008, REQ-AGENT-009, REQ-NFR-006, REQ-TEST-002]
+related: [REQ-AGENT-008, REQ-AGENT-009, REQ-AGENT-010, REQ-AGENT-011, REQ-NFR-006, REQ-TEST-002]
 ---
 
 # Agent contract conventions
@@ -39,6 +39,9 @@ CandidateId: string?            # null for steps before extraction
 Model: string                   # provider and model name, as routed by AI Gateway
 PromptVersion: string           # version from packages/prompts
 InputMode: enum [abstract, full-text]
+OutputMode: enum [tool-use, json-schema, prompt-only]  # how the schema was enforced (REQ-AGENT-010)
+Attempts: integer 1..N          # attempts used, including failed ones (REQ-AGENT-009)
+Repairs: list<enum [unwrapped-json-string, stripped-code-fence]>  # repairs applied (REQ-AGENT-011)
 Output: object                  # the agent's output contract
 Evidence: list<Evidence> (0..20)
 ```
@@ -63,8 +66,19 @@ A publication quote must occur in the text the agent received. The pipeline chec
 
 Fields named `Confidence` are a `number 0..1` that states how well the available input supports the output. Abstract-only input caps confidence at 0.7. Evals check that confidence is calibrated: entries with high confidence should pass more often than entries with low confidence.
 
+## Structured output and repair
+
+The contract schema is sent to the model through the provider's structured-output mechanism, and the result is validated against the same schema either way (REQ-AGENT-010). Providers still return output that is correct in content but wrapped wrongly. Plain code repairs exactly two cases before validation (REQ-AGENT-011):
+
+| Case | Repair |
+|---|---|
+| A field holds a JSON-encoded string where the contract expects an array or object | Decode the string once. |
+| The output is wrapped in a markdown code fence | Remove the fence. |
+
+A repair never changes a value, adds a field, or fills a default. The repaired output goes through full validation and the evidence check like any other output, and each repair is listed in `Repairs`. A new repair case needs a contract test with a real example first.
+
 ## Failure rules
 
-- Invalid output is retried with the validation errors, up to three attempts, then the step fails (REQ-AGENT-009).
+- Invalid output, after any repair, is retried with the validation errors, up to three attempts, then the step fails (REQ-AGENT-009). A repair does not use up an attempt.
 - An agent that cannot answer from its inputs returns its contract with `Confidence` at or below 0.2 and the reason in a `Notes` field, instead of guessing.
 - Publication text is data, never instructions (REQ-NFR-006). Prompts put it inside clearly marked delimiters and tell the model to ignore instructions found inside it.

@@ -3,7 +3,7 @@ title: Security and data protection
 owner: "@SolarnodeCC"
 status: draft
 last_reviewed: 2026-10-28
-related: [REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-NFR-009, REQ-DATA-010]
+related: [REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-NFR-009, REQ-NFR-011, REQ-NFR-012, REQ-DATA-010]
 ---
 
 # Security and data protection
@@ -22,12 +22,12 @@ related: [REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-NFR-009, REQ-DATA-010]
 
 ## Authentication
 
-The MVP has one group of internal users. ADR 0004 proposes Cloudflare Access in front of the dashboard and the API, so no user passwords are stored. Multi-tenancy and organization profiles are later work (REQ-DASH-005, OQ-010).
+The MVP has one group of internal users. ADR 0004 proposes Cloudflare Access in front of the dashboard and the API, so no user passwords are stored. Users have one of three roles, viewer, analyst, or admin, which the API enforces (REQ-NFR-012, OQ-024). Multi-tenancy and organization profiles are later work (REQ-DASH-005, OQ-010).
 
 ## Personal data
 
 - **Authors**: names, ORCIDs, and affiliations come from public scholarly records. They are stored to show provenance and are not used to profile people (REQ-NFR-009).
-- **Users**: the identity from authentication and, later, their feedback (REQ-DASH-004).
+- **Users**: the identity from authentication, the role, the score reviews they write (REQ-SCORE-007), and, later, their feedback (REQ-DASH-004). Usage and cost records are per pipeline run and agent, never per user (REQ-NFR-011).
 - **Model providers**: publication text and agent prompts are sent to model providers. No user data is sent. Check the provider's data retention terms before going live (OQ-014).
 
 ## Model providers

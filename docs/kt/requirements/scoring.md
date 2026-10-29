@@ -92,3 +92,21 @@ Scores agree with expert judgment on a reviewed set of opportunities.
   2. The rank correlation between scores and the reviewers' ranking meets the threshold stored with the set.
   3. The band distribution of the calibration set is reported with each new score model version.
 - Verification: eval on the calibration set
+
+### REQ-SCORE-007: Score review
+
+An analyst can confirm or dispute the score of an opportunity. The review is stored next to the score and never changes it.
+
+- Phase: 4
+- Priority: should
+- Status: planned
+- Source: KT review of a comparable internal governance platform (indicative versus reviewed scores) and ADR 0007
+- Depends on: REQ-SCORE-004, REQ-NFR-012
+- Acceptance criteria:
+  1. A score has a review state: `unreviewed` (the default), `confirmed`, or `disputed`.
+  2. A review stores the user, the date, the state, and the ID of the score it applies to. A reason of at most 500 characters is required when disputing and optional when confirming.
+  3. A review does not change the score, the band, the category values, or the position in a ranking.
+  4. A new score from a rerun or a new score model version starts as `unreviewed`. Earlier reviews stay in the history of the opportunity and show the score model version they applied to.
+  5. Reviews can be exported together with the score and its category values, for calibration (REQ-SCORE-006).
+  6. A user with the viewer role cannot review (REQ-NFR-012).
+- Verification: unit tests and integration test

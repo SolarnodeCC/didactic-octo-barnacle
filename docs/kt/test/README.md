@@ -37,6 +37,9 @@ related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-TEST-005]
 | Evidence | Quotes are checked against the input text in contract tests and evals | REQ-AGENT-008 |
 | Data quality | Ingestion run reports count incomplete records, duplicates flagged for review, and failed PDFs | REQ-NFR-008 |
 | Cost | Budget stop tested with a stubbed gateway; eval runs report cost | REQ-NFR-005 |
+| Usage records | Model call records checked against stubbed gateway totals | REQ-NFR-011 |
+| Output repair | Unit tests of the repair function and contract tests with malformed responses | REQ-AGENT-011 |
+| Concurrency | A stubbed gateway records concurrent calls and checks the limit | REQ-AGENT-012 |
 | Throughput | Load test on recorded fixtures with stubbed models | REQ-NFR-010 |
 | Accessibility | Automated accessibility check in the end-to-end tests | REQ-DASH-006 |
 | Access control | End-to-end test of unauthenticated requests | REQ-NFR-007 |
