@@ -11,7 +11,7 @@ related: [REQ-TEST-003, REQ-TEST-005, REQ-DATA-010]
 ## Fixtures for academic sources
 
 - Responses from OpenAlex, arXiv, and Semantic Scholar are recorded once and stored as fixture files next to the tests that use them, as `fixtures/<source>/<case>.json` (or `.xml` for arXiv).
-- Tests serve fixtures through the fetch mocking of the Workers test pool. Unit, integration, and contract tests never call these APIs (REQ-TEST-003). A test that tries to reach the network fails.
+- Tests serve fixtures through the fetch mocking of the Workers test plugin. Unit, integration, and contract tests never call these APIs (REQ-TEST-003). A test that tries to reach the network fails.
 - Refresh fixtures deliberately, in a separate pull request, and note why. Keep each fixture to the fields the test needs. A small recording script under `scripts/` is added with the first collector.
 - Include error cases: rate limiting, timeouts, empty results, malformed records, a work without an abstract, a retracted work, and a preprint with two versions.
 

@@ -3,12 +3,12 @@ title: Account requirements
 owner: "@SolarnodeCC"
 status: draft
 last_reviewed: 2026-10-29
-related: [REQ-NFR-007, REQ-NFR-009]
+related: [REQ-NFR-007, REQ-NFR-009, REQ-NFR-012]
 ---
 
 # Account requirements
 
-Accounts exist by invitation only. A person signs in with a one-time link sent by email through Resend, and has no password. The decision and its alternatives are in [ADR 0007](../decisions/0007-invitation-only-accounts-with-magic-links.md); the security controls are in [security](../architecture/security.md).
+Accounts exist by invitation only. A person signs in with a one-time link sent by email through Resend, and has no password. The decision and its alternatives are in [ADR 0011](../decisions/0011-invitation-only-accounts-with-magic-links.md); the security controls are in [security](../architecture/security.md).
 
 ### REQ-ACC-001: Invitation-only accounts
 
@@ -35,7 +35,7 @@ An administrator invites a person by email and assigns a role.
 - Source: product decision to go public with invitation-only access
 - Acceptance criteria:
   1. Only an administrator can create, resend, or revoke an invitation.
-  2. An invitation holds the email address, the role, the inviting administrator, and an expiry of 7 days.
+  2. An invitation holds the email address, the role (viewer, analyst, or admin; REQ-NFR-012), the inviting administrator, and an expiry of 7 days.
   3. The invitation token has at least 128 bits of randomness, and only its hash is stored.
   4. Resending an invitation invalidates the earlier token. A revoked or expired invitation is refused with a message that does not reveal whether an account exists.
   5. An administrator sees each invitation as pending, accepted, expired, or revoked.
@@ -92,14 +92,14 @@ Link requests and invitation use are rate limited.
 
 ### REQ-ACC-006: Roles and revocation
 
-Users have a role, and an administrator can remove access immediately.
+An administrator can remove access immediately, and the platform always keeps one administrator.
 
 - Phase: 4
 - Priority: must
 - Status: planned
 - Source: REQ-NFR-007 acceptance criterion on revocation
 - Acceptance criteria:
-  1. The roles are administrator and member. Only an administrator can invite, change a role, or deactivate a user.
+  1. The roles are defined in REQ-NFR-012. Only an admin can invite, change a role, or deactivate a user.
   2. Deactivating a user ends all of their sessions, and their next request is refused within one minute, without a deployment.
   3. The last active administrator cannot be deactivated or demoted.
 - Verification: integration test and end-to-end test

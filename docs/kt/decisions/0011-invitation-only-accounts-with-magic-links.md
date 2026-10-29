@@ -1,12 +1,12 @@
 ---
-title: "0007: Invitation-only accounts with magic links sent through Resend"
+title: "0011: Invitation-only accounts with magic links sent through Resend"
 owner: "@SolarnodeCC"
 status: draft
 last_reviewed: 2026-10-29
-related: [REQ-NFR-007, REQ-NFR-009, REQ-ACC-001, REQ-ACC-002, REQ-ACC-003, REQ-ACC-004]
+related: [REQ-NFR-007, REQ-NFR-009, REQ-NFR-012, REQ-ACC-001, REQ-ACC-002, REQ-ACC-003, REQ-ACC-004]
 ---
 
-# 0007: Invitation-only accounts with magic links sent through Resend
+# 0011: Invitation-only accounts with magic links sent through Resend
 
 - Decision status: Proposed
 - Date: 2026-10-29
@@ -32,7 +32,8 @@ Option 3, if accepted:
 - Later sign-ins use a one-time link sent to the account email, with the same response for known and unknown addresses (REQ-ACC-004).
 - Tokens are random, single purpose, short-lived, and stored only as hashes. Sessions are cookies that the dashboard and the API both accept. The dashboard and the API refuse requests without a session (REQ-NFR-007).
 - There is no registration form, no password, and no third-party identity provider (REQ-ACC-001).
-- Whether to use an authentication library that supports this flow or to build it directly is decided with the toolchain in OQ-023.
+- A user has one role (viewer, analyst, or admin; REQ-NFR-012). The administrator chooses the role on the invitation, and the role is stored with the user in the database. Cloudflare Access groups are not used for roles.
+- Whether to use an authentication library that supports this flow or to build it directly is decided with the toolchain in OQ-029.
 - Cloudflare Access can still protect internal routes such as admin tooling.
 
 ## Consequences

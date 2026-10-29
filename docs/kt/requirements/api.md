@@ -7,7 +7,7 @@ last_reviewed: 2026-10-28
 
 # API requirements
 
-The API in `apps/api` is the only way the dashboard reads data. It is read-only in the MVP.
+The API in `apps/api` is the only way the dashboard reads data. It is read-only in the MVP, except for score reviews (REQ-API-004).
 
 ### REQ-API-001: List opportunities
 
@@ -20,7 +20,7 @@ The API returns scored opportunities with sorting, filtering, and pagination.
 - Acceptance criteria:
   1. The list supports the sort order and filters of REQ-DASH-002.
   2. Pagination uses a cursor and a maximum page size.
-  3. Each item holds the score, band, title, startup name, industries, and source publication.
+  3. Each item holds the score, band, the five category values, title, startup name, industries, and source publication.
 - Verification: integration test and contract test
 
 ### REQ-API-002: Opportunity detail with provenance
@@ -49,3 +49,18 @@ Request and response shapes are defined once and versioned.
   2. Errors use one documented error shape.
   3. A breaking change gets a new API version; the previous version keeps working until the dashboard no longer uses it.
 - Verification: contract test
+
+### REQ-API-004: Score review endpoint
+
+The API accepts reviews of scores. It is the only write operation in the MVP.
+
+- Phase: 4
+- Priority: should
+- Status: planned
+- Source: REQ-SCORE-007
+- Depends on: REQ-API-001, REQ-API-002, REQ-SCORE-007, REQ-NFR-012
+- Acceptance criteria:
+  1. An analyst or admin can submit a review for the current score of an opportunity. A viewer gets a forbidden error (REQ-NFR-012), an unknown opportunity or score ID gets a not-found error, and a review for a score that is no longer current gets a conflict error.
+  2. A repeated review by the same user for the same score is stored as a new entry; the latest entry defines the review state, and earlier entries stay in the history.
+  3. The list endpoint (REQ-API-001) returns the review state and accepts it as a filter. The detail endpoint (REQ-API-002) returns the review history with users, dates, and reasons.
+- Verification: integration test and contract test

@@ -17,14 +17,11 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-002 | Which Cloudflare service implements each layer? | ADR 0004 | phase 1 |
 | OQ-003 | How is each score category derived from agent output? | ADR 0005 | phase 4 |
 | OQ-004 | How do live evals run for pull requests without exposing secrets? | ADR 0006 | phase 3 |
-| OQ-005 | Which embedding model? | Compare a Workers AI model, a provider model, and Semantic Scholar SPECTER2 vectors on the search fixture corpus (REQ-PROC-003) | phase 2 |
-| OQ-006 | How is text extracted from PDFs within Worker limits? | Evaluate a JavaScript PDF library and a Cloudflare-hosted conversion on the fixture PDFs; fall back to the abstract on failure (REQ-DATA-006) | phase 2 |
+| OQ-005 | Which embedding model? | Reference model `bge-base-en-v1.5`; compare the candidates in ADR 0010 on the search fixture corpus (REQ-PROC-003) and select by benchmark | phase 2 |
 | OQ-009 | How is the Next.js dashboard hosted? | Verify Cloudflare's current guidance; prefer the OpenNext adapter on Workers if Pages is no longer recommended for Next.js | phase 4 |
 | OQ-020 | Which model runs each agent, and which model judges evals? | Pick per agent on the golden set by quality and cost; the judge uses a different provider than the agent it grades | phase 3 |
-| OQ-022 | Who may invite, and what limits apply? | Administrators only; a cap on pending invitations; an optional allowlist of email domains (REQ-ACC-002) | phase 4 |
-| OQ-023 | Build the invitation and magic-link flow directly, or use an authentication library? | Evaluate a maintained library that supports invitation-gated magic links on Workers and D1; build directly if none fits (ADR 0007) | phase 4 |
-| OQ-024 | How long are the audit log and sign-in records kept? | 12 months, then deleted; state it in the privacy policy (REQ-ACC-009, REQ-ACC-011) | phase 4 |
-| OQ-018 | Toolchain: package manager, monorepo tooling, language versions, schema library, test tools | pnpm workspaces, TypeScript, Zod, Vitest with the Workers pool, Playwright; record in one ADR with the first package | phase 1 |
+| OQ-022 | How is structured model output enforced across providers? | Use the provider's tool-use or JSON-schema mode through AI Gateway where available, and always validate with the schema from `packages/models`. Check on the golden set that the gateway passes the mode through, and record the mode per agent (REQ-AGENT-010) | phase 3 |
+| OQ-023 | How is the number of concurrent model calls limited across Worker instances? | A per-instance semaphore is not enough, because instances multiply. Limit with Queue consumer concurrency and Workflow limits, plus provider rate limits at AI Gateway. Verify Cloudflare's current limits and how Retry-After is handled (REQ-AGENT-012) | phase 3 |
 
 ## Product and data
 
@@ -32,12 +29,19 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 |---|---|---|---|
 | OQ-007 | Where do market figures come from? | Start with model estimates labeled as estimates; evaluate a market data source or a web search tool in phase 3 | phase 3 |
 | OQ-008 | How are competitors found? | Connect a web search API as an agent tool, behind AI Gateway or a Worker; until then competitors are unverified | phase 3 |
-| OQ-010 | Who are the users, and is the MVP multi-tenant? | External users by invitation only, one shared workspace (ADR 0007); organization profiles later (REQ-DASH-005) | phase 4 |
+| OQ-010 | Who are the users, and is the MVP multi-tenant? | External users by invitation only, one shared workspace (ADR 0011); organization profiles later (REQ-DASH-005) | phase 4 |
 | OQ-011 | Which default currency and geography do market figures use? | EUR and the EU, with global figures allowed when stated | phase 3 |
 | OQ-012 | What is the ingestion scope: OpenAlex filters, arXiv categories, backfill window, daily volume? | arXiv categories in [arXiv](data-sources/arxiv.md); OpenAlex works of the last 30 days filtered by topics that match the target industries; measure the daily volume in phase 1 | phase 1 |
 | OQ-013 | What provisional daily model budget applies before calibration? | A low fixed daily budget per environment, enough for triage and extraction on the configured daily volume (REQ-NFR-005) | phase 2 |
 | OQ-021 | What calibrated daily model budget applies in production? | Measure cost per opportunity on the phase 3 golden set; lock the calibrated budget before scoring goes live | phase 4 |
 | OQ-016 | Build layer by layer, or a thin end-to-end slice first? | One publication through every layer with stubbed agents by the end of phase 2, so the value of the output can be judged early | phase 1 |
+| OQ-024 | How are user roles assigned? | Roles (viewer, analyst, admin) are stored with the user and chosen on the invitation (ADR 0011, REQ-ACC-002); no Cloudflare Access groups (REQ-NFR-012) | phase 4 |
+| OQ-025 | Which thresholds and names define the quadrants of the priority matrix? | Start at 60 for Market Potential and 60 for Technical Feasibility, named Pursue now, Needs technology, Quick win, and Monitor; tune on the calibration set (REQ-DASH-010, REQ-SCORE-006) | phase 4 |
+| OQ-026 | How is the opportunity brief rendered to PDF within Worker limits? | Evaluate a JavaScript PDF library and a Cloudflare-hosted HTML-to-PDF service on the brief layout; fall back to a print-ready HTML page (REQ-DASH-009) | phase 4 |
+| OQ-027 | Does opportunity status (REQ-DASH-004) move into phase 4? | Yes, for the status and decision note only, because reviews already need user identity and a write API (REQ-SCORE-007, REQ-API-004). Organization profiles stay `later` | phase 4 |
+| OQ-028 | Who may invite, and what limits apply? | Admins only; a cap on pending invitations; an optional allowlist of email domains (REQ-ACC-002) | phase 4 |
+| OQ-029 | Build the invitation and magic-link flow directly, or use an authentication library? | Evaluate a maintained library that supports invitation-gated magic links on Workers and D1; build directly if none fits (ADR 0011) | phase 4 |
+| OQ-030 | How long are the audit log and sign-in records kept? | 12 months, then deleted; state it in the privacy policy (REQ-ACC-009, REQ-ACC-011) | phase 4 |
 | OQ-017 | When do organization profiles and feedback come? | After the MVP (REQ-DASH-004, REQ-DASH-005) | later |
 
 ## Legal and people
@@ -50,4 +54,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 
 ## Answered
 
-None yet.
+| ID | Answer | Record |
+|---|---|---|
+| OQ-006 | unpdf in the document-processing Queue consumer, with size and page caps and an abstract fallback | ADR 0009 |
+| OQ-018 | Node 24, pnpm workspaces, TypeScript, Zod, Vitest with `@cloudflare/vitest-plugin`, Playwright | ADR 0008 |

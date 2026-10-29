@@ -29,16 +29,22 @@ last_reviewed: 2026-10-28
 | Industry fit | How well an opportunity fits one target industry, from 0 to 100, returned by the Relevance Agent. |
 | KT document | A knowledge transfer document in `docs/kt/`. The KT documents are the source of truth for the project. |
 | Model judge | A model that grades free-text agent output with a written rubric during evals. |
+| Model call | One request to a model provider through AI Gateway, recorded with its tokens, latency, cost, and outcome (REQ-NFR-011). |
 | Opportunity | A software product or service idea derived from a research finding, with its agent outputs and score. |
+| Opportunity brief | A one-page PDF summary of one opportunity, built from stored data (REQ-DASH-009). |
 | Opportunity score | A weighted score from 0 to 100. See [scoring](scoring.md). |
 | Output contract | The fields an agent must return, with their types and ranges. |
 | Pain level | How severe the problem is for the customer, from 1 to 5, returned by the Problem Discovery Agent. |
 | Phase | A roadmap phase from 1 to 4, or `later`. See [roadmap](roadmap.md). |
 | Pipeline run | Durable work for one unit: a publication through triage and extraction, or one candidate through the agents and scoring (REQ-AGENT-007). |
+| Priority matrix | A chart of opportunities by Market Potential and Technical Feasibility, divided into four quadrants (REQ-DASH-010). |
 | Preprint | A paper published on arXiv before or without peer review. |
 | Publication | The canonical record of one paper, possibly found in several sources. See [data model](architecture/data-model.md). |
 | REQ-ID | A requirement identifier in the form `REQ-<AREA>-<NNN>`, for example `REQ-DATA-001`. |
+| Repair | A fix by plain code of output that is correct but wrapped wrongly, such as an array returned as a JSON string (REQ-AGENT-011). |
+| Role | Viewer, analyst, or admin: what an authenticated user may do (REQ-NFR-012). |
 | SAM | Serviceable addressable market: the part of the TAM the opportunity can reach. |
+| Score review | An analyst's confirmation or dispute of one score, with a reason; it never changes the score (REQ-SCORE-007, ADR 0007). |
 | Score model version | The version of the weights and derivation rules a score was computed with. |
 | Source record | The record of a publication as one source returned it. |
 | Startup concept | The output of the Startup Generator: name, model, pricing, USP, features, and next steps. |

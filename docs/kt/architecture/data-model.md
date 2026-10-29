@@ -3,7 +3,7 @@ title: Data model
 owner: "@SolarnodeCC"
 status: draft
 last_reviewed: 2026-10-28
-related: [REQ-DATA-005, REQ-DATA-007, REQ-SCORE-001, REQ-AGENT-007]
+related: [REQ-DATA-005, REQ-DATA-007, REQ-SCORE-001, REQ-SCORE-007, REQ-AGENT-007, REQ-NFR-011]
 ---
 
 # Data model
@@ -23,6 +23,8 @@ erDiagram
   CANDIDATE ||--o| OPPORTUNITY : becomes
   OPPORTUNITY ||--o{ SCORE : "scored as"
   SCORE }o--|| SCORE_MODEL : "computed with"
+  SCORE ||--o{ SCORE_REVIEW : "reviewed in"
+  PIPELINE_RUN ||--o{ MODEL_CALL : makes
 ```
 
 ## Records
@@ -39,10 +41,12 @@ erDiagram
 | Candidate | Publication, finding, evidence quote | REQ-PROC-004 |
 | Pipeline run | Candidate, status, start, end, cost | REQ-AGENT-007, REQ-NFR-005 |
 | Agent output | Envelope and output (see [contract conventions](../agents/contract-conventions.md)) | REQ-AGENT-007, REQ-AGENT-008 |
+| Model call | Run ID, step, agent, model, prompt version, attempt, input and output tokens, latency, cost, estimated flag, outcome; no prompt or publication text | REQ-NFR-011 |
 | Opportunity | Candidate, status (`complete`, `incomplete`, `hidden`), current score | REQ-SCORE-005 |
 | Score | Five category values, explanation, final score, band, score model version | REQ-SCORE-001, REQ-SCORE-004 |
 | Score model | Version, weights, derivation rule version | REQ-SCORE-003 |
-| User | Email, name, role, status, terms accepted date | REQ-ACC-003, REQ-ACC-006 |
+| Score review | Score ID, user, date, state (`confirmed` or `disputed`), reason | REQ-SCORE-007 |
+| User | Email, name, role, status, terms version and date accepted | REQ-ACC-003, REQ-NFR-012 |
 | Invitation | Email, role, inviting user, token hash, expiry, status | REQ-ACC-002 |
 | Session and sign-in link | Token hash, user, expiry, used flag | REQ-ACC-004 |
 | Audit event | Actor, action, time; never a token | REQ-ACC-009 |
@@ -56,7 +60,7 @@ erDiagram
 
 ## History
 
-Agent outputs and scores are never overwritten. A rerun creates a new pipeline run, and the opportunity points to its latest complete score. This keeps old scores explainable after a prompt, model, or score model change.
+Agent outputs, scores, and score reviews are never overwritten. A rerun creates a new pipeline run, and the opportunity points to its latest complete score. This keeps old scores explainable after a prompt, model, or score model change.
 
 ## Deletion
 

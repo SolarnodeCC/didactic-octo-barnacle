@@ -14,6 +14,12 @@ related: [REQ-NFR-002, REQ-NFR-003]
 | Cloud platform | Cloudflare Workers, Workflows, Queues, D1, R2, Vectorize, AI Gateway |
 | AI and agents | LangGraph, OpenAI, Anthropic, CrewAI (optional) |
 | Frontend | Next.js on Cloudflare Pages, Tailwind CSS |
+| Language and runtime | TypeScript (strict, ES modules); Node 24 LTS for tooling (ADR 0008) |
+| Package manager | pnpm workspaces (ADR 0008) |
+| Contract schemas | Zod in `packages/models` (ADR 0008) |
+| Tests | Vitest, `@cloudflare/vitest-plugin`, Playwright (ADR 0008) |
+| Embedding model | Workers AI `bge-base-en-v1.5` as the reference; final choice by benchmark (ADR 0010, OQ-005) |
+| PDF text extraction | unpdf in the document-processing Queue consumer (ADR 0009) |
 
 Adding a runtime service, package manifest, or infrastructure component that this table does not list requires an update to this document in the same pull request, and an ADR when it replaces a listed technology.
 
@@ -25,18 +31,14 @@ These proposals are not decisions yet. The table above changes when the ADR is a
 |---|---|---|
 | Agent runtime | LangGraph.js in TypeScript inside Cloudflare Workflows; drop CrewAI, which only exists for Python | ADR 0003 |
 | Service per layer | Mapping of each architecture layer to a Cloudflare service | ADR 0004 |
-| Authentication | Invitation-only accounts; one-time sign-in links sent through Resend; no passwords and no third-party identity providers | ADR 0007 |
+| Authentication | Invitation-only accounts; one-time sign-in links sent through Resend; no passwords and no third-party identity providers | ADR 0011 |
 | Dashboard hosting | Choose between Cloudflare Pages and the OpenNext adapter on Workers, which Cloudflare currently recommends for Next.js; verify before the first dashboard code | OQ-009 |
 
 ## Not chosen yet
 
 Each of these is chosen with the first code that needs it, in an ADR, and added to the table:
 
-- Language versions and package manager (OQ-018).
-- Schema library for contracts, for example Zod (OQ-018).
-- Embedding model (OQ-005).
-- PDF text extraction, within Worker CPU and memory limits (OQ-006).
-- Test tools: Vitest with the Cloudflare Workers pool, and Playwright, as proposed in [test levels](../test/levels.md) (OQ-018).
+- The final embedding model (OQ-005), chosen by the benchmark in ADR 0010.
 
 ## Platform limits to design for
 

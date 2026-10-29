@@ -3,7 +3,7 @@ title: Opportunity scoring
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-10-28
-related: [REQ-SCORE-001, REQ-SCORE-002, REQ-SCORE-003, REQ-SCORE-004, REQ-SCORE-005, REQ-SCORE-006]
+related: [REQ-SCORE-001, REQ-SCORE-002, REQ-SCORE-003, REQ-SCORE-004, REQ-SCORE-005, REQ-SCORE-006, REQ-SCORE-007]
 ---
 
 # Opportunity scoring
@@ -41,6 +41,10 @@ Each category value is stored with the agent fields it was read from and their e
 ## Versioning
 
 The weights and derivation rules together form a score model version. A change to either creates a new version; stored scores keep the version they were computed with, and scores from different versions are not mixed in one ranking without a rescore.
+
+## Review
+
+An analyst can confirm or dispute the current score and give a reason (REQ-SCORE-007). A review is stored next to the score and never changes the score, the band, or the ranking (ADR 0007). A new score from a rerun or a new score model version starts as unreviewed. Disputed scores feed calibration.
 
 ## Calibration
 
