@@ -71,7 +71,7 @@ For a single organization, that becomes: which developments will change our mark
 
 ## Success measures
 
-The targets below are provisional. They are fixed before phase 1 starts and are reviewed once, with data, at the end of phase 3 (OQ-032). A baseline method is agreed with the same review.
+The targets below are provisional. They are accepted for phase 1 and reviewed once, with data, at the end of phase 3. A baseline method is agreed with the same review.
 
 | Measure | How it is measured | Provisional target |
 |---|---|---|

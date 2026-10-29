@@ -28,7 +28,7 @@ Model providers receive publication text and prompts, never user data (security)
 | Cloudflare | Hosting, storage, AI Gateway | all platform data | data processing agreement, location of storage |
 | OpenAI / Anthropic (per configured model) | Model calls | publication text, prompts | data processing agreement, retention terms, no training on inputs |
 | Resend | Email delivery | email address | data processing agreement |
-| Web search provider (OQ-031) | Search for two agents | search queries built from publication topics | data processing agreement |
+| Web search provider (OQ-033) | Search for two agents | search queries built from publication topics | data processing agreement |
 
 Transfers outside the EU rely on the standard contractual clauses or the processors' adequacy status; legal confirms this for each processor before launch.
 

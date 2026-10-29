@@ -40,4 +40,4 @@ A publication is in scope (REQ-PROC-006) when at least one of its OpenAlex field
 - Share of publications with an abstract and with a storable PDF (ADR 0014).
 - Cost of triage and extraction per publication (REQ-NFR-005).
 
-Widen the scope only when the measured cost per complete opportunity fits the calibrated budget (OQ-021).
+Phase 2 does not start until the phase 1 measurements give a cost per publication (REQ-NFR-005). Widen the scope only when the measured cost per complete opportunity fits the calibrated budget (OQ-021).

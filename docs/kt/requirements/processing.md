@@ -94,3 +94,19 @@ Triage has a documented scope rule, a typed decision, and a golden set.
   3. The model part of triage follows the [contract conventions](../agents/contract-conventions.md) and has a contract test and a golden set of at least 20 entries (REQ-TEST-005).
   4. The daily limit and the time zone for the day boundary (UTC) are configuration.
 - Verification: unit tests on scope rules, contract test, and eval on the golden set
+
+### REQ-PROC-007: Thin end-to-end slice
+
+One publication runs through every layer with stubbed agents, so the value of the output can be judged early.
+
+- Phase: 2
+- Priority: must
+- Status: planned
+- Source: OQ-016
+- Depends on: REQ-PROC-004, REQ-PROC-005
+- Acceptance criteria:
+  1. A fixture publication is ingested, triaged, extracted, passed through every pipeline step with stubbed agent outputs, scored with a placeholder score model, and returned by the data API.
+  2. The slice runs in the development environment from one command or scheduled trigger and writes a run report (REQ-NFR-008).
+  3. The stubbed agent outputs are the examples of [examples](../examples/README.md), so the slice shows the final output shape.
+  4. Stubs are replaced agent by agent in phase 3 without changing the pipeline.
+- Verification: integration test of the slice with local bindings
