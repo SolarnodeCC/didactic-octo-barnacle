@@ -1,8 +1,8 @@
 ---
 title: Non-functional requirements
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-10-28
+status: approved
+last_reviewed: 2026-10-29
 ---
 
 # Non-functional requirements
