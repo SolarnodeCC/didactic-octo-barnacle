@@ -86,7 +86,7 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 
 ## Launch checklist (planned)
 
-Production launch needs all of these:
+The first production launch is an invited pilot without billing (see the non-goals in the [overview](overview.md)). It needs all of these:
 
 - Sending domain verified with SPF, DKIM, and DMARC (REQ-ACC-007).
 - Terms, privacy policy, author notice, and support contact published (REQ-ACC-011, [privacy](architecture/privacy.md)).
@@ -94,7 +94,8 @@ Production launch needs all of these:
 - Retention job running (REQ-NFR-015) and a restore drill done (REQ-NFR-017).
 - Calibrated daily budget set (OQ-021) and the alert email address and GitHub issue creation tested (REQ-NFR-019).
 - At least one active admin and a tested admin recovery path (REQ-ADM-001, REQ-ADM-002).
-- Load test on seeded data meets REQ-NFR-017.
+- Load test on seeded data meets REQ-NFR-017, run on staging.
+- A fixed monthly model budget for the pilot is set and communicated to the pilot users.
 
 ## Branches
 

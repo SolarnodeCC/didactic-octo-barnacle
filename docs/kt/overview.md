@@ -88,6 +88,9 @@ The targets below are provisional. They are accepted for phase 1 and reviewed on
 - Patents, grants, and news as sources.
 - Validating opportunities with customers; the platform prepares the next steps, people carry them out.
 - Multiple organizations with separate data (later, REQ-DASH-005).
+- Billing, pricing, customer contracts, and per-customer usage limits. The MVP is an invited pilot with a fixed monthly model budget; commercial terms are decided after the pilot, using the measured cost per opportunity.
+- Languages other than English. The interface, the agent outputs, and the briefs are in English, and ingestion is limited to English papers ([ingestion scope](data-sources/ingestion-scope.md)).
+- Bulk export of opportunity data. The single-opportunity brief (REQ-DASH-009) is the only export; a list export is a later requirement.
 
 ## Core workflow
 

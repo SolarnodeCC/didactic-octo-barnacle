@@ -17,7 +17,7 @@ The pilot scope for phases 1 and 2. It is deliberately narrow: measure volume an
 | arXiv categories | `cs.AI`, `cs.SE`, `cs.HC`, `cs.CY` (primary or cross-listed) |
 | OpenAlex window | works published in the last 30 days at the first run (REQ-DATA-009), then incremental |
 | OpenAlex topics | topics whose field or subfield appears in the topic map below |
-| Languages | English only |
+| Languages | English only (also the language of the interface, agent outputs, and briefs) |
 | Daily limit to extraction | 100 publications (provisional; set from the volume measured in phase 1) |
 | Day boundary | UTC |
 

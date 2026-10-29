@@ -262,6 +262,7 @@ The dashboard and the API meet stated availability and latency targets.
   2. The supported browsers are the current and previous major versions of Chrome, Edge, Firefox, and Safari.
   3. The availability target of the dashboard and the API is 99.5 % per month, and a breach raises an alert (REQ-NFR-008).
   4. The recovery point objective is 24 hours and the recovery time objective is 4 hours, tested once with a D1 restore before launch (see [operations](../operations.md)).
+  5. These targets are accepted for the pilot launch and are reviewed before general availability.
 - Verification: load test on seeded data and a restore drill
 
 ### REQ-NFR-018: Organization key on user-owned records
