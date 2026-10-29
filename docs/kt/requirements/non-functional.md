@@ -37,6 +37,22 @@ All calls to model providers, including embedding calls, go through Cloudflare A
   2. Tokens, cost, and latency per agent and per pipeline run can be read from the gateway.
 - Verification: code review and integration test
 
+### REQ-NFR-011: Usage recorded per model call
+
+Every model call is recorded in the platform's own database with its usage and cost.
+
+- Phase: 2
+- Priority: must
+- Status: planned
+- Source: KT review of a comparable internal governance platform (token use and cost transparency) and REQ-NFR-005
+- Depends on: REQ-NFR-003
+- Acceptance criteria:
+  1. Every model call, including embedding calls and retries, creates a model call record with the run ID, pipeline step, agent (when one applies), model, prompt version (when one applies), attempt number, input and output tokens, latency, cost as `Money`, and outcome (`ok`, `invalid-output`, or `provider-error`).
+  2. The cost comes from AI Gateway. When the gateway returns none, the cost is computed from a configured price table, the table version is stored, and the record is marked as estimated.
+  3. A record holds no publication text and no prompt text.
+  4. Totals per agent, per step, and per day can be computed from the records alone, and agree with the AI Gateway totals within the tolerance stated in the test.
+- Verification: integration test with a stubbed gateway
+
 ### REQ-NFR-005: Cost budget
 
 Model spending stays within a configured budget.
@@ -132,9 +148,26 @@ The platform processes as little personal data as possible.
 - Source: KT review of data protection
 - Acceptance criteria:
   1. Only public author metadata from the sources is stored: name, source identifiers such as ORCID, and affiliation.
-  2. User data is limited to what authentication and REQ-DASH-004 need.
+  2. User data is limited to what authentication, roles (REQ-NFR-012), score reviews (REQ-SCORE-007), and REQ-DASH-004 need.
   3. The processing of personal data is described in the security document.
 - Verification: code review
+
+### REQ-NFR-012: Roles
+
+Every authenticated user has exactly one role: viewer, analyst, or admin.
+
+- Phase: 4
+- Priority: should
+- Status: planned
+- Source: REQ-SCORE-007, REQ-DASH-008, and OQ-024
+- Depends on: REQ-NFR-007
+- Acceptance criteria:
+  1. A viewer can read opportunities, scores, and explanations, and export a brief.
+  2. An analyst can do everything a viewer can and also review scores (REQ-SCORE-007).
+  3. An admin can do everything an analyst can and also open the usage and cost view (REQ-DASH-008).
+  4. The API enforces the role. A request outside the role gets a forbidden error, whatever the dashboard shows.
+  5. A user's role can change without a deployment.
+- Verification: integration test and end-to-end test
 
 ## Documentation
 

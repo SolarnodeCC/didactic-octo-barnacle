@@ -17,6 +17,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0004](0004-map-layers-to-cloudflare-services.md) | Map architecture layers to Cloudflare services | Proposed |
 | [0005](0005-derive-category-scores.md) | Derive score categories from agent output | Proposed |
 | [0006](0006-evals-in-pull-requests.md) | Run live evals only for pull requests from this repository | Proposed |
+| [0007](0007-score-review-annotates-score.md) | A score review annotates the score and never changes it | Proposed |
 
 ## When an ADR is needed
 
