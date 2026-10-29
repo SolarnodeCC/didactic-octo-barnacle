@@ -126,7 +126,7 @@ Admins can see how much the platform spends on model calls and where.
 
 ### REQ-DASH-009: Opportunity brief
 
-A user can export a one-page brief of an opportunity as a PDF.
+A user can open a one-page, print-ready brief of an opportunity and save it as a PDF from the browser.
 
 - Phase: 4
 - Priority: could
@@ -134,7 +134,7 @@ A user can export a one-page brief of an opportunity as a PDF.
 - Source: KT review of a comparable internal governance platform (board pack export)
 - Depends on: REQ-DASH-001, REQ-SCORE-004
 - Acceptance criteria:
-  1. The brief holds the title, startup concept summary, score, band, the five category values with their explanation, business case summary, next steps, source publication with a link, evidence quotes, review state, score model version, and the date it was generated.
+  1. The brief is a print-ready HTML page at `/opportunities/:id/brief` with a print stylesheet; the platform generates no PDF file in the MVP. It holds the title, startup concept summary, score, band, the five category values with their explanation, business case summary, next steps, source publication with a link, evidence quotes, review state, score model version, and the date it was generated.
   2. Estimated market figures and unverified competitors are labeled as in REQ-DASH-001.
   3. The brief is built from stored data without a model call, so it matches what the dashboard shows.
   4. The brief contains no stored PDF or full text beyond evidence quotes of at most 500 characters (REQ-DATA-010).
@@ -149,11 +149,11 @@ The dashboard plots opportunities by Market Potential and Technical Feasibility.
 - Phase: 4
 - Priority: should
 - Status: planned
-- Source: KT review of a comparable internal governance platform (priority matrix) and OQ-025
+- Source: KT review of a comparable internal governance platform (priority matrix)
 - Depends on: REQ-DASH-002, REQ-API-001
 - Acceptance criteria:
   1. Each complete opportunity is one point, with Technical Feasibility on the x axis and Market Potential on the y axis, both from the category values of its score (0 to 100). No model call is made to draw the chart.
-  2. Two threshold lines divide the chart into four named quadrants. The thresholds and names are configuration (OQ-025), the chart shows the thresholds in use, and each quadrant shows its count. A value equal to a threshold counts as high.
+  2. Two threshold lines divide the chart into four named quadrants. The thresholds default to 60 for Market Potential and 60 for Technical Feasibility, and the quadrants are named Pursue now (both high), Needs technology (high market, low feasibility), Quick win (low market, high feasibility), and Monitor (both low). Thresholds and names are configuration, tuned on the calibration set (REQ-SCORE-006). The chart shows the thresholds in use, and each quadrant shows its count. A value equal to a threshold counts as high.
   3. A point shows its band by a label or marker shape in addition to color (REQ-DASH-006). Hover and keyboard focus show the title, score, and category values, and activating a point opens the detail view (REQ-DASH-001).
   4. The filters of REQ-DASH-002 apply to the chart.
   5. A table lists the same points with their quadrant, as the accessible alternative to the chart.

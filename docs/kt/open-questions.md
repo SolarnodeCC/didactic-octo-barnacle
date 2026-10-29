@@ -13,7 +13,6 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
-| OQ-004 | How do live evals run for pull requests without exposing secrets? | ADR 0006 | phase 3 |
 | OQ-005 | Which embedding model? | Reference model `bge-base-en-v1.5`; compare the candidates in ADR 0010 on the search fixture corpus (REQ-PROC-003) and select by benchmark | phase 2 |
 | OQ-022 | How is structured model output enforced across providers? | Use the provider's tool-use or JSON-schema mode through AI Gateway where available, and always validate with the schema from `packages/models`. Check on the golden set that the gateway passes the mode through, and record the mode per agent (REQ-AGENT-010) | phase 3 |
 
@@ -25,10 +24,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-011 | Which default currency and geography do market figures use? | EUR and the EU, with global figures allowed when stated | phase 3 |
 | OQ-021 | What calibrated daily model budget applies in production? | Measure cost per opportunity on the phase 3 golden set; lock the calibrated budget before scoring goes live | phase 4 |
 | OQ-024 | How are user roles assigned? | Roles (viewer, analyst, admin) are stored with the user and chosen on the invitation (ADR 0011, REQ-ACC-002); no Cloudflare Access groups (REQ-NFR-012) | phase 4 |
-| OQ-025 | Which thresholds and names define the quadrants of the priority matrix? | Start at 60 for Market Potential and 60 for Technical Feasibility, named Pursue now, Needs technology, Quick win, and Monitor; tune on the calibration set (REQ-DASH-010, REQ-SCORE-006) | phase 4 |
-| OQ-026 | How is the opportunity brief rendered to PDF within Worker limits? | Evaluate a JavaScript PDF library and a Cloudflare-hosted HTML-to-PDF service on the brief layout; fall back to a print-ready HTML page (REQ-DASH-009) | phase 4 |
 | OQ-027 | Does opportunity status (REQ-DASH-004) move into phase 4? | Yes, for the status and decision note only, because reviews already need user identity and a write API (REQ-SCORE-007, REQ-API-004). Organization profiles stay `later` | phase 4 |
-| OQ-028 | Who may invite, and what limits apply? | Admins only; a cap on pending invitations; an optional allowlist of email domains (REQ-ACC-002) | phase 4 |
 | OQ-030 | How long are the audit log and sign-in records kept? | 12 months, then deleted; state it in the privacy policy (REQ-ACC-009, REQ-ACC-011) | phase 4 |
 | OQ-034 | Who is the named owner per role once the team is staffed? | The MVP has one owner, `@SolarnodeCC`, for all areas; split the owner roles of the [KT README](README.md#ownership) and `.github/CODEOWNERS` when more people join | before launch |
 | OQ-017 | When do organization profiles and feedback come? | After the MVP (REQ-DASH-004, REQ-DASH-005) | later |
@@ -60,5 +56,9 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-029 | Build the invitation and magic-link flow directly, no authentication library | ADR 0011 |
 | OQ-031 | Superseded by OQ-033, which names the benchmark | ADR 0013 |
 | OQ-032 | Provisional success targets accepted for phase 1; reviewed once with data at the end of phase 3 | [Overview](overview.md) |
+| OQ-004 | Live evals run only for branches in this repository, in the `evals` environment with required reviewer approval | ADR 0006 |
+| OQ-025 | Thresholds 60 and 60, quadrants Pursue now, Needs technology, Quick win, Monitor, as configuration tuned on the calibration set | REQ-DASH-010 |
+| OQ-026 | The MVP brief is a print-ready HTML page; a PDF renderer is a later change | REQ-DASH-009 |
+| OQ-028 | Admins only invite; pending cap of 50 by default; optional allowlist of email domains per environment | REQ-ACC-002 |
 | OQ-006 | unpdf in the document-processing Queue consumer, with size and page caps and an abstract fallback | ADR 0009 |
 | OQ-018 | Node 24, pnpm workspaces, TypeScript, Zod, Vitest with `@cloudflare/vitest-plugin`, Playwright | ADR 0008 |

@@ -16,7 +16,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0003](0003-agent-runtime-typescript-workflows.md) | Run agents as plain TypeScript steps inside Cloudflare Workflows | Accepted |
 | [0004](0004-map-layers-to-cloudflare-services.md) | Map architecture layers to Cloudflare services | Accepted |
 | [0005](0005-derive-category-scores.md) | Derive score categories from agent output | Accepted |
-| [0006](0006-evals-in-pull-requests.md) | Run live evals only for pull requests from this repository | Proposed |
+| [0006](0006-evals-in-pull-requests.md) | Run live evals only for pull requests from this repository | Accepted |
 | [0007](0007-score-review-annotates-score.md) | A score review annotates the score and never changes it | Proposed |
 | [0008](0008-toolchain.md) | Toolchain: Node 24, pnpm, TypeScript, Zod, Vitest, Playwright | Accepted |
 | [0009](0009-pdf-extraction-unpdf.md) | Extract PDF text with unpdf inside the Queue consumer | Accepted |

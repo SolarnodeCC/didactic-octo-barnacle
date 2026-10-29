@@ -42,4 +42,4 @@ It also runs the `install` command from `.cursor/environment.json` twice to prov
 - Never skip, disable, or quarantine a failing test to get a green build. Fix the test or the code, or change the requirement through a reviewed pull request.
 - A flaky test is a defect. Make it deterministic.
 - Jobs for lint, build, unit, integration, contract, and end-to-end tests need no secrets (REQ-TEST-003).
-- Only the eval job uses secrets, from the `evals` GitHub environment, and only for branches in this repository (ADR 0006, proposed).
+- Only the eval job uses secrets, from the `evals` GitHub environment, and only for branches in this repository (ADR 0006).

@@ -74,4 +74,4 @@ Footer (every page):  Terms | Privacy | Support
 
 ## Brief export
 
-The brief (REQ-DASH-009) is a print-ready HTML page at `/opportunities/:id/brief` until OQ-026 decides the PDF renderer. It is available to every role and is not offered for incomplete opportunities.
+The brief (REQ-DASH-009) is a print-ready HTML page at `/opportunities/:id/brief` in the MVP; a PDF renderer is a later change. It is available to every role and is not offered for incomplete opportunities.

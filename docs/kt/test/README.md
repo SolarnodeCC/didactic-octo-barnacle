@@ -18,7 +18,7 @@ related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-TEST-005]
 
 - **Requirements first.** Every test names the REQ-ID it verifies (REQ-TEST-001), for example a Vitest case named `REQ-SCORE-002: maps 69 to Medium`.
 - **Deterministic where possible.** Scoring, parsing, and storage are plain code and get exact assertions. Only model output needs evals.
-- **No live calls in unit, integration, and contract tests** (REQ-TEST-003). Academic APIs use recorded fixtures; model calls are stubbed. Live evals run in a separate eval job for prompt and model changes and nightly (ADR 0006, proposed).
+- **No live calls in unit, integration, and contract tests** (REQ-TEST-003). Academic APIs use recorded fixtures; model calls are stubbed. Live evals run in a separate eval job for prompt and model changes and nightly (ADR 0006).
 - **Contracts before quality.** Agent output must always match its contract (REQ-TEST-002). Output quality is measured with evals against thresholds (REQ-TEST-004, REQ-TEST-005).
 - **Tests live next to the code** they test, inside each app, agent, or package.
 

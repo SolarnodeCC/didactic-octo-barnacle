@@ -39,7 +39,7 @@ An administrator invites a person by email and assigns a role.
   3. The invitation token has at least 128 bits of randomness, and only its hash is stored.
   4. Resending an invitation invalidates the earlier token. A revoked or expired invitation is refused with a message that does not reveal whether an account exists.
   5. An administrator sees each invitation as pending, accepted, expired, or revoked.
-  6. The number of pending invitations is capped by configuration.
+  6. The number of pending invitations is capped by configuration (default 50). An optional allowlist of email domains per environment restricts which addresses can be invited; when it is set, an invitation to another domain is refused with a clear message.
 - Verification: integration test and end-to-end test
 
 ### REQ-ACC-003: Create an account after opening an invitation

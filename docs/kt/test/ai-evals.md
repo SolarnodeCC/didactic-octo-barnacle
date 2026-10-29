@@ -56,7 +56,7 @@ Agent evals check each agent alone. The calibration set (REQ-SCORE-006, at least
 | Nightly | live model through AI Gateway | reports regressions, does not block |
 | Other pull requests | none | no eval run |
 
-Eval runs that call live models use the secrets of the `evals` GitHub environment, which requires approval by a reviewer before a job starts, and never run on code from forks (ADR 0006, proposed). Search results for the Market Analysis and Competition evals are recorded fixtures (REQ-AGENT-013). Sampling settings are fixed in the model configuration for eval runs.
+Eval runs that call live models use the secrets of the `evals` GitHub environment, which requires approval by a reviewer before a job starts, and never run on code from forks (ADR 0006). Search results for the Market Analysis and Competition evals are recorded fixtures (REQ-AGENT-013). Sampling settings are fixed in the model configuration for eval runs.
 
 ## Cost and latency
 

@@ -51,7 +51,8 @@ States that every screen handles the same way. All messages are plain text (REQ-
 | Hide reason | Required, 1 to 500 characters | "Give a reason for hiding" |
 | Invitation role | Required, one of viewer, analyst, admin | "Choose a role" |
 | Date range | Start not after end; at most 24 months | "Choose a valid date range" |
-| Pending invitation cap | Configured cap | "The limit of pending invitations is reached" |
+| Pending invitation cap | Configured cap, default 50 | "The limit of pending invitations is reached" |
+| Invitation email domain | Must be on the allowlist when one is set | "This email domain is not allowed" |
 
 ## Labels
 
