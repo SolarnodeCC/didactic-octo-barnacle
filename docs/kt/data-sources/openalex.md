@@ -36,4 +36,4 @@ Used for publications, authors, institutions, topics, and citations. OpenAlex is
 
 ## Credentials
 
-Credentials, if any, live in the Cursor environment Secrets tab or GitHub Actions secrets. Record the secret name in [operations](../operations.md) when it is introduced.
+The collector uses an OpenAlex API key or contact email registered by the project owner (ADR 0020). It lives in the Cursor environment Secrets tab, GitHub Actions secrets, or a Worker secret. The name, `OPENALEX_API_KEY`, is in [operations](../operations.md); never commit the value.

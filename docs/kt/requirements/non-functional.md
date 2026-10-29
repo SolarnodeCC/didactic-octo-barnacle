@@ -297,3 +297,20 @@ Alerts reach people by email and open a GitHub issue.
   4. An alert never contains publication text, prompts, user data, or secrets.
   5. The alert credentials are secrets listed in [operations](../operations.md); the GitHub token can only create and comment on issues.
 - Verification: integration test with stubbed email and GitHub clients
+
+### REQ-NFR-020: Migrations and environment bootstrap
+
+Database changes and environment resources are created by versioned, repeatable steps.
+
+- Phase: 1
+- Priority: must
+- Status: planned
+- Source: Readiness assessment; ADR 0020
+- Depends on: REQ-NFR-002
+- Acceptance criteria:
+  1. The bootstrap script creates every missing resource of an environment, and a second run changes nothing and reports no drift.
+  2. Migrations are numbered SQL files, applied in order before the Worker that needs them, and are never edited after they have been applied in production.
+  3. A migration keeps the previous Worker version working (add first, remove in a later migration after the old version is gone).
+  4. A test applies all migrations to an empty local database and checks that the tables and columns the contracts in `packages/models` need exist.
+  5. Each environment's token and account ID are secrets listed in [operations](../operations.md), with the least permissions the environment needs.
+- Verification: integration test of the migrations and the bootstrap against local bindings

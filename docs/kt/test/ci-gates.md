@@ -13,7 +13,7 @@ A gate blocks a merge when it fails. Gates add up: each phase keeps the gates of
 | Phase | Gates added |
 |---|---|
 | Now (specification only) | Configuration check, KT check, workspace install |
-| 1 | Lint, format, typecheck, build, unit tests, integration tests, traceability check (REQ-TEST-001), dependency review |
+| 1 | Lint (ESLint), format check (Prettier), typecheck, build, unit tests, integration tests, traceability check (REQ-TEST-001), dependency review |
 | 2 | Contract tests (REQ-TEST-002) |
 | 3 | Evals on prompt and model changes (REQ-TEST-004) |
 | 4 | End-to-end tests for the dashboard, including the accessibility check |

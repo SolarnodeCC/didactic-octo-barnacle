@@ -48,7 +48,7 @@ The planned layout once code exists:
 | `packages/models` | Schemas for records, agent contracts, and the API; shared by all code | REQ-TEST-002, REQ-API-003 |
 | `packages/prompts` | One versioned prompt per agent | REQ-TEST-004 |
 | `packages/vector-store` | Embedding and Vectorize access, semantic search | REQ-PROC-001, REQ-PROC-002, REQ-PROC-003 |
-| `infrastructure/cloudflare` | Wrangler configuration, bindings, migrations | REQ-NFR-002 |
+| `infrastructure/cloudflare` | Wrangler configuration per environment, bindings, SQL migrations, and the idempotent bootstrap script (ADR 0020) | REQ-NFR-002, REQ-NFR-020 |
 
 Each agent directory holds its agent functions, their tests, and their golden sets under `evals/`. `packages/scoring` holds unit tests with fixed inputs. Fixtures live next to the tests that use them (see [test data](../test/test-data.md)).
 

@@ -35,11 +35,11 @@ CI is defined in `.github/workflows/config.yml` and runs on every pull request a
 | staging | Launch checklist, load test, restore drill, email checks | `main`, before production | a smaller ingestion scope, production-like volume |
 | production | The running platform | `main`, after CI passes | full ingestion scope |
 
-Each environment has its own D1 database, R2 bucket, Vectorize index, Queues with dead-letter queues, Durable Object namespace, AI Gateway, budget (REQ-NFR-005), and Cloudflare API token. A staging environment is a production-like copy: its own D1 database, R2 bucket, Vectorize index, Queues, Durable Object namespace, AI Gateway, budget, and the production Resend sending domain, fed by a smaller ingestion scope. It is deployed from `main` before production and is where the load test, the restore drill, and the email checks of the launch checklist run. Preview stays for pull requests.
+A bootstrap script in `infrastructure/cloudflare` creates the resources of an environment when they are missing and reports drift; running it twice changes nothing (REQ-NFR-020). Each environment has its own D1 database, R2 bucket, Vectorize index, Queues with dead-letter queues, Durable Object namespace, AI Gateway, budget (REQ-NFR-005), and Cloudflare API token. A staging environment is a production-like copy: its own D1 database, R2 bucket, Vectorize index, Queues, Durable Object namespace, AI Gateway, budget, and the production Resend sending domain, fed by a smaller ingestion scope. It is deployed from `main` before production and is where the load test, the restore drill, and the email checks of the launch checklist run. Preview stays for pull requests.
 
 ## Deployment (planned)
 
-A GitHub Actions job deploys with Wrangler after a merge to `main`. Database migrations run before the Worker that needs them. A rollback redeploys the previous version; migrations are written so the previous version still works with the new schema.
+A GitHub Actions job deploys with Wrangler after a merge to `main`. Database migrations are plain SQL files that `wrangler d1 migrations` applies before the Worker that needs them (ADR 0020, REQ-NFR-020). A rollback redeploys the previous version; migrations are written so the previous version still works with the new schema.
 
 ## Schedules (planned)
 
@@ -80,6 +80,8 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 | Secret name | Purpose | Stored in | Environments |
 |---|---|---|---|
 | `RESEND_API_KEY` | Sends invitation and sign-in emails (REQ-ACC-007) | Cloudflare Worker secret; GitHub Actions secret for deployment | preview, production |
+| `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | Deploy with Wrangler and run the bootstrap script; the token has the least permissions each environment needs | GitHub Actions secret | preview, staging, production |
+| `OPENALEX_API_KEY` | OpenAlex requests by the collector (REQ-DATA-001) | Worker secret; GitHub Actions secret for tests that need it | preview, staging, production |
 | `ALERT_GITHUB_TOKEN` | Opens and comments on alert issues; a fine-grained token limited to issues on this repository (REQ-NFR-019) | Cloudflare Worker secret | preview, staging, production |
 | `ALERT_EMAIL_TO` | Ops address that receives alert emails (REQ-NFR-019) | Worker variable | preview, staging, production |
 | Eval provider and AI Gateway credentials (names set when the eval job is added) | Live evals (REQ-TEST-004, ADR 0006) | GitHub environment `evals`, with required reviewer approval | evals |

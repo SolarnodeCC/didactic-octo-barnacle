@@ -17,6 +17,9 @@ related: [REQ-NFR-002, REQ-NFR-003, REQ-AGENT-013]
 | Language and runtime | TypeScript (strict, ES modules); Node 24 LTS for tooling (ADR 0008) |
 | Package manager | pnpm workspaces (ADR 0008) |
 | Contract schemas | Zod in `packages/models` (ADR 0008) |
+| Lint and format | ESLint and Prettier (ADR 0020) |
+| Database migrations | Plain SQL files applied with `wrangler d1 migrations`; no ORM (ADR 0020) |
+| Environment resources | Wrangler configuration per environment plus an idempotent bootstrap script; no Terraform (ADR 0020) |
 | Tests | Vitest, `@cloudflare/vitest-plugin`, Playwright (ADR 0008) |
 | Embedding model | Workers AI `bge-base-en-v1.5` as the reference; final choice by benchmark (ADR 0010, OQ-005) |
 | PDF text extraction | unpdf in the document-processing Queue consumer (ADR 0009) |
@@ -37,7 +40,6 @@ Each of these is chosen with the first code that needs it, in an ADR, and added 
 
 - The final embedding model (OQ-005), chosen by the benchmark in ADR 0010.
 - The web search provider (OQ-033), chosen before phase 3.
-- Lint and format tools, chosen with the first package.
 
 ## Platform limits to design for
 

@@ -30,6 +30,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0017](0017-durable-objects-for-global-limits.md) | Add Durable Objects for global limits | Accepted |
 | [0018](0018-separate-auth-and-admin-api.md) | Separate the auth and admin API from the read API | Accepted |
 | [0019](0019-organization-key-from-the-start.md) | Carry an organization key on user-owned records from the start | Accepted |
+| [0020](0020-foundation-tooling.md) | Foundation tooling: lint, migrations, infrastructure bootstrap, accounts | Accepted |
 
 ## When an ADR is needed
 

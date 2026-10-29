@@ -8,7 +8,7 @@ related: [REQ-DATA-005, REQ-DATA-007, REQ-DATA-011, REQ-SCORE-001, REQ-SCORE-007
 
 # Data model
 
-The logical records the platform stores. Table and column names are decided with the first migration; the storage service for each record is proposed in ADR 0004.
+The logical records the platform stores. Table and column names are decided with the first migration, written as plain SQL (ADR 0020, REQ-NFR-020); the storage service for each record is proposed in ADR 0004.
 
 ```mermaid
 erDiagram
