@@ -60,7 +60,7 @@ The dashboard is usable with a keyboard and a screen reader.
 - Status: planned
 - Source: KT review of non-functional requirements
 - Acceptance criteria:
-  1. The flows in REQ-DASH-001 and REQ-DASH-002 have no WCAG 2.2 level A or AA violations in an automated accessibility check.
+  1. The flows in REQ-DASH-001 and REQ-DASH-002, and the sign-in, create-account, and settings flows (REQ-ACC-003, REQ-ACC-004, REQ-ACC-010), have no WCAG 2.2 level A or AA violations in an automated accessibility check.
   2. Score bands are not shown by color alone.
 - Verification: end-to-end test with an automated accessibility check
 
@@ -158,3 +158,64 @@ The dashboard plots opportunities by Market Potential and Technical Feasibility.
   5. A table lists the same points with their quadrant, as the accessible alternative to the chart.
   6. Incomplete opportunities are not plotted (REQ-SCORE-005).
 - Verification: unit tests of quadrant assignment on boundary values and end-to-end test
+
+### REQ-DASH-011: Home
+
+A landing page shows what is new since the user's last visit.
+
+- Phase: 4
+- Priority: should
+- Status: planned
+- Source: screen specification for the signed-in experience
+- Depends on: REQ-DASH-001, REQ-DASH-002
+- Acceptance criteria:
+  1. Home shows the number of opportunities scored since the user's last visit, how many of them are High or Exceptional, the total number of scored opportunities, and the top 3 to 5 opportunities by score.
+  2. Incomplete and hidden opportunities are excluded (REQ-SCORE-005, REQ-DATA-008).
+  3. The time of the latest completed data update is shown.
+  4. A first visit shows totals only, and a system with no scored opportunities shows an explanation instead of zeros.
+- Verification: end-to-end test
+
+### REQ-DASH-012: Pipeline health
+
+Admins can see whether ingestion and the pipeline are healthy.
+
+- Phase: 4
+- Priority: should
+- Status: planned
+- Source: screen specification for the administrator experience
+- Depends on: REQ-NFR-005, REQ-NFR-008, REQ-NFR-012
+- Acceptance criteria:
+  1. The view shows, per source, the last run with its counts and failures, and the number of incomplete opportunities.
+  2. The view shows when a budget stop happened (REQ-NFR-005) and links to the usage and cost view (REQ-DASH-008) for cost.
+  3. A user who is not an admin is refused (REQ-NFR-012).
+- Verification: end-to-end test and integration test
+
+### REQ-DASH-013: Review queue
+
+Analysts and admins can work through opportunities that need a human decision.
+
+- Phase: later
+- Priority: could
+- Status: planned
+- Source: screen specification for quality review
+- Depends on: REQ-SCORE-005, REQ-DATA-008, REQ-SCORE-006, REQ-DASH-007
+- Acceptance criteria:
+  1. The queue lists incomplete, hidden, and flagged opportunities with the reason.
+  2. An analyst or admin records a decision with an optional reason; it is stored with the user and the date.
+  3. Decisions can be exported for score calibration (REQ-SCORE-006).
+- Verification: end-to-end test
+
+### REQ-DASH-014: System pages
+
+Errors and expired sessions are handled the same way on every page.
+
+- Phase: 4
+- Priority: must
+- Status: planned
+- Source: screen specification for error states
+- Depends on: REQ-NFR-007
+- Acceptance criteria:
+  1. A request for a page the user may not see and a request for a page that does not exist show the same wording, so that the response does not reveal whether the page exists.
+  2. An expired session returns the user to sign-in and, after sign-in, to the page that was requested.
+  3. Error pages show no stack traces. Administrators see a reference ID that matches the log entry.
+- Verification: end-to-end test

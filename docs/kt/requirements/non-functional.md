@@ -135,7 +135,8 @@ Only authenticated users can use the dashboard and the API.
 - Source: KT review of security
 - Acceptance criteria:
   1. An unauthenticated request to the dashboard or the API is refused.
-  2. Access is granted to named users or groups and can be revoked without a deployment.
+  2. Access is granted only to users created from an invitation (REQ-ACC-001) and can be revoked without a deployment (REQ-ACC-006).
+  3. The dashboard and the API accept the same session (REQ-ACC-004).
 - Verification: end-to-end test
 
 ### REQ-NFR-009: Personal data
@@ -148,7 +149,7 @@ The platform processes as little personal data as possible.
 - Source: KT review of data protection
 - Acceptance criteria:
   1. Only public author metadata from the sources is stored: name, source identifiers such as ORCID, and affiliation.
-  2. User data is limited to what authentication, roles (REQ-NFR-012), score reviews (REQ-SCORE-007), and REQ-DASH-004 need.
+  2. User data is limited to the name and email address that accounts need (REQ-ACC-003), sign-in records, roles (REQ-NFR-012), score reviews (REQ-SCORE-007), and REQ-DASH-004.
   3. The processing of personal data is described in the security document.
 - Verification: code review
 

@@ -43,6 +43,7 @@ related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-TEST-005]
 | Throughput | Load test on recorded fixtures with stubbed models | REQ-NFR-010 |
 | Accessibility | Automated accessibility check in the end-to-end tests | REQ-DASH-006 |
 | Access control | End-to-end test of unauthenticated requests | REQ-NFR-007 |
+| Accounts | End-to-end tests of the invitation, create-account, settings, and sign-in flows with a stubbed Resend, including a link opened by a mail scanner; integration tests of token expiry, reuse, and rate limits | REQ-ACC-001 to REQ-ACC-011 |
 
 ## Responsibilities
 

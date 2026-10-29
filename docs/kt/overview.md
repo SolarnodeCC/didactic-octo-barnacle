@@ -35,7 +35,7 @@ In this documentation, a **validated** opportunity is one whose every claim cite
 | Venture builder | Find startup concepts worth validating | Concepts with a business case and next steps |
 | Domain reviewer | Judge whether the platform's output is right | Golden sets, evidence, and a way to record feedback |
 
-The MVP serves one internal team (OQ-010 in [open questions](open-questions.md)).
+The MVP serves invited users in one shared workspace (OQ-010 in [open questions](open-questions.md)).
 
 ## Vision
 

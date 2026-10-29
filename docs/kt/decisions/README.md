@@ -21,6 +21,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0008](0008-toolchain.md) | Toolchain: Node 24, pnpm, TypeScript, Zod, Vitest, Playwright | Accepted |
 | [0009](0009-pdf-extraction-unpdf.md) | Extract PDF text with unpdf inside the Queue consumer | Accepted |
 | [0010](0010-embedding-model-benchmark.md) | Choose the embedding model by benchmark, starting from bge-base-en-v1.5 | Accepted |
+| [0011](0011-invitation-only-accounts-with-magic-links.md) | Invitation-only accounts with magic links sent through Resend | Proposed |
 
 ## When an ADR is needed
 
