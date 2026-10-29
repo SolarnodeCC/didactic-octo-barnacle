@@ -1,7 +1,7 @@
 ---
 title: Admin requirements
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-10-29
 related: [REQ-API-005, REQ-NFR-012, REQ-ACC-009]
 ---

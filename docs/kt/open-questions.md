@@ -27,8 +27,8 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
-| OQ-014 | May we widen full-text use (transient processing, quotes from non-redistributable papers), and do the source and model provider terms allow commercial use? | Legal review of arXiv, OpenAlex, and Semantic Scholar terms and of the provider terms, by a named legal contact, with a written answer. Phase 1 runs abstract-first and stores only license-permitted PDFs (ADR 0014, REQ-DATA-010) | before phase 2 starts |
-| OQ-033 | Which two web search providers are benchmarked for Market Analysis and Competition? | Pick two candidates before phase 3 and compare them on a competitor-recall set for recall, cost per call, terms for storing results, and data processing agreement; record the choice in an ADR (ADR 0013, REQ-AGENT-013) | phase 3 |
+| OQ-014 | May we widen full-text use (transient processing, quotes from non-redistributable papers), and do the source and model provider terms allow commercial use? | Legal review of arXiv, OpenAlex, and Semantic Scholar terms and of the provider terms, by a legal contact named by the project owner, with a written answer. Phase 1 runs abstract-first and stores only license-permitted PDFs (ADR 0014, REQ-DATA-010) | before phase 2 starts |
+| OQ-033 | Which two web search providers are benchmarked for Market Analysis and Competition? | Choose the two candidates at the start of phase 3 after a short market check, then compare them on a competitor-recall set for recall, cost per call, terms for storing results, and data processing agreement; record the choice in an ADR (ADR 0013, REQ-AGENT-013) | start of phase 3 |
 | OQ-015 | Who are the named golden-set and calibration reviewers? | One named expert per target industry (government, healthcare, financial services, enterprise), plus two reviewers on a shared sample to measure agreement | before phase 3 |
 
 ## Answered

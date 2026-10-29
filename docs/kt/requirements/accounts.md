@@ -1,7 +1,7 @@
 ---
 title: Account requirements
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-10-29
 related: [REQ-NFR-007, REQ-NFR-009, REQ-NFR-012]
 ---
