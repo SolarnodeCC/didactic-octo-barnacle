@@ -224,3 +224,19 @@ Errors and expired sessions are handled the same way on every page.
   2. An expired session returns the user to sign-in and, after sign-in, to the page that was requested.
   3. Error pages show no stack traces. Administrators see a reference ID that matches the log entry.
 - Verification: end-to-end test
+
+### REQ-DASH-015: Search by meaning
+
+A user can search opportunities by describing a problem or technology in words.
+
+- Phase: 4
+- Priority: should
+- Status: planned
+- Source: Readiness assessment; REQ-PROC-003
+- Depends on: REQ-API-006, REQ-DASH-002
+- Acceptance criteria:
+  1. A search box on the Opportunities screen sends the query to REQ-API-006 and shows the results in the list layout, ordered by similarity, with the similarity as text.
+  2. The filters of REQ-DASH-002 apply to the results, and clearing the query returns to the score ranking.
+  3. A query with no results shows the empty state; a query that is too short or too long shows the validation message (see [screen states](../ux/states.md)).
+  4. The search box is keyboard operable and labeled for screen readers (REQ-DASH-006).
+- Verification: end-to-end test

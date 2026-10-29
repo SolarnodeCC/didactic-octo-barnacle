@@ -206,3 +206,19 @@ Market Analysis and Competition can search the web for sources, under bounds and
   4. A competitor is `Verified: true` only when a result supports it. A figure is `Basis: sourced` only when it cites a result as `external-url` evidence with the retrieval date.
   5. Eval and contract tests use recorded search results and make no live search calls (REQ-TEST-003).
 - Verification: contract tests with recorded tool results and injection fixtures, and eval
+
+### REQ-AGENT-014: Pinned model versions
+
+Every agent uses an exact model version, and a version change goes through the evals.
+
+- Phase: 3
+- Priority: must
+- Status: planned
+- Source: Readiness assessment
+- Depends on: REQ-AGENT-010, REQ-TEST-004
+- Acceptance criteria:
+  1. The model configuration of each agent names an exact model version; floating aliases are not accepted by the configuration check.
+  2. Changing a pinned version is a pull request that runs the agent's evals (REQ-TEST-004) and records the old and new version.
+  3. The nightly eval run reports a provider deprecation or a behavior change for any pinned version, and the envelope stores the exact version used (see [contract conventions](../agents/contract-conventions.md)).
+  4. A model that the provider retires is replaced before its retirement date; the run report lists pinned versions with their announced retirement dates.
+- Verification: unit test of the configuration check and CI job

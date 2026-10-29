@@ -71,7 +71,7 @@ An existing user signs in with a link sent by email.
   1. A sign-in link works once and expires after 15 minutes. Only its hash is stored.
   2. The response to a link request is the same whether or not an account exists for the address.
   3. A link requested for an address with a pending invitation and no account leads to the create-account screen.
-  4. A session cookie is `HttpOnly`, `Secure`, and `SameSite=Lax`, and has a configured lifetime.
+  4. A session cookie is `HttpOnly`, `Secure`, and `SameSite=Lax`, and has a lifetime of 7 days absolute and 24 hours idle (24 hours absolute for the admin role), all configurable.
   5. The dashboard and the API accept the same session and refuse a request without one (REQ-NFR-007).
   6. A sign-in or invitation link opens a confirmation page, and the token is consumed only when the person presses Continue, so that mail scanners that open links do not use it up.
 - Verification: integration test and end-to-end test, including a test that opens the link with a plain GET request first
@@ -85,8 +85,8 @@ Link requests and invitation use are rate limited.
 - Status: planned
 - Source: KT review of security
 - Acceptance criteria:
-  1. Sign-in link requests are limited per email address and per IP address.
-  2. Failed or reused tokens are limited per IP address. The counters are kept in a Durable Object (ADR 0017), and the IP address is taken from the `CF-Connecting-IP` header.
+  1. Sign-in link requests are limited to 5 per hour per email address and 20 per hour per IP address.
+  2. Failed or reused tokens are limited to 10 per hour per IP address. The counters are kept in a Durable Object (ADR 0017), and the IP address is taken from the `CF-Connecting-IP` header.
   3. A limited request returns the generic response of REQ-ACC-004 or a rate-limit error that does not reveal whether an account exists.
 - Verification: integration test
 

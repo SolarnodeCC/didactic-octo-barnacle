@@ -18,7 +18,7 @@ related: [REQ-DASH-001, REQ-DASH-002, REQ-DASH-003, REQ-DASH-007, REQ-DASH-008, 
 | 4 | Link problem (expired, used, invalid) | `/link/problem` | public | REQ-ACC-002, REQ-ACC-004 |
 | 5 | Create account | `/welcome` | invited | REQ-ACC-003 |
 | 6 | Home | `/` | all | REQ-DASH-011 |
-| 7 | Opportunities | `/opportunities` | all | REQ-DASH-002, REQ-DASH-007 |
+| 7 | Opportunities | `/opportunities` | all | REQ-DASH-002, REQ-DASH-007, REQ-DASH-015 |
 | 8 | Opportunity detail | `/opportunities/:id` | all | REQ-DASH-001, REQ-DASH-007, REQ-DASH-009 |
 | 9 | Priority matrix | `/matrix` | all | REQ-DASH-010 |
 | 10 | Trends | `/trends` | all | REQ-DASH-003 |
@@ -59,7 +59,7 @@ Footer (every page):  Terms | Privacy | Support
 | Link problem | Reason in plain words without revealing whether an account exists; a request-new-link action | Request a new link | Sign in |
 | Create account | Email read-only, name (1 to 100 characters), terms and privacy checkbox | Create account | Home |
 | Home | New since last visit, High and Exceptional count, total, top 3 to 5, last data update | Open an opportunity | Detail, list |
-| Opportunities | Table of score, band, title, startup name, industry, publication date, review state; sort, filter, cursor pagination | Open an opportunity | Detail |
+| Opportunities | Search box, table of score, band, title, startup name, industry, publication date, review state; sort, filter, cursor pagination | Open an opportunity | Detail |
 | Opportunity detail | Header (title, score, band, labels), five categories with explanation and evidence, concept and business case, next steps, source publication, agent outputs, review panel, status panel (pursued, parked, rejected, with a note), brief export | Review the score; export brief | List |
 | Priority matrix | Scatter of Technical Feasibility against Market Potential, quadrant counts, table alternative | Open a point | Detail |
 | Trends | Opportunities per industry over time; publications per topic over time; date range | Change range | none |

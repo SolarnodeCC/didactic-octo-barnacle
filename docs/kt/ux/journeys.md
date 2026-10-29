@@ -24,7 +24,7 @@ related: [REQ-NFR-012, REQ-DASH-001, REQ-DASH-002, REQ-DASH-007, REQ-ACC-003]
 |---|---|---|---|
 | J1 | Join | Admin invites an email → person opens the link → Continue → Create account (name, terms) → Home | Account exists with the invited role |
 | J2 | Return | Sign in → enter email → open link → Continue → Home | Signed in without a password |
-| J3 | Find an opportunity | Home → Opportunities → filter by industry and band → open detail | The user sees the score, why, and the source |
+| J3 | Find an opportunity | Home → Opportunities → filter by industry and band, or search by describing a problem → open detail | The user sees the score, why, and the source |
 | J4 | Decide | Detail → read categories and evidence → read next steps → export brief | A one-page brief |
 | J5 | Review a score | Detail → Confirm or Dispute with a reason | The review is stored; the score and ranking do not change |
 | J6 | Explore | Matrix → hover or focus a point → open detail; Trends → change range | Patterns across opportunities |
