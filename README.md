@@ -36,12 +36,14 @@ Cloudflare Workers, Workflows, Queues, D1, R2, Vectorize, and AI Gateway; Next.j
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Before opening a pull request:
+See [CONTRIBUTING.md](CONTRIBUTING.md). Before opening a pull request (Node 24, pnpm via Corepack):
 
 ```bash
 python3 -m pip install -r scripts/requirements.txt
 python3 scripts/check-config.py
 python3 scripts/check-kt.py
+pnpm install --frozen-lockfile
+pnpm lint && pnpm format:check && pnpm typecheck && pnpm build && pnpm test:unit && pnpm check:traceability
 ```
 
 ---

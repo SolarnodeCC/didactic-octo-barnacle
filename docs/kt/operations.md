@@ -2,29 +2,38 @@
 title: Operations
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-28
+last_reviewed: 2026-10-29
 related: [REQ-NFR-001, REQ-NFR-005, REQ-NFR-008, REQ-NFR-015, REQ-NFR-017, REQ-ADM-001, REQ-ADM-002]
 ---
 
 # Operations
 
-The repository is specification-only. There is no deployed service, dev server, or application package yet. Sections marked *planned* describe how operations will work once code exists; they follow ADR 0004, which is still proposed.
+The repository holds the KT documents and the phase 1 foundation toolchain (`packages/models`, pnpm workspace, lint, and CI). Runtime Workers and deployment are still planned; sections marked *planned* describe how they will work once those packages exist (ADR 0004, ADR 0020).
 
 ## Checks
 
 | Check | Command | Runs in CI |
 |---|---|---|
-| Configuration | `python3 scripts/check-config.py` | yes |
-| KT documents | `python3 scripts/check-kt.py` | yes |
-| Workspace | the `install` command in `.cursor/environment.json` | yes |
+| Configuration | `python3 scripts/check-config.py` | yes (`Configuration` / `parse`) |
+| KT documents | `python3 scripts/check-kt.py` | yes (`Configuration` / `parse`) |
+| Workspace | the `install` command in `.cursor/environment.json` | yes (`Configuration` / `parse`) |
+| Lint | `pnpm lint` | yes (`CI` / `toolchain`) |
+| Format | `pnpm format:check` | yes (`CI` / `toolchain`) |
+| Typecheck | `pnpm typecheck` | yes (`CI` / `toolchain`) |
+| Build | `pnpm build` | yes (`CI` / `toolchain`) |
+| Unit tests | `pnpm test:unit` | yes (`CI` / `toolchain`) |
+| Traceability | `pnpm check:traceability` | yes (`CI` / `toolchain`) |
 
-Install the Python dependency first:
+Install the Python dependency first, then the Node workspace (Node 24, ADR 0008):
 
 ```bash
 python3 -m pip install -r scripts/requirements.txt
+corepack enable
+corepack prepare pnpm@10.18.2 --activate
+pnpm install --frozen-lockfile
 ```
 
-CI is defined in `.github/workflows/config.yml` and runs on every pull request and on pushes to `main`.
+CI is defined in `.github/workflows/config.yml` and `.github/workflows/ci.yml` and runs on every pull request and on pushes to `main`.
 
 ## Environments (planned)
 

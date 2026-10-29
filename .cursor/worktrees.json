@@ -5,6 +5,10 @@
     "git rev-parse --is-inside-work-tree >/dev/null",
     "command -v git >/dev/null",
     "command -v node >/dev/null",
-    "command -v python3 >/dev/null"
+    "command -v python3 >/dev/null",
+    "node -e \"const m=process.versions.node.split('.')[0]; if (m!=='24') { console.error('Node 24 required (ADR 0008); found '+process.version); process.exit(1); }\"",
+    "corepack enable",
+    "corepack prepare pnpm@10.18.2 --activate",
+    "pnpm install --frozen-lockfile"
   ]
 }

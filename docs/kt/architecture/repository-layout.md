@@ -2,7 +2,7 @@
 title: Repository layout
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-28
+last_reviewed: 2026-10-29
 ---
 
 # Repository layout
@@ -31,7 +31,7 @@ The planned layout once code exists:
 └── scripts
 ```
 
-`docs/kt` and `scripts` exist today. The other directories are not implemented yet. When an application is added, extend the `install` command in `.cursor/environment.json` and the `setup-worktree` commands in `.cursor/worktrees.json`.
+`docs/kt`, `scripts`, and `packages/models` exist today. The other directories are not implemented yet. The root is a pnpm workspace (ADR 0008) with ESLint and Prettier at the root (ADR 0020). When an application is added, extend the `install` command in `.cursor/environment.json` and the `setup-worktree` commands in `.cursor/worktrees.json`.
 
 ## What goes where
 

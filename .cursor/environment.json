@@ -1,4 +1,4 @@
 {
   "name": "didactic-octo-barnacle",
-  "install": "set -euo pipefail\ntest -s README.md\ntest -s LICENSE\ngit rev-parse --is-inside-work-tree >/dev/null\ncommand -v git >/dev/null\ncommand -v node >/dev/null\ncommand -v python3 >/dev/null\npython3 -m pip install --disable-pip-version-check -q -r scripts/requirements.txt\n"
+  "install": "set -euo pipefail\ntest -s README.md\ntest -s LICENSE\ngit rev-parse --is-inside-work-tree >/dev/null\ncommand -v git >/dev/null\ncommand -v node >/dev/null\ncommand -v python3 >/dev/null\nif [ -s \"${NVM_DIR:-$HOME/.nvm}/nvm.sh\" ]; then\n  # shellcheck source=/dev/null\n  . \"${NVM_DIR:-$HOME/.nvm}/nvm.sh\"\n  nvm install 24 >/dev/null\n  nvm use 24 >/dev/null\n  export PATH=\"$NVM_BIN:${PATH:-}\"\nfi\nnode_major=\"$(node -p \"process.versions.node.split('.')[0]\")\"\nif [ \"$node_major\" != \"24\" ]; then\n  echo \"Node 24 required (ADR 0008); found $(node -v)\" >&2\n  exit 1\nfi\ncommand -v corepack >/dev/null\ncorepack enable\ncorepack prepare pnpm@10.18.2 --activate\npython3 -m pip install --disable-pip-version-check -q -r scripts/requirements.txt\npnpm install --frozen-lockfile\n"
 }
