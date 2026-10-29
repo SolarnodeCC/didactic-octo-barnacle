@@ -59,8 +59,8 @@ Agents:
       - { Name: Motion, Kind: direct, Description: AI calendar and task scheduler, Verified: false }
       - { Name: Asana, Kind: indirect, Description: Work management platform, Verified: false }
     Saturation: 3
-    Gap: No solution dynamically optimizes based on energy level, meetings, and productivity patterns.
-    GapStrength: 5
+    Gap: Existing tools schedule tasks, but none plan focus blocks from measured switching patterns for knowledge-worker teams.
+    GapStrength: 3
     Differentiation: Plans focus blocks from measured switching patterns instead of static rules.
     Confidence: 0.5
   Relevance:
@@ -104,9 +104,9 @@ Score:
   Categories:
     ScientificNovelty: 60
     MarketPotential: 61.2
-    CompetitiveGap: 75
+    CompetitiveGap: 50
     TechnicalFeasibility: 80
     StrategicRelevance: 88
-  WeightedSum: 71.9
-  OpportunityScore: 72
-  Band: High
+  WeightedSum: 66.9
+  OpportunityScore: 67
+  Band: Medium

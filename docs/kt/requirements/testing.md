@@ -24,7 +24,7 @@ Every test names the requirement it verifies.
 
 ### REQ-TEST-002: Agent contract tests
 
-Every agent and model-backed step has a contract test for its output contract.
+Every model-backed step that exists in the current phase has a contract test for its output contract. In phase 2 that is opportunity extraction (REQ-PROC-004); the six analysis agents are added in phase 3.
 
 - Phase: 2
 - Priority: must
@@ -33,6 +33,7 @@ Every agent and model-backed step has a contract test for its output contract.
 - Acceptance criteria:
   1. The test fails when a field is missing, has the wrong type, or is outside its range.
   2. The test runs without calling a live model.
+  3. By the end of phase 2, opportunity extraction has a contract test. By the end of phase 3, every analysis agent does too.
 - Verification: contract test suite in CI
 
 ### REQ-TEST-003: No live external calls in unit, integration, and contract tests

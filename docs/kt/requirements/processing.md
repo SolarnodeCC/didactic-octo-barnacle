@@ -51,7 +51,7 @@ Users and agents can search publications by meaning.
 
 ### REQ-PROC-005: Triage before the agents
 
-A cheap filter decides which publications go through the agent pipeline.
+A cheap filter decides which publications go to opportunity extraction and, later, the agent pipeline.
 
 - Phase: 2
 - Priority: must
@@ -66,7 +66,7 @@ A cheap filter decides which publications go through the agent pipeline.
 
 ### REQ-PROC-004: Opportunity extraction
 
-Candidate opportunities are extracted from triaged publications and passed to the agents.
+Candidate opportunities are extracted from triaged publications and passed to the agents. The output contract is in [opportunity extraction](../agents/opportunity-extraction.md).
 
 - Phase: 2
 - Priority: must
@@ -75,6 +75,6 @@ Candidate opportunities are extracted from triaged publications and passed to th
 - Depends on: REQ-PROC-005
 - Acceptance criteria:
   1. Each candidate opportunity references the publication it came from and holds a one-sentence finding with an evidence quote from that publication.
-  2. A publication can yield zero, one, or at most the configured number of candidates.
+  2. A publication can yield zero, one, or at most the configured number of candidates; an empty list includes a Notes reason.
   3. The extraction meets its eval threshold on the golden set, including papers that should yield no candidate.
 - Verification: contract test and eval on the golden set

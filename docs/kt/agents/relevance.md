@@ -12,7 +12,7 @@ Requirement: REQ-AGENT-006. Feeds the Strategic Relevance and Technical Feasibil
 
 ## Responsible for
 
-- public sector, healthcare, financial services, and enterprise fit
+- government, healthcare, financial services, and enterprise fit
 - technical feasibility
 - implementation effort
 
@@ -36,7 +36,7 @@ Notes: string(max 400)?
 
 ## Rules
 
-- StrategicRelevanceScore is the highest IndustryFit value, raised by up to 10 points when the opportunity matches a listed focus area of that industry, and capped at 100.
+- StrategicRelevanceScore is the highest IndustryFit value, raised by 5 points for a partial match to a listed focus area of that industry or by 10 points for a clear match, and capped at 100. The raise is documented in Notes when applied.
 - TechnicalFeasibility starts from the research maturity: theoretical 0-29, lab result 30-59, prototype 60-79, field-tested 80-100. It is lowered for constraints such as missing data, regulation, or required hardware.
 
 | ImplementationEffort | Meaning |

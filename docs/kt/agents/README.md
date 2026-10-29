@@ -20,7 +20,11 @@ The multi-agent engine runs on LangGraph with OpenAI or Anthropic models (ADR 00
 | Startup Generator | [startup-generator.md](startup-generator.md) | REQ-AGENT-005 | none (concept and business case) |
 | Relevance | [relevance.md](relevance.md) | REQ-AGENT-006 | Strategic Relevance, Technical Feasibility |
 
-Opportunity extraction (REQ-PROC-004) is a model-backed step before the agents. It follows the same contract conventions and is described in [orchestration](../architecture/orchestration.md).
+Opportunity extraction (REQ-PROC-004) is a model-backed step before the agents. It follows the same contract conventions; its output contract is in [opportunity-extraction.md](opportunity-extraction.md). How it sits in the pipeline is in [orchestration](../architecture/orchestration.md).
+
+| Step | Document | Requirement | Feeds score category |
+|---|---|---|---|
+| Opportunity extraction | [opportunity-extraction.md](opportunity-extraction.md) | REQ-PROC-004 | none (produces candidates) |
 
 ## Every agent document holds
 

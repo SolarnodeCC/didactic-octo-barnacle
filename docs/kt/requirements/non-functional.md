@@ -76,7 +76,7 @@ The platform keeps up with the configured ingestion scope.
 - Source: overview (thousands of papers each day)
 - Acceptance criteria:
   1. A daily ingestion and triage run for the configured scope finishes before the next scheduled run.
-  2. The configured daily number of triaged publications completes the agent pipeline within 24 hours.
+  2. The configured daily number of triaged publications completes triage and opportunity extraction within 24 hours. From phase 3, that same daily number also completes the agent pipeline within 24 hours.
 - Verification: load test on recorded fixtures with stubbed models
 
 ## Security and data protection

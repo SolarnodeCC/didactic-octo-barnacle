@@ -54,6 +54,7 @@ Verified: boolean                           # true only when found by the search
 | 4 | Many solutions, some dominant. | A clear gap for several segments. |
 | 5 | Crowded market with dominant players. | No existing solution addresses the problem. |
 
+- `GapStrength` 5 is only valid when `Competitors` has no `Kind: direct` entry. A listed direct competitor means at least one existing solution addresses the problem, so `GapStrength` is at most 4.
 - Without a search tool, competitors come from model knowledge and have `Verified: false`.
 - An empty competitor list needs a note that explains why none were found.
 

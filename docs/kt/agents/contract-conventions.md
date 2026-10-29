@@ -45,7 +45,7 @@ Evidence: list<Evidence> (0..20)
 
 ## Evidence
 
-Fields marked **evidence required** in a contract need at least one evidence item (REQ-AGENT-008).
+Fields marked **evidence required** in a contract need at least one evidence item (REQ-AGENT-008). A field marked **evidence required when …** needs evidence only when that condition holds (for example Market Analysis TAM/SAM when `Basis` is `sourced`). Estimated figures do not need evidence items; the dashboard still labels them as estimates.
 
 ```yaml
 Evidence:
