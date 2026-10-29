@@ -60,7 +60,7 @@ Footer (every page):  Terms | Privacy | Support
 | Create account | Email read-only, name (1 to 100 characters), terms and privacy checkbox | Create account | Home |
 | Home | New since last visit, High and Exceptional count, total, top 3 to 5, last data update | Open an opportunity | Detail, list |
 | Opportunities | Table of score, band, title, startup name, industry, publication date, review state; sort, filter, cursor pagination | Open an opportunity | Detail |
-| Opportunity detail | Header (title, score, band, labels), five categories with explanation and evidence, concept and business case, next steps, source publication, agent outputs, review panel, brief export | Review the score; export brief | List |
+| Opportunity detail | Header (title, score, band, labels), five categories with explanation and evidence, concept and business case, next steps, source publication, agent outputs, review panel, status panel (pursued, parked, rejected, with a note), brief export | Review the score; export brief | List |
 | Priority matrix | Scatter of Technical Feasibility against Market Potential, quadrant counts, table alternative | Open a point | Detail |
 | Trends | Opportunities per industry over time; publications per topic over time; date range | Change range | none |
 | Account settings | Name, email read-only, role, recent sign-ins, end other sessions, delete account | Save name | none |

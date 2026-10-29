@@ -48,6 +48,7 @@ States that every screen handles the same way. All messages are plain text (REQ-
 | Terms and privacy | Must be accepted | "Accept the terms and the privacy policy to continue" |
 | Dispute reason | Required, at most 500 characters | "Give a reason (up to 500 characters)" |
 | Confirm reason | Optional, at most 500 characters | "Keep the reason under 500 characters" |
+| Status note | Optional, at most 500 characters | "Keep the note under 500 characters" |
 | Hide reason | Required, 1 to 500 characters | "Give a reason for hiding" |
 | Invitation role | Required, one of viewer, analyst, admin | "Choose a role" |
 | Date range | Start not after end; at most 24 months | "Choose a valid date range" |

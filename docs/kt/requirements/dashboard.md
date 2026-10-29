@@ -65,18 +65,22 @@ The dashboard is usable with a keyboard and a screen reader.
   2. Score bands are not shown by color alone.
 - Verification: end-to-end test with an automated accessibility check
 
-### REQ-DASH-004: Opportunity feedback
+### REQ-DASH-004: Opportunity status
 
-Users can record what happened to an opportunity.
+Analysts and admins can record what happened to an opportunity.
 
-- Phase: later
-- Priority: could
+- Phase: 4
+- Priority: should
 - Status: planned
-- Source: overview long-term objective (feedback on pursued opportunities)
+- Source: overview long-term objective (feedback on pursued opportunities); OQ-027
+- Depends on: REQ-DASH-001, REQ-API-004, REQ-NFR-012
 - Acceptance criteria:
-  1. A user can mark an opportunity as pursued, parked, or rejected, with an optional reason.
-  2. Feedback is stored with the user and the date, and can be exported for score calibration (REQ-SCORE-006).
-- Verification: end-to-end test
+  1. An analyst or admin can mark an opportunity as pursued, parked, or rejected, with a decision note of at most 500 characters. A viewer sees the status but has no action (REQ-NFR-012).
+  2. The status is stored with the user and the date. A new entry replaces the current status; earlier entries stay in the history of the opportunity.
+  3. The data API accepts the status as its second write, next to the score review, with forbidden, not-found, and validation errors as in REQ-API-004. The list endpoint accepts the status as a filter.
+  4. Entries can be exported for score calibration (REQ-SCORE-006).
+  5. A status does not change the score, the band, or the position in a ranking.
+- Verification: integration test and end-to-end test
 
 ### REQ-DASH-005: Organization profile
 

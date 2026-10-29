@@ -15,7 +15,7 @@ related: [REQ-NFR-012, REQ-DASH-001, REQ-DASH-002, REQ-DASH-007, REQ-ACC-003]
 | Innovation lead | viewer | Reads a ranked shortlist and exports a brief |
 | Consultant | viewer | Reads evidence and competitors, exports a brief for a client |
 | Venture builder | viewer or analyst | Reads concepts; an analyst also confirms or disputes scores |
-| Domain reviewer | analyst | Judges output and records confirm or dispute reviews. Recording what happened to an opportunity (feedback, REQ-DASH-004) is later |
+| Domain reviewer | analyst | Judges output and records confirm or dispute reviews. Recording what happened to an opportunity (status, REQ-DASH-004) is part of phase 4 |
 | Platform operator | admin | Invites users, watches pipeline and cost, hides or reruns |
 
 ## Journeys

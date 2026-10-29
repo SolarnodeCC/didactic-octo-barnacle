@@ -61,7 +61,7 @@ Users do not need a research background to benefit from scientific progress. The
 
 ### Long-term objective
 
-The long-term objective is an autonomous platform. It ingests, analyzes, and scores research end to end without manual steps, and shortens the path from scientific discovery to economic and societal value. Later phases may add market signals, technology trends, and feedback on the opportunities that organizations pursued (REQ-DASH-004), so the platform can show emerging opportunities earlier than traditional market analysis does. None of these sources is in scope for the MVP (see [Roadmap](roadmap.md)).
+The long-term objective is an autonomous platform. It ingests, analyzes, and scores research end to end without manual steps, and shortens the path from scientific discovery to economic and societal value. Later phases may add market signals, technology trends, and feedback on the opportunities that organizations pursued (opportunity status, REQ-DASH-004, is in the MVP; organization-wide feedback is later), so the platform can show emerging opportunities earlier than traditional market analysis does. None of these sources is in scope for the MVP (see [Roadmap](roadmap.md)).
 
 Organizations should no longer have to ask "Which innovations exist?". Instead, the platform continuously answers:
 

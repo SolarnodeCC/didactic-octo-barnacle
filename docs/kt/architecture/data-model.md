@@ -52,6 +52,7 @@ erDiagram
 | Score | Five category values, explanation, final score, band, score model version | REQ-SCORE-001, REQ-SCORE-004 |
 | Score model | Version, weights, derivation rule version, currency rate table, active flag | REQ-SCORE-003, REQ-ADM-003 |
 | Score review | Score ID, user, date, state (`confirmed` or `disputed`), reason | REQ-SCORE-007 |
+| Opportunity status entry | Opportunity, user, date, status (`pursued`, `parked`, `rejected`), note | REQ-DASH-004 |
 | User | Email, name, role, status, terms version and date accepted | REQ-ACC-003, REQ-NFR-012 |
 | Invitation | Email, role, inviting user, token hash, expiry, status | REQ-ACC-002 |
 | Session and sign-in link | Token hash, user, expiry, used flag | REQ-ACC-004 |

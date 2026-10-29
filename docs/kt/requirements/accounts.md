@@ -129,7 +129,7 @@ A user can delete their account.
 - Source: REQ-NFR-009 and privacy law
 - Acceptance criteria:
   1. A user can delete their own account in settings. It removes the name, the email address, and the sessions.
-  2. Records that refer to the user are anonymized or removed: score reviews (REQ-SCORE-007) keep the review and replace the user with a deleted-user marker, feedback (REQ-DASH-004) is removed, invitations the user sent keep no name, and audit events (REQ-ACC-009) keep an opaque actor ID with no name or email.
+  2. Records that refer to the user are anonymized or removed: score reviews (REQ-SCORE-007) and status entries (REQ-DASH-004) keep the record and replace the user with a deleted-user marker, invitations the user sent keep no name, and audit events (REQ-ACC-009) keep an opaque actor ID with no name or email.
   3. The last active administrator cannot delete their account (REQ-ACC-006).
   4. The privacy policy states what is stored, why, and for how long.
 - Verification: integration test and review of the privacy policy

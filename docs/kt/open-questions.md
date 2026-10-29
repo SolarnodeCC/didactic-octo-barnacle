@@ -21,13 +21,10 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
 | OQ-010 | Who are the users, and is the MVP multi-tenant? | External users by invitation only, one shared workspace (ADR 0011); organization profiles later (REQ-DASH-005) | phase 4 |
-| OQ-011 | Which default currency and geography do market figures use? | EUR and the EU, with global figures allowed when stated | phase 3 |
 | OQ-021 | What calibrated daily model budget applies in production? | Measure cost per opportunity on the phase 3 golden set; lock the calibrated budget before scoring goes live | phase 4 |
 | OQ-024 | How are user roles assigned? | Roles (viewer, analyst, admin) are stored with the user and chosen on the invitation (ADR 0011, REQ-ACC-002); no Cloudflare Access groups (REQ-NFR-012) | phase 4 |
-| OQ-027 | Does opportunity status (REQ-DASH-004) move into phase 4? | Yes, for the status and decision note only, because reviews already need user identity and a write API (REQ-SCORE-007, REQ-API-004). Organization profiles stay `later` | phase 4 |
-| OQ-030 | How long are the audit log and sign-in records kept? | 12 months, then deleted; state it in the privacy policy (REQ-ACC-009, REQ-ACC-011) | phase 4 |
 | OQ-034 | Who is the named owner per role once the team is staffed? | The MVP has one owner, `@SolarnodeCC`, for all areas; split the owner roles of the [KT README](README.md#ownership) and `.github/CODEOWNERS` when more people join | before launch |
-| OQ-017 | When do organization profiles and feedback come? | After the MVP (REQ-DASH-004, REQ-DASH-005) | later |
+| OQ-017 | When do organization profiles and organization-wide feedback come? | After the MVP (REQ-DASH-005) | later |
 
 ## Legal and people
 
@@ -60,5 +57,8 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-025 | Thresholds 60 and 60, quadrants Pursue now, Needs technology, Quick win, Monitor, as configuration tuned on the calibration set | REQ-DASH-010 |
 | OQ-026 | The MVP brief is a print-ready HTML page; a PDF renderer is a later change | REQ-DASH-009 |
 | OQ-028 | Admins only invite; pending cap of 50 by default; optional allowlist of email domains per environment | REQ-ACC-002 |
+| OQ-011 | Default currency EUR and geography EU; global figures allowed when stated | [Market Analysis](agents/market-analysis.md) |
+| OQ-027 | Opportunity status and decision note move into phase 4; organization profiles stay later | REQ-DASH-004 |
+| OQ-030 | Audit log and sign-in records are kept 6 months, then deleted | [Privacy](architecture/privacy.md) |
 | OQ-006 | unpdf in the document-processing Queue consumer, with size and page caps and an abstract fallback | ADR 0009 |
 | OQ-018 | Node 24, pnpm workspaces, TypeScript, Zod, Vitest with `@cloudflare/vitest-plugin`, Playwright | ADR 0008 |

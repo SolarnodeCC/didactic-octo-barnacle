@@ -7,7 +7,7 @@ last_reviewed: 2026-10-28
 
 # API requirements
 
-The data API in `apps/api` is the only way the dashboard reads data. It is read-only in the MVP, except for score reviews (REQ-API-004). Sign-in, account, and admin operations are served by separate routes (ADR 0018, REQ-API-005).
+The data API in `apps/api` is the only way the dashboard reads data. It is read-only in the MVP, except for score reviews (REQ-API-004) and opportunity status (REQ-DASH-004). Sign-in, account, and admin operations are served by separate routes (ADR 0018, REQ-API-005).
 
 ### REQ-API-001: List opportunities
 
@@ -52,7 +52,7 @@ Request and response shapes are defined once and versioned.
 
 ### REQ-API-004: Score review endpoint
 
-The API accepts reviews of scores. It is the only write operation in the MVP.
+The API accepts reviews of scores. With opportunity status (REQ-DASH-004), it is one of the two write operations of the data API in the MVP.
 
 - Phase: 4
 - Priority: should
