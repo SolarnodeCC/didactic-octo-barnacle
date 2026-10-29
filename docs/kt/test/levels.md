@@ -11,13 +11,13 @@ related: [REQ-TEST-002, REQ-API-003, REQ-AGENT-009]
 | Level | What it covers | Proposed tool | Runs |
 |---|---|---|---|
 | Unit | Pure functions: scoring, parsing, metadata extraction, deduplication, triage rules, mapping | Vitest | every pull request |
-| Integration | Workers with their bindings: D1, R2, Queues, Vectorize, Workflows | Vitest with the Cloudflare Workers pool (local Miniflare runtime) | every pull request |
+| Integration | Workers with their bindings: D1, R2, Queues, Vectorize, Workflows | Vitest with `@cloudflare/vitest-plugin` (local runtime) | every pull request |
 | Contract | Agent output against its output contract; API request and response shapes (REQ-API-003) | Schema validation (for example Zod or JSON Schema) in Vitest | every pull request |
 | End-to-end | Dashboard user flows against a local API with seeded data | Playwright | every pull request from phase 4 |
 | Eval | Quality of agent output against golden sets | Eval runner (see [AI evals](ai-evals.md)) | on prompt or model changes, and nightly |
 | Load | Throughput of ingestion and the pipeline (REQ-NFR-010) | Recorded fixtures with stubbed models | on demand and before each phase exit |
 
-Pin the versions of the test tools. The Workers test pool must match the Wrangler version in use.
+Pin the versions of the test tools. The Workers test plugin must match the Wrangler version in use (ADR 0008).
 
 ## Unit
 

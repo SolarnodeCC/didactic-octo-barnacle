@@ -54,4 +54,4 @@ related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-TEST-005]
 
 ## Current state
 
-There is no application code yet, so there are no tests. Today CI runs the configuration check and the KT check (see [CI gates](ci-gates.md)). Tool choices in these documents are proposals and become decisions, recorded as ADRs, with the first package (OQ-018 in [open questions](../open-questions.md)).
+There is no application code yet, so there are no tests. Today CI runs the configuration check and the KT check (see [CI gates](ci-gates.md)). The test tools are decided in ADR 0008.
