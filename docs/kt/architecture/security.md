@@ -34,6 +34,8 @@ Accounts exist by invitation only (ADR 0007, proposed). An administrator invites
 | Roles and immediate revocation | REQ-ACC-006 |
 | Verified sending domain, bounce handling, no link tracking | REQ-ACC-007 |
 | Audit log without tokens | REQ-ACC-009 |
+| Links survive mail scanners: the token is consumed on an explicit Continue | REQ-ACC-004 |
+| Terms, privacy policy, and named processors | REQ-ACC-011 |
 
 Multi-tenancy and organization profiles are later work (REQ-DASH-005, OQ-010). Records carry a user ID from the start so that later work does not need a migration.
 

@@ -73,7 +73,8 @@ An existing user signs in with a link sent by email.
   3. A link requested for an address with a pending invitation and no account leads to the create-account screen.
   4. A session cookie is `HttpOnly`, `Secure`, and `SameSite=Lax`, and has a configured lifetime.
   5. The dashboard and the API accept the same session and refuse a request without one (REQ-NFR-007).
-- Verification: integration test and end-to-end test
+  6. A sign-in or invitation link opens a confirmation page, and the token is consumed only when the person presses Continue, so that mail scanners that open links do not use it up.
+- Verification: integration test and end-to-end test, including a test that opens the link with a plain GET request first
 
 ### REQ-ACC-005: Abuse limits
 
@@ -145,3 +146,34 @@ Security-relevant account events are recorded.
   2. The log never holds a token or a session identifier.
   3. An administrator can read the log.
 - Verification: integration test
+
+### REQ-ACC-010: Account settings
+
+A user manages their own profile and sessions.
+
+- Phase: 4
+- Priority: must
+- Status: planned
+- Source: screen specification for the signed-in experience
+- Depends on: REQ-ACC-003, REQ-ACC-004
+- Acceptance criteria:
+  1. A user can change their name; it must have 1 to 100 characters. The email address is read-only.
+  2. The page shows the user's role and recent sign-ins with the time and the device.
+  3. A user can end all their other sessions.
+  4. Account deletion is offered on the same page (REQ-ACC-008).
+- Verification: end-to-end test
+
+### REQ-ACC-011: Legal pages and support contact
+
+People can read the terms and the privacy policy and can reach support.
+
+- Phase: 4
+- Priority: must
+- Status: planned
+- Source: security review of a public launch
+- Depends on: REQ-ACC-003
+- Acceptance criteria:
+  1. The terms, the privacy policy, and a support contact are linked from the footer of every page and from the create-account screen.
+  2. The privacy policy names the processors of personal data, including Resend and the model providers, and the retention period of account and sign-in records.
+  3. The version and the date of the terms a user accepted are stored with the user (REQ-ACC-003).
+- Verification: end-to-end test and review of the privacy policy

@@ -23,6 +23,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-020 | Which model runs each agent, and which model judges evals? | Pick per agent on the golden set by quality and cost; the judge uses a different provider than the agent it grades | phase 3 |
 | OQ-022 | Who may invite, and what limits apply? | Administrators only; a cap on pending invitations; an optional allowlist of email domains (REQ-ACC-002) | phase 4 |
 | OQ-023 | Build the invitation and magic-link flow directly, or use an authentication library? | Evaluate a maintained library that supports invitation-gated magic links on Workers and D1; build directly if none fits (ADR 0007) | phase 4 |
+| OQ-024 | How long are the audit log and sign-in records kept? | 12 months, then deleted; state it in the privacy policy (REQ-ACC-009, REQ-ACC-011) | phase 4 |
 | OQ-018 | Toolchain: package manager, monorepo tooling, language versions, schema library, test tools | pnpm workspaces, TypeScript, Zod, Vitest with the Workers pool, Playwright; record in one ADR with the first package | phase 1 |
 
 ## Product and data
