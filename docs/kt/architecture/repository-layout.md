@@ -50,5 +50,5 @@ Each agent directory holds the agent's graph, its tests, and its golden set unde
 
 ## Open points
 
-- `apps/pipeline` holds the collector, the document-processing Workers, and the pipeline workflow (ADR 0007). It is added with the first collector code.
-- The workspace is managed with pnpm, with no further monorepo tooling (ADR 0007).
+- `apps/pipeline` holds the collector, the document-processing Workers, and the pipeline workflow (ADR 0008). It is added with the first collector code.
+- The workspace is managed with pnpm, with no further monorepo tooling (ADR 0008).

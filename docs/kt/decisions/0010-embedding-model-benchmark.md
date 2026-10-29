@@ -1,12 +1,12 @@
 ---
-title: "0009: Choose the embedding model by benchmark, starting from bge-base-en-v1.5"
+title: "0010: Choose the embedding model by benchmark, starting from bge-base-en-v1.5"
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-10-29
 related: [REQ-PROC-001, REQ-PROC-002, REQ-PROC-003, REQ-NFR-003]
 ---
 
-# 0009: Choose the embedding model by benchmark, starting from bge-base-en-v1.5
+# 0010: Choose the embedding model by benchmark, starting from bge-base-en-v1.5
 
 - Decision status: Accepted
 - Date: 2026-10-29

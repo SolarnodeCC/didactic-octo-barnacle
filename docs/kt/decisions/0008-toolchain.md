@@ -1,12 +1,12 @@
 ---
-title: "0007: Toolchain: Node 24, pnpm, TypeScript, Zod, Vitest, Playwright"
+title: "0008: Toolchain: Node 24, pnpm, TypeScript, Zod, Vitest, Playwright"
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-10-29
 related: [REQ-NFR-002, REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-API-003]
 ---
 
-# 0007: Toolchain: Node 24, pnpm, TypeScript, Zod, Vitest, Playwright
+# 0008: Toolchain: Node 24, pnpm, TypeScript, Zod, Vitest, Playwright
 
 - Decision status: Accepted
 - Date: 2026-10-29

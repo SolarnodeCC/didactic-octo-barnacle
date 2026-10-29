@@ -141,3 +141,50 @@ Output that does not match the contract is retried a limited number of times and
   2. After the last attempt the step fails with the validation errors stored, and the opportunity is marked incomplete.
   3. Failed steps are listed in the run report (REQ-NFR-008).
 - Verification: contract test with malformed stubbed responses
+
+### REQ-AGENT-010: Structured model output
+
+Every agent call asks the model for output that matches the agent's output contract through the provider's structured-output mechanism, not through prose instructions alone.
+
+- Phase: 3
+- Priority: must
+- Status: planned
+- Source: KT review of a comparable internal governance platform (typed output through forced tool use)
+- Depends on: REQ-NFR-003, REQ-AGENT-009
+- Acceptance criteria:
+  1. Each agent call sends the contract schema from `packages/models` to the model through the mechanism chosen in OQ-022 (tool use or JSON-schema mode).
+  2. The returned output is always validated against the same schema before it is stored; a provider's claim that its output conforms is never accepted in place of validation.
+  3. When a provider or model cannot enforce a schema, the call falls back to prompt instructions plus validation, and the envelope records the mode used in `OutputMode`.
+- Verification: contract test with stubbed provider responses for each output mode
+
+### REQ-AGENT-011: Repair of recoverable formatting errors
+
+Output whose content is correct but whose wrapping is wrong is repaired by plain code before it counts as a failed attempt.
+
+- Phase: 3
+- Priority: should
+- Status: planned
+- Source: KT review of a comparable internal governance platform (an array returned as a double-encoded JSON string)
+- Depends on: REQ-AGENT-009, REQ-NFR-008
+- Acceptance criteria:
+  1. The repair handles only the cases listed in [contract conventions](../agents/contract-conventions.md): a JSON-encoded string where the contract expects an array or object, and output wrapped in a markdown code fence.
+  2. A repair never changes a value, adds a missing field, or fills a default. The repaired output is validated in full and its evidence is checked (REQ-AGENT-008).
+  3. Every repair is recorded in the envelope field `Repairs`, and the run report shows the repair rate per agent and prompt version.
+  4. A repaired output does not use up an attempt of REQ-AGENT-009; output that is still invalid after repair counts as a failed attempt.
+- Verification: unit tests of the repair function and contract tests with malformed stubbed responses
+
+### REQ-AGENT-012: Bounded model concurrency
+
+The number of model calls in flight is limited across the whole platform, so a burst of runs does not exceed provider rate limits or overshoot the daily budget.
+
+- Phase: 3
+- Priority: must
+- Status: planned
+- Source: KT review of a comparable internal governance platform (cap on concurrent model calls)
+- Depends on: REQ-AGENT-007, REQ-NFR-005
+- Acceptance criteria:
+  1. A configured maximum number of concurrent model calls per provider applies across all pipeline runs and all running instances, not per Worker instance. The mechanism is chosen in OQ-023.
+  2. A call above the limit waits; it is not dropped, and waiting does not count toward the attempt limit of REQ-AGENT-009.
+  3. A provider rate-limit response (HTTP 429) is retried with backoff and respects a `Retry-After` header when present. It counts toward the attempt limit like other provider errors (see [orchestration](../architecture/orchestration.md)).
+  4. The run report states the highest concurrency reached and the total time calls spent waiting.
+- Verification: integration test with a stubbed gateway that records concurrent calls

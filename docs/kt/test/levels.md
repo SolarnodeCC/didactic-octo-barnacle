@@ -17,7 +17,7 @@ related: [REQ-TEST-002, REQ-API-003, REQ-AGENT-009]
 | Eval | Quality of agent output against golden sets | Eval runner (see [AI evals](ai-evals.md)) | on prompt or model changes, and nightly |
 | Load | Throughput of ingestion and the pipeline (REQ-NFR-010) | Recorded fixtures with stubbed models | on demand and before each phase exit |
 
-Pin the versions of the test tools. The Workers test plugin must match the Wrangler version in use (ADR 0007).
+Pin the versions of the test tools. The Workers test plugin must match the Wrangler version in use (ADR 0008).
 
 ## Unit
 

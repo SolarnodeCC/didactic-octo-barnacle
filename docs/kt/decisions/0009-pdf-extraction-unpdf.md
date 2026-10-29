@@ -1,12 +1,12 @@
 ---
-title: "0008: Extract PDF text with unpdf inside the Queue consumer"
+title: "0009: Extract PDF text with unpdf inside the Queue consumer"
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-10-29
 related: [REQ-DATA-006, REQ-DATA-004, REQ-DATA-010, REQ-NFR-002]
 ---
 
-# 0008: Extract PDF text with unpdf inside the Queue consumer
+# 0009: Extract PDF text with unpdf inside the Queue consumer
 
 - Decision status: Accepted
 - Date: 2026-10-29

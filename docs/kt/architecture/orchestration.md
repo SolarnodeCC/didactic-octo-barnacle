@@ -3,7 +3,7 @@ title: Pipeline orchestration
 owner: "@SolarnodeCC"
 status: draft
 last_reviewed: 2026-10-28
-related: [REQ-AGENT-007, REQ-AGENT-009, REQ-PROC-004, REQ-PROC-005]
+related: [REQ-AGENT-007, REQ-AGENT-009, REQ-AGENT-011, REQ-AGENT-012, REQ-PROC-004, REQ-PROC-005, REQ-SCORE-007]
 ---
 
 # Pipeline orchestration
@@ -53,9 +53,11 @@ Market Analysis, Competition, and Relevance depend only on the Research Analyst 
 
 | Failure | Handling |
 |---|---|
+| Output is correct but wrapped wrongly | Repaired by plain code and validated; no attempt is used (REQ-AGENT-011). |
 | Output does not match the contract | Retry with the validation errors, up to three attempts (REQ-AGENT-009). |
+| Too many model calls in flight | The call waits for a free slot; waiting is not an attempt (REQ-AGENT-012). |
 | Evidence quote not found in the input | Treated as invalid output. |
-| Provider error or timeout | Retry with backoff; counts toward the same attempt limit. |
+| Provider error, rate limit (429), or timeout | Retry with backoff, honoring `Retry-After`; counts toward the same attempt limit. |
 | Daily budget reached | No new runs start; running steps finish (REQ-NFR-005). |
 | Final failure | Step marked failed with errors stored; the opportunity is incomplete and not scored (REQ-SCORE-005). |
 
@@ -68,4 +70,4 @@ Market Analysis, Competition, and Relevance depend only on the Research Analyst 
 
 ## Human review
 
-The MVP has no review step inside the pipeline. Reviewers judge output through the dashboard and, later, through feedback (REQ-DASH-004).
+The pipeline has no review step. Analysts review scores after scoring, in the dashboard: a review annotates the score and never changes it or triggers a rerun (REQ-SCORE-007, ADR 0007). Feedback on what happened to an opportunity comes later (REQ-DASH-004).
