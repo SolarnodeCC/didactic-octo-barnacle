@@ -13,17 +13,18 @@ The documents in `docs/kt/` are the source of truth for the Research Opportunity
 
 1. [Overview](overview.md): problem, users, vision, principles, success measures, non-goals, target industries, and core workflow.
 2. [Glossary](glossary.md): terms used across the documents.
-3. [Architecture](architecture/README.md): layers, orchestration, data model, security, technology stack, and repository layout.
-4. [Data sources](data-sources/README.md): OpenAlex, arXiv, and Semantic Scholar.
+3. [Architecture](architecture/README.md): layers, orchestration, data model, security, privacy, technology stack, and repository layout.
+4. [Data sources](data-sources/README.md): OpenAlex, arXiv, Semantic Scholar, and the ingestion scope.
 5. [Agents](agents/README.md): the multi-agent framework, contract conventions, and each agent's typed output contract.
 6. [Scoring](scoring.md): the opportunity scoring model.
 7. [Roadmap](roadmap.md): MVP phases, requirements per phase, Definition of Ready, and exit criteria.
 8. [Requirements](requirements/README.md): numbered, testable requirements.
-9. [Test strategy](test/README.md): how requirements are verified.
-10. [Operations](operations.md): checks, CI, environments, deployment, monitoring, and secrets handling.
-11. [Decisions](decisions/README.md): architecture decision records (ADRs).
-12. [Open questions](open-questions.md): decisions still to be made, with a proposal and a deadline phase.
-13. [Examples](examples/README.md): example outputs as YAML files.
+9. [UX specification](ux/README.md): screen inventory, journeys, screen states, and wireframes.
+10. [Test strategy](test/README.md): how requirements are verified.
+11. [Operations](operations.md): checks, CI, environments, deployment, monitoring, and secrets handling.
+12. [Decisions](decisions/README.md): architecture decision records (ADRs).
+13. [Open questions](open-questions.md): decisions still to be made, with a proposal and a deadline phase.
+14. [Examples](examples/README.md): example outputs as YAML files.
 
 ## Rules for KT documents
 
@@ -36,6 +37,18 @@ The documents in `docs/kt/` are the source of truth for the Research Opportunity
 - **Track open decisions** in [open questions](open-questions.md) instead of writing "not decided yet" in a document.
 - **No secrets.** Name the GitHub Actions secret or Cursor environment secret instead of writing a value. Keep tokens and machine-local paths out.
 - Write in English. Use a fenced code block with a language tag for commands, JSON, YAML, and diagrams.
+
+## Ownership
+
+Every document has an owner in its frontmatter. The owner role per area is below; one person or team is named per role (OQ-019). Until then the code owner handle is `@SolarnodeCC`, and `.github/CODEOWNERS` requires its review for `docs/kt/`.
+
+| Area | Owner role |
+|---|---|
+| Overview, roadmap, scoring, requirements | Product owner |
+| Architecture, decisions, data sources, operations | Lead engineer |
+| Agents, evals, test strategy | AI engineering lead |
+| Security, privacy, accounts | Security and privacy lead |
+| UX specification | Design lead |
 
 ## Document template
 

@@ -26,8 +26,9 @@ Requirement: REQ-AGENT-006. Feeds the Strategic Relevance and Technical Feasibil
 
 ```yaml
 IndustryFit: map<enum [government, healthcare, financial-services, enterprise], integer 0..100>  # all four keys
-StrategicRelevanceScore: integer 0..100     # evidence required
-TechnicalFeasibility: integer 0..100        # evidence required
+StrategicRelevanceScore: integer 0..100     # computed by the pipeline from IndustryFit and the focus-area match; not written by the model
+FocusMatch: map<enum [government, healthcare, financial-services, enterprise], enum [none, partial, clear]>  # all four keys
+TechnicalFeasibility: integer 0..100        # model estimate; basis in Notes
 ImplementationEffort: enum [S, M, L, XL]
 Constraints: list<string(max 200)> (0..5)   # for example regulation or data access
 Confidence: number 0..1
@@ -36,8 +37,8 @@ Notes: string(max 400)?
 
 ## Rules
 
-- StrategicRelevanceScore is the highest IndustryFit value, raised by 5 points for a partial match to a listed focus area of that industry or by 10 points for a clear match, and capped at 100. The raise is documented in Notes when applied.
-- TechnicalFeasibility starts from the research maturity: theoretical 0-29, lab result 30-59, prototype 60-79, field-tested 80-100. It is lowered for constraints such as missing data, regulation, or required hardware.
+- `StrategicRelevanceScore` is computed by plain code, not by the model: the highest `IndustryFit` value, raised by 5 points when that industry's `FocusMatch` is `partial` or by 10 points when it is `clear`, capped at 100. The model supplies `IndustryFit` and `FocusMatch`.
+- TechnicalFeasibility is a model estimate; it has no evidence requirement because the agent does not receive publication text. It starts from the research maturity: theoretical 0-29, lab result 30-59, prototype 60-79, field-tested 80-100. It is lowered for constraints such as missing data, regulation, or required hardware.
 
 | ImplementationEffort | Meaning |
 |---|---|

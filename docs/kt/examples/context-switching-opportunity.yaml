@@ -65,7 +65,8 @@ Agents:
     Confidence: 0.5
   Relevance:
     IndustryFit: { government: 60, healthcare: 55, financial-services: 50, enterprise: 80 }
-    StrategicRelevanceScore: 88
+    FocusMatch: { government: none, healthcare: none, financial-services: none, enterprise: clear }
+    StrategicRelevanceScore: 90
     TechnicalFeasibility: 80
     ImplementationEffort: M
     Constraints:
@@ -103,10 +104,11 @@ Score:
   ModelVersion: 1
   Categories:
     ScientificNovelty: 60
-    MarketPotential: 61.2
+    MarketPotential: 76.1
     CompetitiveGap: 50
     TechnicalFeasibility: 80
-    StrategicRelevance: 88
-  WeightedSum: 66.9
-  OpportunityScore: 67
-  Band: Medium
+    StrategicRelevance: 90
+  WeightedSum: 71.0
+  OpportunityScore: 71
+  Band: High
+  Labels: [estimate-based]

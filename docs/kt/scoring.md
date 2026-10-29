@@ -29,18 +29,18 @@ The final score maps to a band:
 
 ## Computation
 
-1. Each category value is a number from 0 to 100, derived from agent fields by plain code (REQ-SCORE-003). The proposed rules are in ADR 0005.
-2. The final score is the weighted sum, rounded half up to an integer (REQ-SCORE-001). A weighted sum of 69.5 becomes 70 and lands in High.
+1. Each category value is a number from 0 to 100, derived from agent fields by plain code (REQ-SCORE-003). The rules are in ADR 0005.
+2. The final score is the weighted sum, computed in integer arithmetic and rounded half up to an integer (REQ-SCORE-001). A weighted sum of 69.5 becomes 70 and lands in High.
 3. The band is computed from the rounded score (REQ-SCORE-002).
 4. When a category cannot be derived, the opportunity gets no score and is marked incomplete (REQ-SCORE-005). Missing categories are never filled with a default.
 
 ## Explanation
 
-Each category value is stored with the agent fields it was read from and their evidence, so the dashboard can show why an opportunity scored as it did (REQ-SCORE-004). Market figures that are estimates and competitors that were not verified are labeled.
+Each category value is stored with the agent fields it was read from and their evidence, so the dashboard can show why an opportunity scored as it did (REQ-SCORE-004). Market figures that are estimates and competitors that were not verified are labeled. While the market figures used are estimates, the score carries the label `estimate-based` (ADR 0005, REQ-SCORE-004); a sourced figure (REQ-AGENT-013) removes it.
 
 ## Versioning
 
-The weights and derivation rules together form a score model version. A change to either creates a new version; stored scores keep the version they were computed with, and scores from different versions are not mixed in one ranking without a rescore.
+The weights and derivation rules together form a score model version. A change to either creates a new version; stored scores keep the version they were computed with, and scores from different versions are not mixed in one ranking. Lists and rankings use the active score model version set by an admin; a rescore (REQ-ADM-003) computes new scores from stored agent outputs without a model call.
 
 ## Review
 
@@ -48,4 +48,4 @@ An analyst can confirm or dispute the current score and give a reason (REQ-SCORE
 
 ## Calibration
 
-Scores are checked against expert judgment on a calibration set (REQ-SCORE-006). The calibration report shows the rank correlation and the band distribution. Most opportunities are expected in Low and Medium; if many land in Exceptional, the rules are too generous.
+Scores are checked against expert judgment on a calibration set of at least 60 opportunities (REQ-SCORE-006). The calibration report shows the rank correlation with its 95 % confidence interval and the band distribution. Most opportunities are expected in Low and Medium; if many land in Exceptional, the rules are too generous.

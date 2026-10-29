@@ -3,12 +3,12 @@ title: Pipeline orchestration
 owner: "@SolarnodeCC"
 status: draft
 last_reviewed: 2026-10-28
-related: [REQ-AGENT-007, REQ-AGENT-009, REQ-AGENT-011, REQ-AGENT-012, REQ-PROC-004, REQ-PROC-005, REQ-SCORE-007]
+related: [REQ-AGENT-007, REQ-AGENT-009, REQ-AGENT-011, REQ-AGENT-012, REQ-AGENT-013, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-SCORE-007, REQ-ADM-002]
 ---
 
 # Pipeline orchestration
 
-This document describes how one publication becomes zero or more scored opportunities. The runtime is proposed in ADR 0003 and the service mapping in ADR 0004.
+This document describes how one publication becomes zero or more scored opportunities. The runtime is decided in ADR 0003 and the service mapping in ADR 0004.
 
 ## Core workflow mapping
 
@@ -29,13 +29,13 @@ In the running pipeline, extraction comes first: it turns a publication into can
 
 ```text
 publication
-  └─ triage (rules, then a cheap model)            REQ-PROC-005
+  └─ triage (rules, then a cheap model)            REQ-PROC-005, REQ-PROC-006
       └─ opportunity extraction → 0..N candidates   REQ-PROC-004
           └─ per candidate:
               Research Analyst                      REQ-AGENT-001
               Problem Discovery                     REQ-AGENT-002
-              ├─ Market Analysis      (parallel)    REQ-AGENT-003
-              ├─ Competition          (parallel)    REQ-AGENT-004
+              ├─ Market Analysis      (parallel)    REQ-AGENT-003  (search tool, REQ-AGENT-013)
+              ├─ Competition          (parallel)    REQ-AGENT-004  (search tool, REQ-AGENT-013)
               └─ Relevance            (parallel)    REQ-AGENT-006
               Startup Generator                     REQ-AGENT-005
               scoring engine (plain code)           REQ-SCORE-001
@@ -55,7 +55,7 @@ Market Analysis, Competition, and Relevance depend only on the Research Analyst 
 |---|---|
 | Output is correct but wrapped wrongly | Repaired by plain code and validated; no attempt is used (REQ-AGENT-011). |
 | Output does not match the contract | Retry with the validation errors, up to three attempts (REQ-AGENT-009). |
-| Too many model calls in flight | The call waits for a free slot; waiting is not an attempt (REQ-AGENT-012). |
+| Too many model calls in flight | The call waits for a free slot in the Durable Object semaphore; waiting is not an attempt (REQ-AGENT-012). |
 | Evidence quote not found in the input | Treated as invalid output. |
 | Provider error, rate limit (429), or timeout | Retry with backoff, honoring `Retry-After`; counts toward the same attempt limit. |
 | Daily budget reached | No new runs start; running steps finish (REQ-NFR-005). |
@@ -63,10 +63,14 @@ Market Analysis, Competition, and Relevance depend only on the Research Analyst 
 
 ## Models and prompts
 
-- The model for each agent is configuration, not code. Every call goes through AI Gateway (REQ-NFR-003).
+- The model for each agent is configuration, not code. Every call goes through AI Gateway (REQ-NFR-003) and one shared model-call helper (ADR 0003).
 - Prompts live in `packages/prompts`, one versioned prompt per agent. The version is stored in the output envelope (see [contract conventions](../agents/contract-conventions.md)).
 - Changing a prompt or a model triggers the evals for that agent (REQ-TEST-004).
 - Temperature and other sampling settings are part of the model configuration and are versioned with it.
+
+## Admin recovery
+
+A failed or incomplete candidate is rerun by an admin from the first failed step (REQ-ADM-002). A rerun creates a new pipeline run; completed steps are not repeated.
 
 ## Human review
 

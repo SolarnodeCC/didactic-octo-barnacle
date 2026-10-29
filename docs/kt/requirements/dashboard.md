@@ -14,13 +14,14 @@ A web dashboard shows the scored opportunities.
 - Phase: 4
 - Priority: must
 - Status: planned
-- Source: README roadmap phase 4 and Technology Stack (Next.js on Cloudflare Pages)
+- Source: README roadmap phase 4 and Technology Stack (Next.js on Workers, ADR 0012)
 - Depends on: REQ-API-001, REQ-API-002
 - Acceptance criteria:
   1. Each opportunity shows its score, band, startup concept, next steps, and source publication with a link to the source.
   2. Each opportunity shows its five category values with their explanation and evidence (REQ-SCORE-004).
   3. An opportunity links to the agent outputs it was built from.
-  4. Competitors that were not verified, and market figures that are estimates, are labeled as such.
+  4. Competitors that were not verified, and market figures that are estimates, are labeled as such. A score marked `estimate-based` (REQ-SCORE-004) shows that label next to the score, and the input mode (abstract or full text) is shown.
+  5. All model-generated text and URLs follow REQ-NFR-013.
 - Verification: end-to-end test
 
 ### REQ-DASH-002: Opportunity ranking
@@ -197,7 +198,7 @@ Analysts and admins can work through opportunities that need a human decision.
 - Phase: later
 - Priority: could
 - Status: planned
-- Source: screen specification for quality review
+- Source: [screen specification](../ux/screens.md) for quality review
 - Depends on: REQ-SCORE-005, REQ-DATA-008, REQ-SCORE-006, REQ-DASH-007
 - Acceptance criteria:
   1. The queue lists incomplete, hidden, and flagged opportunities with the reason.
@@ -212,7 +213,7 @@ Errors and expired sessions are handled the same way on every page.
 - Phase: 4
 - Priority: must
 - Status: planned
-- Source: screen specification for error states
+- Source: [screen specification](../ux/screens.md) for error states
 - Depends on: REQ-NFR-007
 - Acceptance criteria:
   1. A request for a page the user may not see and a request for a page that does not exist show the same wording, so that the response does not reveal whether the page exists.

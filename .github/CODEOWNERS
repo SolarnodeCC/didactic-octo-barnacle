@@ -3,3 +3,5 @@
 /AGENTS.md @SolarnodeCC
 /CLAUDE.md @SolarnodeCC
 .claude/** @SolarnodeCC
+/docs/kt/** @SolarnodeCC
+/scripts/** @SolarnodeCC

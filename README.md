@@ -32,7 +32,7 @@ Scientific Research → Problem Discovery → Market Analysis → Competitive An
 
 ## Technology stack
 
-Cloudflare Workers, Workflows, Queues, D1, R2, Vectorize, and AI Gateway; Next.js on Cloudflare Pages with Tailwind CSS; LangGraph with OpenAI or Anthropic. Details are in the [technology stack](docs/kt/architecture/technology-stack.md).
+Cloudflare Workers, Workflows, Queues, D1, R2, Vectorize, and AI Gateway; Next.js on Workers (OpenNext) with Tailwind CSS; plain TypeScript agents with OpenAI or Anthropic through AI Gateway. Details are in the [technology stack](docs/kt/architecture/technology-stack.md).
 
 ## Contributing
 
@@ -62,6 +62,5 @@ Built with:
 - Cloudflare
 - OpenAI
 - Anthropic
-- LangGraph
 
 Contributions are welcome.

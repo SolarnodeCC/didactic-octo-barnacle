@@ -47,7 +47,7 @@ Notes: string(max 400)?
 | 50-79 | A new method or a clearly new finding for this field. |
 | 80-100 | A new direction with few or no comparable publications. |
 
-- Novelty evidence cites at least one related publication or states that none were found.
+- Novelty evidence cites at least one related publication, or is a `none-found` item stating that none were found.
 - Industry uses `other` only when none of the four target industries applies.
 
 ## Evals

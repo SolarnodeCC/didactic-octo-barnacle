@@ -27,7 +27,7 @@ Option 3, if accepted. A review has a state (`confirmed` or `disputed`), a user,
 
 ## Consequences
 
-- The API has one write operation in the MVP (REQ-API-004), and user data is stored for reviews (REQ-NFR-009).
+- The data API has one write operation in the MVP (REQ-API-004), and user data is stored for reviews (REQ-NFR-009). Auth and admin writes are separate routes (ADR 0018).
 - Reviews need roles, so REQ-NFR-012 belongs in phase 4 with the dashboard.
 - Disputed scores are exported for calibration (REQ-SCORE-006) and are candidates for golden set entries, like the "bad output reached the dashboard" case in [operations](../operations.md).
 - The ranking never depends on a person, so two analysts cannot produce two rankings.

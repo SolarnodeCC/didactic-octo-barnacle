@@ -12,7 +12,7 @@ Used for preprints in computer science, which often appear on arXiv months befor
 
 ## Categories
 
-"Computer Science" on arXiv covers every `cs.*` category. The configured list starts with the categories closest to software opportunities (OQ-012):
+"Computer Science" on arXiv covers every `cs.*` category. The pilot scope uses `cs.AI`, `cs.SE`, `cs.HC`, and `cs.CY` ([ingestion scope](ingestion-scope.md)). The other categories below are added by configuration once volume and cost are measured (OQ-012):
 
 | Category | Area |
 |---|---|

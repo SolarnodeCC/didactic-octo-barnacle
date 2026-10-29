@@ -18,7 +18,8 @@ Every requirement has a unique ID and testable acceptance criteria. Pull request
 | DASH | [dashboard.md](dashboard.md) | Dashboard, ranking, and trends |
 | API | [api.md](api.md) | Read API for the dashboard |
 | ACC | [accounts.md](accounts.md) | Invitations, sign-in links, roles, and account deletion |
-| NFR | [non-functional.md](non-functional.md) | Platform, security, and documentation constraints |
+| ADM | [admin.md](admin.md) | Admin operations: hide, rerun, rescore, role matrix |
+| NFR | [non-functional.md](non-functional.md) | Platform, security, privacy, service levels, and documentation constraints |
 | TEST | [testing.md](testing.md) | Test strategy obligations |
 
 ## Format

@@ -20,7 +20,7 @@ The research collector fetches works from OpenAlex, with their authors, institut
 - Status: planned
 - Source: README roadmap phase 1 and Data Sources section
 - Acceptance criteria:
-  1. Works that match the configured ingestion scope are fetched with their authors, institutions, topics, and citation counts.
+  1. Works that match the configured ingestion scope (see [OpenAlex](../data-sources/openalex.md)) are fetched with their authors, institutions, topics, and citation counts.
   2. A repeated run does not create duplicate publications.
   3. A failed or rate-limited request is retried with exponential backoff up to the configured number of attempts; an item that still fails is recorded for the next run and does not stop the whole run.
   4. The abstract is reconstructed from `abstract_inverted_index` when OpenAlex provides one.
@@ -96,7 +96,7 @@ The full-text PDF of an ingested publication is stored when it is openly availab
 - Status: planned
 - Source: README roadmap phase 1
 - Acceptance criteria:
-  1. A PDF is openly available when a source gives an open access URL and a license recorded under REQ-DATA-010.
+  1. A PDF is openly available when a source gives an open access URL and a license recorded under REQ-DATA-010 that allows storage (ADR 0014). Most arXiv PDFs do not qualify, so those publications stay abstract-only.
   2. The PDF is stored once, keyed by its content hash, and linked to its publication record.
   3. A publication without an available PDF is still ingested and marked as having no PDF.
 - Verification: integration test with local object storage
@@ -126,7 +126,7 @@ Text is extracted from stored PDFs so agents can read more than the abstract.
 - Acceptance criteria:
   1. Extracted text is stored with the extractor name and version.
   2. A PDF that cannot be parsed is marked as failed; the publication falls back to its abstract.
-  3. Agents receive whether they read the full text or only the abstract.
+  3. Agents receive whether they read the full text or only the abstract. Abstract-only is the normal case for publications without a storable PDF (ADR 0014).
 - Verification: unit tests on fixture PDFs with an open license
 
 ### REQ-DATA-008: Retractions and withdrawals
@@ -139,7 +139,7 @@ Retracted or withdrawn publications do not produce or keep active opportunities.
 - Source: overview principle Reliability
 - Acceptance criteria:
   1. A publication that OpenAlex marks as retracted, or that arXiv marks as withdrawn, is flagged on the next run.
-  2. Opportunities based only on a flagged publication are hidden from ranking and marked with the reason.
+  2. The opportunities of a flagged publication are hidden from ranking and marked with the reason. An opportunity has exactly one publication (ADR 0015).
   3. The vector of a flagged publication is removed (REQ-PROC-002).
 - Verification: integration test with a retracted fixture record
 
@@ -155,4 +155,21 @@ The platform records the license of each document and respects it.
   1. The license of each stored PDF and of each source's metadata is recorded.
   2. A PDF without a recorded license that allows storage is not stored.
   3. The dashboard links to the source of a document instead of serving the PDF, unless the license allows redistribution.
+  4. The PDF URL comes from a source record, uses `https`, and is fetched by an allowlisted fetcher with a size limit, a timeout, a content-type check, and no access to internal addresses.
 - Verification: unit tests on license rules and code review
+
+### REQ-DATA-011: Idempotent queue processing
+
+Every Queue consumer and Workflow step tolerates repeated delivery.
+
+- Phase: 1
+- Priority: must
+- Status: planned
+- Source: Readiness assessment; ADR 0004
+- Depends on: REQ-DATA-009
+- Acceptance criteria:
+  1. A consumer checks stored state before it works, so processing the same message twice gives the same stored result.
+  2. Queue messages are typed records with a schema version and carry IDs only, never large payloads.
+  3. A message that fails its retries goes to a dead-letter queue, and the run report counts dead-lettered messages (REQ-NFR-008).
+  4. A dead-lettered message can be replayed by an admin without creating duplicates.
+- Verification: integration test that delivers each message twice and replays a dead-lettered message

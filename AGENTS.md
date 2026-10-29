@@ -9,7 +9,7 @@ Planned layout, once code exists:
 - `packages/vector-store`, `packages/prompts`, and `packages/models`
 - `infrastructure/cloudflare`
 
-The intended stack is Cloudflare Workers, Workflows, Queues, D1, R2, Vectorize, and AI Gateway; Next.js on Cloudflare Pages with Tailwind CSS; and LangGraph with OpenAI or Anthropic. Academic sources named in the KT documents are OpenAlex, arXiv, and Semantic Scholar.
+The intended stack is Cloudflare Workers, Workflows, Queues, D1, R2, Vectorize, and AI Gateway; Next.js on Workers (OpenNext) with Tailwind CSS; and plain TypeScript agents with OpenAI or Anthropic through AI Gateway. Academic sources named in the KT documents are OpenAlex, arXiv, and Semantic Scholar.
 
 Do not invent credentials, commit secrets, or add a second license. Open a pull request instead of committing to `main`.
 

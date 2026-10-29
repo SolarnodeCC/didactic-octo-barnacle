@@ -20,7 +20,7 @@ The platform runs on the Cloudflare services listed in the [technology stack](..
 - Status: planned
 - Source: README Technology Stack
 - Acceptance criteria:
-  1. Every runtime component is deployed as a Cloudflare Worker, Workflow, or Pages project.
+  1. Every runtime component is deployed as a Cloudflare Worker, Workflow, or Durable Object. The dashboard runs on Workers through the OpenNext adapter (ADR 0012).
   2. A service outside the listed stack is only added with an ADR.
 - Verification: code review
 
@@ -121,7 +121,7 @@ Publication text is treated as untrusted input to models.
 - Source: KT review of security
 - Acceptance criteria:
   1. Publication text is passed to models as delimited data, never as instructions.
-  2. Agents have no tools that write data or send messages outside the pipeline.
+  2. Agents have no tools that write data or send messages outside the pipeline. The only read tool is the bounded search tool (REQ-AGENT-013), and its results are treated as untrusted too.
   3. Fixtures with injected instructions in the abstract or full text do not change agent behavior beyond the contract.
 - Verification: contract tests with injection fixtures and code review
 
@@ -184,3 +184,82 @@ The KT documents stay small, linked, and consistent.
   1. CI fails when a KT file exceeds 400 lines or 25 KiB, or a requirement file holds more than 40 requirements.
   2. CI fails on missing frontmatter, broken relative links, a directory without an index, or an undefined or duplicate REQ-ID.
 - Verification: `scripts/check-kt.py` in `.github/workflows/config.yml`
+
+## Web security, privacy, and service levels
+
+### REQ-NFR-013: Safe rendering of model and source content
+
+Text and URLs written by models or taken from sources are rendered as plain text.
+
+- Phase: 4
+- Priority: must
+- Status: planned
+- Source: Readiness assessment; ADR 0016
+- Depends on: REQ-DASH-001
+- Acceptance criteria:
+  1. Model-generated and source-derived text is rendered as plain text. No such content is inserted as HTML.
+  2. A URL becomes a link only when it uses `https`; links carry `rel="noopener noreferrer nofollow"`.
+  3. The dashboard sends a Content Security Policy without inline scripts, `X-Content-Type-Options: nosniff`, a `Referrer-Policy`, and `frame-ancestors 'none'`.
+  4. Tests render fixtures with script tags, `javascript:` URLs, and very long strings in every field a model writes, and assert that nothing executes or breaks the layout.
+- Verification: unit tests of the link rule and end-to-end test with hostile fixtures
+
+### REQ-NFR-014: Request integrity
+
+State-changing requests are protected against cross-site request forgery, and the API accepts no other origins.
+
+- Phase: 4
+- Priority: must
+- Status: planned
+- Source: Readiness assessment; ADR 0016
+- Depends on: REQ-ACC-004
+- Acceptance criteria:
+  1. Every request that changes state needs a valid CSRF token and an `Origin` header that matches the site.
+  2. The API sends no CORS headers that allow another origin.
+  3. The dashboard and the API are served from one site, so the session cookie is never sent cross-site.
+  4. A request with a missing or wrong token or origin gets a forbidden error and changes nothing.
+- Verification: integration test and end-to-end test
+
+### REQ-NFR-015: Data retention
+
+Every class of stored data has a retention period, and deletion covers backups.
+
+- Phase: 4
+- Priority: must
+- Status: planned
+- Source: Readiness assessment; OQ-030; [privacy](../architecture/privacy.md)
+- Depends on: REQ-NFR-009
+- Acceptance criteria:
+  1. The [privacy](../architecture/privacy.md) document lists a retention period for model call records, run reports, raw source records, stored PDFs and text, sign-in records, audit events, and backups.
+  2. A scheduled job deletes records that are past their period, and the job reports counts in a run report (REQ-NFR-008).
+  3. A deletion or erasure request is also applied to restored backups before they serve traffic, and the privacy policy states the longest time a deleted record can remain in a backup.
+- Verification: integration test of the retention job and review of the privacy document
+
+### REQ-NFR-016: Author personal data
+
+The platform has a documented lawful basis and an erasure process for the author data it stores.
+
+- Phase: 1
+- Priority: must
+- Status: planned
+- Source: Readiness assessment (GDPR); REQ-NFR-009
+- Acceptance criteria:
+  1. The [privacy](../architecture/privacy.md) document states the lawful basis for storing author names, ORCIDs, and affiliations, and how the notice to authors is given.
+  2. A request from an author to erase their data removes the author record and their affiliations from the platform, keeps the publications, and is recorded in the audit log without the personal data.
+  3. Author data is never shown outside provenance and is never used to profile people.
+- Verification: integration test of author erasure and review of the privacy document
+
+### REQ-NFR-017: Service levels
+
+The dashboard and the API meet stated availability and latency targets.
+
+- Phase: 4
+- Priority: should
+- Status: planned
+- Source: Readiness assessment
+- Depends on: REQ-API-001, REQ-DASH-002
+- Acceptance criteria:
+  1. The list endpoint (REQ-API-001) answers within 500 ms at the 95th percentile on a seeded database of 10,000 opportunities, and the detail endpoint within 800 ms.
+  2. The supported browsers are the current and previous major versions of Chrome, Edge, Firefox, and Safari.
+  3. The availability target of the dashboard and the API is 99.5 % per month, and a breach raises an alert (REQ-NFR-008).
+  4. The recovery point objective is 24 hours and the recovery time objective is 4 hours, tested once with a D1 restore before launch (see [operations](../operations.md)).
+- Verification: load test on seeded data and a restore drill

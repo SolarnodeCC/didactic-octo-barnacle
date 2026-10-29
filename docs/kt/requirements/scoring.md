@@ -49,7 +49,7 @@ Each category value is derived from agent output with the versioned rules summar
 - Depends on: REQ-AGENT-001, REQ-AGENT-002, REQ-AGENT-003, REQ-AGENT-004, REQ-AGENT-006
 - Acceptance criteria:
   1. Every category has a derivation rule that names the agent fields it reads (ADR 0005 while Proposed; the accepted ADR thereafter).
-  2. The derivation is plain code without model calls.
+  2. The derivation is plain code without model calls and uses integer arithmetic, so rounding half up is exact (ADR 0005).
   3. Changing a rule or a weight creates a new score model version; stored scores keep their version.
 - Verification: unit tests per category with fixed agent outputs
 
@@ -64,6 +64,7 @@ Every score can be explained category by category.
 - Acceptance criteria:
   1. Each category value is stored with the agent fields it was derived from and their evidence (REQ-AGENT-008).
   2. The explanation is available through the API and the dashboard (REQ-API-002, REQ-DASH-001).
+  3. A score is labeled `estimate-based` while the market figures it used have `Basis: estimated`, and the label is stored with the score (ADR 0005).
 - Verification: unit tests and end-to-end test
 
 ### REQ-SCORE-005: Incomplete inputs
@@ -75,7 +76,7 @@ An opportunity is only scored when all five categories can be derived.
 - Status: planned
 - Source: KT review of scoring
 - Acceptance criteria:
-  1. An opportunity with a missing or failed category input gets no score and is marked incomplete with the missing category.
+  1. An opportunity with a missing or failed category input, or with a SAM amount of zero or less, gets no score and is marked incomplete with the missing category.
   2. Incomplete opportunities are excluded from ranking by default.
 - Verification: unit tests
 
@@ -88,8 +89,8 @@ Scores agree with expert judgment on a reviewed set of opportunities.
 - Status: planned
 - Source: KT review of scoring
 - Acceptance criteria:
-  1. A calibration set of at least 30 opportunities is ranked by reviewers, and their ranking is stored with the set.
-  2. The rank correlation between scores and the reviewers' ranking meets the threshold stored with the set.
+  1. A calibration set of at least 60 opportunities is ranked by reviewers, and their ranking is stored with the set.
+  2. The Spearman rank correlation between scores and the reviewers' ranking is at least 0.6 (provisional, confirmed by the code owner before the first calibration run), and the report states its 95 % confidence interval.
   3. The band distribution of the calibration set is reported with each new score model version.
 - Verification: eval on the calibration set
 
