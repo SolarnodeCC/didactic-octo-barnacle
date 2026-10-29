@@ -1,0 +1,50 @@
+---
+title: Open questions
+owner: "@SolarnodeCC"
+status: draft
+last_reviewed: 2026-10-28
+---
+
+# Open questions
+
+Questions that block or shape the build. Each has a proposal and the phase by which it must be answered. An answered question becomes an ADR or a change to a KT document, and its row is removed in the same pull request. IDs are never reused.
+
+## Architecture and technology
+
+| ID | Question | Proposal | Decide before |
+|---|---|---|---|
+| OQ-001 | Which language and agent runtime? | LangGraph.js inside Cloudflare Workflows; drop CrewAI (ADR 0003) | phase 1 |
+| OQ-002 | Which Cloudflare service implements each layer? | ADR 0004 | phase 1 |
+| OQ-003 | How is each score category derived from agent output? | ADR 0005 | phase 4 |
+| OQ-004 | How do live evals run for pull requests without exposing secrets? | ADR 0006 | phase 3 |
+| OQ-005 | Which embedding model? | Compare a Workers AI model, a provider model, and Semantic Scholar SPECTER2 vectors on the search fixture corpus (REQ-PROC-003) | phase 2 |
+| OQ-006 | How is text extracted from PDFs within Worker limits? | Evaluate a JavaScript PDF library and a Cloudflare-hosted conversion on the fixture PDFs; fall back to the abstract on failure (REQ-DATA-006) | phase 2 |
+| OQ-009 | How is the Next.js dashboard hosted? | Verify Cloudflare's current guidance; prefer the OpenNext adapter on Workers if Pages is no longer recommended for Next.js | phase 4 |
+| OQ-020 | Which model runs each agent, and which model judges evals? | Pick per agent on the golden set by quality and cost; the judge uses a different provider than the agent it grades | phase 3 |
+| OQ-018 | Toolchain: package manager, monorepo tooling, language versions, schema library, test tools | pnpm workspaces, TypeScript, Zod, Vitest with the Workers pool, Playwright; record in one ADR with the first package | phase 1 |
+
+## Product and data
+
+| ID | Question | Proposal | Decide before |
+|---|---|---|---|
+| OQ-007 | Where do market figures come from? | Start with model estimates labeled as estimates; evaluate a market data source or a web search tool in phase 3 | phase 3 |
+| OQ-008 | How are competitors found? | Connect a web search API as an agent tool, behind AI Gateway or a Worker; until then competitors are unverified | phase 3 |
+| OQ-010 | Who are the users, and is the MVP multi-tenant? | One internal team behind Cloudflare Access; organization profiles later (REQ-DASH-005) | phase 4 |
+| OQ-011 | Which default currency and geography do market figures use? | EUR and the EU, with global figures allowed when stated | phase 3 |
+| OQ-012 | What is the ingestion scope: OpenAlex filters, arXiv categories, backfill window, daily volume? | arXiv categories in [arXiv](data-sources/arxiv.md); OpenAlex works of the last 30 days filtered by topics that match the target industries; measure the daily volume in phase 1 | phase 1 |
+| OQ-013 | What provisional daily model budget applies before calibration? | A low fixed daily budget per environment, enough for triage and extraction on the configured daily volume (REQ-NFR-005) | phase 2 |
+| OQ-021 | What calibrated daily model budget applies in production? | Measure cost per opportunity on the phase 3 golden set; lock the calibrated budget before scoring goes live | phase 4 |
+| OQ-016 | Build layer by layer, or a thin end-to-end slice first? | One publication through every layer with stubbed agents by the end of phase 2, so the value of the output can be judged early | phase 1 |
+| OQ-017 | When do organization profiles and feedback come? | After the MVP (REQ-DASH-004, REQ-DASH-005) | later |
+
+## Legal and people
+
+| ID | Question | Proposal | Decide before |
+|---|---|---|---|
+| OQ-014 | May we store and show PDFs and full text, and do the source and model provider terms allow commercial use? | Legal review of arXiv, OpenAlex, and Semantic Scholar terms and of the provider data retention terms; store only openly licensed PDFs until then (REQ-DATA-010) | phase 1 |
+| OQ-015 | Who reviews golden sets and the calibration set? | At least one reviewer per target industry, named in the golden set | phase 3 |
+| OQ-019 | Who owns each KT document? | Name a person or role per document in `owner` instead of the organization handle | phase 1 |
+
+## Answered
+
+None yet.

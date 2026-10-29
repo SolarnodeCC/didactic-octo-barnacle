@@ -29,3 +29,24 @@ The planned layout once code exists:
 ```
 
 `docs/kt` and `scripts` exist today. The other directories are not implemented yet. When an application is added, extend the `install` command in `.cursor/environment.json` and the `setup-worktree` commands in `.cursor/worktrees.json`.
+
+## What goes where
+
+| Directory | Holds | Requirements |
+|---|---|---|
+| `apps/dashboard` | Next.js dashboard | REQ-DASH-001, REQ-DASH-002, REQ-DASH-003 |
+| `apps/api` | Read-only API Worker | REQ-API-001, REQ-API-002, REQ-API-003 |
+| `agents/research-agent` | Opportunity extraction, Research Analyst, Problem Discovery | REQ-PROC-004, REQ-AGENT-001, REQ-AGENT-002 |
+| `agents/startup-agent` | Market Analysis, Competition, Startup Generator | REQ-AGENT-003, REQ-AGENT-004, REQ-AGENT-005 |
+| `agents/scoring-agent` | Relevance Agent and the deterministic scoring engine | REQ-AGENT-006, REQ-SCORE-001, REQ-SCORE-003 |
+| `packages/models` | Schemas for records, agent contracts, and the API; shared by all code | REQ-TEST-002, REQ-API-003 |
+| `packages/prompts` | One versioned prompt per agent | REQ-TEST-004 |
+| `packages/vector-store` | Embedding and Vectorize access, semantic search | REQ-PROC-001, REQ-PROC-002, REQ-PROC-003 |
+| `infrastructure/cloudflare` | Wrangler configuration, bindings, migrations | REQ-NFR-002 |
+
+Each agent directory holds the agent's graph, its tests, and its golden set under `evals/`. Fixtures live next to the tests that use them (see [test data](../test/test-data.md)).
+
+## Open points
+
+- The collector and document-processing Workers have no directory yet. The proposal is `apps/pipeline`, which also holds the pipeline workflow (OQ-018 in [open questions](../open-questions.md)).
+- The package manager and monorepo tooling are chosen with the first package (OQ-018).

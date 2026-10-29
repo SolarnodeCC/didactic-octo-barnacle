@@ -1,17 +1,112 @@
-# Research finding: context switching causes significant productivity loss
-# among knowledge workers. This is the platform output for that finding.
-Problem: Knowledge workers lose focus when switching tasks.
-TargetMarket: Enterprise organizations
-ExistingSolutions:
-  - Todoist
-  - Motion
-  - Asana
-MarketGap: >-
-  No solution dynamically optimizes based on energy level,
-  meetings and productivity patterns.
-GeneratedStartup: AI Focus Planner
-BusinessModel:
-  Type: SaaS
-  Pricing: "€15/user/month"
-ImplementationComplexity: Medium
-OpportunityScore: 87
+# Platform output for a research finding: context switching causes significant
+# productivity loss among knowledge workers. The publication, IDs, quotes, and
+# figures are illustrative and do not refer to a real record. Field names follow
+# the agent contracts in docs/kt/agents/ and the score model in ADR 0005.
+Publication:
+  Id: pub-example-0001
+  Title: Task switching and focus loss among knowledge workers
+  Source: openalex
+  SourceId: W0000000000
+  Doi: 10.0000/example.0001
+  PublicationDate: "2026-09-15"
+  InputMode: abstract
+Candidate:
+  Id: cand-example-0001
+  Finding: Frequent task switching measurably reduces the focus and output of knowledge workers.
+  EvidenceQuote: Frequent switching between tasks reduced sustained focus.
+Agents:
+  ResearchAnalyst:
+    Novelty: 60
+    NoveltyRationale: Earlier work measured interruptions; this study links switching patterns to output over months.
+    RelatedPublicationIds: [pub-example-0102, pub-example-0187]
+    Maturity: field-tested
+    Industry: [enterprise, government]
+    Technology: [activity sensing, scheduling optimization]
+    Confidence: 0.6
+  ProblemDiscovery:
+    Problem: Knowledge workers lose focus and output when they switch between tasks and meetings.
+    Customer:
+      Segment: Enterprise organizations with large knowledge-worker teams
+      Role: Head of employee experience
+      Industry: enterprise
+    PainLevel: 4
+    PainRationale: Lost focus time costs measurable output, and employers already pay for productivity tools.
+    Confidence: 0.6
+  MarketAnalysis:
+    TAM:
+      Low: { Amount: 8000000000, Currency: EUR }
+      High: { Amount: 12000000000, Currency: EUR }
+      Year: 2026
+      Geography: global
+      Basis: estimated
+    SAM:
+      Low: { Amount: 2000000000, Currency: EUR }
+      High: { Amount: 4000000000, Currency: EUR }
+      Year: 2026
+      Geography: EU
+      Basis: estimated
+    GrowthRate:
+      CagrPercent: 14
+      Period: 2026-2031
+      Basis: estimated
+    Method: top-down
+    Assumptions:
+      - Productivity software spend per knowledge worker stays stable.
+    Confidence: 0.4
+  Competition:
+    Competitors:
+      - { Name: Todoist, Kind: indirect, Description: Task manager, Verified: false }
+      - { Name: Motion, Kind: direct, Description: AI calendar and task scheduler, Verified: false }
+      - { Name: Asana, Kind: indirect, Description: Work management platform, Verified: false }
+    Saturation: 3
+    Gap: Existing tools schedule tasks, but none plan focus blocks from measured switching patterns for knowledge-worker teams.
+    GapStrength: 3
+    Differentiation: Plans focus blocks from measured switching patterns instead of static rules.
+    Confidence: 0.5
+  Relevance:
+    IndustryFit: { government: 60, healthcare: 55, financial-services: 50, enterprise: 80 }
+    StrategicRelevanceScore: 88
+    TechnicalFeasibility: 80
+    ImplementationEffort: M
+    Constraints:
+      - Calendar and activity data need employee consent.
+    Confidence: 0.6
+  StartupGenerator:
+    StartupName: AI Focus Planner
+    OpportunityType: saas
+    ValueProposition: Protects focus time by planning work around each person's switching patterns.
+    TargetCustomer: Enterprise organizations with large knowledge-worker teams
+    BusinessModel: subscription
+    Pricing:
+      Model: per-user
+      Price: { Amount: 15, Currency: EUR }
+      Unit: user per month
+    USP: Plans focus blocks from measured switching patterns instead of static rules.
+    MvpFeatures:
+      - Calendar integration
+      - Daily focus plan
+      - Switching report per team
+    NextSteps:
+      - Interview five heads of employee experience about focus time.
+      - Test a calendar-only prototype with one internal team.
+      - Review consent requirements for activity data with a privacy officer.
+    BusinessCase:
+      Summary: A per-user subscription for employers that already pay for productivity tools.
+      KeyAssumptions:
+        - Employers will share calendar data with a new vendor.
+        - Focus time gains can be shown within one quarter.
+      KeyRisks:
+        - Established calendar vendors add the same feature.
+        - Employees see activity sensing as surveillance.
+    Confidence: 0.5
+Score:
+  ModelVersion: 1
+  Categories:
+    ScientificNovelty: 60
+    MarketPotential: 61.2
+    CompetitiveGap: 50
+    TechnicalFeasibility: 80
+    StrategicRelevance: 88
+  WeightedSum: 66.9
+  OpportunityScore: 67
+  Band: Medium

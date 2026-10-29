@@ -15,6 +15,7 @@ import yaml
 
 KT = pathlib.Path("docs/kt")
 REQUIREMENTS = KT / "requirements"
+DECISIONS = KT / "decisions"
 
 WARN_LINES = 250
 MAX_LINES = 400
@@ -58,6 +59,8 @@ def split_frontmatter(path, text):
 
 
 def check_frontmatter(path, front):
+    # Accepted ADRs are never edited, so they are exempt from the review warning.
+    accepted_adr = DECISIONS in path.parents and path.name != "README.md" and front.get("status") == "approved"
     for key in DOC_KEYS:
         if key not in front:
             errors.append(f"{path}: frontmatter is missing {key}")
@@ -66,7 +69,7 @@ def check_frontmatter(path, front):
     reviewed = front.get("last_reviewed")
     if "last_reviewed" in front and not isinstance(reviewed, datetime.date):
         errors.append(f"{path}: last_reviewed must be a YYYY-MM-DD date")
-    elif isinstance(reviewed, datetime.date):
+    elif isinstance(reviewed, datetime.date) and not accepted_adr:
         age = (datetime.date.today() - reviewed).days
         if age > REVIEW_DAYS:
             warnings.append(f"{path}: last reviewed {age} days ago")
