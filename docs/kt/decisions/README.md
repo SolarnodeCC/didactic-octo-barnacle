@@ -41,6 +41,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0028](0028-freeze-migration-0001.md) | Freeze migration 0001 at the phase 1 tables | Accepted |
 | [0029](0029-pdf-fetcher-host-policy.md) | PDF fetcher host policy | Accepted |
 | [0030](0030-alert-delivery-in-phase-1.md) | Alert delivery in phase 1 | Accepted |
+| [0031](0031-author-erasure-list.md) | Author erasure keeps a keyed-hash list | Accepted |
 
 ## When an ADR is needed
 

@@ -29,4 +29,19 @@ describe("REQ-DATA-007: cross-source merge decisions", () => {
     });
     expect(decision.Action).toBe("review");
   });
+
+  it("REQ-NFR-016: a missing first author is no evidence, so equal titles are not flagged", () => {
+    const base = {
+      Incoming: { ArxivId: "2409.1" },
+      Existing: { OpenAlexIds: ["w1"] },
+      IncomingTitle: "Same Title",
+      ExistingTitle: "Same Title",
+    };
+    expect(
+      decideMerge({ ...base, IncomingFirstAuthor: "", ExistingFirstAuthor: "Ada Lovelace" }).Action,
+    ).toBe("create");
+    expect(decideMerge({ ...base, IncomingFirstAuthor: "", ExistingFirstAuthor: "" }).Action).toBe(
+      "create",
+    );
+  });
 });

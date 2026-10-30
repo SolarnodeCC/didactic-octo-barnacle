@@ -1,6 +1,12 @@
 /** The slice of the R2 bucket API the pipeline uses. `R2Bucket` satisfies it. */
 export interface ObjectStore {
   head(key: string): Promise<unknown | null>;
+  get(key: string): Promise<{ text(): Promise<string> } | null>;
+  list(options: { prefix: string; cursor?: string }): Promise<{
+    objects: Array<{ key: string }>;
+    truncated: boolean;
+    cursor?: string;
+  }>;
   put(
     key: string,
     value: Uint8Array,
