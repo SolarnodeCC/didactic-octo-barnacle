@@ -113,7 +113,7 @@ Invitation and sign-in emails are sent through Resend from a verified domain.
 - Status: planned
 - Source: product decision to use Resend for magic links
 - Acceptance criteria:
-  1. The sending domain is verified with SPF, DKIM, and DMARC before launch.
+  1. The sending domain (`wispel.cc`, ADR 0026) is verified with SPF, DKIM, and DMARC before launch.
   2. Emails have a plain-text part, no tracking pixels, and no link tracking that rewrites the token link.
   3. A bounce or complaint reported by Resend is recorded, and an administrator sees that the invitation was not delivered.
   4. The Resend API key is a secret listed in [operations](../operations.md) and is never logged.

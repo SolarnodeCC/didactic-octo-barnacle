@@ -111,7 +111,7 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 
 The first production launch is an invited pilot without billing (see the non-goals in the [overview](overview.md)). It needs all of these:
 
-- Sending domain verified with SPF, DKIM, and DMARC (REQ-ACC-007).
+- Sending domain `wispel.cc` verified with SPF, DKIM, and DMARC (REQ-ACC-007, ADR 0026).
 - Terms, privacy policy, author notice, and support contact published (REQ-ACC-011, [privacy](architecture/privacy.md)).
 - Data processing agreements signed with Cloudflare, the model providers, Resend, and the search provider.
 - Retention job running (REQ-NFR-015) and a restore drill done (REQ-NFR-017).
