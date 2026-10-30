@@ -36,8 +36,15 @@ A publication is in scope (REQ-PROC-006) when at least one of its OpenAlex field
 
 ## Measure in phase 1
 
-- Publications per day per source, and how many pass triage.
-- Share of publications with an abstract and with a storable PDF (ADR 0014).
-- Cost of triage and extraction per publication (REQ-NFR-005).
+- Publications per day per source (by publication date).
+- Share of publications with an abstract, complete records, and a storable PDF (ADR 0014), and what happened to the PDF messages.
+- Runs per day with their outcome, dead-lettered messages, flagged duplicates, and alerts.
+- The cost per publication as an **estimate** (ADR 0032). Phase 1 makes no model calls, so triage and extraction are not measured. The estimate takes the real mean abstract length, the stated prompt sizes, and the price of the configured model from `infrastructure/cloudflare/measure/cost-assumptions.json`. A price left empty is reported as missing, never guessed. Phase 2 replaces the estimate with the first measured cost.
 
-Phase 2 does not start until the phase 1 measurements give a cost per publication (REQ-NFR-005). Widen the scope only when the measured cost per complete opportunity fits the calibrated budget (OQ-021).
+How: the manual workflow `Staging measure` runs read-only queries against the staging database and prints the report (`pnpm --filter @roi/cloudflare-infra measure --env staging`). Run it a few days after the first scheduled runs. A run that stopped at the page cap (`ingestion.max_pages_per_run`) makes the counts lower bounds, and the daily figure sums both sources, so a publication found in both counts twice: the figures are upper bounds for the cost and lower bounds for the share of coverage, and are read that way.
+
+Phase 2 does not start until the phase 1 measurements give a complete estimate of the cost per publication (REQ-NFR-005). Widen the scope only when the measured cost per complete opportunity fits the calibrated budget (OQ-021).
+
+## Results
+
+Not measured yet. After the first scheduled runs on staging, the report of `Staging measure` is recorded here, with its date, the page cap status, and the assumptions used.

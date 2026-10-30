@@ -35,13 +35,13 @@ A phase starts when:
 1. The requirement files for its requirements are `approved` (see [requirements review](requirements/README.md#review)).
 2. The open questions marked for that phase in [open questions](open-questions.md) are answered or have an accepted ADR. OQ-005 is closed (ADR 0010); OQ-014 remains the legal gate for phase 2; OQ-015 remains the reviewer-naming gate for phase 3.
 3. The previous phase meets its exit criteria.
-4. Phase 2 also needs the written legal answer of OQ-014 ([review brief](legal/review-brief.md)) and a measured cost per publication from phase 1 (REQ-NFR-005).
+4. Phase 2 also needs the written legal answer of OQ-014 ([review brief](legal/review-brief.md)) and the cost per publication from phase 1 (REQ-NFR-005), which is an estimate from real phase 1 data (ADR 0032) because phase 1 makes no model calls; the first measured cost comes from the first model calls in phase 2.
 
 ## Exit criteria
 
 | Phase | Done when |
 |---|---|
-| 1 | A scheduled run ingests the pilot scope from OpenAlex and arXiv into the development environment without duplicates, delivering every queue message twice changes nothing, the run report shows counts and failures, and daily volume and cost per publication are measured and recorded in [ingestion scope](data-sources/ingestion-scope.md). |
+| 1 | A scheduled run ingests the pilot scope from OpenAlex and arXiv into the development environment without duplicates, delivering every queue message twice changes nothing, the run report shows counts and failures, and the daily volume is measured on the deployed pipeline and the cost per publication is estimated from it, both recorded in [ingestion scope](data-sources/ingestion-scope.md) (ADR 0032). |
 | 2 | A semantic search on the fixture corpus reaches recall at 10 of at least 0.8, and triage plus extraction meet their golden-set thresholds and produce candidates within the daily budget. The thresholds are written down before the first run (REQ-TEST-005). The thin slice (REQ-PROC-007) runs end to end with stubbed agents. |
 | 3 | Every agent meets the eval threshold fixed for it before its first run, and the pipeline produces complete, evidence-backed outputs for the golden set within the cost per complete opportunity target of the [overview](overview.md). |
 | 4 | Authenticated users can rank, filter, and open explained opportunities in the dashboard, admins can hide and rerun, the calibration report shows Spearman at least 0.6 with its interval (REQ-SCORE-006), and the launch checklist in [operations](operations.md) is complete. |

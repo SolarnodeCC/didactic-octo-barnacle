@@ -73,6 +73,10 @@ vars = { ENVIRONMENT = "staging", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo
 [env.staging.triggers]
 crons = ["0 6 * * *", "30 7 * * *"]
 
+# Keep the structured log lines (REQ-NFR-008) so a run can be followed afterwards.
+[env.staging.observability]
+enabled = true
+
 [[env.staging.d1_databases]]
 binding = "DB"
 database_name = "roi-staging"
@@ -106,6 +110,10 @@ vars = { ENVIRONMENT = "production", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-o
 
 [env.production.triggers]
 crons = ["0 6 * * *", "30 7 * * *"]
+
+# Keep the structured log lines (REQ-NFR-008) so a run can be followed afterwards.
+[env.production.observability]
+enabled = true
 
 [[env.production.d1_databases]]
 binding = "DB"

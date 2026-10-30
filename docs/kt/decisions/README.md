@@ -42,6 +42,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0029](0029-pdf-fetcher-host-policy.md) | PDF fetcher host policy | Accepted |
 | [0030](0030-alert-delivery-in-phase-1.md) | Alert delivery in phase 1 | Accepted |
 | [0031](0031-author-erasure-list.md) | Author erasure keeps a keyed-hash list | Accepted |
+| [0032](0032-phase-1-cost-per-publication-is-an-estimate.md) | The phase 1 cost per publication is an estimate from real data | Accepted |
 
 ## When an ADR is needed
 

@@ -1,0 +1,17 @@
+{
+  "note": "Assumptions for the phase 1 ESTIMATE of the cost per publication (ADR 0032). The token counts are placeholders until the phase 2 prompts exist. The prices are null on purpose: fill in the current price of the model configured for each step, from the provider's price list, in a reviewed pull request. Without prices the report shows token volumes only.",
+  "charsPerToken": 4,
+  "dailyExtractionLimit": 100,
+  "triage": {
+    "promptTokens": 500,
+    "outputTokens": 100,
+    "inputEurPerMillionTokens": null,
+    "outputEurPerMillionTokens": null
+  },
+  "extraction": {
+    "promptTokens": 1500,
+    "outputTokens": 800,
+    "inputEurPerMillionTokens": null,
+    "outputEurPerMillionTokens": null
+  }
+}
