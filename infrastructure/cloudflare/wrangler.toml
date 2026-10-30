@@ -1,7 +1,7 @@
 # Cloudflare Worker bindings for the research pipeline (ADR 0004, ADR 0020).
-# The collector Worker package in apps/pipeline will point at these resources.
+# The collector Worker in apps/pipeline (src/worker.ts) uses these resources.
 name = "roi-pipeline"
-main = "src/placeholder-worker.ts"
+main = "../../apps/pipeline/src/worker.ts"
 compatibility_date = "2026-10-01"
 compatibility_flags = ["nodejs_compat"]
 

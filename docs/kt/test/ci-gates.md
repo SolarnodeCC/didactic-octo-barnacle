@@ -53,6 +53,8 @@ pnpm check:traceability
 
 `pnpm typecheck` builds `@roi/models` first so workspace packages can resolve its declaration files.
 
+The collector integration tests in `apps/pipeline` run in `pnpm test:unit`. They apply the real migrations from `infrastructure/cloudflare/migrations` to an in-memory SQLite database that stands in for D1, and use recorded fixtures and stubbed `fetch` functions (REQ-TEST-003).
+
 ## Rules
 
 - Never skip, disable, or quarantine a failing test to get a green build. Fix the test or the code, or change the requirement through a reviewed pull request.

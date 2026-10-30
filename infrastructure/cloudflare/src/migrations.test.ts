@@ -21,7 +21,11 @@ function tableColumns(db: Database.Database, table: string): string[] {
 
 describe("REQ-NFR-020: migrations hold columns required by packages/models", () => {
   it("REQ-NFR-020: lists numbered SQL migrations in order", () => {
-    expect(listMigrationFiles()).toEqual(["0001_init.sql", "0002_title_author_review.sql"]);
+    expect(listMigrationFiles()).toEqual([
+      "0001_init.sql",
+      "0002_title_author_review.sql",
+      "0003_publication_title_author_key.sql",
+    ]);
   });
 
   it("REQ-NFR-020: applies migrations and exposes expected tables and columns", () => {
@@ -29,7 +33,11 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
     const applied = applyMigrations((sql) => {
       db.exec(sql);
     });
-    expect(applied).toEqual(["0001_init.sql", "0002_title_author_review.sql"]);
+    expect(applied).toEqual([
+      "0001_init.sql",
+      "0002_title_author_review.sql",
+      "0003_publication_title_author_key.sql",
+    ]);
 
     for (const table of EXPECTED_PHASE1_TABLES) {
       const columns = tableColumns(db, table.name);
