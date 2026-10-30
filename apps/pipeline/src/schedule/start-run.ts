@@ -1,4 +1,6 @@
+import { notify } from "../alerts/notify.js";
 import { fetchPageEnvelope, type PipelineDeps, type RunSource } from "../queue/deps.js";
+import { reportForAlert } from "../report/safe-report.js";
 import {
   createRun,
   finishRunStatement,
@@ -12,6 +14,17 @@ export type StartRunResult =
   | { Outcome: "skipped"; RunId: string; Reason: string };
 
 const HOUR_MS = 60 * 60 * 1000;
+
+/** The start failed after the run row was stored; carries the run ID for the alert. */
+export class StartRunError extends Error {
+  constructor(
+    message: string,
+    readonly RunId: string,
+  ) {
+    super(message);
+    this.name = "StartRunError";
+  }
+}
 
 /**
  * Cron entry for one source (REQ-DATA-009): compute the window from the last
@@ -42,6 +55,14 @@ export async function startRun(deps: PipelineDeps, source: RunSource): Promise<S
       }),
     ]);
     deps.Log?.("run.timed_out", { runId: running.Id, source });
+    const report = await reportForAlert(deps, running.Id, now);
+    await notify(deps, {
+      Type: "run-timeout",
+      Source: source,
+      RunId: running.Id,
+      Summary: `A run was still open after ${deps.Config.RunTimeoutHours} hours and was closed as failed.`,
+      ...(report ? { Report: report } : {}),
+    });
   }
 
   const from = windowStart({
@@ -64,7 +85,10 @@ export async function startRun(deps: PipelineDeps, source: RunSource): Promise<S
         WindowEnd: now.slice(0, 10),
       }),
     ]);
-    throw error;
+    throw new StartRunError(
+      `could not queue the first page: ${error instanceof Error ? error.message : "unknown error"}`,
+      runId,
+    );
   }
   deps.Log?.("run.started", { runId, source, windowFrom: from });
   return { Outcome: "started", RunId: runId, WindowFrom: from };

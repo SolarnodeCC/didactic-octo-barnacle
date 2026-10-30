@@ -64,13 +64,13 @@ Cron expressions (UTC) are in [defaults](architecture/defaults.md).
 | Retention job | daily 03:00 | REQ-NFR-015 |
 | Nightly evals | daily 02:00 | REQ-TEST-004 |
 
-## Monitoring (planned)
+## Monitoring
 
 - Every ingestion and pipeline run writes a run report with counts and failures (REQ-NFR-008).
 - A failed scheduled run, a run that exceeds its time window, a budget stop, a dead-lettered message, or a breach of the availability target (REQ-NFR-017) raises an alert (REQ-NFR-019). An alert sends an email to the ops address and opens a GitHub issue labeled `alert`; repeats within 24 hours comment on the open issue.
 - AI Gateway shows tokens, cost, and latency per agent (REQ-NFR-003).
 
-## Runbooks (planned)
+## Runbooks
 
 Severity: **SEV1** production down or data loss risk; **SEV2** ingestion or pipeline stopped; **SEV3** single-candidate or single-user issue. Page the owner in [open questions](open-questions.md) OQ-034 (MVP: `@SolarnodeCC`). Post a short note in the ops issue; no public status page in the MVP.
 
@@ -81,7 +81,7 @@ Severity: **SEV1** production down or data loss risk; **SEV2** ingestion or pipe
 | The daily budget is reached | SEV2 | Check cost per opportunity in AI Gateway before raising the budget (ADR 0023). |
 | Bad output reached the dashboard | SEV3 | Hide the opportunity in Operations (REQ-ADM-001), add the case to the golden set, and fix the prompt through a pull request with evals. |
 | Candidates failed or are incomplete | SEV3 | Open Pipeline health and rerun them from the first failed step (REQ-ADM-002). Check the budget first. |
-| A message is dead-lettered | SEV3 | Inspect payload in `queue_message_log`, fix the cause, replay via `POST /admin/queue/replay` (REQ-DATA-011). |
+| A message is dead-lettered | SEV3 | An alert names the message and its run. Inspect `payload_json` and `last_error` in `queue_message_log`, fix the cause, and replay it with `replayDeadLetter` (REQ-DATA-011; the route `POST /admin/queue/replay` comes with the admin API in phase 4). |
 | An author asks for erasure | SEV3 | Follow the erasure process in [privacy](architecture/privacy.md) (REQ-NFR-016); use `POST /admin/authors/:id/erase`. |
 | Availability below 99.5% (REQ-NFR-017) | SEV1 | Check Workers/D1 status, last deploy, and error rate; roll back Worker if the last deploy correlates; open a SEV1 issue. |
 | Need to restore D1 | SEV1 | Time Travel to the restore point; apply erasure list since that point; rebuild vectors from publications; verify with a smoke list/detail request. |
@@ -96,7 +96,7 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 
 | Secret name | Purpose | Stored in | Environments |
 |---|---|---|---|
-| `RESEND_API_KEY` | Sends invitation and sign-in emails (REQ-ACC-007) | Cloudflare Worker secret; GitHub Actions secret for deployment | preview, staging, production |
+| `RESEND_API_KEY` | Sends invitation and sign-in emails (REQ-ACC-007) and alert emails (REQ-NFR-019) | Cloudflare Worker secret; GitHub Actions secret for deployment | preview, staging, production |
 | `RESEND_WEBHOOK_SECRET` | Verifies Resend bounce and complaint webhooks (REQ-ACC-007) | Worker secret | preview, staging, production |
 | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | Deploy with Wrangler and run the bootstrap script; the token has the least permissions each environment needs | GitHub Actions secret | preview, staging, production |
 | `OPENALEX_API_KEY` | OpenAlex requests by the collector (REQ-DATA-001) | Worker secret; GitHub Actions secret for tests that need it | preview, staging, production |
@@ -105,8 +105,10 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 | `ANTHROPIC_API_KEY` | Model provider behind AI Gateway (when Anthropic is configured) | AI Gateway / Worker secret | preview, staging, production |
 | `SEARCH_PROVIDER_API_KEY` | Primary web search provider for Market Analysis and Competition (ADR 0022) | Worker secret | preview, staging, production |
 | `SEARCH_PROVIDER_FALLBACK_API_KEY` | Second search provider for benchmark and failover (ADR 0022) | Worker secret | preview, staging, production |
-| `ALERT_GITHUB_TOKEN` | Opens and comments on alert issues; a fine-grained token limited to issues on this repository (REQ-NFR-019) | Cloudflare Worker secret | preview, staging, production |
-| `ALERT_EMAIL_TO` | Ops address that receives alert emails (REQ-NFR-019) | Worker variable | preview, staging, production |
+| `ALERT_GITHUB_TOKEN` | Opens and comments on alert issues; a fine-grained token for this repository only, with the permission Issues: read and write and no other (REQ-NFR-019 AC5) | Cloudflare Worker secret | preview, staging, production |
+| `ALERT_EMAIL_TO` | Ops address that receives alert emails (REQ-NFR-019); kept out of the repository | Worker variable | preview, staging, production |
+| `ALERT_EMAIL_FROM` | Sender of alert emails: `onboarding@resend.dev` in staging (delivers only to the Resend account owner); an address on the verified domain in production (ADR 0030) | Worker variable (`wrangler.toml`) | staging, production |
+| `ALERT_GITHUB_REPO` | `owner/repo` that receives alert issues | Worker variable (`wrangler.toml`) | staging, production |
 | `EVAL_OPENAI_API_KEY`, `EVAL_ANTHROPIC_API_KEY`, `EVAL_AI_GATEWAY_TOKEN` | Live evals (REQ-TEST-004, ADR 0006); judge uses a different provider than the agent | GitHub environment `evals`, with required reviewer approval | evals |
 
 ## Launch checklist (planned)
@@ -117,7 +119,7 @@ The first production launch is an invited pilot without billing (see the non-goa
 - Terms, privacy policy, author notice, and support contact published (REQ-ACC-011, [privacy](architecture/privacy.md)).
 - Data processing agreements signed with Cloudflare, the model providers, Resend, and the search provider.
 - Retention job running (REQ-NFR-015) and a restore drill done (REQ-NFR-017).
-- Calibrated daily budget set (ADR 0023) and the alert email address and GitHub issue creation tested (REQ-NFR-019).
+- Calibrated daily budget set (ADR 0023), the GitHub label `alert` created, and the alert email address and GitHub issue creation tested (REQ-NFR-019).
 - At least one active admin and a tested admin recovery path (REQ-ADM-001, REQ-ADM-002).
 - Load test on seeded data meets REQ-NFR-017, run on staging.
 - A fixed monthly model budget for the pilot is set and communicated to the pilot users.

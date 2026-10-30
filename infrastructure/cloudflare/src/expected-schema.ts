@@ -113,4 +113,8 @@ export const EXPECTED_PHASE1_TABLES: ExpectedTable[] = [
       "updated_at",
     ],
   },
+  {
+    name: "alert_state",
+    columns: ["alert_key", "issue_number", "first_alerted_at", "last_alerted_at", "occurrences"],
+  },
 ];

@@ -22,3 +22,7 @@ export { replayDeadLetter } from "./queue/replay.js";
 export { checkPdfUrl } from "./documents/url-policy.js";
 export { createPdfFetcher, PdfFetchError } from "./documents/safe-fetch.js";
 export { handleDocumentIngest } from "./queue/document-ingest.js";
+export { buildRunReport } from "./report/build-run-report.js";
+export { sanitizeReason } from "./report/sanitize.js";
+export { createAlertSink } from "./alerts/sink.js";
+export { logLine } from "./log-line.js";

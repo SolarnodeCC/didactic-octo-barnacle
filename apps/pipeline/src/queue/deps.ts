@@ -3,6 +3,7 @@ import { type QueueMessageEnvelope, type SourceName } from "@roi/models";
 import { type ArxivPage } from "../collectors/arxiv/client.js";
 import { type OpenAlexPage } from "../collectors/openalex/client.js";
 import { QUEUE_SCHEMA_VERSION, type IngestConfig } from "../config.js";
+import { type AlertSink } from "../alerts/types.js";
 import { type ObjectStore } from "../documents/object-store.js";
 import { type FetchedPdf } from "../documents/safe-fetch.js";
 import { type SqlDatabase } from "../store/sql.js";
@@ -14,6 +15,8 @@ export type PipelineDeps = {
   Now: () => string;
   NewId: () => string;
   Config: IngestConfig;
+  /** Raises alerts for failed runs and dead-lettered messages (REQ-NFR-019); optional. */
+  Alert?: AlertSink;
   /** R2 bucket for stored PDFs. */
   Documents: ObjectStore;
   /** The only way a PDF is downloaded (REQ-DATA-010 AC4). */

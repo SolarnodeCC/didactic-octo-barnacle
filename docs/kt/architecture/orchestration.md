@@ -75,6 +75,13 @@ Cron (OpenAlex / arXiv)
 - A message that fails its retries goes to the dead-letter queue. The dead-letter consumer marks it, counts it in its run, and closes that run as `failed`. Replaying the message reopens the run, and the page can finish it.
 - A new start is skipped while the previous run of that source is `running`, until it is older than `ingestion.run_timeout_hours`.
 
+## Run reports and alerts
+
+- A run report (`RunReport` in `packages/models`) is built from the run row and the message log: status, window, pages, counts, failed items with short reasons, the dead-lettered messages of the run, and three data-quality counters (incomplete records, duplicates flagged, failed PDFs). It holds IDs, counts, and shortened reasons, never publication text (REQ-NFR-008).
+- Three events raise an alert today: a dead-lettered message (`dead-letter`, which also closes its run as failed), a scheduled start that fails (`failed-run`), and a run that outlived `ingestion.run_timeout_hours` (`run-timeout`). The budget stop and availability alerts arrive with their requirements.
+- An alert opens a GitHub issue with the label `alert` and sends a plain-text email. The key is the type, the environment, and the source (or message type). A repeat within 24 hours of the first alert adds a comment to the issue and sends nothing else. State is kept in `alert_state` and written only after a channel delivered, so an alert nobody received is tried again (REQ-NFR-019).
+- Each channel fails on its own and never stops the pipeline: a failure is logged without secrets and the other channel still delivers.
+
 ## State and durability
 
 - Each step is a durable step: its output is stored with the run ID before the next step starts (REQ-AGENT-007). A resumed run skips completed steps.

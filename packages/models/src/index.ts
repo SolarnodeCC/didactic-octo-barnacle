@@ -62,3 +62,5 @@ export {
   type DedupeIdentifiers,
   type DedupeMatch,
 } from "./dedupe.js";
+
+export { AlertTypeSchema, RunReportSchema, type AlertType, type RunReport } from "./run-report.js";

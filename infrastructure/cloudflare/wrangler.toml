@@ -68,7 +68,7 @@ max_retries = 1
 
 [env.staging]
 name = "roi-pipeline-staging"
-vars = { ENVIRONMENT = "staging" }
+vars = { ENVIRONMENT = "staging", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo-barnacle", ALERT_EMAIL_FROM = "onboarding@resend.dev" }
 
 [env.staging.triggers]
 crons = ["0 6 * * *", "30 7 * * *"]
@@ -102,7 +102,7 @@ max_retries = 1
 
 [env.production]
 name = "roi-pipeline-production"
-vars = { ENVIRONMENT = "production" }
+vars = { ENVIRONMENT = "production", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo-barnacle" }
 
 [env.production.triggers]
 crons = ["0 6 * * *", "30 7 * * *"]
