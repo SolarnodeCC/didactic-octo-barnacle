@@ -2,7 +2,7 @@
 title: Migration 0001 schema design
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-10-30
 related: [REQ-NFR-020, REQ-DATA-005, REQ-DATA-007, REQ-DATA-011, REQ-NFR-018, REQ-ACC-002, REQ-ACC-004]
 ---
 
@@ -65,4 +65,10 @@ Physical D1 tables for the first SQL migration (`infrastructure/cloudflare/migra
 
 ## Completeness
 
-`publication.completeness` is `complete` when title, abstract, and at least one stable external ID (DOI or arXiv ID) are present; otherwise `incomplete`. Opportunity completeness follows REQ-SCORE-005 (all five categories present).
+`publication.completeness` follows REQ-DATA-005: `complete` when title, abstract, authors, publication date, source, and source identifier are present; otherwise `incomplete`, with the missing fields recorded in `missing_fields_json`. A DOI or arXiv ID is not required. Opportunity completeness follows REQ-SCORE-005 (all five categories present).
+
+## Implementation notes
+
+- `infrastructure/cloudflare/migrations/0001_init.sql` currently holds the shared research corpus ingestion subset (`publication`, `source_record`, `author`, `authorship`, `document`, `ingestion_run`, `queue_message_log`). The other tables above are added to the same file before its first deploy.
+- Additive columns not listed in the tables above, carrying fields of the `packages/models` contracts: `publication` (`topics_json`, `missing_fields_json`, `language`, `has_storable_pdf`, `created_at`, `updated_at`), `source_record` (`open_access_url`, `pdf_url`, `pdf_license`), `authorship` (`affiliations_json`; `affiliation` holds the first), `document` (`stored_at`), `ingestion_run` (`status`), `queue_message_log` (`last_error`, `created_at`).
+- `0002_title_author_review.sql` adds `title_author_review` for title-and-first-author matches that wait for human review and are never auto-merged (REQ-DATA-007).

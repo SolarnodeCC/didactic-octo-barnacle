@@ -1,0 +1,97 @@
+# Cloudflare Worker bindings for the research pipeline (ADR 0004, ADR 0020).
+# The collector Worker package in apps/pipeline will point at these resources.
+name = "roi-pipeline"
+main = "src/placeholder-worker.ts"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "local"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "roi-local"
+database_id = "00000000-0000-0000-0000-000000000001"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "roi-documents-local"
+
+[[queues.producers]]
+binding = "PUBLICATION_QUEUE"
+queue = "roi-publications-local"
+
+[[queues.consumers]]
+queue = "roi-publications-local"
+max_retries = 3
+dead_letter_queue = "roi-publications-dlq-local"
+
+[env.preview]
+name = "roi-pipeline-preview"
+vars = { ENVIRONMENT = "preview" }
+
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "roi-preview"
+database_id = "REPLACE_WITH_PREVIEW_D1_ID"
+migrations_dir = "migrations"
+
+[[env.preview.r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "roi-documents-preview"
+
+[[env.preview.queues.producers]]
+binding = "PUBLICATION_QUEUE"
+queue = "roi-publications-preview"
+
+[[env.preview.queues.consumers]]
+queue = "roi-publications-preview"
+max_retries = 3
+dead_letter_queue = "roi-publications-dlq-preview"
+
+[env.staging]
+name = "roi-pipeline-staging"
+vars = { ENVIRONMENT = "staging" }
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "roi-staging"
+database_id = "REPLACE_WITH_STAGING_D1_ID"
+migrations_dir = "migrations"
+
+[[env.staging.r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "roi-documents-staging"
+
+[[env.staging.queues.producers]]
+binding = "PUBLICATION_QUEUE"
+queue = "roi-publications-staging"
+
+[[env.staging.queues.consumers]]
+queue = "roi-publications-staging"
+max_retries = 3
+dead_letter_queue = "roi-publications-dlq-staging"
+
+[env.production]
+name = "roi-pipeline-production"
+vars = { ENVIRONMENT = "production" }
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "roi-production"
+database_id = "REPLACE_WITH_PRODUCTION_D1_ID"
+migrations_dir = "migrations"
+
+[[env.production.r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "roi-documents-production"
+
+[[env.production.queues.producers]]
+binding = "PUBLICATION_QUEUE"
+queue = "roi-publications-production"
+
+[[env.production.queues.consumers]]
+queue = "roi-publications-production"
+max_retries = 3
+dead_letter_queue = "roi-publications-dlq-production"
