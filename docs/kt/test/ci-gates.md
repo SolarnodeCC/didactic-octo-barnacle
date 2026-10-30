@@ -2,7 +2,7 @@
 title: CI gates
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-10-28
+last_reviewed: 2026-10-29
 related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004]
 ---
 
@@ -25,6 +25,9 @@ When a gate is added, record the name of its status check here and add it to the
 | Status check | Gate |
 |---|---|
 | `parse` | Configuration check, KT check, workspace install |
+| `toolchain` | Lint, format check, typecheck, build, unit tests, traceability (REQ-TEST-001) |
+
+Integration tests and dependency review are added with the first Worker package and stay listed above until then.
 
 ## Current CI
 
@@ -36,6 +39,17 @@ python3 scripts/check-kt.py
 ```
 
 It also runs the `install` command from `.cursor/environment.json` twice to prove it is idempotent.
+
+`.github/workflows/ci.yml` runs the phase 1 toolchain gates:
+
+```bash
+pnpm lint
+pnpm format:check
+pnpm typecheck
+pnpm build
+pnpm test:unit
+pnpm check:traceability
+```
 
 ## Rules
 

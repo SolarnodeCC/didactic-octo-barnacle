@@ -29,6 +29,7 @@ related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-TEST-005]
 - [Golden sets](golden-sets.md): reviewer slots (OQ-015), sizes, item format, and threshold files.
 - [Test data](test-data.md): fixtures, golden sets, and privacy rules.
 - [CI gates](ci-gates.md): which checks block a merge in each roadmap phase.
+- [Named reviews](named-reviews.md): requirements verified by a named review or CI script (REQ-TEST-001).
 
 ## Beyond functional tests
 
@@ -56,4 +57,4 @@ related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-TEST-005]
 
 ## Current state
 
-There is no application code yet, so there are no tests. Today CI runs the configuration check and the KT check (see [CI gates](ci-gates.md)). The test tools are decided in ADR 0008.
+`packages/models` has unit tests for phase 1 ingestion schemas and helpers. CI runs the configuration check, the KT check, and the toolchain gates including the traceability check (see [CI gates](ci-gates.md)). The test tools are decided in ADR 0008.

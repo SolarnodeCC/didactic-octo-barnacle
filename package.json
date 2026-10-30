@@ -1,0 +1,35 @@
+{
+  "name": "research-opportunity-intelligence",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.18.2",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r run typecheck",
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "test:unit": "pnpm -r run test:unit",
+    "check:traceability": "python3 scripts/check-traceability.py"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.37.0",
+    "@types/node": "^24.7.2",
+    "eslint": "^9.37.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.4.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.0",
+    "vitest": "^3.2.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

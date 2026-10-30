@@ -8,7 +8,7 @@ related: [REQ-DATA-005, REQ-DATA-007, REQ-DATA-011, REQ-SCORE-001, REQ-SCORE-007
 
 # Data model
 
-The logical records the platform stores. Physical table and column names for the first migration are in [schema migration 0001](schema-migration-0001.md) (ADR 0020, REQ-NFR-020). Storage services per record are decided in ADR 0004.
+The logical records the platform stores. Physical table and column names for the first migration are in [schema migration 0001](schema-migration-0001.md) (ADR 0020, REQ-NFR-020). Zod schemas for the phase 1 ingestion records live in `packages/models` (ADR 0008). Storage services per record are decided in ADR 0004.
 
 ```mermaid
 erDiagram

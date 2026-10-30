@@ -4,3 +4,9 @@
 CLAUDE.local.md
 .cursor/local/
 *.pem
+node_modules/
+dist/
+coverage/
+.wrangler/
+*.tsbuildinfo
+.DS_Store

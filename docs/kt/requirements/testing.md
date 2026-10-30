@@ -15,7 +15,7 @@ Every test names the requirement it verifies.
 
 - Phase: 1
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: test strategy
 - Acceptance criteria:
   1. Each test name or description contains a REQ-ID; tests of shared helpers that implement no requirement are allowed and reported as untraced.

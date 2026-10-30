@@ -1,12 +1,12 @@
 # Research Opportunity Intelligence Platform
 
-This repository specifies a platform that turns scientific publications into scored software opportunities. The knowledge transfer (KT) documents in `docs/kt/` are the product source of truth; `README.md` is a summary that links to them (see `docs/kt/decisions/0002-kt-documents-are-source-of-truth.md`). The checked-in tree is that specification plus the MIT `LICENSE`. The apps, agents, packages, and Cloudflare infrastructure described in the KT documents are not implemented yet.
+This repository specifies a platform that turns scientific publications into scored software opportunities. The knowledge transfer (KT) documents in `docs/kt/` are the product source of truth; `README.md` is a summary that links to them (see `docs/kt/decisions/0002-kt-documents-are-source-of-truth.md`). The checked-in tree is that specification, the MIT `LICENSE`, and the phase 1 foundation (`packages/models` and the pnpm workspace). The apps, agents, remaining packages, and Cloudflare infrastructure described in the KT documents are not implemented yet.
 
-Planned layout, once code exists:
+Planned layout:
 
-- `apps/dashboard` and `apps/api`
+- `apps/dashboard`, `apps/api`, and `apps/pipeline`
 - `agents/extraction`, `agents/analysis`, `agents/market`, and `agents/startup`
-- `packages/vector-store`, `packages/prompts`, `packages/scoring`, and `packages/models`
+- `packages/vector-store`, `packages/prompts`, `packages/scoring`, and `packages/models` (present)
 - `infrastructure/cloudflare`
 
 The intended stack is Cloudflare Workers, Workflows, Queues, D1, R2, Vectorize, and AI Gateway; Next.js on Workers (OpenNext) with Tailwind CSS; and plain TypeScript agents with OpenAI or Anthropic through AI Gateway. Academic sources named in the KT documents are OpenAlex, arXiv, and Semantic Scholar.
@@ -17,7 +17,8 @@ Do not invent credentials, commit secrets, or add a second license. Open a pull 
 
 - Configuration check: `python3 scripts/check-config.py` from the repository root (after `install`, or after `python3 -m pip install -r scripts/requirements.txt`). It parses every JSON and YAML file and the frontmatter of `.cursor/rules/*.mdc`. CI runs the same script.
 - KT check: `python3 scripts/check-kt.py` from the repository root. It checks frontmatter, file size limits (400 lines and 25 KiB per file, 40 requirements per requirement file), directory indexes, relative links, and requirement IDs in `docs/kt/`. CI runs the same script.
-- Workspace check: run the `install` command from `.cursor/environment.json`. That command also installs `scripts/requirements.txt`.
+- Workspace check: run the `install` command from `.cursor/environment.json`. That command installs `scripts/requirements.txt`, checks Node 24, and runs `pnpm install --frozen-lockfile`.
+- Toolchain: `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm build`, `pnpm test:unit`, and `pnpm check:traceability` (REQ-TEST-001). CI runs them in `.github/workflows/ci.yml`.
 
 ## KT documents
 

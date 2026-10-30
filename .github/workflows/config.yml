@@ -16,15 +16,27 @@ concurrency:
 jobs:
   parse:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Enable Corepack and pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.18.2 --activate
+
       - name: Parse JSON, YAML, and rule frontmatter
         run: |
           python3 -m pip install --disable-pip-version-check -q -r scripts/requirements.txt
           python3 scripts/check-config.py
+
       - name: Check KT documents
         run: python3 scripts/check-kt.py
+
       - name: Run environment install
         run: |
           python3 - << 'PY'

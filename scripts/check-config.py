@@ -9,9 +9,22 @@ import sys
 
 import yaml
 
+SKIP_DIRS = {".git", "node_modules", "dist", "coverage", ".wrangler"}
+SKIP_YAML_NAMES = {"pnpm-lock.yaml"}
+
 root = pathlib.Path(".")
-json_files = [p for p in root.rglob("*.json") if ".git" not in p.parts]
-yaml_files = [p for p in list(root.rglob("*.yml")) + list(root.rglob("*.yaml")) if ".git" not in p.parts]
+
+
+def keep(path: pathlib.Path) -> bool:
+    return not SKIP_DIRS.intersection(path.parts)
+
+
+json_files = [p for p in root.rglob("*.json") if keep(p)]
+yaml_files = [
+    p
+    for p in list(root.rglob("*.yml")) + list(root.rglob("*.yaml"))
+    if keep(p) and p.name not in SKIP_YAML_NAMES
+]
 mdc_files = list(root.glob(".cursor/rules/*.mdc"))
 if not json_files or not yaml_files or not mdc_files:
     sys.exit("expected json, yaml, and mdc files")
