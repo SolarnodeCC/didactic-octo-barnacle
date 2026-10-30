@@ -39,6 +39,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0026](0026-wispel-cc-platform-domain.md) | wispel.cc as the platform domain | Accepted |
 | [0027](0027-bootstrap-scope-and-vectorize-settings.md) | Bootstrap scope and Vectorize settings | Accepted |
 | [0028](0028-freeze-migration-0001.md) | Freeze migration 0001 at the phase 1 tables | Accepted |
+| [0029](0029-pdf-fetcher-host-policy.md) | PDF fetcher host policy | Accepted |
 
 ## When an ADR is needed
 

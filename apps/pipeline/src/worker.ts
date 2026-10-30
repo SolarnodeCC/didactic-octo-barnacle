@@ -1,6 +1,8 @@
 import { fetchArxivPage } from "./collectors/arxiv/client.js";
 import { fetchOpenAlexPage } from "./collectors/openalex/client.js";
 import { DEFAULT_INGEST_CONFIG } from "./config.js";
+import { createPdfFetcher } from "./documents/safe-fetch.js";
+import { type ObjectStore } from "./documents/object-store.js";
 import { ARXIV_MIN_REQUEST_INTERVAL_MS, createRateLimiter } from "./http/rate-limit.js";
 import { consumeBatch } from "./queue/consume.js";
 import { type PipelineDeps } from "./queue/deps.js";
@@ -12,7 +14,7 @@ import { type SqlDatabase } from "./store/sql.js";
 export type Env = {
   ENVIRONMENT: string;
   DB: SqlDatabase;
-  DOCUMENTS: unknown;
+  DOCUMENTS: ObjectStore;
   PUBLICATION_QUEUE: QueueSender;
   /** Worker secret; the name is listed in docs/kt/operations.md. */
   OPENALEX_API_KEY?: string;
@@ -35,6 +37,16 @@ function buildDeps(env: Env): PipelineDeps {
     Now: () => new Date().toISOString(),
     NewId: () => crypto.randomUUID(),
     Config: config,
+    Documents: env.DOCUMENTS,
+    FetchPdf: createPdfFetcher({
+      Fetch: workerFetch,
+      Limits: {
+        MaxBytes: config.Pdf.MaxBytes,
+        TimeoutMs: config.Pdf.TimeoutMs,
+        MaxRedirects: config.Pdf.MaxRedirects,
+        AllowedHosts: config.Pdf.AllowedHosts,
+      },
+    }),
     Log: (event, fields) => console.log(JSON.stringify({ event, env: env.ENVIRONMENT, ...fields })),
     Sources: {
       FetchOpenAlexPage: (request) =>

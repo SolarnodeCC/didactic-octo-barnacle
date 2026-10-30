@@ -1,12 +1,13 @@
 import { QueueMessageEnvelopeSchema, type IngestionRunFailure } from "@roi/models";
 
 import { claimMessage, completeStatement, markFailed } from "./log.js";
-import { fetchPageEnvelope, type PipelineDeps } from "./deps.js";
+import { documentIngestEnvelope, fetchPageEnvelope, type PipelineDeps } from "./deps.js";
 import {
   ingestArxivEntries,
   ingestOpenAlexWorks,
   type IngestResult,
 } from "../ingest/ingest-page.js";
+import { pendingDocumentIds } from "../store/document-repo.js";
 import { finishRunStatement, getRun, recordPageStatement, type RunRow } from "../store/run-repo.js";
 
 export type PageOutcome = "processed" | "duplicate" | "dead-lettered" | "skipped";
@@ -71,6 +72,12 @@ async function processPage(
       SourceId: null,
       Reason: `page cap of ${deps.Config.MaxPagesPerRun} reached; the next run covers the rest`,
     });
+  }
+
+  // Publications with a storable PDF get a document message; the PDF itself is fetched
+  // by its own consumer. Sent before the commit, like the next page: a repeat is deduplicated.
+  for (const publicationId of await pendingDocumentIds(deps.Db, fetched.Result.PdfCandidates)) {
+    await deps.Queue.send(documentIngestEnvelope(publicationId));
   }
 
   const statements = [

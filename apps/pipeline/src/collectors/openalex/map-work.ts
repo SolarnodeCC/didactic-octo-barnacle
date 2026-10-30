@@ -58,7 +58,9 @@ export function mapOpenAlexWork(work: OpenAlexWork, fetchedAt: string): MappedOp
     .filter((value): value is string => Boolean(value));
 
   const pdfLicense = normalizePdfLicense(work.primary_location?.license ?? null);
-  const pdfUrl = work.primary_location?.pdf_url ?? work.open_access?.oa_url ?? null;
+  // The license belongs to the primary location, so the PDF must come from that same
+  // location. `open_access.oa_url` can be another location, with another license.
+  const pdfUrl = work.primary_location?.pdf_url ?? null;
 
   const authors = (work.authorships ?? [])
     .map((authorship, index) => {

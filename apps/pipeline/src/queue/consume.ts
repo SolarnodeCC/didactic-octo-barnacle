@@ -1,5 +1,8 @@
+import { QueueMessageEnvelopeSchema } from "@roi/models";
+
 import { handleDeadLetter } from "./dead-letter.js";
 import { type PipelineDeps } from "./deps.js";
+import { handleDocumentIngest } from "./document-ingest.js";
 import { handleFetchPage } from "./fetch-page.js";
 import { type QueueBatchLike } from "./types.js";
 
@@ -19,6 +22,10 @@ export async function consumeBatch(deps: PipelineDeps, batch: QueueBatchLike): P
     try {
       if (deadLetters) {
         await handleDeadLetter(deps, message.body);
+      } else if (
+        QueueMessageEnvelopeSchema.safeParse(message.body).data?.Type === "document.ingest"
+      ) {
+        await handleDocumentIngest(deps, message.body);
       } else {
         await handleFetchPage(deps, message.body);
       }

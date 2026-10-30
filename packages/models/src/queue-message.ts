@@ -4,9 +4,9 @@ import { IsoDateTimeSchema, SourceNameSchema } from "./common.js";
 
 /**
  * Message types of docs/kt/architecture/defaults.md. A type is added here when its
- * producer and consumer exist; `document.ingest` arrives with REQ-DATA-004.
+ * producer and consumer exist.
  */
-export const QueueMessageTypeSchema = z.enum(["source.fetch_page"]);
+export const QueueMessageTypeSchema = z.enum(["source.fetch_page", "document.ingest"]);
 
 export type QueueMessageType = z.infer<typeof QueueMessageTypeSchema>;
 

@@ -3,6 +3,8 @@ import { type QueueMessageEnvelope, type SourceName } from "@roi/models";
 import { type ArxivPage } from "../collectors/arxiv/client.js";
 import { type OpenAlexPage } from "../collectors/openalex/client.js";
 import { QUEUE_SCHEMA_VERSION, type IngestConfig } from "../config.js";
+import { type ObjectStore } from "../documents/object-store.js";
+import { type FetchedPdf } from "../documents/safe-fetch.js";
 import { type SqlDatabase } from "../store/sql.js";
 import { type QueueSender } from "./types.js";
 
@@ -12,6 +14,10 @@ export type PipelineDeps = {
   Now: () => string;
   NewId: () => string;
   Config: IngestConfig;
+  /** R2 bucket for stored PDFs. */
+  Documents: ObjectStore;
+  /** The only way a PDF is downloaded (REQ-DATA-010 AC4). */
+  FetchPdf: (url: string) => Promise<FetchedPdf>;
   Sources: {
     FetchOpenAlexPage: (request: { FromDate: string; Cursor?: string }) => Promise<OpenAlexPage>;
     FetchArxivPage: (request: { Start: number; MaxResults: number }) => Promise<ArxivPage>;
@@ -33,6 +39,17 @@ export function fetchPageEnvelope(
     Type: "source.fetch_page",
     SchemaVersion: QUEUE_SCHEMA_VERSION,
     Ids: { RunId: runId, Source: source, Page: page },
+    Attempt: 0,
+  };
+}
+
+/** Deterministic ID: a publication is queued for its PDF at most once. */
+export function documentIngestEnvelope(publicationId: string): QueueMessageEnvelope {
+  return {
+    MessageId: `document:${publicationId}`,
+    Type: "document.ingest",
+    SchemaVersion: QUEUE_SCHEMA_VERSION,
+    Ids: { PublicationId: publicationId },
     Attempt: 0,
   };
 }

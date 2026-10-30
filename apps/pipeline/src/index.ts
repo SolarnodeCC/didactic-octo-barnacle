@@ -19,3 +19,6 @@ export { consumeBatch } from "./queue/consume.js";
 export { handleFetchPage } from "./queue/fetch-page.js";
 export { handleDeadLetter } from "./queue/dead-letter.js";
 export { replayDeadLetter } from "./queue/replay.js";
+export { checkPdfUrl } from "./documents/url-policy.js";
+export { createPdfFetcher, PdfFetchError } from "./documents/safe-fetch.js";
+export { handleDocumentIngest } from "./queue/document-ingest.js";

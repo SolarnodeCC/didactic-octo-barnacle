@@ -18,12 +18,15 @@ export type IngestResult = {
   Counts: IngestionRunCounts;
   /** Items that failed; the run report (REQ-NFR-008) and the next run pick them up. */
   Failures: IngestionRunFailure[];
+  /** Publications whose source record has a PDF URL and a license that allows storage. */
+  PdfCandidates: string[];
 };
 
 function emptyResult(): IngestResult {
   return {
     Counts: { Fetched: 0, Created: 0, Updated: 0, Skipped: 0, Failed: 0, DeadLettered: 0 },
     Failures: [],
+    PdfCandidates: [],
   };
 }
 
@@ -35,7 +38,11 @@ async function ingestItem(
 ): Promise<void> {
   result.Counts.Fetched += 1;
   try {
-    const outcome = await upsertMappedRecord(deps.Db, map(), deps);
+    const mapped = map();
+    const outcome = await upsertMappedRecord(deps.Db, mapped, deps);
+    if (mapped.Publication.HasStorablePdf) {
+      result.PdfCandidates.push(outcome.PublicationId);
+    }
     if (outcome.Outcome === "created") {
       result.Counts.Created += 1;
     } else if (outcome.Outcome === "updated") {
