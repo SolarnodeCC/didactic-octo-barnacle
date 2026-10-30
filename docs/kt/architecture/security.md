@@ -61,7 +61,7 @@ default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src
 
 ## Personal data
 
-- **Authors**: names, ORCIDs, and affiliations come from public scholarly records. They are stored to show provenance and are not used to profile people (REQ-NFR-009). The lawful basis, notice, and erasure process are in [privacy](privacy.md) (REQ-NFR-016).
+- **Authors**: names, ORCIDs, and affiliations come from public scholarly records. They are stored to show provenance and are not used to profile people (REQ-NFR-009). Only these fields are stored: `author.display_name`, `author.orcid`, `authorship.affiliation`, and `authorship.affiliations_json`, plus `publication.title_author_key`, which is derived from the first author's name; a test fails when a new person-related column appears (REQ-NFR-009). The lawful basis, notice, and erasure process are in [privacy](privacy.md) (REQ-NFR-016).
 - **Users**: name and email address, sign-in records, the role, the score reviews they write (REQ-SCORE-007), and the status notes they write (REQ-DASH-004). Users can delete their account (REQ-ACC-008). Resend processes email addresses to deliver invitations and sign-in links (ADR 0011). Usage and cost records are per pipeline run and agent, never per user (REQ-NFR-011).
 - **Model providers**: publication text and agent prompts are sent to model providers. No user data is sent. Check the provider's data retention terms before going live (OQ-014). Retention periods for all data classes are in [privacy](privacy.md) (REQ-NFR-015).
 

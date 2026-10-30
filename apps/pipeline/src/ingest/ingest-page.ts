@@ -5,6 +5,7 @@ import { type ArxivEntry } from "../collectors/arxiv/types.js";
 import { mapOpenAlexWork } from "../collectors/openalex/map-work.js";
 import { type OpenAlexWork } from "../collectors/openalex/types.js";
 import { isArxivCategoryInScope, PILOT_ARXIV_CATEGORIES } from "../normalize/scope.js";
+import { ErasureConfigError } from "../privacy/author-key.js";
 import { upsertMappedRecord, type MappedRecord } from "../store/publication-repo.js";
 import { type SqlDatabase } from "../store/sql.js";
 
@@ -12,6 +13,7 @@ export type IngestDeps = {
   Db: SqlDatabase;
   Now: () => string;
   NewId: () => string;
+  SuppressedAuthors?: (authorIds: string[]) => Promise<Set<string>>;
 };
 
 export type IngestResult = {
@@ -51,6 +53,10 @@ async function ingestItem(
       result.Counts.Skipped += 1;
     }
   } catch (error) {
+    // Without the erasure key an erased author could be stored again: stop the page.
+    if (error instanceof ErasureConfigError) {
+      throw error;
+    }
     // One bad item never stops the page (REQ-DATA-001 AC3).
     result.Counts.Failed += 1;
     result.Failures.push({

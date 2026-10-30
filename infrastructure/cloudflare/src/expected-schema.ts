@@ -117,4 +117,12 @@ export const EXPECTED_PHASE1_TABLES: ExpectedTable[] = [
     name: "alert_state",
     columns: ["alert_key", "issue_number", "first_alerted_at", "last_alerted_at", "occurrences"],
   },
+  {
+    name: "author_erasure",
+    columns: ["id", "subject_hash", "reason", "erased_at"],
+  },
+  {
+    name: "audit_event",
+    columns: ["id", "organization_id", "actor_id_opaque", "action", "created_at", "meta_json"],
+  },
 ];

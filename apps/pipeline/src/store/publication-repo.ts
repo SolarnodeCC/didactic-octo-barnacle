@@ -23,6 +23,8 @@ export type MappedRecord = {
 export type UpsertDeps = {
   Now: () => string;
   NewId: () => string;
+  /** Of these author IDs, the ones erased on request; they are not stored again (REQ-NFR-016). */
+  SuppressedAuthors?: (authorIds: string[]) => Promise<Set<string>>;
 };
 
 export type UpsertResult = {
@@ -266,7 +268,22 @@ export async function upsertMappedRecord(
 ): Promise<UpsertResult> {
   const now = deps.Now();
   const incoming = mapped.Publication;
-  const incomingFirstAuthor = mapped.Authors[0]?.DisplayName ?? "";
+  const erased = deps.SuppressedAuthors
+    ? await deps.SuppressedAuthors(mapped.Authors.map(authorId))
+    : new Set<string>();
+  const firstAuthor = mapped.Authors[0];
+  // An erased first author is not used for matching or kept in the title key.
+  const incomingFirstAuthor =
+    firstAuthor && !erased.has(authorId(firstAuthor)) ? firstAuthor.DisplayName : "";
+  if (erased.size > 0) {
+    const kept = mapped.Authors.filter((author) => !erased.has(authorId(author)));
+    const keptSource = new Set(kept.map((author) => author.SourceAuthorId));
+    mapped = {
+      ...mapped,
+      Authors: kept,
+      Authorships: mapped.Authorships.filter((ship) => keptSource.has(ship.SourceAuthorId)),
+    };
+  }
   const incomingKey = incomingFirstAuthor
     ? titleAuthorReviewKey(incoming.Title, incomingFirstAuthor)
     : null;

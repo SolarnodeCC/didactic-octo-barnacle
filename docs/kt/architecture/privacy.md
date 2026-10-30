@@ -32,6 +32,15 @@ Model providers receive publication text and prompts, never user data (security)
 
 Transfers outside the EU rely on the standard contractual clauses or the processors' adequacy status; legal confirms this for each processor before launch.
 
+### Legitimate interest of the author data (engineering input for legal)
+
+- **Purpose:** show where an opportunity comes from, so a reader can judge and trace its source publication.
+- **Necessity:** the name and affiliation identify the source work; the ORCID tells two authors with the same name apart. Nothing else about the person is stored.
+- **Balance:** the data is already public in scholarly records; authors expect it to be cited. It is never shown outside provenance, never used to score, rank, or profile a person (REQ-NFR-016 AC3), and never sent to a model provider as a person-level record.
+- **Safeguards:** an author can ask for erasure at any time (below); an erased author is not stored again.
+
+Legal confirms or replaces this assessment (OQ-014). Until then the lawful basis in the table above stays "to confirm with legal".
+
 ## Notice to authors
 
 Authors are not users. The notice is a public page, linked from the footer, that says what author data is stored, from which source, why, and how to ask for erasure. Individual notices are not sent (disproportionate effort); legal confirms this under GDPR Art. 14.
@@ -39,8 +48,11 @@ Authors are not users. The notice is a public page, linked from the footer, that
 ## Erasure
 
 - **User**: account deletion in settings (REQ-ACC-008).
-- **Author**: a request to the support contact. An admin removes the author record and affiliations; publications stay. The action is recorded in the audit log without the personal data (REQ-NFR-016).
-- **Backups**: D1 Time Travel keeps history for a limited period. A restore applies the list of erasures made since the restore point before the database serves traffic (REQ-NFR-015). The longest time a deleted record can remain in a backup is stated in the privacy policy.
+- **Author**: a request to the support contact. An admin finds the stored author records (an ORCID identifies one author; an arXiv author has one record per paper and is found by exact name) and erases each of them (`eraseAuthor`; the route `POST /admin/authors/:id/erase` comes with the admin API in phase 4). Erasure removes the author record and every affiliation. The publications stay. It also clears the title-and-first-author key of the author's publications, which holds the first author's normalized name. The reason is a code (`author-request`, `legal-order`, `ingested-in-error`), never free text.
+- **Not stored again:** the next ingestion would fetch the same work and store the author again, so an erased author is put on an erasure list. The list holds an HMAC-SHA256 of the stored author ID, keyed with the Worker secret `ERASURE_HASH_KEY`, and a reason code: no name, ORCID, or affiliation. Ingestion skips listed authors. Without the key, ingestion stops instead of storing an author (ADR 0031).
+- **Audit:** an audit event `author.erased` with an opaque actor, the erasure ID, the reason code, and counts. It holds no personal data (REQ-NFR-016 AC2).
+- **What erasure does not change:** the text of publications (titles, abstracts, stored PDFs) can contain the author's name. Publications are removed separately, on request or when ingested by mistake (data model, deletion).
+- **Backups**: D1 Time Travel keeps history for a limited period. A restore applies the list of erasures made since the restore point before the database serves traffic (REQ-NFR-015). The erasure list is also kept in the document bucket (`erasures/<hash>.json`), which a database restore does not touch, and `reapplyErasures` puts the entries back and removes any listed author the restored data brought back. The longest time a deleted record can remain in a backup is stated in the privacy policy.
 
 ## Retention
 

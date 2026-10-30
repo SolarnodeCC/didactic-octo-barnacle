@@ -82,7 +82,7 @@ Severity: **SEV1** production down or data loss risk; **SEV2** ingestion or pipe
 | Bad output reached the dashboard | SEV3 | Hide the opportunity in Operations (REQ-ADM-001), add the case to the golden set, and fix the prompt through a pull request with evals. |
 | Candidates failed or are incomplete | SEV3 | Open Pipeline health and rerun them from the first failed step (REQ-ADM-002). Check the budget first. |
 | A message is dead-lettered | SEV3 | An alert names the message and its run. Inspect `payload_json` and `last_error` in `queue_message_log`, fix the cause, and replay it with `replayDeadLetter` (REQ-DATA-011; the route `POST /admin/queue/replay` comes with the admin API in phase 4). |
-| An author asks for erasure | SEV3 | Follow the erasure process in [privacy](architecture/privacy.md) (REQ-NFR-016); use `POST /admin/authors/:id/erase`. |
+| An author asks for erasure | SEV3 | Follow the erasure process in [privacy](architecture/privacy.md) (REQ-NFR-016): find the author records, erase each with `eraseAuthor`, and answer within one month. The route `POST /admin/authors/:id/erase` comes with the admin API in phase 4. |
 | Availability below 99.5% (REQ-NFR-017) | SEV1 | Check Workers/D1 status, last deploy, and error rate; roll back Worker if the last deploy correlates; open a SEV1 issue. |
 | Need to restore D1 | SEV1 | Time Travel to the restore point; apply erasure list since that point; rebuild vectors from publications; verify with a smoke list/detail request. |
 
@@ -106,6 +106,7 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 | `SEARCH_PROVIDER_API_KEY` | Primary web search provider for Market Analysis and Competition (ADR 0022) | Worker secret | preview, staging, production |
 | `SEARCH_PROVIDER_FALLBACK_API_KEY` | Second search provider for benchmark and failover (ADR 0022) | Worker secret | preview, staging, production |
 | `ALERT_GITHUB_TOKEN` | Opens and comments on alert issues; a fine-grained token for this repository only, with the permission Issues: read and write and no other (REQ-NFR-019 AC5) | Cloudflare Worker secret | preview, staging, production |
+| `ERASURE_HASH_KEY` | Keys the erasure list of erased authors: at least 32 random characters. Ingestion stops without it. Losing or changing it makes the list useless, so keep it with the other secrets (REQ-NFR-016, ADR 0031) | Cloudflare Worker secret | staging, production |
 | `ALERT_EMAIL_TO` | Ops address that receives alert emails (REQ-NFR-019); kept out of the repository | Worker variable | preview, staging, production |
 | `ALERT_EMAIL_FROM` | Sender of alert emails: `onboarding@resend.dev` in staging (delivers only to the Resend account owner); an address on the verified domain in production (ADR 0030) | Worker variable (`wrangler.toml`) | staging, production |
 | `ALERT_GITHUB_REPO` | `owner/repo` that receives alert issues | Worker variable (`wrangler.toml`) | staging, production |
@@ -116,6 +117,7 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 The first production launch is an invited pilot without billing (see the non-goals in the [overview](overview.md)). It needs all of these:
 
 - Sending domain `wispel.cc` verified with SPF, DKIM, and DMARC (REQ-ACC-007, ADR 0026).
+- Author erasure reachable by an admin (`POST /admin/authors/:id/erase`), `ERASURE_HASH_KEY` set, and an erasure tested on staging (REQ-NFR-016).
 - Terms, privacy policy, author notice, and support contact published (REQ-ACC-011, [privacy](architecture/privacy.md)).
 - Data processing agreements signed with Cloudflare, the model providers, Resend, and the search provider.
 - Retention job running (REQ-NFR-015) and a restore drill done (REQ-NFR-017).

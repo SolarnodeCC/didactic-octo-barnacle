@@ -12,6 +12,9 @@ import { type OpenAlexWork } from "../collectors/openalex/types.js";
 import { DEFAULT_INGEST_CONFIG, type IngestConfig } from "../config.js";
 import { type FetchedPdf } from "../documents/safe-fetch.js";
 import { consumeBatch } from "../queue/consume.js";
+import { createAuthorGuard } from "../privacy/author-guard.js";
+import { createAuthorKeyHasher, type AuthorKeyHasher } from "../privacy/author-key.js";
+import { type ErasureDeps } from "../privacy/erase-author.js";
 import { type PipelineDeps } from "../queue/deps.js";
 
 const fixtures = join(dirname(fileURLToPath(import.meta.url)), "../fixtures");
@@ -66,6 +69,8 @@ export type Harness = {
   /** URLs the PDF fetcher was asked for. */
   PdfRequests: string[];
   Deps: PipelineDeps;
+  /** What `eraseAuthor` and `reapplyErasures` need, on the same database and bucket. */
+  Erasure: ErasureDeps;
   Clock: { Now: string };
   OpenAlexRequests: Array<{ FromDate: string; Cursor?: string }>;
   ArxivRequests: Array<{ Start: number; MaxResults: number }>;
@@ -81,7 +86,11 @@ export type Harness = {
 
 export function createHarness(
   config: Partial<IngestConfig> = {},
-  overrides: { FetchPdf?: PipelineDeps["FetchPdf"] } = {},
+  overrides: {
+    FetchPdf?: PipelineDeps["FetchPdf"];
+    /** The erasure key; `null` leaves it unset, as in a misconfigured Worker. */
+    AuthorKey?: string | null;
+  } = {},
 ): Harness {
   const database = createTestDatabase();
   const queue = new FakeQueue();
@@ -103,7 +112,13 @@ export function createHarness(
     return next instanceof Error ? Promise.reject(next) : Promise.resolve(next);
   };
 
+  const hashAuthorId: AuthorKeyHasher = createAuthorKeyHasher(
+    overrides.AuthorKey === null
+      ? undefined
+      : (overrides.AuthorKey ?? "test-erasure-key-0123456789abcdef0123"),
+  );
   const deps: PipelineDeps = {
+    AuthorGuard: createAuthorGuard(database.Db, hashAuthorId),
     Db: database.Db,
     Queue: queue,
     Now: () => clock.Now,
@@ -140,6 +155,13 @@ export function createHarness(
     Bucket: bucket,
     PdfRequests: pdfRequests,
     Deps: deps,
+    Erasure: {
+      Db: database.Db,
+      Documents: bucket,
+      Now: () => clock.Now,
+      NewId: ids,
+      HashAuthorId: hashAuthorId,
+    },
     Clock: clock,
     OpenAlexRequests: openAlexRequests,
     ArxivRequests: arxivRequests,
@@ -180,4 +202,20 @@ export function arxivPage(entries: ArxivEntry[], returned = entries.length): Arx
 /** A small file that passes the PDF magic-byte check; the label makes its hash unique. */
 export function pdfBytes(label: string): Uint8Array {
   return new TextEncoder().encode(`%PDF-1.7\n${label}\n%%EOF`);
+}
+
+/**
+ * Every value in every table and every object in the bucket as one text, to prove that a
+ * string (a name, an ORCID) is nowhere in the stored data.
+ */
+export function everythingStored(harness: Harness): string {
+  const raw = harness.Database.Raw;
+  const tables = raw
+    .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")
+    .all() as Array<{ name: string }>;
+  const rows = tables.map(({ name }) => JSON.stringify(raw.prepare(`SELECT * FROM ${name}`).all()));
+  const objects = [...harness.Bucket.objects.entries()].map(
+    ([key, value]) => `${key} ${new TextDecoder().decode(value.bytes)}`,
+  );
+  return [...rows, ...objects].join("\n");
 }

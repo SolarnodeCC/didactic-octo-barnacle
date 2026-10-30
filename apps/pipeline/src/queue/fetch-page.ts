@@ -19,7 +19,13 @@ type FetchedPage = {
 };
 
 async function fetchAndIngest(deps: PipelineDeps, run: RunRow, page: number): Promise<FetchedPage> {
-  const ingestDeps = { Db: deps.Db, Now: deps.Now, NewId: deps.NewId };
+  const guard = deps.AuthorGuard;
+  const ingestDeps = {
+    Db: deps.Db,
+    Now: deps.Now,
+    NewId: deps.NewId,
+    ...(guard ? { SuppressedAuthors: (ids: string[]) => guard.Suppressed(ids) } : {}),
+  };
   const from = run.WindowFrom ?? deps.Now().slice(0, 10);
 
   if (run.Source === "openalex") {
