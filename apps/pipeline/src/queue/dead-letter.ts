@@ -1,6 +1,8 @@
 import { QueueMessageEnvelopeSchema } from "@roi/models";
 
+import { notify } from "../alerts/notify.js";
 import { type PipelineDeps } from "./deps.js";
+import { reportForAlert } from "../report/safe-report.js";
 import {
   addCounts,
   appendFailures,
@@ -24,6 +26,11 @@ export async function handleDeadLetter(
   const parsed = QueueMessageEnvelopeSchema.safeParse(body);
   if (!parsed.success) {
     deps.Log?.("dead_letter.unreadable", { issues: parsed.error.issues.length });
+    await notify(deps, {
+      Type: "dead-letter",
+      Source: "unknown",
+      Summary: "A message that could not be read was dead-lettered and cannot be replayed.",
+    });
     return "unreadable";
   }
   const envelope = parsed.data;
@@ -57,8 +64,10 @@ export async function handleDeadLetter(
         ),
   ];
 
-  const run = envelope.Ids.RunId ? await getRun(deps.Db, envelope.Ids.RunId) : null;
-  if (run && run.Status === "running") {
+  const runId = envelope.Ids.RunId;
+  const run = runId ? await getRun(deps.Db, runId) : null;
+  const closesRun = run?.Status === "running";
+  if (run && closesRun) {
     const counts = addCounts(run.Counts, { ...emptyCounts(), DeadLettered: 1 });
     const failures = appendFailures(run.Failures, [
       { SourceId: null, Reason: `message ${envelope.MessageId} dead-lettered: ${reason}` },
@@ -77,6 +86,15 @@ export async function handleDeadLetter(
   }
 
   await deps.Db.batch(statements);
-  deps.Log?.("dead_letter.recorded", { messageId: envelope.MessageId, runId: envelope.Ids.RunId });
+  deps.Log?.("dead_letter.recorded", { messageId: envelope.MessageId, runId });
+  const report = runId ? await reportForAlert(deps, runId, now) : null;
+  await notify(deps, {
+    Type: "dead-letter",
+    Source: envelope.Ids.Source ?? envelope.Type,
+    ...(runId ? { RunId: runId } : {}),
+    MessageId: envelope.MessageId,
+    Summary: `A ${envelope.Type} message was dead-lettered after its retries${closesRun ? "; its run was closed as failed" : ""}.`,
+    ...(report ? { Report: report } : {}),
+  });
   return "recorded";
 }

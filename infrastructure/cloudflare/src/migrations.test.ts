@@ -26,6 +26,7 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
       "0002_title_author_review.sql",
       "0003_publication_title_author_key.sql",
       "0004_ingestion_run_state.sql",
+      "0005_alert_state.sql",
     ]);
   });
 
@@ -39,6 +40,7 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
       "0002_title_author_review.sql",
       "0003_publication_title_author_key.sql",
       "0004_ingestion_run_state.sql",
+      "0005_alert_state.sql",
     ]);
 
     for (const table of EXPECTED_PHASE1_TABLES) {

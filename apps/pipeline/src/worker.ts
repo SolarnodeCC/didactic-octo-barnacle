@@ -1,6 +1,8 @@
 import { fetchArxivPage } from "./collectors/arxiv/client.js";
 import { fetchOpenAlexPage } from "./collectors/openalex/client.js";
 import { DEFAULT_INGEST_CONFIG } from "./config.js";
+import { createAlertSink } from "./alerts/sink.js";
+import { logLine } from "./log-line.js";
 import { createPdfFetcher } from "./documents/safe-fetch.js";
 import { type ObjectStore } from "./documents/object-store.js";
 import { ARXIV_MIN_REQUEST_INTERVAL_MS, createRateLimiter } from "./http/rate-limit.js";
@@ -18,6 +20,14 @@ export type Env = {
   PUBLICATION_QUEUE: QueueSender;
   /** Worker secret; the name is listed in docs/kt/operations.md. */
   OPENALEX_API_KEY?: string;
+  /** Alert delivery (REQ-NFR-019). A channel without its settings is skipped. */
+  ALERT_GITHUB_REPO?: string;
+  /** Worker secret: a fine-grained token limited to issues on this repository. */
+  ALERT_GITHUB_TOKEN?: string;
+  /** Worker secret; the key that sends alert emails. */
+  RESEND_API_KEY?: string;
+  ALERT_EMAIL_TO?: string;
+  ALERT_EMAIL_FROM?: string;
 };
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -31,6 +41,8 @@ function buildDeps(env: Env): PipelineDeps {
     BaseMs: config.Http.BaseMs,
     Sleep: sleep,
   };
+  const log = (event: string, fields: Record<string, unknown>) =>
+    console.log(logLine(env.ENVIRONMENT, event, fields));
   return {
     Db: env.DB,
     Queue: env.PUBLICATION_QUEUE,
@@ -47,7 +59,27 @@ function buildDeps(env: Env): PipelineDeps {
         AllowedHosts: config.Pdf.AllowedHosts,
       },
     }),
-    Log: (event, fields) => console.log(JSON.stringify({ event, env: env.ENVIRONMENT, ...fields })),
+    Log: log,
+    Alert: createAlertSink({
+      Db: env.DB,
+      Fetch: workerFetch,
+      Backoff: backoff,
+      Now: () => new Date().toISOString(),
+      Environment: env.ENVIRONMENT,
+      Log: log,
+      ...(env.ALERT_GITHUB_REPO && env.ALERT_GITHUB_TOKEN
+        ? { Github: { Repo: env.ALERT_GITHUB_REPO, Token: env.ALERT_GITHUB_TOKEN } }
+        : {}),
+      ...(env.RESEND_API_KEY && env.ALERT_EMAIL_TO && env.ALERT_EMAIL_FROM
+        ? {
+            Email: {
+              ApiKey: env.RESEND_API_KEY,
+              To: env.ALERT_EMAIL_TO,
+              From: env.ALERT_EMAIL_FROM,
+            },
+          }
+        : {}),
+    }),
     Sources: {
       FetchOpenAlexPage: (request) =>
         fetchOpenAlexPage(

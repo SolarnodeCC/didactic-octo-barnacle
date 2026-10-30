@@ -33,7 +33,7 @@ function emptyResult(): IngestResult {
 async function ingestItem(
   deps: IngestDeps,
   result: IngestResult,
-  sourceId: string,
+  sourceId: string | null | undefined,
   map: () => MappedRecord,
 ): Promise<void> {
   result.Counts.Fetched += 1;
@@ -54,7 +54,8 @@ async function ingestItem(
     // One bad item never stops the page (REQ-DATA-001 AC3).
     result.Counts.Failed += 1;
     result.Failures.push({
-      SourceId: sourceId,
+      // A malformed item can lack an ID; JSON would drop `undefined`, so keep it as null.
+      SourceId: sourceId ?? null,
       Reason: error instanceof Error ? error.message : String(error),
     });
   }

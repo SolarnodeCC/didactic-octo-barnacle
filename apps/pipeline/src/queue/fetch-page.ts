@@ -131,7 +131,11 @@ export async function handleFetchPage(deps: PipelineDeps, body: unknown): Promis
   const envelope = QueueMessageEnvelopeSchema.parse(body);
   const claim = await claimMessage(deps.Db, envelope, deps.Now());
   if (claim !== "claimed") {
-    deps.Log?.("message.skipped", { messageId: envelope.MessageId, reason: claim });
+    deps.Log?.("message.skipped", {
+      messageId: envelope.MessageId,
+      runId: envelope.Ids.RunId,
+      reason: claim,
+    });
     return claim;
   }
 

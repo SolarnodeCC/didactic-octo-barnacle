@@ -26,7 +26,13 @@ async function finish(
   note: string | null,
 ): Promise<DocumentOutcome> {
   await deps.Db.batch([completeStatement(deps.Db, messageId, deps.Now(), note)]);
-  deps.Log?.("document.finished", { messageId, outcome, note });
+  // The publication ID is the part of the message ID after `document:`.
+  deps.Log?.("document.finished", {
+    messageId,
+    publicationId: messageId.replace(/^document:/, ""),
+    outcome,
+    note,
+  });
   return outcome;
 }
 

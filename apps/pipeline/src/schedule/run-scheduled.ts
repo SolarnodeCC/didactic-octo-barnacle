@@ -1,6 +1,7 @@
 import { CRON_SOURCES } from "../config.js";
+import { notify } from "../alerts/notify.js";
 import { type PipelineDeps } from "../queue/deps.js";
-import { startRun, type StartRunResult } from "./start-run.js";
+import { startRun, StartRunError, type StartRunResult } from "./start-run.js";
 
 /** Handles a cron trigger; an unknown cron expression starts nothing. */
 export async function runScheduled(
@@ -12,5 +13,18 @@ export async function runScheduled(
     deps.Log?.("cron.unknown", { cron });
     return null;
   }
-  return startRun(deps, source);
+  try {
+    return await startRun(deps, source);
+  } catch (error) {
+    // The run could not start: tell a person, then let the cron report the failure too.
+    const runId = error instanceof StartRunError ? error.RunId : undefined;
+    deps.Log?.("run.start_failed", { source, runId });
+    await notify(deps, {
+      Type: "failed-run",
+      Source: source,
+      ...(runId ? { RunId: runId } : {}),
+      Summary: `The scheduled start failed: ${error instanceof Error ? error.message : "unknown error"}`,
+    });
+    throw error;
+  }
 }

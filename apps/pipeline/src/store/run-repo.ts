@@ -15,6 +15,7 @@ export type RunRow = {
   Source: Extract<SourceName, "openalex" | "arxiv">;
   Status: IngestionRunStatus;
   StartedAt: string;
+  EndedAt: string | null;
   WindowFrom: string | null;
   PageCursor: string | null;
   PagesDone: number;
@@ -27,6 +28,7 @@ type DbRun = {
   source: RunRow["Source"];
   status: IngestionRunStatus;
   started_at: string;
+  ended_at: string | null;
   window_from: string | null;
   page_cursor: string | null;
   pages_done: number;
@@ -57,7 +59,7 @@ export function appendFailures(
 }
 
 const RUN_COLUMNS =
-  "id, source, status, started_at, window_from, page_cursor, pages_done, counts_json, failures_json";
+  "id, source, status, started_at, ended_at, window_from, page_cursor, pages_done, counts_json, failures_json";
 
 function toRun(row: DbRun): RunRow {
   return {
@@ -65,6 +67,7 @@ function toRun(row: DbRun): RunRow {
     Source: row.source,
     Status: row.status,
     StartedAt: row.started_at,
+    EndedAt: row.ended_at,
     WindowFrom: row.window_from,
     PageCursor: row.page_cursor,
     PagesDone: row.pages_done,
