@@ -8,7 +8,7 @@ related: [REQ-NFR-001, REQ-NFR-005, REQ-NFR-008, REQ-NFR-015, REQ-NFR-017, REQ-A
 
 # Operations
 
-The repository holds the KT documents, the phase 1 foundation toolchain (`packages/models`, pnpm workspace, lint, and CI), and Cloudflare infrastructure scaffolding (`infrastructure/cloudflare`: Wrangler config, D1 migrations, bootstrap planner). Runtime collector Workers and live deploy are still planned; sections marked *planned* describe how they will work once those packages exist (ADR 0004 (Accepted), ADR 0020).
+The repository holds the KT documents, the phase 1 foundation toolchain (`packages/models`, pnpm workspace, lint, and CI), and Cloudflare infrastructure scaffolding (`infrastructure/cloudflare`: Wrangler config, D1 migrations, bootstrap planner). `apps/pipeline` also holds the source clients (retry with backoff, arXiv rate limiting), the D1 repository with deduplication, and a Worker entry that answers a health check. Scheduled runs, queue consumers, and live deploy are still planned; sections marked *planned* describe how they will work once those packages exist (ADR 0004 (Accepted), ADR 0020).
 
 ## Checks
 

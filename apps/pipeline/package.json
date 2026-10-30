@@ -10,9 +10,12 @@
     "test:unit": "vitest run"
   },
   "dependencies": {
-    "@roi/models": "workspace:*"
+    "@roi/models": "workspace:*",
+    "fast-xml-parser": "^5.11.2"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^11.10.0",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   }

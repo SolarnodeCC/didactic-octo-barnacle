@@ -26,6 +26,7 @@ export const EXPECTED_PHASE1_TABLES: ExpectedTable[] = [
       "missing_fields_json",
       "language",
       "has_storable_pdf",
+      "title_author_key",
       "created_at",
       "updated_at",
     ],
