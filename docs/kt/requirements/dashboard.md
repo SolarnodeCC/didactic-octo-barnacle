@@ -34,7 +34,7 @@ Opportunities can be ranked and filtered.
 - Source: README roadmap phase 4
 - Acceptance criteria:
   1. Opportunities are sorted by score by default, and ties are sorted by publication date, newest first.
-  2. Opportunities can be filtered by target industry, band, and publication date.
+  2. Opportunities can be filtered by target industry, band, publication date, review state, and decision status (REQ-DASH-004). The shared filter bar in [screens](../ux/screens.md) exposes all five.
   3. Results are paginated.
 - Verification: end-to-end test
 
@@ -73,12 +73,12 @@ Analysts and admins can record what happened to an opportunity.
 - Priority: should
 - Status: planned
 - Source: overview long-term objective (feedback on pursued opportunities); OQ-027
-- Depends on: REQ-DASH-001, REQ-API-004, REQ-NFR-012
+- Depends on: REQ-DASH-001, REQ-NFR-012
 - Acceptance criteria:
   1. An analyst or admin can mark an opportunity as pursued, parked, or rejected, with a decision note of at most 500 characters. A viewer sees the status but has no action (REQ-NFR-012).
   2. The status is stored with the user and the date. A new entry replaces the current status; earlier entries stay in the history of the opportunity.
-  3. The data API accepts the status as its second write, next to the score review, with forbidden, not-found, and validation errors as in REQ-API-004. The list endpoint accepts the status as a filter.
-  4. Entries can be exported for score calibration (REQ-SCORE-006).
+  3. The data API accepts the status as its second write (`POST /api/v1/opportunities/:id/status`, ADR 0021), with forbidden, not-found, and validation errors as in REQ-API-004. The list endpoint accepts the status as a filter.
+  4. Entries can be exported for score calibration through `GET /api/v1/calibration/export` (ADR 0025, REQ-SCORE-006).
   5. A status does not change the score, the band, or the position in a ranking.
 - Verification: integration test and end-to-end test
 

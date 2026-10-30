@@ -8,7 +8,7 @@ related: [REQ-NFR-001, REQ-NFR-005, REQ-NFR-008, REQ-NFR-015, REQ-NFR-017, REQ-A
 
 # Operations
 
-The repository holds the KT documents and the phase 1 foundation toolchain (`packages/models`, pnpm workspace, lint, and CI). Runtime Workers and deployment are still planned; sections marked *planned* describe how they will work once those packages exist (ADR 0004, ADR 0020).
+The repository holds the KT documents and the phase 1 foundation toolchain (`packages/models`, pnpm workspace, lint, and CI). Runtime Workers and deployment are still planned; sections marked *planned* describe how they will work once those packages exist (ADR 0004 (Accepted), ADR 0020).
 
 ## Checks
 
@@ -48,17 +48,19 @@ A bootstrap script in `infrastructure/cloudflare` creates the resources of an en
 
 ## Deployment (planned)
 
-A GitHub Actions job deploys with Wrangler after a merge to `main`. Database migrations are plain SQL files that `wrangler d1 migrations` applies before the Worker that needs them (ADR 0020, REQ-NFR-020). A rollback redeploys the previous version; migrations are written so the previous version still works with the new schema.
+A GitHub Actions job deploys with Wrangler after a merge to `main`. Database migrations are plain SQL files that `wrangler d1 migrations` applies before the Worker that needs them (ADR 0020, REQ-NFR-020). A rollback redeploys the previous Worker version via Wrangler rollback or re-deploy of the prior git tag; migrations are written expand/contract so the previous version still works with the new schema. Vectorize index rebuilds are a separate runbook step after a restore. Staging is promoted to production only after the launch checklist items for that release pass on staging.
 
 ## Schedules (planned)
 
+Cron expressions (UTC) are in [defaults](architecture/defaults.md).
+
 | Job | Schedule | Requirement |
 |---|---|---|
-| OpenAlex ingestion | daily | REQ-DATA-009 |
-| arXiv ingestion | daily, after the arXiv announcement | REQ-DATA-009 |
-| Retraction check | weekly | REQ-DATA-008 |
-| Retention job | daily | REQ-NFR-015 |
-| Nightly evals | nightly | REQ-TEST-004 |
+| OpenAlex ingestion | daily 06:00 | REQ-DATA-009 |
+| arXiv ingestion | daily 07:30 | REQ-DATA-009 |
+| Retraction check | weekly Monday 08:00 | REQ-DATA-008 |
+| Retention job | daily 03:00 | REQ-NFR-015 |
+| Nightly evals | daily 02:00 | REQ-TEST-004 |
 
 ## Monitoring (planned)
 
@@ -68,15 +70,19 @@ A GitHub Actions job deploys with Wrangler after a merge to `main`. Database mig
 
 ## Runbooks (planned)
 
-| Situation | First steps |
-|---|---|
-| A source rate-limits or is down | Check the run report; the next run picks up failed items. Lower the request rate if limits changed. |
-| A model provider is down | Pipeline steps retry and then fail; rerun failed candidates when the provider recovers, or switch the model in configuration. |
-| The daily budget is reached | Check cost per opportunity in AI Gateway before raising the budget. |
-| Bad output reached the dashboard | Hide the opportunity in Operations (REQ-ADM-001), add the case to the golden set, and fix the prompt through a pull request with evals. |
-| Candidates failed or are incomplete | Open Pipeline health and rerun them from the first failed step (REQ-ADM-002). Check the budget first. |
-| A message is dead-lettered | Inspect the message, fix the cause, and replay it (REQ-DATA-011). |
-| An author asks for erasure | Follow the erasure process in [privacy](architecture/privacy.md) (REQ-NFR-016). |
+Severity: **SEV1** production down or data loss risk; **SEV2** ingestion or pipeline stopped; **SEV3** single-candidate or single-user issue. Page the owner in [open questions](open-questions.md) OQ-034 (MVP: `@SolarnodeCC`). Post a short note in the ops issue; no public status page in the MVP.
+
+| Situation | Sev | First steps |
+|---|---|---|
+| A source rate-limits or is down | SEV2 | Check the run report; the next run picks up failed items. Lower the request rate if limits changed. |
+| A model provider is down | SEV2 | Pipeline steps retry and then fail; rerun failed candidates when the provider recovers, or switch the model in configuration through a PR. |
+| The daily budget is reached | SEV2 | Check cost per opportunity in AI Gateway before raising the budget (ADR 0023). |
+| Bad output reached the dashboard | SEV3 | Hide the opportunity in Operations (REQ-ADM-001), add the case to the golden set, and fix the prompt through a pull request with evals. |
+| Candidates failed or are incomplete | SEV3 | Open Pipeline health and rerun them from the first failed step (REQ-ADM-002). Check the budget first. |
+| A message is dead-lettered | SEV3 | Inspect payload in `queue_message_log`, fix the cause, replay via `POST /admin/queue/replay` (REQ-DATA-011). |
+| An author asks for erasure | SEV3 | Follow the erasure process in [privacy](architecture/privacy.md) (REQ-NFR-016); use `POST /admin/authors/:id/erase`. |
+| Availability below 99.5% (REQ-NFR-017) | SEV1 | Check Workers/D1 status, last deploy, and error rate; roll back Worker if the last deploy correlates; open a SEV1 issue. |
+| Need to restore D1 | SEV1 | Time Travel to the restore point; apply erasure list since that point; rebuild vectors from publications; verify with a smoke list/detail request. |
 
 ## Backup and recovery (planned)
 
@@ -88,12 +94,18 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 
 | Secret name | Purpose | Stored in | Environments |
 |---|---|---|---|
-| `RESEND_API_KEY` | Sends invitation and sign-in emails (REQ-ACC-007) | Cloudflare Worker secret; GitHub Actions secret for deployment | preview, production |
+| `RESEND_API_KEY` | Sends invitation and sign-in emails (REQ-ACC-007) | Cloudflare Worker secret; GitHub Actions secret for deployment | preview, staging, production |
+| `RESEND_WEBHOOK_SECRET` | Verifies Resend bounce and complaint webhooks (REQ-ACC-007) | Worker secret | preview, staging, production |
 | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | Deploy with Wrangler and run the bootstrap script; the token has the least permissions each environment needs | GitHub Actions secret | preview, staging, production |
 | `OPENALEX_API_KEY` | OpenAlex requests by the collector (REQ-DATA-001) | Worker secret; GitHub Actions secret for tests that need it | preview, staging, production |
+| `AI_GATEWAY_ACCOUNT_ID`, `AI_GATEWAY_API_TOKEN` | Route model calls through AI Gateway (REQ-NFR-003) | Worker secret | preview, staging, production |
+| `OPENAI_API_KEY` | Model provider behind AI Gateway (when OpenAI is configured) | AI Gateway / Worker secret | preview, staging, production |
+| `ANTHROPIC_API_KEY` | Model provider behind AI Gateway (when Anthropic is configured) | AI Gateway / Worker secret | preview, staging, production |
+| `SEARCH_PROVIDER_API_KEY` | Primary web search provider for Market Analysis and Competition (ADR 0022) | Worker secret | preview, staging, production |
+| `SEARCH_PROVIDER_FALLBACK_API_KEY` | Second search provider for benchmark and failover (ADR 0022) | Worker secret | preview, staging, production |
 | `ALERT_GITHUB_TOKEN` | Opens and comments on alert issues; a fine-grained token limited to issues on this repository (REQ-NFR-019) | Cloudflare Worker secret | preview, staging, production |
 | `ALERT_EMAIL_TO` | Ops address that receives alert emails (REQ-NFR-019) | Worker variable | preview, staging, production |
-| Eval provider and AI Gateway credentials (names set when the eval job is added) | Live evals (REQ-TEST-004, ADR 0006) | GitHub environment `evals`, with required reviewer approval | evals |
+| `EVAL_OPENAI_API_KEY`, `EVAL_ANTHROPIC_API_KEY`, `EVAL_AI_GATEWAY_TOKEN` | Live evals (REQ-TEST-004, ADR 0006); judge uses a different provider than the agent | GitHub environment `evals`, with required reviewer approval | evals |
 
 ## Launch checklist (planned)
 
@@ -103,7 +115,7 @@ The first production launch is an invited pilot without billing (see the non-goa
 - Terms, privacy policy, author notice, and support contact published (REQ-ACC-011, [privacy](architecture/privacy.md)).
 - Data processing agreements signed with Cloudflare, the model providers, Resend, and the search provider.
 - Retention job running (REQ-NFR-015) and a restore drill done (REQ-NFR-017).
-- Calibrated daily budget set (OQ-021) and the alert email address and GitHub issue creation tested (REQ-NFR-019).
+- Calibrated daily budget set (ADR 0023) and the alert email address and GitHub issue creation tested (REQ-NFR-019).
 - At least one active admin and a tested admin recovery path (REQ-ADM-001, REQ-ADM-002).
 - Load test on seeded data meets REQ-NFR-017, run on staging.
 - A fixed monthly model budget for the pilot is set and communicated to the pilot users.

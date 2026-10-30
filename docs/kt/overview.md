@@ -41,7 +41,7 @@ The MVP serves invited users of one organization who share the research corpus. 
 
 Thousands of scientific papers are published every day. Most never reach product teams, entrepreneurs, innovation departments, government organizations, or consulting firms. The platform continuously scans new research, extracts problems worth solving, identifies market gaps, and generates evidence-backed software concepts.
 
-The platform connects scientific research with practical innovation. It replaces chance discovery with a scalable, consistent, and traceable process. It ingests new publications from OpenAlex, arXiv, and Semantic Scholar, derives software opportunities from them, and scores each opportunity on scientific novelty, market potential, competitive gap, technical feasibility, and strategic relevance (see [Opportunity scoring](scoring.md)).
+The platform connects scientific research with practical innovation. It replaces chance discovery with a scalable, consistent, and traceable process. The MVP ingests new publications from OpenAlex and arXiv (Semantic Scholar is later, REQ-DATA-003), derives software opportunities from them, and scores each opportunity on scientific novelty, market potential, competitive gap, technical feasibility, and strategic relevance (see [Opportunity scoring](scoring.md)).
 
 OpenAlex covers all disciplines, including the management, health, and social science research behind many opportunities; arXiv adds early preprints in computer science (see [data sources](data-sources/README.md)).
 
@@ -55,7 +55,7 @@ Users do not need a research background to benefit from scientific progress. The
 
 | Principle | Meaning | Requirements |
 |---|---|---|
-| **Relevance** | An opportunity matters to the user's industry and strategy. | REQ-AGENT-006, REQ-DASH-005 |
+| **Relevance** | An opportunity matters to the user's industry. MVP relevance uses the four target industries; organization-specific strategy comes later (REQ-DASH-005). | REQ-AGENT-006 |
 | **Reliability** | Every recommendation cites verifiable source publications, and its score can be explained category by category. | REQ-AGENT-008, REQ-SCORE-004, REQ-API-002 |
 | **Actionability** | Every recommendation leads to a concrete decision or next step. | REQ-AGENT-005, REQ-DASH-001 |
 
@@ -71,15 +71,19 @@ For a single organization, that becomes: which developments will change our mark
 
 ## Success measures
 
-The targets below are provisional. They are accepted for phase 1 and reviewed once, with data, at the end of phase 3. A baseline method is agreed with the same review.
+The targets below are provisional. Precision, Explainability, Time saved, and Cost are reviewed with data at the end of phase 3. Agreement is reviewed after the phase 4 calibration set exists (REQ-SCORE-006). "Worth exploring" means the reviewer would spend at least one follow-up hour on the opportunity (yes/no). Time saved compares wall-clock reviewer time to produce that judgment with the platform versus reading the same 20 papers without it.
 
 | Measure | How it is measured | Provisional target |
 |---|---|---|
-| Precision | Share of High and Exceptional opportunities that reviewers judge worth exploring | at least 50 % |
+| Precision | Share of High and Exceptional opportunities that reviewers judge worth exploring (yes = would spend ≥1 follow-up hour) | at least 50 % |
 | Explainability | Share of opportunities whose claims all have evidence or an estimate label | at least 95 % |
 | Time saved | Reviewer time per useful opportunity, compared with manual review of the same number of papers, measured with three reviewers on a sample of 20 papers | at most 25 % of the manual time |
-| Agreement | Rank correlation between scores and reviewer ranking (REQ-SCORE-006) | Spearman at least 0.6, with its 95 % interval |
-| Cost | Model cost per complete opportunity (REQ-NFR-005) | at most EUR 2 until the calibrated budget (OQ-021) |
+| Agreement | Rank correlation between scores and reviewer ranking (REQ-SCORE-006), measured in phase 4 | Spearman at least 0.6, with its 95 % interval |
+| Cost | Model cost per complete opportunity (REQ-NFR-005) | at most EUR 2 until the calibrated budget (ADR 0023) |
+
+## Substitutes today
+
+Without this platform, the same users rely on manual literature review, consultant desk research, ad-hoc ChatGPT prompts over abstracts, and general academic search (OpenAlex, Google Scholar, Semantic Scholar). Those substitutes find papers; they do not produce a ranked, evidence-backed, multi-agent opportunity shortlist with category scores. The MVP competes on that decision artifact, not on search recall.
 
 ## Non-goals for the MVP
 
@@ -90,29 +94,19 @@ The targets below are provisional. They are accepted for phase 1 and reviewed on
 - Multiple organizations with separate data (later, REQ-DASH-005).
 - Billing, pricing, customer contracts, and per-customer usage limits. The MVP is an invited pilot with a fixed monthly model budget; commercial terms are decided after the pilot, using the measured cost per opportunity.
 - Languages other than English. The interface, the agent outputs, and the briefs are in English, and ingestion is limited to English papers ([ingestion scope](data-sources/ingestion-scope.md)).
-- Bulk export of opportunity data. The single-opportunity brief (REQ-DASH-009) is the only export; a list export is a later requirement.
+- Bulk list or spreadsheet export of opportunities. Allowed exports are the single-opportunity brief, calibration JSON lines, and admin DSAR JSON (ADR 0025); a list export is later.
 
 ## Core workflow
 
+Conceptual product steps (not the runtime order):
+
 ```text
-Scientific Research
-        ↓
-Problem Discovery
-        ↓
-Market Analysis
-        ↓
-Competitive Analysis
-        ↓
-Software Opportunity Discovery
-        ↓
-Startup Generation
-        ↓
-Business Case Creation
-        ↓
-Opportunity Scoring
+Scientific Research → Problem Discovery → Market Analysis → Competitive Analysis
+→ Software Opportunity Discovery → Startup Generation → Business Case Creation
+→ Opportunity Scoring
 ```
 
-[Orchestration](architecture/orchestration.md) maps each step to a component and gives the order in which the pipeline runs them.
+Runtime order differs: triage and opportunity extraction run before the analysis agents. [Orchestration](architecture/orchestration.md) is the source of truth for pipeline order and maps each conceptual step to a component.
 
 ## Target industries
 

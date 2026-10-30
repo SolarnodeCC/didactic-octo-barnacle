@@ -1,7 +1,7 @@
 ---
 title: Screen states
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-10-29
 related: [REQ-DASH-006, REQ-DASH-011, REQ-DASH-014, REQ-ACC-003, REQ-ACC-004, REQ-SCORE-007]
 ---
@@ -25,6 +25,10 @@ States that every screen handles the same way. All messages are plain text (REQ-
 | Trends | "Not enough data for this range" with a suggestion to widen it |
 | Pipeline health, no runs | "No runs yet" with the schedule |
 | Invitations, none | "No invitations yet" and the Invite action |
+| Users, none | Should not happen after bootstrap; show "No users" and contact support |
+| Usage and cost, no spend | "No model spend in this range" |
+| Opportunity operations, no match | "No opportunity matches that title or ID" |
+| Brief for incomplete | Not offered; link returns not found |
 | Audit log, none | "No events in this range" |
 
 ## Error

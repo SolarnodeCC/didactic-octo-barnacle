@@ -1,14 +1,14 @@
 ---
 title: Low-fidelity wireframes
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-10-29
-related: [REQ-DASH-001, REQ-DASH-002, REQ-DASH-007, REQ-DASH-010, REQ-DASH-011, REQ-ACC-003, REQ-ACC-004]
+related: [REQ-DASH-001, REQ-DASH-002, REQ-DASH-004, REQ-DASH-007, REQ-DASH-010, REQ-DASH-011, REQ-ACC-003, REQ-ACC-004]
 ---
 
 # Low-fidelity wireframes
 
-Layout only. Wording, spacing, and visual design are decided with the first dashboard code. All text shown from models is plain text (REQ-NFR-013).
+Layout only. Visual tokens are in ADR 0024. All text shown from models is plain text (REQ-NFR-013).
 
 ## Sign in and Continue
 
@@ -52,9 +52,10 @@ Layout only. Wording, spacing, and visual design are decided with the first dash
 ```text
 ┌ Opportunities ───────────────────────────────────────────────────┐
 │ Search [describe a problem or technology______] [ Search ]         │
-│ Filters: Industry [All ▾] Band [All ▾] Date [from – to] Review [All ▾] │
-│ Score  Band  Title / startup          Industry   Published  Review    │
-│  71    High  AI Focus Planner         enterprise 2026-09-15 unreviewed│
+│ Filters: Industry [All ▾] Band [All ▾] Date [from–to]                │
+│          Review [All ▾] Status [All ▾]                               │
+│ Score Band Title/startup Industry Published Review Status            │
+│  71   High AI Focus Planner enterprise 2026-09-15 unreviewed —       │
 │  ...                                                                  │
 │ [ Previous ]                                          [ Next ]        │
 └──────────────────────────────────────────────────────────────────────┘
@@ -64,8 +65,9 @@ Layout only. Wording, spacing, and visual design are decided with the first dash
 
 ```text
 ┌ AI Focus Planner ──────────────────────────────────────────────────┐
-│ Score 71  High   [Estimate-based] [Based on the abstract]            │
+│ Score 71  High   Evidence-backed   [Estimate-based] [Abstract]       │
 │ Review: unreviewed   [ Confirm ] [ Dispute ]   (analyst, admin)      │
+│ Status: none   [ Pursued ] [ Parked ] [ Rejected ] note [____]       │
 │ [ Export brief ]                                                     │
 ├ Categories ─────────────────────────────────────────────────────────┤
 │ Scientific Novelty    60  ▸ why, evidence                            │
@@ -78,7 +80,7 @@ Layout only. Wording, spacing, and visual design are decided with the first dash
 ├ Source publication ─────────────────────────────────────────────────┤
 │ Title, authors, date, link to the source                             │
 ├ Agent outputs (model, prompt version) ▸ ────────────────────────────┤
-│ Review history: user, date, state, reason                            │
+│ Review history · Status history                                      │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -120,4 +122,60 @@ Point shapes show the band in addition to color (REQ-DASH-010).
 │ Incomplete opportunities: 5   Budget stops: none this week        │
 │ Failed candidates: cand-… step Competition   [ Rerun ]            │
 └──────────────────────────────────────────────────────────────────┘
+```
+
+## Check your email / Link problem
+
+```text
+┌ Check your email ─────────────┐  ┌ Link problem ──────────────────┐
+│ If an account exists for that │  │ This link expired or was used. │
+│ address, a link is on the way.│  │ [ Request a new link ]         │
+│ [ Resend ] (after 60s)        │  │ No hint whether the email is   │
+└───────────────────────────────┘  │ registered.                    │
+                                   └────────────────────────────────┘
+```
+
+## Trends / Account settings / Usage
+
+```text
+┌ Trends ───────────────────────┐  ┌ Settings ──────────────────────┐
+│ Range [last 12 months ▾]      │  │ Name [____________] [ Save ]   │
+│ Opportunities / industry      │  │ Email (read-only)  Role viewer │
+│ Publications / topic (top 20) │  │ Recent sign-ins …              │
+└───────────────────────────────┘  │ [ End other sessions ]         │
+                                   │ [ Delete account ]             │
+                                   └────────────────────────────────┘
+
+┌ Usage and cost ───────────────────────────────────────────────────┐
+│ Range [this month ▾]  Spent EUR 412 / budget EUR 800               │
+│ By day · By step · By agent   (estimates labeled)                  │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+## Invitations / Users / Audit
+
+```text
+┌ Invitations ──────────────────┐  ┌ Users ─────────────────────────┐
+│ Email [____] Role [viewer ▾]  │  │ Name  Email  Role  Status       │
+│ [ Invite ]                    │  │ …     …      [admin ▾] Active  │
+│ pending · sent · revoked      │  │ [ Deactivate ] (not last admin)│
+└───────────────────────────────┘  └────────────────────────────────┘
+
+┌ Audit log ────────────────────────────────────────────────────────┐
+│ Filter action [All ▾]                                              │
+│ Time  Actor  Action  Target                                        │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+## Brief / Legal / System
+
+```text
+┌ Brief (print) ────────────────┐  ┌ Terms / Privacy / Support ─────┐
+│ Title, score, band, categories│  │ Version · date · body           │
+│ concept, next steps, source   │  │ Support: email contact          │
+│ (print stylesheet)            │  └────────────────────────────────┘
+└───────────────────────────────┘
+┌ Not found / Session expired / Error ──────────────────────────────┐
+│ Plain message · [ Sign in ] or [ Home ] · referenceId when error   │
+└────────────────────────────────────────────────────────────────────┘
 ```
