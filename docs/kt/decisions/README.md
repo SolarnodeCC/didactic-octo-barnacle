@@ -36,6 +36,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0023](0023-daily-model-budget-formula.md) | Calibrate the daily model budget from measured cost | Accepted |
 | [0024](0024-design-system-foundation.md) | Dashboard design system foundation | Accepted |
 | [0025](0025-export-policy-mvp.md) | MVP export policy | Accepted |
+| [0026](0026-wispel-cc-platform-domain.md) | wispel.cc as the platform domain | Accepted |
 
 ## When an ADR is needed
 
