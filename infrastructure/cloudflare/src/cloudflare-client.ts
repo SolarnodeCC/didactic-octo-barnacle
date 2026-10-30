@@ -28,6 +28,38 @@ type ApiEnvelope<T> = {
   result_info?: { total_pages?: number };
 };
 
+/** A credential has the wrong shape; raised before any request is made. */
+export class CloudflareConfigError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "CloudflareConfigError";
+  }
+}
+
+/**
+ * Checks the account ID and token before the first request. A wrong account ID
+ * otherwise shows up as a vague 404 ("could not route"). Only lengths are named in
+ * the messages, never the values.
+ */
+export function normalizeCredentials(input: { AccountId: string; ApiToken: string }): {
+  AccountId: string;
+  ApiToken: string;
+} {
+  const accountId = input.AccountId.trim();
+  const apiToken = input.ApiToken.trim();
+  if (!/^[0-9a-f]{32}$/i.test(accountId)) {
+    throw new CloudflareConfigError(
+      `CLOUDFLARE_ACCOUNT_ID must be the 32-character hexadecimal account ID from the Cloudflare dashboard, without quotes or spaces (got ${accountId.length} characters).`,
+    );
+  }
+  if (apiToken.length === 0 || /\s/.test(apiToken)) {
+    throw new CloudflareConfigError(
+      "CLOUDFLARE_API_TOKEN is empty or contains whitespace; paste the token without spaces or line breaks.",
+    );
+  }
+  return { AccountId: accountId, ApiToken: apiToken };
+}
+
 export class CloudflareApiError extends Error {
   constructor(
     message: string,
@@ -59,13 +91,14 @@ function isDeadLetterQueue(name: string): boolean {
  */
 export function createCloudflareClient(options: CloudflareClientOptions): ResourceClient {
   const fetchFn = options.Fetch ?? fetch;
-  const base = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(options.AccountId)}`;
+  const credentials = normalizeCredentials(options);
+  const base = `https://api.cloudflare.com/client/v4/accounts/${credentials.AccountId}`;
 
   async function call<T>(method: "GET" | "POST", path: string, body?: unknown): Promise<T> {
     const response = await fetchFn(`${base}${path}`, {
       method,
       headers: {
-        authorization: `Bearer ${options.ApiToken}`,
+        authorization: `Bearer ${credentials.ApiToken}`,
         "content-type": "application/json",
       },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),

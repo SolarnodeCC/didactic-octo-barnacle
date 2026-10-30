@@ -3,12 +3,13 @@ import { describe, expect, it } from "vitest";
 import { bootstrapEnvironment, desiredResources } from "./bootstrap.js";
 import {
   CloudflareApiError,
+  CloudflareConfigError,
   VECTORIZE_DIMENSIONS,
   VECTORIZE_METRIC,
   createCloudflareClient,
 } from "./cloudflare-client.js";
 
-const ACCOUNT = "acc123";
+const ACCOUNT = "0123456789abcdef0123456789abcdef";
 const TOKEN = "secret-token-value";
 
 type Call = { method: string; path: string; auth: string | null; body: unknown };
@@ -215,5 +216,41 @@ describe("REQ-NFR-020: Cloudflare bootstrap client", () => {
       Promise.resolve(Response.json({ success: false, errors: [{ message: "bad" }] }));
     const client = createCloudflareClient({ AccountId: ACCOUNT, ApiToken: TOKEN, Fetch: failing });
     await expect(client.create({ Kind: "d1", Name: "roi-staging" })).rejects.toThrow(/bad/);
+  });
+
+  it("REQ-NFR-020: rejects a malformed account ID before any request and never prints it", () => {
+    const account = fakeAccount();
+    const bad = `"${ACCOUNT}"`;
+    expect(() =>
+      createCloudflareClient({ AccountId: bad, ApiToken: TOKEN, Fetch: account.fetchFn }),
+    ).toThrow(CloudflareConfigError);
+    try {
+      createCloudflareClient({ AccountId: bad, ApiToken: TOKEN, Fetch: account.fetchFn });
+    } catch (error) {
+      expect((error as Error).message).toContain("got 34 characters");
+      expect((error as Error).message).not.toContain(ACCOUNT);
+    }
+    expect(account.calls).toEqual([]);
+  });
+
+  it("REQ-NFR-020: trims whitespace around the account ID and token, as pasted secrets often have", async () => {
+    const account = fakeAccount();
+    const client = createCloudflareClient({
+      AccountId: `${ACCOUNT}\n`,
+      ApiToken: ` ${TOKEN}\n`,
+      Fetch: account.fetchFn,
+    });
+    await client.list();
+    expect(account.calls[0]?.auth).toBe(`Bearer ${TOKEN}`);
+  });
+
+  it("REQ-NFR-020: rejects a token with whitespace inside", () => {
+    expect(() =>
+      createCloudflareClient({
+        AccountId: ACCOUNT,
+        ApiToken: "abc def",
+        Fetch: fakeAccount().fetchFn,
+      }),
+    ).toThrow(/whitespace/);
   });
 });
