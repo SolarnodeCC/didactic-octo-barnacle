@@ -75,11 +75,11 @@ Ingestion runs on a schedule and fetches only what is new or changed since the l
 
 - Phase: 1
 - Priority: must
-- Status: planned
+- Status: done
 - Source: overview (continuous scanning)
 - Depends on: REQ-DATA-001, REQ-DATA-002
 - Acceptance criteria:
-  1. Each source has a configured schedule and a stored cursor or date of its last successful run.
+  1. Each source has a configured schedule and a stored cursor or date of its last successful run. Only a run that finished without failed items moves the cursor, so the next run covers the items that failed.
   2. A run fetches records published or updated after that cursor, with a configured overlap window.
   3. A first run backfills a configured window, for example the last 30 days.
   4. Every run stores its start, end, record counts, and failures.
@@ -171,5 +171,5 @@ Every Queue consumer and Workflow step tolerates repeated delivery.
   1. A consumer checks stored state before it works, so processing the same message twice gives the same stored result.
   2. Queue messages are typed records with a schema version and carry IDs only, never large payloads.
   3. A message that fails its retries goes to a dead-letter queue, and the run report counts dead-lettered messages (REQ-NFR-008).
-  4. A dead-lettered message can be replayed by an admin without creating duplicates.
+  4. A dead-lettered message can be replayed without creating duplicates. In phase 1 this is the replay function; the admin route `POST /admin/queue/replay` arrives with the admin API in phase 4 (REQ-ADM-004).
 - Verification: integration test that delivers each message twice and replays a dead-lettered message

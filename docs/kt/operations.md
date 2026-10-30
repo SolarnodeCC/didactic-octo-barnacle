@@ -8,7 +8,7 @@ related: [REQ-NFR-001, REQ-NFR-005, REQ-NFR-008, REQ-NFR-015, REQ-NFR-017, REQ-A
 
 # Operations
 
-The repository holds the KT documents, the phase 1 foundation toolchain (`packages/models`, pnpm workspace, lint, and CI), and Cloudflare infrastructure scaffolding (`infrastructure/cloudflare`: Wrangler config, D1 migrations, bootstrap planner). `apps/pipeline` also holds the source clients (retry with backoff, arXiv rate limiting), the D1 repository with deduplication, and a Worker entry that answers a health check. Scheduled runs, queue consumers, and live deploy are still planned; sections marked *planned* describe how they will work once those packages exist (ADR 0004 (Accepted), ADR 0020).
+The repository holds the KT documents, the phase 1 foundation toolchain (`packages/models`, pnpm workspace, lint, and CI), and Cloudflare infrastructure scaffolding (`infrastructure/cloudflare`: Wrangler config, D1 migrations, bootstrap planner). `apps/pipeline` also holds the source clients (retry with backoff, arXiv rate limiting), the D1 repository with deduplication, and a Worker entry that answers a health check. It also holds the cron handler that starts a run, the queue consumer for pages and dead letters, and the replay function for dead-lettered messages (REQ-DATA-009, REQ-DATA-011). PDF fetching, run reports, alerts, and the live Worker deploy are still planned; sections marked *planned* describe how they will work once those packages exist (ADR 0004 (Accepted), ADR 0020).
 
 ## Checks
 
@@ -46,19 +46,19 @@ CI is defined in `.github/workflows/config.yml` and `.github/workflows/ci.yml` a
 
 The bootstrap planner in `infrastructure/cloudflare` (`pnpm --filter @roi/cloudflare-infra bootstrap -- --env <name>`) lists the D1, R2, Queues with dead-letter queues, Vectorize, and AI Gateway for an environment and reports drift (REQ-NFR-020, ADR 0027). `--apply` creates missing resources when `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are set; running it twice creates nothing. Each environment has its own resources, budget (REQ-NFR-005), and Cloudflare API token. A staging environment is a production-like copy: its own D1 database, R2 bucket, Vectorize index, Queues, AI Gateway, Durable Object namespace (created by the Worker deploy), budget, and the production Resend sending domain, fed by a smaller ingestion scope. It is deployed from `main` before production and is where the load test, the restore drill, and the email checks of the launch checklist run. Preview stays for pull requests. Wrangler configuration and numbered SQL migrations live under `infrastructure/cloudflare`.
 
-The bootstrap script creates D1, R2, a Queue and its dead-letter queue, a Vectorize index (768 dimensions, cosine, ADR 0027), and an AI Gateway through the Cloudflare API; Durable Object namespaces come from a Worker deploy (ADR 0027). The manual workflow `.github/workflows/staging-bootstrap.yml` reports drift for staging and, with `apply`, creates what is missing, using the secrets of the GitHub environment `staging`. The workflow `.github/workflows/staging-database.yml` lists and applies the migrations on `roi-staging`. Migration `0001_init.sql` is not applied to any deployed database until its remaining tables are added (see [schema migration 0001](architecture/schema-migration-0001.md)), because applied migrations are never edited (REQ-NFR-020).
+The bootstrap script creates D1, R2, a Queue and its dead-letter queue, a Vectorize index (768 dimensions, cosine, ADR 0027), and an AI Gateway through the Cloudflare API; Durable Object namespaces come from a Worker deploy (ADR 0027). The manual workflow `.github/workflows/staging-bootstrap.yml` reports drift for staging and, with `apply`, creates what is missing, using the secrets of the GitHub environment `staging`. The workflow `.github/workflows/staging-database.yml` lists and applies the migrations on `roi-staging`. Migration `0001_init.sql` is frozen at the phase 1 ingestion tables; tables for later phases come in new migrations (ADR 0028), so migrations 0001 to 0004 can be applied to staging.
 
 ## Deployment (planned)
 
 A GitHub Actions job deploys with Wrangler after a merge to `main`. Database migrations are plain SQL files that `wrangler d1 migrations` applies before the Worker that needs them (ADR 0020, REQ-NFR-020). A rollback redeploys the previous Worker version via Wrangler rollback or re-deploy of the prior git tag; migrations are written expand/contract so the previous version still works with the new schema. Vectorize index rebuilds are a separate runbook step after a restore. Staging is promoted to production only after the launch checklist items for that release pass on staging.
 
-## Schedules (planned)
+## Schedules
 
 Cron expressions (UTC) are in [defaults](architecture/defaults.md).
 
 | Job | Schedule | Requirement |
 |---|---|---|
-| OpenAlex ingestion | daily 06:00 | REQ-DATA-009 |
+| OpenAlex ingestion | daily 06:00 (cron in `wrangler.toml` for staging and production; the Worker is not deployed yet) | REQ-DATA-009 |
 | arXiv ingestion | daily 07:30 | REQ-DATA-009 |
 | Retraction check | weekly Monday 08:00 | REQ-DATA-008 |
 | Retention job | daily 03:00 | REQ-NFR-015 |

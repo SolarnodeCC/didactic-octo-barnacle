@@ -17,7 +17,11 @@ Starter configuration values. Stored as versioned config in `infrastructure/clou
 | `ingestion.daily_extraction_limit` | `100` | Provisional; see [ingestion scope](../data-sources/ingestion-scope.md) |
 | `triage.accept_score_cut` | `0.55` | Inclusive; publications at or above are accepted (REQ-PROC-005) |
 | `extraction.max_candidates_per_publication` | `3` | Hard cap (REQ-PROC-004) |
-| `arxiv.min_request_interval_ms` | `3000` | At most one request per 3 seconds |
+| `arxiv.min_request_interval_ms` | `3000` | At most one request per 3 seconds; the next arXiv page is delivered after 3 seconds |
+| `ingestion.overlap_days` | `2` | A run starts this many days before the end of the last successful window (REQ-DATA-009) |
+| `ingestion.backfill_days` | `30` | A first run fetches this many days, and no window is longer (REQ-DATA-009) |
+| `ingestion.max_pages_per_run` | `50` | Pages (100 each) one run may fetch; a run that hits the cap is `partial` |
+| `ingestion.run_timeout_hours` | `6` | A run still `running` after this long is closed as `failed` when the next one starts |
 
 ## Pipeline concurrency
 
@@ -41,7 +45,7 @@ Starter configuration values. Stored as versioned config in `infrastructure/clou
 | `candidate.run` | `1` | Extraction (0..N) | Starts one candidate Workflow |
 | `queue.dead_letter` | `1` | Any consumer after max attempts | Admin replay (REQ-DATA-011) |
 
-Payload of every message: `{ schemaVersion, type, ids: { publicationId?, candidateId?, documentId? }, attempt }`. Large bodies stay in D1/R2; messages carry IDs only.
+Payload of every message: `{ schemaVersion, type, ids: { runId?, source?, page?, publicationId?, candidateId?, documentId? }, attempt }`. Large bodies stay in D1/R2; messages carry IDs only, and `packages/models` rejects any other key. A type is added to the `QueueMessageTypeSchema` enum when its producer and consumer exist; `source.fetch_page` is the first. Its message ID is `fetch:<runId>:<page>`, so a page sent twice is one message. The Queue consumer takes one message at a time (`max_batch_size = 1`, `max_concurrency = 1`), retries three times, and then moves the message to the dead-letter queue, which the same Worker consumes.
 
 ## Search tool I/O
 

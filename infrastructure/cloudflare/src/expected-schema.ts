@@ -79,6 +79,9 @@ export const EXPECTED_PHASE1_TABLES: ExpectedTable[] = [
       "counts_json",
       "failures_json",
       "status",
+      "window_from",
+      "page_cursor",
+      "pages_done",
     ],
   },
   {
@@ -94,6 +97,7 @@ export const EXPECTED_PHASE1_TABLES: ExpectedTable[] = [
       "updated_at",
       "last_error",
       "created_at",
+      "payload_json",
     ],
   },
   {

@@ -65,6 +65,15 @@ Cron (OpenAlex / arXiv)
 - The Workflow step names match `pipeline_step.step_name` in [schema migration 0001](schema-migration-0001.md): `research_analyst`, `problem_discovery`, `market_analysis`, `competition`, `relevance`, `startup_generator`, `scoring`.
 - Idempotency key for a queue message is `message_id` in `queue_message_log`. Idempotency key for a Workflow step is `(pipeline_run_id, step_name)`.
 
+## Scheduled ingestion
+
+- A cron trigger starts one run per source (`0 6 * * *` OpenAlex, `30 7 * * *` arXiv, UTC). The run row stores its window start, which is the end of the last `succeeded` run minus `ingestion.overlap_days`, or `ingestion.backfill_days` back for a first run, and never further back than `ingestion.backfill_days`.
+- Each page is one `source.fetch_page` message. The consumer claims the message in `queue_message_log`, fetches the page, stores it, and writes the counts, the next page cursor, and the message state in one batch. A repeated delivery finds the message `completed` and does nothing.
+- The next page is queued before that batch is written. If the Worker stops in between, the same page is stored again, which changes nothing, and the next page is the same message.
+- The last page closes the run: `succeeded`, or `partial` when an item failed or the page cap was reached. A run that ends `partial` or `failed` stores no window end, so the next run covers the same days again. Stored publications are not duplicated (REQ-DATA-001, REQ-DATA-002).
+- A message that fails its retries goes to the dead-letter queue. The dead-letter consumer marks it, counts it in its run, and closes that run as `failed`. Replaying the message reopens the run, and the page can finish it.
+- A new start is skipped while the previous run of that source is `running`, until it is older than `ingestion.run_timeout_hours`.
+
 ## State and durability
 
 - Each step is a durable step: its output is stored with the run ID before the next step starts (REQ-AGENT-007). A resumed run skips completed steps.
