@@ -1,0 +1,13 @@
+{
+  "id": "http://arxiv.org/abs/2409.33333v1",
+  "title": "A number theory preprint",
+  "summary": "Pure mathematics outside the pilot categories.",
+  "published": "2026-09-11T00:00:00Z",
+  "updated": "2026-09-11T00:00:00Z",
+  "categories": ["math.NT"],
+  "primaryCategory": "math.NT",
+  "authors": [{ "name": "Emmy Noether" }],
+  "pdfUrl": "https://arxiv.org/pdf/2409.33333",
+  "license": "cc-by",
+  "withdrawn": false
+}

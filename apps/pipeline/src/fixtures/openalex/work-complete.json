@@ -1,0 +1,50 @@
+{
+  "id": "https://openalex.org/W1001",
+  "title": "Software opportunities from clinical decision support",
+  "publication_date": "2026-09-15",
+  "doi": "https://doi.org/10.1000/OpenAlex.Example",
+  "ids": {
+    "openalex": "https://openalex.org/W1001",
+    "doi": "https://doi.org/10.1000/OpenAlex.Example",
+    "arxiv": "https://arxiv.org/abs/2409.11111v2"
+  },
+  "abstract_inverted_index": {
+    "Clinical": [0],
+    "decision": [1],
+    "support": [2],
+    "can": [3],
+    "surface": [4],
+    "software": [5],
+    "opportunities.": [6]
+  },
+  "authorships": [
+    {
+      "author_position": "first",
+      "author": {
+        "id": "https://openalex.org/A1",
+        "display_name": "Ada Lovelace",
+        "orcid": "https://orcid.org/0000-0001-2345-6789"
+      },
+      "institutions": [{ "display_name": "Example University" }]
+    }
+  ],
+  "topics": [
+    {
+      "display_name": "Health informatics",
+      "field": { "display_name": "Medicine" },
+      "subfield": { "display_name": "Health informatics" }
+    }
+  ],
+  "cited_by_count": 3,
+  "language": "en",
+  "is_retracted": false,
+  "open_access": {
+    "is_oa": true,
+    "oa_url": "https://example.org/paper.pdf"
+  },
+  "primary_location": {
+    "license": "cc-by",
+    "pdf_url": "https://example.org/paper.pdf",
+    "landing_page_url": "https://example.org/paper"
+  }
+}

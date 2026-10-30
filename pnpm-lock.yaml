@@ -36,6 +36,19 @@ importers:
         specifier: ^3.2.4
         version: 3.2.7(@types/node@24.19.2)
 
+  apps/pipeline:
+    dependencies:
+      '@roi/models':
+        specifier: workspace:*
+        version: link:../../packages/models
+    devDependencies:
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@24.19.2)
+
   infrastructure/cloudflare:
     dependencies:
       '@roi/models':

@@ -1,0 +1,14 @@
+{
+  "id": "http://arxiv.org/abs/2409.22222v1",
+  "title": "Human-centered AI for enterprise workflows",
+  "summary": "We study software opportunities that arise from human-centered AI research.",
+  "published": "2026-09-10T00:00:00Z",
+  "updated": "2026-09-10T00:00:00Z",
+  "doi": "10.48550/arXiv.2409.22222",
+  "categories": ["cs.AI", "cs.HC"],
+  "primaryCategory": "cs.AI",
+  "authors": [{ "name": "Grace Hopper", "affiliation": "Navy Lab" }, { "name": "Alan Turing" }],
+  "pdfUrl": "https://arxiv.org/pdf/2409.22222",
+  "license": "arxiv-nonexclusive-distrib-1.0",
+  "withdrawn": false
+}

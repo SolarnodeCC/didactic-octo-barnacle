@@ -42,7 +42,7 @@ Unit, integration, and contract tests do not call academic APIs or model provide
 
 - Phase: 1
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: test strategy and ADR 0006
 - Acceptance criteria:
   1. Academic API tests use recorded fixtures, and a test that tries to reach the network fails.
