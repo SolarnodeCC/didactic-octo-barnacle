@@ -37,6 +37,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0024](0024-design-system-foundation.md) | Dashboard design system foundation | Accepted |
 | [0025](0025-export-policy-mvp.md) | MVP export policy | Accepted |
 | [0026](0026-wispel-cc-platform-domain.md) | wispel.cc as the platform domain | Accepted |
+| [0027](0027-bootstrap-scope-and-vectorize-settings.md) | Bootstrap scope and Vectorize settings | Accepted |
 
 ## When an ADR is needed
 

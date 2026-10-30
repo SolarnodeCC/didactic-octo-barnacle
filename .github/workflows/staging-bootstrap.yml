@@ -1,0 +1,55 @@
+name: Staging bootstrap
+
+# Manual run that compares the staging Cloudflare account with the resources the
+# project needs and, with `apply`, creates the missing ones (REQ-NFR-020, ADR 0020).
+# It uses the GitHub environment `staging`, whose secrets CLOUDFLARE_API_TOKEN and
+# CLOUDFLARE_ACCOUNT_ID are listed in docs/kt/operations.md. Running it twice
+# creates nothing the second time.
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Create the missing resources (otherwise only report drift)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Enable Corepack and pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.18.2 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Report drift
+        run: node infrastructure/cloudflare/dist/bootstrap-cli.js --env staging
+
+      - name: Create missing resources
+        if: ${{ inputs.apply }}
+        run: node infrastructure/cloudflare/dist/bootstrap-cli.js --env staging --apply

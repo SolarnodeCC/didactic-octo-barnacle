@@ -6,8 +6,7 @@
 
 export type EnvironmentName = "local" | "preview" | "staging" | "production";
 
-export type ResourceKind =
-  "d1" | "r2" | "queue" | "queue-dlq" | "vectorize" | "durable-object-namespace" | "ai-gateway";
+export type ResourceKind = "d1" | "r2" | "queue" | "queue-dlq" | "vectorize" | "ai-gateway";
 
 export type DesiredResource = {
   Kind: ResourceKind;
@@ -23,6 +22,11 @@ export type DriftReport = {
   Ok: DesiredResource[];
 };
 
+/**
+ * Resources the bootstrap script creates. Durable Object namespaces are not in
+ * this list: Cloudflare creates them when a Worker with a Durable Object class
+ * is deployed (ADR 0027).
+ */
 export function desiredResources(environment: EnvironmentName): DesiredResource[] {
   const suffix = environment === "local" ? "local" : environment;
   return [
@@ -31,7 +35,6 @@ export function desiredResources(environment: EnvironmentName): DesiredResource[
     { Kind: "queue", Name: `roi-publications-${suffix}` },
     { Kind: "queue-dlq", Name: `roi-publications-dlq-${suffix}` },
     { Kind: "vectorize", Name: `roi-publications-${suffix}` },
-    { Kind: "durable-object-namespace", Name: `roi-global-limits-${suffix}` },
     { Kind: "ai-gateway", Name: `roi-${suffix}` },
   ];
 }
@@ -42,9 +45,12 @@ function keyOf(resource: DesiredResource): string {
 
 export function reportDrift(
   environment: EnvironmentName,
-  existing: ExistingResource[],
+  allExisting: ExistingResource[],
 ): DriftReport {
+  let existing = allExisting;
   const desired = desiredResources(environment);
+  // Resources of other environments (`roi-staging` while planning `preview`) are not drift.
+  existing = existing.filter((resource) => resource.Name.endsWith(`-${environment}`));
   const existingKeys = new Set(existing.map(keyOf));
   const desiredKeys = new Set(desired.map(keyOf));
 

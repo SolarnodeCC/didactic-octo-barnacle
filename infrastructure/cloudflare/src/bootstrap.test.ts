@@ -29,7 +29,6 @@ describe("REQ-NFR-020: environment bootstrap is idempotent", () => {
       "roi-publications-preview",
       "roi-publications-dlq-preview",
       "roi-publications-preview",
-      "roi-global-limits-preview",
       "roi-preview",
     ]);
   });
@@ -58,5 +57,11 @@ describe("REQ-NFR-020: environment bootstrap is idempotent", () => {
     expect(second.Created).toEqual([]);
     expect(second.Drift.Missing).toEqual([]);
     expect(second.Drift.Extra).toEqual([]);
+  });
+});
+
+describe("REQ-NFR-020: Durable Object namespaces are left to the Worker deploy", () => {
+  it("REQ-NFR-020: the bootstrap plan has no Durable Object namespace (ADR 0027)", () => {
+    expect(JSON.stringify(desiredResources("staging"))).not.toMatch(/durable/i);
   });
 });
