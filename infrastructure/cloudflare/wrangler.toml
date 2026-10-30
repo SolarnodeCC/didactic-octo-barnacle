@@ -24,8 +24,16 @@ queue = "roi-publications-local"
 
 [[queues.consumers]]
 queue = "roi-publications-local"
+max_batch_size = 1
+max_concurrency = 1
 max_retries = 3
 dead_letter_queue = "roi-publications-dlq-local"
+
+# The dead-letter queue is consumed by the same Worker (REQ-DATA-011).
+[[queues.consumers]]
+queue = "roi-publications-dlq-local"
+max_batch_size = 1
+max_retries = 1
 
 [env.preview]
 name = "roi-pipeline-preview"
@@ -47,12 +55,23 @@ queue = "roi-publications-preview"
 
 [[env.preview.queues.consumers]]
 queue = "roi-publications-preview"
+max_batch_size = 1
+max_concurrency = 1
 max_retries = 3
 dead_letter_queue = "roi-publications-dlq-preview"
+
+# The dead-letter queue is consumed by the same Worker (REQ-DATA-011).
+[[env.preview.queues.consumers]]
+queue = "roi-publications-dlq-preview"
+max_batch_size = 1
+max_retries = 1
 
 [env.staging]
 name = "roi-pipeline-staging"
 vars = { ENVIRONMENT = "staging" }
+
+[env.staging.triggers]
+crons = ["0 6 * * *", "30 7 * * *"]
 
 [[env.staging.d1_databases]]
 binding = "DB"
@@ -70,12 +89,23 @@ queue = "roi-publications-staging"
 
 [[env.staging.queues.consumers]]
 queue = "roi-publications-staging"
+max_batch_size = 1
+max_concurrency = 1
 max_retries = 3
 dead_letter_queue = "roi-publications-dlq-staging"
+
+# The dead-letter queue is consumed by the same Worker (REQ-DATA-011).
+[[env.staging.queues.consumers]]
+queue = "roi-publications-dlq-staging"
+max_batch_size = 1
+max_retries = 1
 
 [env.production]
 name = "roi-pipeline-production"
 vars = { ENVIRONMENT = "production" }
+
+[env.production.triggers]
+crons = ["0 6 * * *", "30 7 * * *"]
 
 [[env.production.d1_databases]]
 binding = "DB"
@@ -93,5 +123,13 @@ queue = "roi-publications-production"
 
 [[env.production.queues.consumers]]
 queue = "roi-publications-production"
+max_batch_size = 1
+max_concurrency = 1
 max_retries = 3
 dead_letter_queue = "roi-publications-dlq-production"
+
+# The dead-letter queue is consumed by the same Worker (REQ-DATA-011).
+[[env.production.queues.consumers]]
+queue = "roi-publications-dlq-production"
+max_batch_size = 1
+max_retries = 1

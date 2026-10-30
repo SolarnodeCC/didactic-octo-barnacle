@@ -45,10 +45,12 @@ export {
 
 export {
   QueueMessageEnvelopeSchema,
+  QueueMessageIdsSchema,
   QueueMessageLogSchema,
   QueueMessageStatusSchema,
   QueueMessageTypeSchema,
   type QueueMessageEnvelope,
+  type QueueMessageIds,
   type QueueMessageLog,
   type QueueMessageStatus,
   type QueueMessageType,

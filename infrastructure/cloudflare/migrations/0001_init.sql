@@ -1,8 +1,9 @@
 -- Migration 0001: shared research corpus, phase 1 ingestion subset (REQ-NFR-020, ADR 0020).
 -- Table and column names follow docs/kt/architecture/schema-migration-0001.md.
 -- Columns marked "additive" are not in that document; they carry fields the
--- @roi/models contracts need. The remaining tables in the document (triage,
--- agents, scoring, auth, tenancy) are added to this file before its first deploy.
+-- @roi/models contracts need. This file is frozen at the phase 1 ingestion tables;
+-- the other tables in the document (triage, agents, scoring, auth, tenancy) come in
+-- new numbered migrations (ADR 0028).
 -- Zod fields stay PascalCase in packages/models; the repository layer maps them.
 
 CREATE TABLE publication (

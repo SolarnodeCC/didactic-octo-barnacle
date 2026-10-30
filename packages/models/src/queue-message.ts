@@ -1,12 +1,12 @@
 import { z } from "zod";
 
-import { IsoDateTimeSchema } from "./common.js";
+import { IsoDateTimeSchema, SourceNameSchema } from "./common.js";
 
-export const QueueMessageTypeSchema = z.enum([
-  "publication-upserted",
-  "pdf-fetch",
-  "dead-letter-replay",
-]);
+/**
+ * Message types of docs/kt/architecture/defaults.md. A type is added here when its
+ * producer and consumer exist; `document.ingest` arrives with REQ-DATA-004.
+ */
+export const QueueMessageTypeSchema = z.enum(["source.fetch_page"]);
 
 export type QueueMessageType = z.infer<typeof QueueMessageTypeSchema>;
 
@@ -20,15 +20,29 @@ export const QueueMessageStatusSchema = z.enum([
 
 export type QueueMessageStatus = z.infer<typeof QueueMessageStatusSchema>;
 
-/** Typed queue envelope: IDs only, never large payloads (REQ-DATA-011). */
-export const QueueMessageEnvelopeSchema = z.object({
-  MessageId: z.string().min(1),
-  Type: QueueMessageTypeSchema,
-  SchemaVersion: z.string().min(1),
-  PublicationId: z.string().min(1).optional(),
-  SourceRecordId: z.string().min(1).optional(),
-  RunId: z.string().min(1).optional(),
-});
+/** The only values a message may carry: IDs and a page number, never a payload. */
+export const QueueMessageIdsSchema = z
+  .object({
+    RunId: z.string().min(1).optional(),
+    Source: SourceNameSchema.optional(),
+    Page: z.number().int().nonnegative().optional(),
+    PublicationId: z.string().min(1).optional(),
+    DocumentId: z.string().min(1).optional(),
+  })
+  .strict();
+
+export type QueueMessageIds = z.infer<typeof QueueMessageIdsSchema>;
+
+/** Typed queue envelope: schema version, IDs, and attempt (REQ-DATA-011 AC2). */
+export const QueueMessageEnvelopeSchema = z
+  .object({
+    MessageId: z.string().min(1),
+    Type: QueueMessageTypeSchema,
+    SchemaVersion: z.string().min(1),
+    Ids: QueueMessageIdsSchema,
+    Attempt: z.number().int().nonnegative(),
+  })
+  .strict();
 
 export type QueueMessageEnvelope = z.infer<typeof QueueMessageEnvelopeSchema>;
 
