@@ -2,6 +2,8 @@ import { fetchArxivPage } from "./collectors/arxiv/client.js";
 import { fetchOpenAlexPage } from "./collectors/openalex/client.js";
 import { DEFAULT_INGEST_CONFIG } from "./config.js";
 import { createAlertSink } from "./alerts/sink.js";
+import { createAuthorGuard } from "./privacy/author-guard.js";
+import { createAuthorKeyHasher } from "./privacy/author-key.js";
 import { logLine } from "./log-line.js";
 import { createPdfFetcher } from "./documents/safe-fetch.js";
 import { type ObjectStore } from "./documents/object-store.js";
@@ -20,6 +22,11 @@ export type Env = {
   PUBLICATION_QUEUE: QueueSender;
   /** Worker secret; the name is listed in docs/kt/operations.md. */
   OPENALEX_API_KEY?: string;
+  /**
+   * Worker secret (at least 32 random characters). It keys the erasure list; without it
+   * ingestion stops rather than store an erased author again (REQ-NFR-016).
+   */
+  ERASURE_HASH_KEY?: string;
   /** Alert delivery (REQ-NFR-019). A channel without its settings is skipped. */
   ALERT_GITHUB_REPO?: string;
   /** Worker secret: a fine-grained token limited to issues on this repository. */
@@ -50,6 +57,7 @@ function buildDeps(env: Env): PipelineDeps {
     NewId: () => crypto.randomUUID(),
     Config: config,
     Documents: env.DOCUMENTS,
+    AuthorGuard: createAuthorGuard(env.DB, createAuthorKeyHasher(env.ERASURE_HASH_KEY)),
     FetchPdf: createPdfFetcher({
       Fetch: workerFetch,
       Limits: {

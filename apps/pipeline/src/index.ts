@@ -26,3 +26,6 @@ export { buildRunReport } from "./report/build-run-report.js";
 export { sanitizeReason } from "./report/sanitize.js";
 export { createAlertSink } from "./alerts/sink.js";
 export { logLine } from "./log-line.js";
+export { createAuthorKeyHasher, ErasureConfigError } from "./privacy/author-key.js";
+export { createAuthorGuard } from "./privacy/author-guard.js";
+export { eraseAuthor, findAuthorIds, reapplyErasures } from "./privacy/erase-author.js";

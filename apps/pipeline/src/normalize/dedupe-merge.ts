@@ -29,7 +29,8 @@ export function decideMerge(options: {
 
   const incomingKey = titleAuthorReviewKey(options.IncomingTitle, options.IncomingFirstAuthor);
   const existingKey = titleAuthorReviewKey(options.ExistingTitle, options.ExistingFirstAuthor);
-  if (incomingKey === existingKey && incomingKey !== "|") {
+  const hasAuthors = options.IncomingFirstAuthor !== "" && options.ExistingFirstAuthor !== "";
+  if (hasAuthors && incomingKey === existingKey) {
     return { Action: "review", ReviewKey: incomingKey };
   }
 

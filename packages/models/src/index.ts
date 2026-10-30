@@ -64,3 +64,10 @@ export {
 } from "./dedupe.js";
 
 export { AlertTypeSchema, RunReportSchema, type AlertType, type RunReport } from "./run-report.js";
+
+export {
+  ErasureReasonSchema,
+  ErasureRecordSchema,
+  type ErasureReason,
+  type ErasureRecord,
+} from "./erasure.js";
