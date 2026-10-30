@@ -44,16 +44,21 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  // Live Cloudflare API client is wired when credentials exist; until then plan only.
+  if (apply) {
+    // The live Cloudflare API client is not implemented yet. Fail loudly instead of
+    // reporting a plan as if resources had been applied.
+    console.error(
+      "Apply is not implemented: the live Cloudflare client has not been wired. Run without --apply to print the plan.",
+    );
+    process.exit(1);
+  }
+
   const result = await bootstrapEnvironment({
     Environment: environment,
-    Mode: apply ? "apply" : "plan",
+    Mode: "plan",
   });
 
   console.log(JSON.stringify(result, null, 2));
-  if (result.Drift.Missing.length > 0 && apply) {
-    process.exit(1);
-  }
 }
 
 main().catch((error: unknown) => {
