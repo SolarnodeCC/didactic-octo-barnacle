@@ -15,7 +15,7 @@ related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-N
 | Instructions hidden in a paper or search result steer an agent (prompt injection) | Paper text and search results are delimited data; agents have no write tools; the search tool is bounded and read-only; output is validated against the contract; injection fixtures in tests | REQ-NFR-006, REQ-AGENT-013 |
 | Model output runs script or links to a hostile site in the dashboard | Plain-text rendering, https-only links, strict CSP (ADR 0016) | REQ-NFR-013 |
 | A cross-site page triggers a state-changing request | CSRF token, `Origin` check, one site for dashboard and API, no CORS (ADR 0016) | REQ-NFR-014 |
-| Fetching a PDF or page reaches an internal address or a hostile file | Allowlisted fetcher with `https`, size and time limits, content-type check, no internal addresses | REQ-DATA-010, REQ-AGENT-013 |
+| Fetching a PDF or page reaches an internal address or a hostile file | The one PDF fetcher (ADR 0029): `https` and public host names only, each redirect checked, size and time limits, content-type and magic-byte check | REQ-DATA-010, REQ-AGENT-013 |
 | A forged bounce or complaint event from the email provider | Webhook signature verification and replay window | REQ-ACC-007 |
 | A leaked API key or Cloudflare token | Secrets only in Cursor environment secrets or GitHub Actions secrets; secret scanning with push protection; least-privilege tokens per environment | REQ-NFR-001 |
 | Model spending runs away | Daily budget and per-run cost reporting through AI Gateway | REQ-NFR-005 |
@@ -24,6 +24,10 @@ related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-N
 | Secrets exposed to untrusted code in CI | Pull request jobs run without secrets; live evals only for branches in this repository, in a protected `evals` environment that requires reviewer approval (ADR 0006) | REQ-TEST-003, REQ-TEST-004 |
 | Redistribution of copyrighted papers | License recorded per document; PDFs stored and served only when the license allows it | REQ-DATA-010 |
 | Vulnerable dependencies | Dependabot, pinned versions, and a dependency review gate in CI | see [CI gates](../test/ci-gates.md) |
+
+## PDF fetcher
+
+`apps/pipeline/src/documents` holds the only code that downloads PDFs. It accepts `https` on port 443 and public host names; it refuses IP addresses in any notation, `localhost`, single-label names, and names ending in `.local`, `.internal`, `.lan`, or `.home.arpa`. It follows at most three redirects and checks each target again, reads at most `pdf.max_bytes`, stops at `pdf.timeout_ms`, and accepts a file only when it is served as `application/pdf` and starts with `%PDF-`. Workers cannot resolve DNS, so a public name that points to a private address is not detected by the Worker; Cloudflare does not route a Worker's requests to its own internal network, and `pdf.allowed_hosts` narrows the reach further when needed. The URL and license always come from the stored source record, never from a queue message.
 
 ## Authentication
 

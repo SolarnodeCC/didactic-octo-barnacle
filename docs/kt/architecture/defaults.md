@@ -38,7 +38,7 @@ Starter configuration values. Stored as versioned config in `infrastructure/clou
 | Type | Schema version | Producer | Consumer |
 |---|---|---|---|
 | `source.fetch_page` | `1` | Cron / collector Workflow | Collector Worker |
-| `document.ingest` | `1` | Collector after license gate | Document-processing Queue consumer |
+| `document.ingest` | `1` | Page consumer after the license gate | Document-processing Queue consumer; message ID `document:<publicationId>` |
 | `publication.embed` | `1` | Document processing or abstract-only path | Embedding Worker |
 | `publication.triage` | `1` | After embed (or abstract ready) | Triage Worker |
 | `publication.extract` | `1` | Triage accept | Extraction Worker |
@@ -46,6 +46,15 @@ Starter configuration values. Stored as versioned config in `infrastructure/clou
 | `queue.dead_letter` | `1` | Any consumer after max attempts | Admin replay (REQ-DATA-011) |
 
 Payload of every message: `{ schemaVersion, type, ids: { runId?, source?, page?, publicationId?, candidateId?, documentId? }, attempt }`. Large bodies stay in D1/R2; messages carry IDs only, and `packages/models` rejects any other key. A type is added to the `QueueMessageTypeSchema` enum when its producer and consumer exist; `source.fetch_page` is the first. Its message ID is `fetch:<runId>:<page>`, so a page sent twice is one message. The Queue consumer takes one message at a time (`max_batch_size = 1`, `max_concurrency = 1`), retries three times, and then moves the message to the dead-letter queue, which the same Worker consumes.
+
+## PDF fetching
+
+| Key | Default | Notes |
+|---|---|---|
+| `pdf.max_bytes` | `26214400` | 25 MiB; a larger file is refused (REQ-DATA-010 AC4) |
+| `pdf.timeout_ms` | `20000` | One deadline for all redirects and the download |
+| `pdf.max_redirects` | `3` | Each redirect target is checked again |
+| `pdf.allowed_hosts` | empty | Empty means any public host; a list limits fetching to those hosts and their subdomains (ADR 0029) |
 
 ## Search tool I/O
 

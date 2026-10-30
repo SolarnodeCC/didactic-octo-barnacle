@@ -48,7 +48,7 @@ Market Analysis, Competition, and Relevance depend only on the Research Analyst 
 ```text
 Cron (OpenAlex / arXiv)
   → collector Workflow (pagination, dedup, source_record)
-      → queue document.ingest (license-gated PDF) and/or publication.embed
+      → queue document.ingest (license-gated PDF, REQ-DATA-004) and/or publication.embed
           → document-processing Queue consumer (optional)
           → embedding Worker
           → queue publication.triage
@@ -71,6 +71,7 @@ Cron (OpenAlex / arXiv)
 - Each page is one `source.fetch_page` message. The consumer claims the message in `queue_message_log`, fetches the page, stores it, and writes the counts, the next page cursor, and the message state in one batch. A repeated delivery finds the message `completed` and does nothing.
 - The next page is queued before that batch is written. If the Worker stops in between, the same page is stored again, which changes nothing, and the next page is the same message.
 - The last page closes the run: `succeeded`, or `partial` when an item failed or the page cap was reached. A run that ends `partial` or `failed` stores no window end, so the next run covers the same days again. Stored publications are not duplicated (REQ-DATA-001, REQ-DATA-002).
+- After a page is stored, each publication with a PDF URL and a license that allows storage gets a `document.ingest` message, unless it has a document or a finished message. The consumer takes the URL and license from the stored source record, fetches the file with the PDF fetcher, and stores it under `pdfs/<sha256>.pdf` in R2 with a `document` row. A file that can never work (not a PDF, too large, refused URL, 404) completes the message with the reason in `last_error`; a timeout or 5xx is retried and can be dead-lettered. A PDF problem never fails an ingestion run.
 - A message that fails its retries goes to the dead-letter queue. The dead-letter consumer marks it, counts it in its run, and closes that run as `failed`. Replaying the message reopens the run, and the page can finish it.
 - A new start is skipped while the previous run of that source is `running`, until it is older than `ingestion.run_timeout_hours`.
 

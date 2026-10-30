@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { FakeBucket } from "./fake-bucket.js";
 import { FakeQueue } from "./fake-queue.js";
 import { counter, createTestDatabase, type TestDatabase } from "./sqlite-d1.js";
 import { type ArxivPage } from "../collectors/arxiv/client.js";
@@ -9,6 +10,7 @@ import { type ArxivEntry } from "../collectors/arxiv/types.js";
 import { type OpenAlexPage } from "../collectors/openalex/client.js";
 import { type OpenAlexWork } from "../collectors/openalex/types.js";
 import { DEFAULT_INGEST_CONFIG, type IngestConfig } from "../config.js";
+import { type FetchedPdf } from "../documents/safe-fetch.js";
 import { consumeBatch } from "../queue/consume.js";
 import { type PipelineDeps } from "../queue/deps.js";
 
@@ -19,13 +21,23 @@ const baseWork = JSON.parse(
 ) as OpenAlexWork;
 
 /** A complete OpenAlex work with its own IDs, so works never merge with each other. */
-export function makeWork(n: number): OpenAlexWork {
+export function makeWork(
+  n: number,
+  options: { Pdf?: { Url: string | null; License: string | null }; OaUrl?: string } = {},
+): OpenAlexWork {
   return {
     ...baseWork,
     id: `https://openalex.org/W${n}`,
     title: `Opportunity research paper number ${n}`,
     doi: `https://doi.org/10.1000/paper.${n}`,
     ids: { openalex: `https://openalex.org/W${n}`, doi: `https://doi.org/10.1000/paper.${n}` },
+    // No PDF unless asked for, so tests that are not about documents queue none.
+    open_access: { is_oa: Boolean(options.OaUrl), oa_url: options.OaUrl ?? null },
+    primary_location: {
+      license: options.Pdf?.License ?? null,
+      pdf_url: options.Pdf?.Url ?? null,
+      landing_page_url: `https://example.org/landing/${n}`,
+    },
   };
 }
 
@@ -50,6 +62,9 @@ export function makeEntry(n: number, updated: string): ArxivEntry {
 export type Harness = {
   Database: TestDatabase;
   Queue: FakeQueue;
+  Bucket: FakeBucket;
+  /** URLs the PDF fetcher was asked for. */
+  PdfRequests: string[];
   Deps: PipelineDeps;
   Clock: { Now: string };
   OpenAlexRequests: Array<{ FromDate: string; Cursor?: string }>;
@@ -57,14 +72,22 @@ export type Harness = {
   /** Replace the scripted OpenAlex pages; each call to the client takes the next one. */
   SetOpenAlexPages(pages: Array<OpenAlexPage | Error>): void;
   SetArxivPages(pages: Array<ArxivPage | Error>): void;
+  /** Script the PDF fetcher: bytes, or an error, per URL. */
+  SetPdfs(pdfs: Record<string, Uint8Array | Error>): void;
   Drain(options?: { Duplicate?: boolean; MaxRetries?: number }): Promise<number>;
   Count(table: string): number;
   Run(id?: string): Record<string, unknown>;
 };
 
-export function createHarness(config: Partial<IngestConfig> = {}): Harness {
+export function createHarness(
+  config: Partial<IngestConfig> = {},
+  overrides: { FetchPdf?: PipelineDeps["FetchPdf"] } = {},
+): Harness {
   const database = createTestDatabase();
   const queue = new FakeQueue();
+  const bucket = new FakeBucket();
+  const pdfRequests: string[] = [];
+  let pdfs: Record<string, Uint8Array | Error> = {};
   const clock = { Now: "2026-10-30T06:00:00.000Z" };
   const ids = counter("id");
   let openAlexPages: Array<OpenAlexPage | Error> = [];
@@ -86,6 +109,19 @@ export function createHarness(config: Partial<IngestConfig> = {}): Harness {
     Now: () => clock.Now,
     NewId: ids,
     Config: { ...DEFAULT_INGEST_CONFIG, ...config },
+    Documents: bucket,
+    FetchPdf:
+      overrides.FetchPdf ??
+      ((url): Promise<FetchedPdf> => {
+        pdfRequests.push(url);
+        const next = pdfs[url];
+        if (next === undefined) {
+          return Promise.reject(new Error(`no scripted PDF for ${url}`));
+        }
+        return next instanceof Error
+          ? Promise.reject(next)
+          : Promise.resolve({ Bytes: next, FinalUrl: url });
+      }),
     Sources: {
       FetchOpenAlexPage: (request) => {
         openAlexRequests.push(request);
@@ -101,6 +137,8 @@ export function createHarness(config: Partial<IngestConfig> = {}): Harness {
   return {
     Database: database,
     Queue: queue,
+    Bucket: bucket,
+    PdfRequests: pdfRequests,
     Deps: deps,
     Clock: clock,
     OpenAlexRequests: openAlexRequests,
@@ -110,6 +148,9 @@ export function createHarness(config: Partial<IngestConfig> = {}): Harness {
     },
     SetArxivPages: (pages) => {
       arxivPages = [...pages];
+    },
+    SetPdfs: (next) => {
+      pdfs = { ...next };
     },
     Drain: (options = {}) =>
       queue.drain({
@@ -134,4 +175,9 @@ export function openAlexPage(works: OpenAlexWork[], nextCursor: string | null): 
 
 export function arxivPage(entries: ArxivEntry[], returned = entries.length): ArxivPage {
   return { Entries: entries, OutOfScope: returned - entries.length, Returned: returned };
+}
+
+/** A small file that passes the PDF magic-byte check; the label makes its hash unique. */
+export function pdfBytes(label: string): Uint8Array {
+  return new TextEncoder().encode(`%PDF-1.7\n${label}\n%%EOF`);
 }

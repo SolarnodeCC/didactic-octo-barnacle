@@ -93,10 +93,10 @@ The full-text PDF of an ingested publication is stored when it is openly availab
 
 - Phase: 1
 - Priority: must
-- Status: planned
+- Status: done
 - Source: README roadmap phase 1
 - Acceptance criteria:
-  1. A PDF is openly available when a source gives an open access URL and a license recorded under REQ-DATA-010 that allows storage (ADR 0014). Most arXiv PDFs do not qualify, so those publications stay abstract-only.
+  1. A PDF is openly available when a source gives the URL of a PDF in the location whose license is recorded under REQ-DATA-010 and allows storage (ADR 0014). A separate open access URL does not qualify, because its license may differ. Most arXiv PDFs do not qualify, so those publications stay abstract-only.
   2. The PDF is stored once, keyed by its content hash, and linked to its publication record.
   3. A publication without an available PDF is still ingested and marked as having no PDF.
 - Verification: integration test with local object storage
@@ -155,7 +155,7 @@ The platform records the license of each document and respects it.
   1. The license of each stored PDF and of each source's metadata is recorded.
   2. A PDF without a recorded license that allows storage is not stored.
   3. The dashboard links to the source of a document instead of serving the PDF, unless the license allows redistribution.
-  4. The PDF URL comes from a source record, uses `https`, and is fetched by an allowlisted fetcher with a size limit, a timeout, a content-type check, and no access to internal addresses.
+  4. The PDF URL comes from a source record and is fetched by the one PDF fetcher (ADR 0029): `https` on port 443 only, public host names only (no IP addresses, `localhost`, or internal names; an optional host list limits it further), each redirect checked again with at most 3, a size limit, one overall timeout, and a check of the content type and of the file's first bytes.
 - Verification: unit tests on license rules and code review
 
 ### REQ-DATA-011: Idempotent queue processing

@@ -56,13 +56,22 @@ export async function claimMessage(
   return "claimed";
 }
 
-/** Statement that marks a message completed; callers put it in the batch with the work. */
-export function completeStatement(db: SqlDatabase, messageId: string, now: string): SqlStatement {
+/**
+ * Statement that marks a message completed; callers put it in the batch with the work.
+ * A note records why a message was completed without doing its work (for example a
+ * PDF that is not a PDF), so the reason stays visible in the log.
+ */
+export function completeStatement(
+  db: SqlDatabase,
+  messageId: string,
+  now: string,
+  note: string | null = null,
+): SqlStatement {
   return db
     .prepare(
-      "UPDATE queue_message_log SET status = 'completed', last_error = NULL, updated_at = ? WHERE message_id = ?",
+      "UPDATE queue_message_log SET status = 'completed', last_error = ?, updated_at = ? WHERE message_id = ?",
     )
-    .bind(now, messageId);
+    .bind(note === null ? null : note.slice(0, MAX_ERROR_LENGTH), now, messageId);
 }
 
 /** Error text is cut short and holds only our own messages: no publication text. */

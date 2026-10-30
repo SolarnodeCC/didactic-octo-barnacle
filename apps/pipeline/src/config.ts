@@ -15,6 +15,13 @@ export type IngestConfig = {
   /** Seconds before the next arXiv page is delivered (`arxiv.min_request_interval_ms`). */
   ArxivPageDelaySeconds: number;
   Http: { MaxAttempts: number; BaseMs: number };
+  Pdf: {
+    MaxBytes: number;
+    TimeoutMs: number;
+    MaxRedirects: number;
+    /** Empty means any public host; a list limits fetching to those hosts (REQ-DATA-010 AC4). */
+    AllowedHosts: readonly string[];
+  };
 };
 
 export const DEFAULT_INGEST_CONFIG: IngestConfig = {
@@ -25,6 +32,7 @@ export const DEFAULT_INGEST_CONFIG: IngestConfig = {
   RunTimeoutHours: 6,
   ArxivPageDelaySeconds: 3,
   Http: { MaxAttempts: 3, BaseMs: 500 },
+  Pdf: { MaxBytes: 25 * 1024 * 1024, TimeoutMs: 20_000, MaxRedirects: 3, AllowedHosts: [] },
 };
 
 /** Cron expressions (UTC) of docs/kt/architecture/defaults.md, one per source. */

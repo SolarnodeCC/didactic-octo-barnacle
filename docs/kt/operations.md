@@ -8,7 +8,7 @@ related: [REQ-NFR-001, REQ-NFR-005, REQ-NFR-008, REQ-NFR-015, REQ-NFR-017, REQ-A
 
 # Operations
 
-The repository holds the KT documents, the phase 1 foundation toolchain (`packages/models`, pnpm workspace, lint, and CI), and Cloudflare infrastructure scaffolding (`infrastructure/cloudflare`: Wrangler config, D1 migrations, bootstrap planner). `apps/pipeline` also holds the source clients (retry with backoff, arXiv rate limiting), the D1 repository with deduplication, and a Worker entry that answers a health check. It also holds the cron handler that starts a run, the queue consumer for pages and dead letters, and the replay function for dead-lettered messages (REQ-DATA-009, REQ-DATA-011). PDF fetching, run reports, alerts, and the live Worker deploy are still planned; sections marked *planned* describe how they will work once those packages exist (ADR 0004 (Accepted), ADR 0020).
+The repository holds the KT documents, the phase 1 foundation toolchain (`packages/models`, pnpm workspace, lint, and CI), and Cloudflare infrastructure scaffolding (`infrastructure/cloudflare`: Wrangler config, D1 migrations, bootstrap planner). `apps/pipeline` also holds the source clients (retry with backoff, arXiv rate limiting), the D1 repository with deduplication, and a Worker entry that answers a health check. It also holds the cron handler that starts a run, the queue consumer for pages and dead letters, and the replay function for dead-lettered messages (REQ-DATA-009, REQ-DATA-011). It also stores license-gated PDFs in R2 through a safe fetcher (REQ-DATA-004, REQ-DATA-010). Run reports, alerts, and the live Worker deploy are still planned; sections marked *planned* describe how they will work once those packages exist (ADR 0004 (Accepted), ADR 0020).
 
 ## Checks
 
