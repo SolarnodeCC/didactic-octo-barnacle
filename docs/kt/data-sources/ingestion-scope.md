@@ -1,25 +1,25 @@
 ---
 title: Ingestion scope
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-10-29
 related: [REQ-DATA-001, REQ-DATA-002, REQ-DATA-009, REQ-PROC-005, REQ-PROC-006]
 ---
 
 # Ingestion scope
 
-The pilot scope for phases 1 and 2. It is deliberately narrow: measure volume and cost, then widen it by changing configuration (OQ-012).
+The locked pilot scope for phase 1. It is deliberately narrow: measure volume and cost, then widen it by changing configuration (answered OQ-012). Values marked provisional may change after phase 1 measurements without changing the topic map.
 
 ## Pilot values
 
-| Setting | Pilot value |
-|---|---|
-| arXiv categories | `cs.AI`, `cs.SE`, `cs.HC`, `cs.CY` (primary or cross-listed) |
-| OpenAlex window | works published in the last 30 days at the first run (REQ-DATA-009), then incremental |
-| OpenAlex topics | topics whose field or subfield appears in the topic map below |
-| Languages | English only (also the language of the interface, agent outputs, and briefs) |
-| Daily limit to extraction | 100 publications (provisional; set from the volume measured in phase 1) |
-| Day boundary | UTC |
+| Setting | Pilot value | Locked? |
+|---|---|---|
+| arXiv categories | `cs.AI`, `cs.SE`, `cs.HC`, `cs.CY` (primary or cross-listed) | locked for phase 1 |
+| OpenAlex window | works published in the last 30 days at the first run (REQ-DATA-009), then incremental | locked for phase 1 |
+| OpenAlex topics | topics whose field or subfield appears in the topic map below | locked names; IDs filled when the collector is built |
+| Languages | English only (also the language of the interface, agent outputs, and briefs) | locked |
+| Daily limit to extraction | 100 publications | provisional until phase 1 volume is measured |
+| Day boundary | UTC | locked |
 
 The limit and the map are configuration, not code. Changing them is a reviewed pull request that records the reason.
 

@@ -7,7 +7,7 @@ last_reviewed: 2026-10-29
 
 # API requirements
 
-The data API in `apps/api` is the only way the dashboard reads data. It is read-only in the MVP, except for score reviews (REQ-API-004) and opportunity status (REQ-DASH-004). Sign-in, account, and admin operations are served by separate routes (ADR 0018, REQ-API-005).
+The data API in `apps/api` is the only way the dashboard reads data. It is read-only in the MVP, except for score reviews (REQ-API-004) and opportunity status (REQ-DASH-004, ADR 0021). Sign-in, account, and admin operations are served by separate routes (ADR 0018, REQ-API-005). Paths, methods, roles, and error codes are in [api routes](../architecture/api-routes.md).
 
 ### REQ-API-001: List opportunities
 

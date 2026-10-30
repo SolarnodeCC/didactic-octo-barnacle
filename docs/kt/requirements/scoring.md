@@ -40,7 +40,7 @@ Each score maps to a band: 0 to 39 Low, 40 to 69 Medium, 70 to 89 High, 90 to 10
 
 ### REQ-SCORE-003: Category derivation
 
-Each category value is derived from agent output with the versioned rules summarized in [scoring](../scoring.md). The proposed derivation formulas live in ADR 0005 until that ADR is accepted; after acceptance they become score model version 1.
+Each category value is derived from agent output with the versioned rules summarized in [scoring](../scoring.md). The derivation formulas in ADR 0005 (Accepted) are score model version 1.
 
 - Phase: 4
 - Priority: must
@@ -48,7 +48,7 @@ Each category value is derived from agent output with the versioned rules summar
 - Source: scoring document and ADR 0005
 - Depends on: REQ-AGENT-001, REQ-AGENT-002, REQ-AGENT-003, REQ-AGENT-004, REQ-AGENT-006
 - Acceptance criteria:
-  1. Every category has a derivation rule that names the agent fields it reads (ADR 0005 while Proposed; the accepted ADR thereafter).
+  1. Every category has a derivation rule that names the agent fields it reads (ADR 0005).
   2. The derivation is plain code without model calls and uses integer arithmetic, so rounding half up is exact (ADR 0005).
   3. Changing a rule or a weight creates a new score model version; stored scores keep their version.
 - Verification: unit tests per category with fixed agent outputs

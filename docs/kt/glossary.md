@@ -1,8 +1,8 @@
 ---
 title: Glossary
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-10-28
+status: approved
+last_reviewed: 2026-10-29
 ---
 
 # Glossary
@@ -31,7 +31,7 @@ last_reviewed: 2026-10-28
 | Model judge | A model that grades free-text agent output with a written rubric during evals. |
 | Model call | One request to a model provider through AI Gateway, recorded with its tokens, latency, cost, and outcome (REQ-NFR-011). |
 | Opportunity | A software product or service idea derived from a research finding, with its agent outputs and score. |
-| Opportunity brief | A one-page PDF summary of one opportunity, built from stored data (REQ-DASH-009). |
+| Opportunity brief | A one-page print-ready HTML summary of one opportunity, built from stored data (REQ-DASH-009, ADR 0025). Users may print to PDF from the browser; the platform does not generate a PDF file in the MVP. |
 | Opportunity score | A weighted score from 0 to 100. See [scoring](scoring.md). |
 | Output contract | The fields an agent must return, with their types and ranges. |
 | Pain level | How severe the problem is for the customer, from 1 to 5, returned by the Problem Discovery Agent. |
