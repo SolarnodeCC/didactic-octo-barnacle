@@ -57,7 +57,7 @@ vars = { ENVIRONMENT = "staging" }
 [[env.staging.d1_databases]]
 binding = "DB"
 database_name = "roi-staging"
-database_id = "REPLACE_WITH_STAGING_D1_ID"
+database_id = "e613e0ae-e79e-43c4-83e1-a44eb7307c7e"
 migrations_dir = "migrations"
 
 [[env.staging.r2_buckets]]
