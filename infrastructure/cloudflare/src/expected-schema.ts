@@ -1,6 +1,6 @@
 /**
  * D1 columns required by the phase 1 Zod contracts in @roi/models (REQ-NFR-020).
- * Keep snake_case here; packages/models field names stay PascalCase.
+ * Names follow docs/kt/architecture/schema-migration-0001.md; packages/models field names stay PascalCase.
  */
 
 export type ExpectedTable = {
@@ -10,20 +10,20 @@ export type ExpectedTable = {
 
 export const EXPECTED_PHASE1_TABLES: ExpectedTable[] = [
   {
-    name: "publications",
+    name: "publication",
     columns: [
       "id",
       "title",
       "abstract",
-      "publication_date",
+      "published_at",
       "doi",
       "arxiv_id",
       "arxiv_version",
-      "topics_json",
       "citation_count",
       "completeness",
+      "retracted",
+      "topics_json",
       "missing_fields_json",
-      "retraction_flag",
       "language",
       "has_storable_pdf",
       "created_at",
@@ -31,78 +31,77 @@ export const EXPECTED_PHASE1_TABLES: ExpectedTable[] = [
     ],
   },
   {
-    name: "source_records",
+    name: "source_record",
     columns: [
       "id",
       "publication_id",
       "source",
-      "source_id",
+      "source_work_id",
       "fetched_at",
       "metadata_license",
+      "raw_r2_key",
       "open_access_url",
       "pdf_url",
       "pdf_license",
     ],
   },
   {
-    name: "authors",
+    name: "author",
     columns: ["id", "display_name", "orcid"],
   },
   {
-    name: "authorships",
-    columns: ["publication_id", "author_id", "position", "affiliations_json"],
+    name: "authorship",
+    columns: ["publication_id", "author_id", "affiliation", "position", "affiliations_json"],
   },
   {
-    name: "documents",
+    name: "document",
     columns: [
       "id",
       "publication_id",
+      "pdf_r2_key",
       "content_hash",
-      "storage_key",
       "license",
-      "extracted_text_key",
+      "extracted_text_r2_key",
       "extractor_version",
+      "status",
       "stored_at",
     ],
   },
   {
-    name: "ingestion_runs",
+    name: "ingestion_run",
     columns: [
       "id",
       "source",
       "cursor",
-      "status",
       "started_at",
       "ended_at",
       "counts_json",
       "failures_json",
+      "status",
     ],
   },
   {
-    name: "ingestion_cursors",
-    columns: ["source", "cursor", "last_success_at"],
-  },
-  {
-    name: "queue_message_logs",
+    name: "queue_message_log",
     columns: [
+      "id",
       "message_id",
       "type",
       "schema_version",
       "status",
       "attempts",
       "dead_letter",
+      "updated_at",
       "last_error",
       "created_at",
-      "updated_at",
     ],
   },
   {
-    name: "title_author_reviews",
+    name: "title_author_review",
     columns: [
       "id",
       "review_key",
       "incoming_source",
-      "incoming_source_id",
+      "incoming_source_work_id",
       "existing_publication_id",
       "status",
       "created_at",
