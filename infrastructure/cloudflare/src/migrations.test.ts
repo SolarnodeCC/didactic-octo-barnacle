@@ -21,7 +21,7 @@ function tableColumns(db: Database.Database, table: string): string[] {
 
 describe("REQ-NFR-020: migrations hold columns required by packages/models", () => {
   it("REQ-NFR-020: lists numbered SQL migrations in order", () => {
-    expect(listMigrationFiles()[0]).toBe("0001_phase1_ingestion.sql");
+    expect(listMigrationFiles()).toEqual(["0001_init.sql", "0002_title_author_review.sql"]);
   });
 
   it("REQ-NFR-020: applies migrations and exposes expected tables and columns", () => {
@@ -29,7 +29,7 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
     const applied = applyMigrations((sql) => {
       db.exec(sql);
     });
-    expect(applied).toEqual(["0001_phase1_ingestion.sql"]);
+    expect(applied).toEqual(["0001_init.sql", "0002_title_author_review.sql"]);
 
     for (const table of EXPECTED_PHASE1_TABLES) {
       const columns = tableColumns(db, table.name);
@@ -37,6 +37,28 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
         expect(columns, `${table.name}.${column}`).toContain(column);
       }
     }
+  });
+
+  it("REQ-NFR-020: enforces one document per publication and one record per source work", () => {
+    const db = new Database(":memory:");
+    applyMigrations((sql) => {
+      db.exec(sql);
+    });
+    const now = "2026-10-29T12:00:00Z";
+    db.prepare(
+      "INSERT INTO publication (id, title, completeness, created_at, updated_at) VALUES (?, ?, 'incomplete', ?, ?)",
+    ).run("pub_1", "Title", now, now);
+    const insertDocument = db.prepare(
+      "INSERT INTO document (id, publication_id, pdf_r2_key, content_hash, license, stored_at) VALUES (?, 'pub_1', 'k', ?, 'cc-by', ?)",
+    );
+    insertDocument.run("doc_1", "hash_1", now);
+    expect(() => insertDocument.run("doc_2", "hash_2", now)).toThrow(/UNIQUE/);
+
+    const insertSource = db.prepare(
+      "INSERT INTO source_record (id, publication_id, source, source_work_id, fetched_at) VALUES (?, 'pub_1', 'arxiv', 'w1', ?)",
+    );
+    insertSource.run("src_1", now);
+    expect(() => insertSource.run("src_2", now)).toThrow(/UNIQUE/);
   });
 
   it("REQ-NFR-020: contracts still parse sample rows shaped for the migrated schema", () => {
