@@ -4,6 +4,7 @@ import {
   hasCloudflareCredentials,
   type EnvironmentName,
 } from "./bootstrap.js";
+import { createCloudflareClient } from "./cloudflare-client.js";
 
 const ENVIRONMENTS = new Set<EnvironmentName>(["local", "preview", "staging", "production"]);
 
@@ -44,18 +45,19 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  if (apply) {
-    // The live Cloudflare API client is not implemented yet. Fail loudly instead of
-    // reporting a plan as if resources had been applied.
-    console.error(
-      "Apply is not implemented: the live Cloudflare client has not been wired. Run without --apply to print the plan.",
-    );
-    process.exit(1);
-  }
+  // With credentials the plan reads the real account; applying creates what is missing.
+  // Without them, only the desired resources are printed.
+  const client = hasCloudflareCredentials()
+    ? createCloudflareClient({
+        AccountId: process.env.CLOUDFLARE_ACCOUNT_ID as string,
+        ApiToken: process.env.CLOUDFLARE_API_TOKEN as string,
+      })
+    : undefined;
 
   const result = await bootstrapEnvironment({
     Environment: environment,
-    Mode: "plan",
+    Mode: apply ? "apply" : "plan",
+    ...(client ? { Client: client } : {}),
   });
 
   console.log(JSON.stringify(result, null, 2));
