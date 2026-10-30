@@ -24,7 +24,8 @@ The documents in `docs/kt/` are the source of truth for the Research Opportunity
 11. [Operations](operations.md): checks, CI, environments, deployment, monitoring, and secrets handling.
 12. [Decisions](decisions/README.md): architecture decision records (ADRs).
 13. [Open questions](open-questions.md): decisions still to be made, with a proposal and a deadline phase.
-14. [Examples](examples/README.md): example outputs as YAML files.
+14. [Legal](legal/README.md): legal review brief for OQ-014 and launch DPAs.
+15. [Examples](examples/README.md): example outputs as YAML files.
 
 ## Rules for KT documents
 

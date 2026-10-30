@@ -1,9 +1,9 @@
 ---
 title: Screen inventory and navigation
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-10-29
-related: [REQ-DASH-001, REQ-DASH-002, REQ-DASH-003, REQ-DASH-007, REQ-DASH-008, REQ-DASH-009, REQ-DASH-010, REQ-DASH-011, REQ-DASH-012, REQ-DASH-014, REQ-ACC-003, REQ-ACC-004, REQ-ACC-010, REQ-ACC-011, REQ-ADM-001, REQ-ADM-002, REQ-ADM-003]
+related: [REQ-DASH-001, REQ-DASH-002, REQ-DASH-003, REQ-DASH-004, REQ-DASH-007, REQ-DASH-008, REQ-DASH-009, REQ-DASH-010, REQ-DASH-011, REQ-DASH-012, REQ-DASH-014, REQ-ACC-003, REQ-ACC-004, REQ-ACC-010, REQ-ACC-011, REQ-ADM-001, REQ-ADM-002, REQ-ADM-003]
 ---
 
 # Screen inventory and navigation
@@ -46,8 +46,9 @@ Footer (every page):  Terms | Privacy | Support
 
 - The Admin menu is not rendered for other roles. A direct request to an admin path by another role shows the not-found page (REQ-DASH-014).
 - An unauthenticated request to any signed-in path redirects to sign in and returns to the requested path after sign-in (REQ-DASH-014).
-- The opportunity list, matrix, and trends share one filter bar (industry, band, publication date, review state). The filters live in the URL so a view can be shared.
-- The detail page is reached from Home, the list, the matrix (activating a point), and search results in later work.
+- The opportunity list, matrix, and trends share one filter bar (industry, band, publication date, review state, decision status). The filters live in the URL so a view can be shared.
+- The detail page is reached from Home, the list, the matrix (activating a point), and search results.
+- Brief export is screen note for path `/opportunities/:id/brief` (not a separate inventory row).
 
 ## Screen notes
 

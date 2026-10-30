@@ -7,7 +7,7 @@ last_reviewed: 2026-10-28
 
 # Requirements
 
-Every requirement has a unique ID and testable acceptance criteria. Pull requests name the requirements they implement or change, and tests name the requirement they verify. The acceptance criteria were derived from the original README and a KT review, and still need team review; files stay `draft` until that review is done (see [Review](#review)).
+Every requirement has a unique ID and testable acceptance criteria. Pull requests name the requirements they implement or change, and tests name the requirement they verify. Requirement files in this tree are `approved` after code-owner review (see [Review](#review)). Architecture, UX, and test supporting docs are approved when they match these requirements; remaining open decisions live in [open questions](../open-questions.md).
 
 | Area | File | Scope |
 |---|---|---|
