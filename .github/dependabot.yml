@@ -8,3 +8,15 @@ updates:
     directory: "/scripts"
     schedule:
       interval: weekly
+  # pnpm workspaces are read through the npm ecosystem at the root (REQ-NFR-021).
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      dev-tooling:
+        dependency-type: development
+        update-types: [minor, patch]
+      runtime:
+        dependency-type: production
+        update-types: [minor, patch]

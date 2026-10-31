@@ -115,3 +115,23 @@ Records that users own carry an organization ID, so several organizations can be
   3. Publications, candidates, agent outputs, opportunities, and scores are shared by all organizations and carry no organization ID.
   4. An integration test with two organizations asserts that a user of one never reads, changes, or invites into the other, on every route that touches these records.
 - Verification: integration test with two seeded organizations
+
+### REQ-NFR-021: Repository, CI, and request hardening
+
+The repository, its CI, and the collector's outbound requests keep their security settings, and a change that undoes one fails CI.
+
+- Phase: 1
+- Priority: must
+- Status: in-progress
+- Source: Code review of 2026-10-31; ADR 0033
+- Depends on: REQ-NFR-001, REQ-DATA-001, REQ-DATA-010
+- Acceptance criteria:
+  1. `scripts/check-hardening.py` runs in CI and fails when: a workflow action is not pinned to a commit SHA; `actions/checkout` keeps credentials; a workflow has no top-level `permissions`; a workflow uses `pull_request_target`, or uses secrets on `pull_request`; a `run` script interpolates event data or inputs; Dependabot misses github-actions, pip, or npm; CODEOWNERS has no default owner; `wrangler.toml` turns on workers.dev or preview URLs; or CI does not audit dependencies.
+  2. CI runs `pnpm audit:ci`: no known advisory in production dependencies, and none of severity high or critical in any dependency. Dependabot opens weekly update pull requests for npm.
+  3. `Staging deploy` refuses a commit without a successful `parse` and `toolchain` check run.
+  4. Every outbound request of the collector has a timeout, a wait taken from `Retry-After` is capped, and a request that is not idempotent is not retried after an outcome that may have been processed (a 5xx, a timeout, or a network error). Emails to Resend carry an idempotency key.
+  5. A queue message that fails is logged with the queue name and the error class, never the error text.
+  6. The PDF fetcher refuses names that embed an IP address and the public wildcard-DNS services listed in code, in addition to the rules of REQ-DATA-010.
+  7. The collector Worker has no workers.dev address and no preview URLs.
+- Verification: `scripts/check-hardening.py` in CI, unit tests, and code review. Required reviewers on the GitHub environment `staging` and required status checks on `main` are repository settings; [operations](../../operations.md) lists them for the quarterly review.
+

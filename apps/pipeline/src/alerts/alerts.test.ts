@@ -249,12 +249,24 @@ describe("REQ-NFR-019: a broken channel never stops the pipeline", () => {
     expect(alertRow(h, "dead-letter|staging|openalex")).toMatchObject({ issue_number: 42 });
   });
 
-  it("REQ-NFR-019: a temporary 502 from GitHub is retried", async () => {
+  it("REQ-NFR-021: a 502 from GitHub is not retried, so no second issue can appear", async () => {
     const { h, network } = setup();
     network.mode.github = "error-once";
     await deadLetteredRun(h);
-    expect(network.issuesCreated()).toHaveLength(2); // one 502, then the retry that works
-    expect(alertRow(h, "dead-letter|staging|openalex")).toMatchObject({ issue_number: 42 });
+    expect(network.issuesCreated()).toHaveLength(1); // the 502 is ambiguous: not repeated
+    expect(network.emails()).toHaveLength(1); // the email channel still delivers
+    expect(alertRow(h, "dead-letter|staging|openalex")).toMatchObject({ issue_number: null });
+  });
+
+  it("REQ-NFR-021: every try of one email carries the same idempotency key", async () => {
+    const { h, network } = setup();
+    network.mode.email = "error-once";
+    await deadLetteredRun(h);
+    const emails = network.emails();
+    expect(emails).toHaveLength(2); // one 502, then the retry that works
+    const keys = emails.map((email) => email.headers.get("idempotency-key"));
+    expect(keys[0]).toBeTruthy();
+    expect(keys[1]).toBe(keys[0]);
   });
 
   it("REQ-NFR-019: no channel configured sends nothing and stores no state", async () => {

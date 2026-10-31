@@ -5,6 +5,11 @@ main = "../../apps/pipeline/src/worker.ts"
 compatibility_date = "2026-10-01"
 compatibility_flags = ["nodejs_compat"]
 
+# The Worker is driven by cron and queues only. No workers.dev address, no preview URLs
+# (REQ-NFR-021); environments inherit both settings.
+workers_dev = false
+preview_urls = false
+
 [vars]
 ENVIRONMENT = "local"
 

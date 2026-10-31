@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import { fetchWithBackoff, type BackoffOptions, type FetchFn } from "../../http/retry.js";
 import { type OpenAlexWork } from "./types.js";
 
@@ -19,10 +21,15 @@ export type OpenAlexPage = {
   NextCursor: string | null;
 };
 
-type OpenAlexResponse = {
-  results?: OpenAlexWork[];
-  meta?: { next_cursor?: string | null };
-};
+/**
+ * The envelope of a page is checked at the boundary. Single works stay loosely typed here
+ * on purpose: the mapper rejects a bad work and the run records it, so one odd record
+ * does not fail the whole page (REQ-DATA-001 AC3).
+ */
+const OpenAlexResponseSchema = z.object({
+  results: z.array(z.unknown()).default([]),
+  meta: z.object({ next_cursor: z.string().nullable().optional() }).optional(),
+});
 
 const OPENALEX_WORKS_URL = "https://api.openalex.org/works";
 
@@ -50,9 +57,12 @@ export async function fetchOpenAlexPage(
     { headers: { accept: "application/json" } },
     deps.Backoff,
   );
-  const body = (await response.json()) as OpenAlexResponse;
+  const parsed = OpenAlexResponseSchema.safeParse(await response.json());
+  if (!parsed.success) {
+    throw new Error("OpenAlex returned a page in an unexpected shape");
+  }
   return {
-    Works: body.results ?? [],
-    NextCursor: body.meta?.next_cursor ?? null,
+    Works: parsed.data.results as OpenAlexWork[],
+    NextCursor: parsed.data.meta?.next_cursor ?? null,
   };
 }

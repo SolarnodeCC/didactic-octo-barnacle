@@ -30,7 +30,12 @@ export async function consumeBatch(deps: PipelineDeps, batch: QueueBatchLike): P
         await handleFetchPage(deps, message.body);
       }
       message.ack();
-    } catch {
+    } catch (error) {
+      // The name only: a message can carry a URL or other text that does not belong in a log.
+      deps.Log?.("queue.message_failed", {
+        queue: batch.queue,
+        error: error instanceof Error ? error.name : "unknown",
+      });
       message.retry();
     }
   }

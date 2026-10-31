@@ -52,6 +52,16 @@ The bootstrap script creates D1, R2, a Queue and its dead-letter queue, a Vector
 
 Staging is deployed by the manual workflow `.github/workflows/staging-deploy.yml`, run from `main` only. It builds, applies pending database migrations (unless switched off), and uploads the Worker together with its secrets in one version (`wrangler deploy --secrets-file`), so the Worker never runs without its erasure key. The workflow then lists the live deployment. Production gets the same workflow after the launch checklist passes on staging. Database migrations are plain SQL files that `wrangler d1 migrations` applies before the Worker that needs them (ADR 0020, REQ-NFR-020). A rollback redeploys the previous Worker version via Wrangler rollback or re-deploy of the prior git tag; migrations are written expand/contract so the previous version still works with the new schema. Vectorize index rebuilds are a separate runbook step after a restore.
 
+Settings outside the repository cannot be checked by `scripts/check-hardening.py`. Review them every quarter and after any change of owners (REQ-NFR-021, ADR 0033):
+
+| Setting | Expected |
+|---|---|
+| GitHub environment `staging` | Required reviewers; deployment limited to the `main` branch |
+| Branch protection on `main` | Pull request required; status checks `parse` and `toolchain` required; no force pushes |
+| Secret scanning and push protection | On (REQ-NFR-001) |
+| Dependency graph and Dependabot alerts | On, so Dependabot security updates and GitHub's dependency review action work |
+| Cloudflare API token | Least permissions for the environment (see the secrets table) |
+
 Set these in the GitHub environment `staging` before the first run:
 
 | Kind | Name | Needed |

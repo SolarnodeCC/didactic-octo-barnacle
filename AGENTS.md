@@ -18,6 +18,7 @@ Do not invent credentials, commit secrets, or add a second license. Open a pull 
 - Configuration check: `python3 scripts/check-config.py` from the repository root (after `install`, or after `python3 -m pip install -r scripts/requirements.txt`). It parses every JSON and YAML file and the frontmatter of `.cursor/rules/*.mdc`. CI runs the same script.
 - KT check: `python3 scripts/check-kt.py` from the repository root. It checks frontmatter, file size limits (400 lines and 25 KiB per file, 40 requirements per requirement file), directory indexes, relative links, and requirement IDs in `docs/kt/`. CI runs the same script.
 - Workspace check: run the `install` command from `.cursor/environment.json`. That command installs `scripts/requirements.txt`, checks Node 24, and runs `pnpm install --frozen-lockfile`.
+- Hardening check: `python3 scripts/check-hardening.py` from the repository root (REQ-NFR-021). It fails when a workflow action is not SHA-pinned, `actions/checkout` keeps credentials, `permissions` is missing, Dependabot or CODEOWNERS loses coverage, or `wrangler.toml` turns on workers.dev. CI runs the same script; run `pnpm audit:ci` for the dependency gate.
 - Toolchain: `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm build`, `pnpm test:unit`, and `pnpm check:traceability` (REQ-TEST-001). CI runs them in `.github/workflows/ci.yml`.
 
 ## KT documents
