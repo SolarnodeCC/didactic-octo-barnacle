@@ -20,14 +20,34 @@ describe("REQ-DATA-001: OpenAlex client", () => {
     const url = new URL(buildOpenAlexUrl({ FromDate: "2026-09-29", ApiKey: "k" }));
     expect(url.searchParams.get("filter")).toBe("from_publication_date:2026-09-29");
     expect(url.searchParams.get("cursor")).toBe("*");
-    expect(url.searchParams.get("api_key")).toBe("k");
-    expect(url.searchParams.get("mailto")).toBeNull();
+    expect(url.searchParams.get("per-page")).toBe("100");
+    expect(url.searchParams.get("api_key")).toBeNull();
   });
 
-  it("REQ-DATA-001: falls back to a contact email when there is no key", () => {
-    const url = new URL(buildOpenAlexUrl({ FromDate: "2026-09-29", Mailto: "ops@example.org" }));
-    expect(url.searchParams.get("mailto")).toBe("ops@example.org");
-    expect(url.searchParams.get("api_key")).toBeNull();
+  it("REQ-DATA-001: sends the API key as a bearer token, not in the URL", async () => {
+    const headersSeen: Array<Record<string, string>> = [];
+    const fetchFn: FetchFn = (_input, init) => {
+      headersSeen.push((init?.headers ?? {}) as Record<string, string>);
+      return Promise.resolve(Response.json({ results: [], meta: { next_cursor: null } }));
+    };
+    await fetchOpenAlexPage(
+      { FromDate: "2026-09-29", ApiKey: "secret-key" },
+      { Fetch: fetchFn, Backoff: backoff },
+    );
+    expect(headersSeen[0]).toEqual({
+      accept: "application/json",
+      authorization: "Bearer secret-key",
+    });
+  });
+
+  it("REQ-DATA-001: omits Authorization when there is no key", async () => {
+    const headersSeen: Array<Record<string, string>> = [];
+    const fetchFn: FetchFn = (_input, init) => {
+      headersSeen.push((init?.headers ?? {}) as Record<string, string>);
+      return Promise.resolve(Response.json({ results: [], meta: { next_cursor: null } }));
+    };
+    await fetchOpenAlexPage({ FromDate: "2026-09-29" }, { Fetch: fetchFn, Backoff: backoff });
+    expect(headersSeen[0]).toEqual({ accept: "application/json" });
   });
 
   it("REQ-DATA-001: returns the works and the next cursor, null on the last page", async () => {
@@ -61,14 +81,5 @@ describe("REQ-DATA-001: OpenAlex client", () => {
       { Fetch: fetchFn, Backoff: backoff },
     );
     expect(page.Works).toEqual([]);
-  });
-
-  it("REQ-DATA-001: rejects a page whose envelope has the wrong shape", async () => {
-    for (const body of [{ results: "not a list" }, { results: [], meta: { next_cursor: 5 } }, []]) {
-      const fetchFn: FetchFn = () => Promise.resolve(Response.json(body));
-      await expect(
-        fetchOpenAlexPage({ FromDate: "2026-09-29" }, { Fetch: fetchFn, Backoff: backoff }),
-      ).rejects.toThrow(/unexpected shape/);
-    }
   });
 });

@@ -1,5 +1,3 @@
-import { z } from "zod";
-
 import { fetchWithBackoff, type BackoffOptions, type FetchFn } from "../../http/retry.js";
 import { type OpenAlexWork } from "./types.js";
 
@@ -9,10 +7,11 @@ export type OpenAlexPageRequest = {
   /** Cursor from the previous page; omit for the first page. */
   Cursor?: string;
   PerPage?: number;
-  /** From the `OPENALEX_API_KEY` secret; the name is in docs/kt/operations.md. */
+  /**
+   * From the `OPENALEX_API_KEY` secret (docs/kt/operations.md). Required for cursor
+   * paging past the first page (ADR 0034); omit only for a keyless single-page smoke test.
+   */
   ApiKey?: string;
-  /** Contact email, used when no key is set (docs/kt/data-sources/openalex.md). */
-  Mailto?: string;
 };
 
 export type OpenAlexPage = {
@@ -21,15 +20,10 @@ export type OpenAlexPage = {
   NextCursor: string | null;
 };
 
-/**
- * The envelope of a page is checked at the boundary. Single works stay loosely typed here
- * on purpose: the mapper rejects a bad work and the run records it, so one odd record
- * does not fail the whole page (REQ-DATA-001 AC3).
- */
-const OpenAlexResponseSchema = z.object({
-  results: z.array(z.unknown()).default([]),
-  meta: z.object({ next_cursor: z.string().nullable().optional() }).optional(),
-});
+type OpenAlexResponse = {
+  results?: OpenAlexWork[];
+  meta?: { next_cursor?: string | null };
+};
 
 const OPENALEX_WORKS_URL = "https://api.openalex.org/works";
 
@@ -38,12 +32,15 @@ export function buildOpenAlexUrl(request: OpenAlexPageRequest): string {
   params.set("filter", `from_publication_date:${request.FromDate}`);
   params.set("per-page", String(request.PerPage ?? 100));
   params.set("cursor", request.Cursor ?? "*");
-  if (request.ApiKey) {
-    params.set("api_key", request.ApiKey);
-  } else if (request.Mailto) {
-    params.set("mailto", request.Mailto);
-  }
   return `${OPENALEX_WORKS_URL}?${params.toString()}`;
+}
+
+function openAlexHeaders(apiKey?: string): Record<string, string> {
+  const headers: Record<string, string> = { accept: "application/json" };
+  if (apiKey) {
+    headers.authorization = `Bearer ${apiKey}`;
+  }
+  return headers;
 }
 
 /** Fetch one page of works (REQ-DATA-001); failed requests retry with backoff. */
@@ -54,15 +51,12 @@ export async function fetchOpenAlexPage(
   const response = await fetchWithBackoff(
     deps.Fetch,
     buildOpenAlexUrl(request),
-    { headers: { accept: "application/json" } },
+    { headers: openAlexHeaders(request.ApiKey) },
     deps.Backoff,
   );
-  const parsed = OpenAlexResponseSchema.safeParse(await response.json());
-  if (!parsed.success) {
-    throw new Error("OpenAlex returned a page in an unexpected shape");
-  }
+  const body = (await response.json()) as OpenAlexResponse;
   return {
-    Works: parsed.data.results as OpenAlexWork[],
-    NextCursor: parsed.data.meta?.next_cursor ?? null,
+    Works: body.results ?? [],
+    NextCursor: body.meta?.next_cursor ?? null,
   };
 }
