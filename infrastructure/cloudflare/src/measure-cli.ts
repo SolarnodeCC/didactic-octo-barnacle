@@ -25,25 +25,48 @@ export function parseWranglerRows(stdout: string): Row[] {
   return parsed.flatMap((statement) => statement.results ?? []);
 }
 
+/**
+ * `execFileSync` only says "Command failed" and keeps wrangler's own message in `stdout` and
+ * `stderr`. Show that message, and say what to do when the tables are missing. Wrangler prints
+ * the account only in its own output, so nothing secret is added here.
+ */
+export function describeWranglerFailure(error: unknown): string {
+  const failure = error as { stdout?: unknown; stderr?: unknown; message?: unknown };
+  const output = [failure.stderr, failure.stdout]
+    .map((part) => (typeof part === "string" ? part : Buffer.isBuffer(part) ? part.toString() : ""))
+    .join("\n")
+    .trim();
+  const text = output || (typeof failure.message === "string" ? failure.message : String(error));
+  const hint = /no such table/i.test(text)
+    ? "\nThe database has no tables yet. Run the workflow `Staging deploy` with migrations on, then measure again."
+    : "";
+  return `Measuring failed. Wrangler said:\n${text}${hint}`;
+}
+
 function wranglerExecute(environment: string): (sql: string) => Promise<Row[]> {
   return (sql) => {
-    const stdout = execFileSync(
-      "pnpm",
-      [
-        "exec",
-        "wrangler",
-        "d1",
-        "execute",
-        "DB",
-        "--env",
-        environment,
-        "--remote",
-        "--json",
-        "--command",
-        sql,
-      ],
-      { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 },
-    );
+    let stdout: string;
+    try {
+      stdout = execFileSync(
+        "pnpm",
+        [
+          "exec",
+          "wrangler",
+          "d1",
+          "execute",
+          "DB",
+          "--env",
+          environment,
+          "--remote",
+          "--json",
+          "--command",
+          sql,
+        ],
+        { encoding: "utf8", maxBuffer: 16 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] },
+      );
+    } catch (error) {
+      throw new Error(describeWranglerFailure(error), { cause: error });
+    }
     return Promise.resolve(parseWranglerRows(stdout));
   };
 }

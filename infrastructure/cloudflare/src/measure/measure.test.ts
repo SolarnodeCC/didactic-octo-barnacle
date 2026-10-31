@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 import { parseCostAssumptions, type CostAssumptions } from "./estimate.js";
 import { MEASUREMENT_QUERIES } from "./queries.js";
 import { buildReport, collectMeasurements, formatMarkdown, type Row } from "./report.js";
-import { parseWranglerRows } from "../measure-cli.js";
+import { describeWranglerFailure, parseWranglerRows } from "../measure-cli.js";
 import { applyMigrations } from "../migrations.js";
 
 const NOW = "2026-10-30T12:00:00.000Z";
@@ -375,5 +375,22 @@ describe("REQ-NFR-020: reading wrangler output", () => {
       { a: 1 },
       { a: 2 },
     ]);
+  });
+
+  it("REQ-NFR-020: shows wrangler's own error output when a query fails", () => {
+    const error = Object.assign(new Error("Command failed: pnpm exec wrangler"), {
+      stderr: "X [ERROR] some real cause",
+      stdout: "",
+    });
+    const message = describeWranglerFailure(error);
+    expect(message).toContain("some real cause");
+    expect(message).not.toContain("Staging deploy");
+  });
+
+  it("REQ-NFR-020: tells the operator to run Staging deploy when the tables are missing", () => {
+    const error = Object.assign(new Error("Command failed"), {
+      stderr: "D1_ERROR: no such table: ingestion_run: SQLITE_ERROR",
+    });
+    expect(describeWranglerFailure(error)).toContain("Staging deploy");
   });
 });
