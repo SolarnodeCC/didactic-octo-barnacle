@@ -76,7 +76,8 @@ name = "roi-pipeline-staging"
 vars = { ENVIRONMENT = "staging", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo-barnacle", ALERT_EMAIL_FROM = "onboarding@resend.dev" }
 
 [env.staging.triggers]
-crons = ["0 6 * * *", "30 7 * * *"]
+# The last two crons are TEMPORARY, for the first staging run on 31 Oct 2026.
+crons = ["0 6 * * *", "30 7 * * *", "30 16 * * *", "0 17 * * *"]
 
 # Keep the structured log lines (REQ-NFR-008) so a run can be followed afterwards.
 [env.staging.observability]

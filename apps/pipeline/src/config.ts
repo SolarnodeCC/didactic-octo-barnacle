@@ -39,6 +39,9 @@ export const DEFAULT_INGEST_CONFIG: IngestConfig = {
 export const CRON_SOURCES: Readonly<Record<string, "openalex" | "arxiv">> = {
   "0 6 * * *": "openalex",
   "30 7 * * *": "arxiv",
+  // TEMPORARY (31 Oct 2026): one-off first run on staging. Removed again in the next PR.
+  "30 16 * * *": "openalex",
+  "0 17 * * *": "arxiv",
 };
 
 /** Version of the queue message schema (docs/kt/architecture/defaults.md). */
