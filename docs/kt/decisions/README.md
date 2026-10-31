@@ -2,7 +2,7 @@
 title: Decisions index
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-10-31
 ---
 
 # Architecture decision records
@@ -44,6 +44,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0031](0031-author-erasure-list.md) | Author erasure keeps a keyed-hash list | Accepted |
 | [0032](0032-phase-1-cost-per-publication-is-an-estimate.md) | The phase 1 cost per publication is an estimate from real data | Accepted |
 | [0033](0033-repository-hardening-guardrails.md) | Repository hardening is enforced by a CI check | Accepted |
+| [0034](0034-openalex-free-api-key.md) | OpenAlex free API key for cursor paging | Accepted |
 
 ## When an ADR is needed
 
