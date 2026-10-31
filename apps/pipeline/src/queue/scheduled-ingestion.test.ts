@@ -45,8 +45,8 @@ describe("REQ-DATA-009: scheduled ingestion through the queue", () => {
 
     expect(h.Count("publication")).toBe(3);
     expect(h.OpenAlexRequests).toEqual([
-      { FromDate: "2026-09-30" },
-      { FromDate: "2026-09-30", Cursor: "cursor-2" },
+      { FromDate: "2026-09-30", SubfieldIds: [] },
+      { FromDate: "2026-09-30", SubfieldIds: [], Cursor: "cursor-2" },
     ]);
     const run = h.Run();
     expect(run["status"]).toBe("succeeded");

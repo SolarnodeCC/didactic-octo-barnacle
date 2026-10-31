@@ -20,7 +20,7 @@ The research collector fetches works from OpenAlex, with their authors, institut
 - Status: in-progress
 - Source: README roadmap phase 1 and Data Sources section
 - Acceptance criteria:
-  1. Works that match the configured ingestion scope (see [OpenAlex](../data-sources/openalex.md)) are fetched with their authors, institutions, topics, and citation counts.
+  1. Works that match the configured ingestion scope (see [OpenAlex](../data-sources/openalex.md)) are fetched with their authors, institutions, topics, and citation counts. The request filters on language and on the configured subfield IDs, and a returned work whose topics match none of the topic-map names is skipped, counted, and not stored.
   2. A repeated run does not create duplicate publications.
   3. A failed or rate-limited request is retried with exponential backoff up to the configured number of attempts; an item that still fails is recorded for the next run and does not stop the whole run. Each request has a timeout and a long `Retry-After` is capped (REQ-NFR-021).
   4. The abstract is reconstructed from `abstract_inverted_index` when OpenAlex provides one.

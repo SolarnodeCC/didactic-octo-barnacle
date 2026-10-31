@@ -24,7 +24,7 @@ Used for publications, authors, institutions, topics, and citations. OpenAlex is
 
 ## Ingestion
 
-- Scope: works filtered by publication date and by the topic map of the [ingestion scope](ingestion-scope.md).
+- Scope: works filtered by publication date, by language (`language:en`), and by the topic map of the [ingestion scope](ingestion-scope.md). The request carries the configured subfield IDs as `topics.subfield.id:A|B|…` (at most 100 values). The collector also checks every returned work against the topic-map names and skips a work that matches none, so scope holds even when the ID list is empty or OpenAlex returns more than asked. Skipped works are counted in the run report.
 - Incremental runs filter on publication date with an overlap window (REQ-DATA-009). Check which date filters the account tier supports; filters on update date may need a paid tier.
 - Use cursor paging for large result sets. Cursor paging past the first page needs a free API key (ADR 0034).
 - Use `per_page=100` and `select=` for only the fields above, so the daily budget goes further.

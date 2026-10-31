@@ -94,6 +94,7 @@ function buildDeps(env: Env): PipelineDeps {
           {
             FromDate: request.FromDate,
             PerPage: config.PageSize,
+            ...(request.SubfieldIds ? { SubfieldIds: request.SubfieldIds } : {}),
             ...(request.Cursor ? { Cursor: request.Cursor } : {}),
             ...(env.OPENALEX_API_KEY ? { ApiKey: env.OPENALEX_API_KEY } : {}),
           },

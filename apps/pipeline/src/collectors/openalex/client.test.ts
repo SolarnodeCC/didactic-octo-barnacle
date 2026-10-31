@@ -18,10 +18,19 @@ describe("REQ-DATA-001: OpenAlex client", () => {
 
   it("REQ-DATA-001: filters on the start date and starts at the first cursor", () => {
     const url = new URL(buildOpenAlexUrl({ FromDate: "2026-09-29", ApiKey: "k" }));
-    expect(url.searchParams.get("filter")).toBe("from_publication_date:2026-09-29");
+    expect(url.searchParams.get("filter")).toBe("from_publication_date:2026-09-29,language:en");
     expect(url.searchParams.get("cursor")).toBe("*");
     expect(url.searchParams.get("per-page")).toBe("100");
     expect(url.searchParams.get("api_key")).toBeNull();
+  });
+
+  it("REQ-DATA-001: filters on the configured subfield IDs when there are any", () => {
+    const url = new URL(
+      buildOpenAlexUrl({ FromDate: "2026-09-29", SubfieldIds: ["1710", " 1709 ", ""] }),
+    );
+    expect(url.searchParams.get("filter")).toBe(
+      "from_publication_date:2026-09-29,language:en,topics.subfield.id:1710|1709",
+    );
   });
 
   it("REQ-DATA-001: sends the API key as a bearer token, not in the URL", async () => {

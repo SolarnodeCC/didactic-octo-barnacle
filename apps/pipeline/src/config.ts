@@ -1,3 +1,5 @@
+import { PILOT_OPENALEX_TOPIC_NAMES } from "./normalize/scope.js";
+
 /**
  * Runtime defaults for scheduled ingestion. The values are the ones in
  * docs/kt/architecture/defaults.md; changing them is a reviewed pull request.
@@ -15,6 +17,17 @@ export type IngestConfig = {
   /** Seconds before the next arXiv page is delivered (`arxiv.min_request_interval_ms`). */
   ArxivPageDelaySeconds: number;
   Http: { MaxAttempts: number; BaseMs: number };
+  /** What an OpenAlex work must match to be stored (docs/kt/data-sources/ingestion-scope.md). */
+  OpenAlexScope: {
+    /** Field and subfield names of the topic map; a work needs one of them (REQ-DATA-001 AC1). */
+    TopicNames: readonly string[];
+    /**
+     * OpenAlex subfield IDs (for example `1710`) sent as a server-side filter so out-of-scope
+     * works are never downloaded. Empty means no server-side filter: only the name check
+     * above keeps works out. Fill from the OpenAlex taxonomy; see ingestion-scope.md.
+     */
+    SubfieldIds: readonly string[];
+  };
   Pdf: {
     MaxBytes: number;
     TimeoutMs: number;
@@ -32,6 +45,7 @@ export const DEFAULT_INGEST_CONFIG: IngestConfig = {
   RunTimeoutHours: 6,
   ArxivPageDelaySeconds: 3,
   Http: { MaxAttempts: 3, BaseMs: 500 },
+  OpenAlexScope: { TopicNames: PILOT_OPENALEX_TOPIC_NAMES, SubfieldIds: [] },
   Pdf: { MaxBytes: 25 * 1024 * 1024, TimeoutMs: 20_000, MaxRedirects: 3, AllowedHosts: [] },
 };
 

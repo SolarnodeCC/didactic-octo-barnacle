@@ -4,7 +4,11 @@ import { mapArxivEntry } from "../collectors/arxiv/map-entry.js";
 import { type ArxivEntry } from "../collectors/arxiv/types.js";
 import { mapOpenAlexWork } from "../collectors/openalex/map-work.js";
 import { type OpenAlexWork } from "../collectors/openalex/types.js";
-import { isArxivCategoryInScope, PILOT_ARXIV_CATEGORIES } from "../normalize/scope.js";
+import {
+  isArxivCategoryInScope,
+  isOpenAlexTopicsInScope,
+  PILOT_ARXIV_CATEGORIES,
+} from "../normalize/scope.js";
 import { ErasureConfigError } from "../privacy/author-key.js";
 import { upsertMappedRecord, type MappedRecord } from "../store/publication-repo.js";
 import { type SqlDatabase } from "../store/sql.js";
@@ -67,14 +71,33 @@ async function ingestItem(
   }
 }
 
-/** Store a page of OpenAlex works (REQ-DATA-001). */
+function openAlexTopicNames(work: OpenAlexWork): string[] {
+  return (work.topics ?? [])
+    .flatMap((topic) => [
+      topic.display_name,
+      topic.field?.display_name,
+      topic.subfield?.display_name,
+    ])
+    .filter((value): value is string => Boolean(value));
+}
+
+/**
+ * Store a page of OpenAlex works (REQ-DATA-001). A work whose topics, fields, and subfields
+ * match none of `topicNames` is skipped and never stored, whatever the server-side filter did.
+ */
 export async function ingestOpenAlexWorks(
   deps: IngestDeps,
   works: OpenAlexWork[],
+  topicNames: readonly string[],
 ): Promise<IngestResult> {
   const result = emptyResult();
   const fetchedAt = deps.Now();
   for (const work of works) {
+    if (!isOpenAlexTopicsInScope(openAlexTopicNames(work), topicNames)) {
+      result.Counts.Fetched += 1;
+      result.Counts.Skipped += 1;
+      continue;
+    }
     await ingestItem(deps, result, work.id, () => mapOpenAlexWork(work, fetchedAt));
   }
   return result;
