@@ -1,0 +1,51 @@
+name: Staging measure
+
+# Manual read-only report of the phase 1 measurements on staging (docs/kt/roadmap.md, exit
+# criteria; ADR 0032). It runs SELECT queries against the staging database and prints the
+# volume, data quality, and the cost per publication ESTIMATE as the job summary and in the
+# log. It changes nothing. Run it a few days after the first scheduled runs.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-measure
+  cancel-in-progress: false
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Enable Corepack and pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.18.2 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Measure
+        working-directory: infrastructure/cloudflare
+        run: |
+          node dist/measure-cli.js --env staging --json-out "$RUNNER_TEMP/phase1.json" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "::group::Raw report (JSON)"
+          cat "$RUNNER_TEMP/phase1.json"
+          echo
+          echo "::endgroup::"

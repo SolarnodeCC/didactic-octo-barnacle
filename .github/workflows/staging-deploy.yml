@@ -1,0 +1,95 @@
+name: Staging deploy
+
+# Manual deploy of the collector Worker to staging (REQ-NFR-002, REQ-NFR-020, ADR 0020).
+# It applies the database migrations first (they are expand-only, so the running Worker
+# keeps working), then uploads the Worker together with its secrets in one version.
+# The GitHub environment `staging` supplies:
+#   secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, ERASURE_HASH_KEY (required),
+#            OPENALEX_API_KEY, ALERT_GITHUB_TOKEN, RESEND_API_KEY (optional)
+#   variable: ALERT_EMAIL_TO (optional)
+# A missing optional value only switches that feature off. See docs/kt/operations.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      migrate:
+        description: "Apply pending database migrations before the deploy"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Only the reviewed code on main goes to staging.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: staging
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Enable Corepack and pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.18.2 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Check the erasure key
+        env:
+          ERASURE_HASH_KEY: ${{ secrets.ERASURE_HASH_KEY }}
+        run: |
+          # Without this key the Worker stops ingesting (REQ-NFR-016). Only the length is checked.
+          if [ "${#ERASURE_HASH_KEY}" -lt 32 ]; then
+            echo "::error::ERASURE_HASH_KEY is missing or shorter than 32 characters in the secrets of the environment staging"
+            exit 1
+          fi
+
+      - name: Apply migrations
+        if: ${{ inputs.migrate }}
+        working-directory: infrastructure/cloudflare
+        run: pnpm exec wrangler d1 migrations apply DB --env staging --remote
+
+      - name: Deploy the Worker with its secrets
+        working-directory: infrastructure/cloudflare
+        env:
+          ERASURE_HASH_KEY: ${{ secrets.ERASURE_HASH_KEY }}
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          ALERT_GITHUB_TOKEN: ${{ secrets.ALERT_GITHUB_TOKEN }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ALERT_EMAIL_TO: ${{ vars.ALERT_EMAIL_TO }}
+        run: |
+          umask 077
+          secrets_file="$RUNNER_TEMP/worker-secrets.json"
+          # The file is built from the environment by node, so no value passes through the shell.
+          node -e 'const out = {}; for (const key of ["ERASURE_HASH_KEY", "OPENALEX_API_KEY", "ALERT_GITHUB_TOKEN", "RESEND_API_KEY"]) { if (process.env[key]) out[key] = process.env[key]; } process.stdout.write(JSON.stringify(out));' > "$secrets_file"
+          args=(--env staging --secrets-file "$secrets_file" --message "Deploy ${GITHUB_SHA::7} from GitHub Actions")
+          if [ -n "$ALERT_EMAIL_TO" ]; then
+            args+=(--var "ALERT_EMAIL_TO:$ALERT_EMAIL_TO")
+          fi
+          pnpm exec wrangler deploy "${args[@]}"
+
+      - name: Remove the secrets file
+        if: ${{ always() }}
+        run: rm -f "$RUNNER_TEMP/worker-secrets.json"
+
+      - name: Show the live deployment
+        working-directory: infrastructure/cloudflare
+        run: pnpm exec wrangler deployments list --env staging

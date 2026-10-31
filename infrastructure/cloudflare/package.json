@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "bin": {
-    "roi-bootstrap": "./dist/bootstrap-cli.js"
+    "roi-bootstrap": "./dist/bootstrap-cli.js",
+    "roi-measure": "./dist/measure-cli.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -12,7 +13,8 @@
     "test": "vitest run",
     "test:unit": "vitest run",
     "bootstrap": "node ./dist/bootstrap-cli.js",
-    "migrations:list": "node ./dist/list-migrations.js"
+    "migrations:list": "node ./dist/list-migrations.js",
+    "measure": "node ./dist/measure-cli.js"
   },
   "dependencies": {
     "@roi/models": "workspace:*"

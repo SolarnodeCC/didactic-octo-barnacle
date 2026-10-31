@@ -45,7 +45,7 @@ Model spending stays within a configured budget.
 - Source: KT review of cost and volume
 - Depends on: REQ-NFR-003
 - Acceptance criteria:
-  1. A daily budget for model calls is configured per environment. Before calibration it is the daily limit times the measured cost per publication times 1.5, and phase 2 does not start without that measurement.
+  1. A daily budget for model calls is configured per environment. Before calibration it is the daily limit times the cost per publication times 1.5. At the start of phase 2 the cost per publication is the estimate from phase 1 data (ADR 0032); the first measured cost from phase 2 model calls replaces it. Phase 2 does not start without the estimate.
   2. When the budget is reached, no new pipeline runs start that day; running steps finish.
   3. Cost per publication and per opportunity is reported for each run.
 - Verification: integration test with a stubbed gateway and a low budget

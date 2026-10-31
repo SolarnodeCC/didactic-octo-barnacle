@@ -35,7 +35,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-009 | Dashboard on Workers with the OpenNext adapter | ADR 0012 |
 | OQ-012 | Narrow pilot scope with a topic map; daily volume is measured in phase 1 | [Ingestion scope](data-sources/ingestion-scope.md) |
 | OQ-023 | Global model-call limit in a Durable Object semaphore | ADR 0017 |
-| OQ-013 | Provisional phase 2 budget = daily limit × measured cost per publication × 1.5, recalculated after phase 1; phase 2 does not start without a measured cost per publication | REQ-NFR-005 |
+| OQ-013 | Provisional phase 2 budget = daily limit × cost per publication × 1.5, where phase 1 estimates the cost per publication from real data (ADR 0032) and the first model calls of phase 2 replace the estimate; phase 2 does not start without the estimate | REQ-NFR-005 |
 | OQ-016 | Thin end-to-end slice first: one publication through every layer with stubbed agents by the end of phase 2 | REQ-PROC-007, [roadmap](roadmap.md) |
 | OQ-019 | Single owner `@SolarnodeCC` for the MVP; splitting by role is OQ-034 | [KT README](README.md#ownership) |
 | OQ-020 | Benchmark two or three models per agent on the golden set in phase 3; the eval judge uses a different provider than the agent it grades | [AI evals](test/ai-evals.md) |
