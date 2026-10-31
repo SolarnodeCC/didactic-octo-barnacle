@@ -8,6 +8,11 @@ export type OpenAlexPageRequest = {
   Cursor?: string;
   PerPage?: number;
   /**
+   * OpenAlex subfield IDs of the topic map (REQ-DATA-001 AC1). Empty or omitted sends no
+   * topic filter. English is always required: the pilot is English only.
+   */
+  SubfieldIds?: readonly string[];
+  /**
    * From the `OPENALEX_API_KEY` secret (docs/kt/operations.md). Required for cursor
    * paging past the first page (ADR 0034); omit only for a keyless single-page smoke test.
    */
@@ -29,7 +34,13 @@ const OPENALEX_WORKS_URL = "https://api.openalex.org/works";
 
 export function buildOpenAlexUrl(request: OpenAlexPageRequest): string {
   const params = new URLSearchParams();
-  params.set("filter", `from_publication_date:${request.FromDate}`);
+  const filters = [`from_publication_date:${request.FromDate}`, "language:en"];
+  const subfields = (request.SubfieldIds ?? []).map((id) => id.trim()).filter(Boolean);
+  if (subfields.length > 0) {
+    // One filter with OR values; OpenAlex allows at most 100 of them.
+    filters.push(`topics.subfield.id:${subfields.join("|")}`);
+  }
+  params.set("filter", filters.join(","));
   params.set("per-page", String(request.PerPage ?? 100));
   params.set("cursor", request.Cursor ?? "*");
   return `${OPENALEX_WORKS_URL}?${params.toString()}`;

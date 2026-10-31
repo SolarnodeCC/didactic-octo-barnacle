@@ -16,10 +16,12 @@ The locked pilot scope for phase 1. It is deliberately narrow: measure volume an
 |---|---|---|
 | arXiv categories | `cs.AI`, `cs.SE`, `cs.HC`, `cs.CY` (primary or cross-listed) | locked for phase 1 |
 | OpenAlex window | works published in the last 30 days at the first run (REQ-DATA-009), then incremental | locked for phase 1 |
-| OpenAlex topics | topics whose field or subfield appears in the topic map below | locked names; IDs filled when the collector is built |
+| OpenAlex topics | topics whose field or subfield appears in the topic map below | locked names; subfield IDs still to be filled (see below) |
 | Languages | English only (also the language of the interface, agent outputs, and briefs) | locked |
 | Daily limit to extraction | 100 publications | provisional until phase 1 volume is measured |
 | Day boundary | UTC | locked |
+
+The OpenAlex request filters on subfield IDs, but the IDs are not looked up yet: `OpenAlexScope.SubfieldIds` in `apps/pipeline/src/config.ts` is empty. Until it is filled, only the name check keeps out-of-scope works from being stored, and the collector still downloads them (they count as `Skipped`). Look the IDs up in the OpenAlex taxonomy with an API key, store them in that setting, and compare the `Skipped` share of `Staging measure` before and after. The names in the map must also match the names OpenAlex returns; a name that never matches silently drops its works, so check the `Skipped` share on the first staging runs.
 
 The limit and the map are configuration, not code. Changing them is a reviewed pull request that records the reason.
 

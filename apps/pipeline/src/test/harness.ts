@@ -46,7 +46,7 @@ export function makeWork(
 
 /** A work the mapper cannot store, to prove one bad item does not stop a page. */
 export function makeBrokenWork(): OpenAlexWork {
-  return { title: "No id at all" } as unknown as OpenAlexWork;
+  return { title: "No id at all", topics: baseWork.topics } as unknown as OpenAlexWork;
 }
 
 export function makeEntry(n: number, updated: string): ArxivEntry {

@@ -25,7 +25,11 @@ export type PipelineDeps = {
   /** The only way a PDF is downloaded (REQ-DATA-010 AC4). */
   FetchPdf: (url: string) => Promise<FetchedPdf>;
   Sources: {
-    FetchOpenAlexPage: (request: { FromDate: string; Cursor?: string }) => Promise<OpenAlexPage>;
+    FetchOpenAlexPage: (request: {
+      FromDate: string;
+      Cursor?: string;
+      SubfieldIds?: readonly string[];
+    }) => Promise<OpenAlexPage>;
     FetchArxivPage: (request: { Start: number; MaxResults: number }) => Promise<ArxivPage>;
   };
   /** Structured log line; the worker writes JSON, tests can leave it out (REQ-NFR-008 AC1). */

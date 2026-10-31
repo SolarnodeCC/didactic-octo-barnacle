@@ -31,10 +31,15 @@ async function fetchAndIngest(deps: PipelineDeps, run: RunRow, page: number): Pr
   if (run.Source === "openalex") {
     const fetched = await deps.Sources.FetchOpenAlexPage({
       FromDate: from,
+      SubfieldIds: deps.Config.OpenAlexScope.SubfieldIds,
       ...(run.PageCursor ? { Cursor: run.PageCursor } : {}),
     });
     return {
-      Result: await ingestOpenAlexWorks(ingestDeps, fetched.Works),
+      Result: await ingestOpenAlexWorks(
+        ingestDeps,
+        fetched.Works,
+        deps.Config.OpenAlexScope.TopicNames,
+      ),
       HasMore: fetched.NextCursor !== null && fetched.Works.length > 0,
       NextCursor: fetched.NextCursor,
     };

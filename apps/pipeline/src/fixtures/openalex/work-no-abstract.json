@@ -8,7 +8,13 @@
   },
   "abstract_inverted_index": null,
   "authorships": [],
-  "topics": [],
+  "topics": [
+    {
+      "display_name": "Software engineering practice",
+      "field": { "display_name": "Computer science" },
+      "subfield": { "display_name": "Software engineering" }
+    }
+  ],
   "cited_by_count": 0,
   "language": "en",
   "is_retracted": false,

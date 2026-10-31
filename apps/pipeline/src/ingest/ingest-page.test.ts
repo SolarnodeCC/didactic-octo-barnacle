@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import { ingestArxivEntries, ingestOpenAlexWorks, type IngestDeps } from "./ingest-page.js";
 import { parseArxivFeed } from "../collectors/arxiv/parse-feed.js";
 import { type OpenAlexWork } from "../collectors/openalex/types.js";
+import { PILOT_OPENALEX_TOPIC_NAMES } from "../normalize/scope.js";
 import { counter, createTestDatabase } from "../test/sqlite-d1.js";
 
 const fixtures = join(dirname(fileURLToPath(import.meta.url)), "../fixtures");
@@ -28,14 +29,39 @@ function setup() {
 }
 
 describe("REQ-DATA-001: OpenAlex page ingestion", () => {
+  it("REQ-DATA-001: a work outside the topic map is skipped and never stored", async () => {
+    const { deps, rows } = setup();
+    const outside = {
+      ...work("work-complete.json"),
+      topics: [
+        {
+          display_name: "Marine biology",
+          field: { display_name: "Agricultural and biological sciences" },
+          subfield: { display_name: "Aquatic science" },
+        },
+      ],
+    };
+    const result = await ingestOpenAlexWorks(
+      deps,
+      [outside, { ...outside, id: "https://openalex.org/W2", topics: [] }],
+      PILOT_OPENALEX_TOPIC_NAMES,
+    );
+
+    expect(result.Counts).toMatchObject({ Fetched: 2, Created: 0, Skipped: 2, Failed: 0 });
+    expect(rows("publication")).toBe(0);
+  });
+
   it("REQ-DATA-001: one failing item is recorded and does not stop the page", async () => {
     const { deps, rows } = setup();
-    const broken = { title: "No id" } as unknown as OpenAlexWork;
-    const result = await ingestOpenAlexWorks(deps, [
-      work("work-complete.json"),
-      broken,
-      work("work-no-abstract.json"),
-    ]);
+    const broken = {
+      title: "No id",
+      topics: work("work-complete.json").topics,
+    } as unknown as OpenAlexWork;
+    const result = await ingestOpenAlexWorks(
+      deps,
+      [work("work-complete.json"), broken, work("work-no-abstract.json")],
+      PILOT_OPENALEX_TOPIC_NAMES,
+    );
 
     expect(result.Counts).toEqual({
       Fetched: 3,
@@ -52,8 +78,8 @@ describe("REQ-DATA-001: OpenAlex page ingestion", () => {
   it("REQ-DATA-001: a repeated run creates no duplicates and counts the items as skipped", async () => {
     const { deps, rows } = setup();
     const works = [work("work-complete.json"), work("work-no-abstract.json")];
-    await ingestOpenAlexWorks(deps, works);
-    const again = await ingestOpenAlexWorks(deps, works);
+    await ingestOpenAlexWorks(deps, works, PILOT_OPENALEX_TOPIC_NAMES);
+    const again = await ingestOpenAlexWorks(deps, works, PILOT_OPENALEX_TOPIC_NAMES);
 
     expect(again.Counts).toMatchObject({ Created: 0, Updated: 0, Skipped: 2, Failed: 0 });
     expect(rows("publication")).toBe(2);
