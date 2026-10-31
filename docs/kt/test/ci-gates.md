@@ -2,8 +2,8 @@
 title: CI gates
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-10-29
-related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004]
+last_reviewed: 2026-10-31
+related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-NFR-021]
 ---
 
 # CI gates
@@ -24,10 +24,10 @@ When a gate is added, record the name of its status check here and add it to the
 
 | Status check | Gate |
 |---|---|
-| `parse` | Configuration check, KT check, workspace install |
-| `toolchain` | Lint, format check, typecheck, build, unit tests, traceability (REQ-TEST-001) |
+| `parse` | Configuration check, KT check, hardening check (REQ-NFR-021), workspace install |
+| `toolchain` | Dependency audit (REQ-NFR-021), lint, format check, typecheck, build, unit tests, traceability (REQ-TEST-001) |
 
-Integration tests and dependency review are added with the first Worker package and stay listed above until then.
+Dependency review is covered by `pnpm audit:ci` and Dependabot (ADR 0033); GitHub's dependency review action is added when the repository's dependency graph is on.
 
 ## Current CI
 
@@ -36,6 +36,7 @@ Integration tests and dependency review are added with the first Worker package 
 ```bash
 python3 scripts/check-config.py
 python3 scripts/check-kt.py
+python3 scripts/check-hardening.py
 ```
 
 It also runs the `install` command from `.cursor/environment.json` twice to prove it is idempotent.
@@ -43,6 +44,7 @@ It also runs the `install` command from `.cursor/environment.json` twice to prov
 `.github/workflows/ci.yml` runs the phase 1 toolchain gates:
 
 ```bash
+pnpm audit:ci
 pnpm lint
 pnpm format:check
 pnpm build

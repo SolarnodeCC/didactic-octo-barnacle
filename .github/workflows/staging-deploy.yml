@@ -19,6 +19,7 @@ on:
 
 permissions:
   contents: read
+  checks: read
 
 concurrency:
   group: staging-deploy
@@ -36,6 +37,21 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Require green checks for this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Staging only gets a commit whose pull request checks passed (REQ-NFR-021).
+          for check in parse toolchain; do
+            conclusion=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs?check_name=$check&filter=latest" --jq '.check_runs | sort_by(.completed_at) | last | .conclusion')
+            if [ "$conclusion" != "success" ]; then
+              echo "::error::The check '$check' has no successful run for $GITHUB_SHA (found: ${conclusion:-none})"
+              exit 1
+            fi
+          done
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:

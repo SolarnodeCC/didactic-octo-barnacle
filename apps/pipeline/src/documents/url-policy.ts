@@ -14,6 +14,26 @@ export type UrlCheck = { Ok: true; Url: URL } | { Ok: false; Reason: string };
 
 const INTERNAL_SUFFIXES = [".localhost", ".local", ".internal", ".lan", ".home.arpa", ".intranet"];
 
+/**
+ * Public wildcard-DNS services: `10.0.0.1.nip.io` is a public name that resolves to the
+ * address inside it. The Worker cannot resolve DNS, so these names are refused up front
+ * (ADR 0029, REQ-NFR-021).
+ */
+const WILDCARD_DNS_DOMAINS = [
+  "nip.io",
+  "sslip.io",
+  "xip.io",
+  "localtest.me",
+  "lvh.me",
+  "local.gd",
+  "vcap.me",
+  "traefik.me",
+  "lacolhost.com",
+];
+
+/** An IPv4 address written into a name, as `10.0.0.1.example.org` or `10-0-0-1.example.org`. */
+const EMBEDDED_IPV4 = /(^|[.-])\d{1,3}([.-])\d{1,3}\2\d{1,3}\2\d{1,3}($|[.-])/;
+
 function isIpLiteral(host: string): boolean {
   // `new URL` turns decimal, octal, and hex IPv4 forms into dotted form first.
   return host.startsWith("[") || /^\d{1,3}(\.\d{1,3}){3}$/.test(host);
@@ -52,6 +72,12 @@ export function checkPdfUrl(raw: string, policy: UrlPolicy): UrlCheck {
   }
   if (INTERNAL_SUFFIXES.some((suffix) => host.endsWith(suffix))) {
     return { Ok: false, Reason: "host looks internal" };
+  }
+  if (
+    WILDCARD_DNS_DOMAINS.some((domain) => host === domain || host.endsWith(`.${domain}`)) ||
+    EMBEDDED_IPV4.test(host)
+  ) {
+    return { Ok: false, Reason: "host name embeds an IP address" };
   }
   if (policy.AllowedHosts.length > 0 && !matchesAllowed(host, policy.AllowedHosts)) {
     return { Ok: false, Reason: `host ${host} is not on the allowlist` };

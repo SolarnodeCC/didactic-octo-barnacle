@@ -68,6 +68,7 @@ Alerts reach people by email and open a GitHub issue.
   3. A repeated alert with the same key (type, environment, source) within 24 hours adds a comment to the open issue instead of opening another issue or email.
   4. An alert never contains publication text, prompts, user data, or secrets.
   5. The alert credentials are secrets listed in [operations](../../operations.md); the GitHub token can only create and comment on issues.
+  6. A retry cannot duplicate an alert: the email carries an idempotency key, and an issue or comment request is retried only after a 429 (REQ-NFR-021).
 - Verification: integration test with stubbed email and GitHub clients
 
 ### REQ-NFR-020: Migrations and environment bootstrap

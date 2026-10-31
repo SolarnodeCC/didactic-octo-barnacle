@@ -62,4 +62,13 @@ describe("REQ-DATA-001: OpenAlex client", () => {
     );
     expect(page.Works).toEqual([]);
   });
+
+  it("REQ-DATA-001: rejects a page whose envelope has the wrong shape", async () => {
+    for (const body of [{ results: "not a list" }, { results: [], meta: { next_cursor: 5 } }, []]) {
+      const fetchFn: FetchFn = () => Promise.resolve(Response.json(body));
+      await expect(
+        fetchOpenAlexPage({ FromDate: "2026-09-29" }, { Fetch: fetchFn, Backoff: backoff }),
+      ).rejects.toThrow(/unexpected shape/);
+    }
+  });
 });

@@ -29,3 +29,4 @@ Option 1. "Allowlisted" means that one fetcher is the only code allowed to downl
 - The Worker cannot resolve DNS, so it cannot detect a public name that points to a private address. Cloudflare does not route a Worker's requests to its own internal network, which limits the harm; a host list closes the gap when needed.
 - A file that can never be fetched is completed with its reason in the message log; a transient failure is retried and can be dead-lettered and replayed.
 - Moving to option 2 later is a configuration change, not a code change.
+- Update 2026-10-31 (ADR 0033): names that embed an IP address (`10.0.0.1.example.org`, `10-0-0-1.example.org`) and public wildcard-DNS services such as `nip.io` are refused too. They are public names that point inside a network, which the Worker cannot see by resolving DNS.

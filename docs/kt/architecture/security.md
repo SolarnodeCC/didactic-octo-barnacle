@@ -2,8 +2,8 @@
 title: Security and data protection
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
-related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-NFR-009, REQ-NFR-011, REQ-NFR-012, REQ-NFR-013, REQ-NFR-014, REQ-NFR-015, REQ-NFR-016, REQ-DATA-010, REQ-AGENT-013]
+last_reviewed: 2026-10-31
+related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-NFR-009, REQ-NFR-011, REQ-NFR-012, REQ-NFR-013, REQ-NFR-014, REQ-NFR-015, REQ-NFR-016, REQ-NFR-021, REQ-DATA-010, REQ-AGENT-013]
 ---
 
 # Security and data protection
@@ -23,11 +23,13 @@ related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-N
 | Mass signup or token guessing | No public registration; rate limits; 128-bit tokens stored as hashes | REQ-ACC-002, REQ-ACC-005 |
 | Secrets exposed to untrusted code in CI | Pull request jobs run without secrets; live evals only for branches in this repository, in a protected `evals` environment that requires reviewer approval (ADR 0006) | REQ-TEST-003, REQ-TEST-004 |
 | Redistribution of copyrighted papers | License recorded per document; PDFs stored and served only when the license allows it | REQ-DATA-010 |
-| Vulnerable dependencies | Dependabot, pinned versions, and a dependency review gate in CI | see [CI gates](../test/ci-gates.md) |
+| Vulnerable dependencies | Dependabot for npm, pip, and GitHub Actions; pinned versions; `pnpm audit:ci` in CI (ADR 0033) | REQ-NFR-021, see [CI gates](../test/ci-gates.md) |
+| A CI or deploy change weakens the pipeline's own security | `scripts/check-hardening.py` fails the pull request: SHA-pinned actions, no stored checkout token, least-privilege `permissions`, no `pull_request_target`, no script injection, default code owner; staging deploys only after green checks | REQ-NFR-021 |
+| A hung or hostile upstream stalls the Worker, or a retry duplicates an alert | Timeout per request, capped `Retry-After`, no retry of a non-idempotent request after an unclear outcome, Resend idempotency key | REQ-NFR-021 |
 
 ## PDF fetcher
 
-`apps/pipeline/src/documents` holds the only code that downloads PDFs. It accepts `https` on port 443 and public host names; it refuses IP addresses in any notation, `localhost`, single-label names, and names ending in `.local`, `.internal`, `.lan`, or `.home.arpa`. It follows at most three redirects and checks each target again, reads at most `pdf.max_bytes`, stops at `pdf.timeout_ms`, and accepts a file only when it is served as `application/pdf` and starts with `%PDF-`. Workers cannot resolve DNS, so a public name that points to a private address is not detected by the Worker; Cloudflare does not route a Worker's requests to its own internal network, and `pdf.allowed_hosts` narrows the reach further when needed. The URL and license always come from the stored source record, never from a queue message.
+`apps/pipeline/src/documents` holds the only code that downloads PDFs. It accepts `https` on port 443 and public host names; it refuses IP addresses in any notation, names that embed an IP address, public wildcard-DNS services such as `nip.io`, `localhost`, single-label names, and names ending in `.local`, `.internal`, `.lan`, or `.home.arpa`. It follows at most three redirects and checks each target again, reads at most `pdf.max_bytes`, stops at `pdf.timeout_ms`, and accepts a file only when it is served as `application/pdf` and starts with `%PDF-`. Workers cannot resolve DNS, so a public name that points to a private address is not detected by the Worker; Cloudflare does not route a Worker's requests to its own internal network, and `pdf.allowed_hosts` narrows the reach further when needed. The URL and license always come from the stored source record, never from a queue message.
 
 ## Authentication
 

@@ -10,6 +10,14 @@ export type EmailConfig = { ApiKey: string; From: string; To: string };
 
 type Deps = { Fetch: FetchFn; Backoff: BackoffOptions };
 
+/**
+ * GitHub has no idempotency key, so a retry after a 5xx or a timeout could open a second
+ * issue or add a second comment. Only a 429 is retried (REQ-NFR-019, REQ-NFR-021).
+ */
+function githubBackoff(backoff: BackoffOptions): BackoffOptions {
+  return { ...backoff, RetryAmbiguous: false };
+}
+
 const REPO_PATTERN = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
 
 function githubHeaders(token: string): Record<string, string> {
@@ -43,7 +51,7 @@ export async function createAlertIssue(
       headers: githubHeaders(config.Token),
       body: JSON.stringify({ title: issue.Title, body: issue.Body, labels: ["alert"] }),
     },
-    deps.Backoff,
+    githubBackoff(deps.Backoff),
   );
   const created = (await response.json()) as { number?: number };
   if (typeof created.number !== "number") {
@@ -63,7 +71,7 @@ export async function commentOnAlertIssue(
     deps.Fetch,
     `https://api.github.com/repos/${config.Repo}/issues/${issueNumber}/comments`,
     { method: "POST", headers: githubHeaders(config.Token), body: JSON.stringify({ body }) },
-    deps.Backoff,
+    githubBackoff(deps.Backoff),
   );
 }
 
@@ -73,6 +81,8 @@ export async function sendAlertEmail(
   deps: Deps,
   email: { Subject: string; Text: string },
 ): Promise<void> {
+  // One key for all tries of this email: Resend then sends it once, whatever is retried.
+  const idempotencyKey = crypto.randomUUID();
   await fetchWithBackoff(
     deps.Fetch,
     "https://api.resend.com/emails",
@@ -81,6 +91,7 @@ export async function sendAlertEmail(
       headers: {
         authorization: `Bearer ${config.ApiKey}`,
         "content-type": "application/json",
+        "idempotency-key": idempotencyKey,
       },
       body: JSON.stringify({
         from: config.From,

@@ -57,6 +57,21 @@ describe("REQ-DATA-010: PDF URL policy", () => {
     }
   });
 
+  it("REQ-NFR-021: refuses public names that embed an IP address or use wildcard DNS", () => {
+    for (const url of [
+      "https://127.0.0.1.nip.io/a.pdf",
+      "https://169-254-169-254.sslip.io/a.pdf",
+      "https://app.localtest.me/a.pdf",
+      "https://anything.lvh.me/a.pdf",
+      "https://10.0.0.5.example.org/a.pdf",
+      "https://192-168-1-1.example.org/a.pdf",
+    ]) {
+      expect(refused(url), url).toMatch(/embeds an IP address|IP address/);
+    }
+    expect(checkPdfUrl("https://dspace.mit.edu/bitstream/1721.1/123/a.pdf", open).Ok).toBe(true);
+    expect(checkPdfUrl("https://arxiv.org/pdf/2401.00001", open).Ok).toBe(true);
+  });
+
   it("REQ-DATA-010: refuses credentials, odd ports, and a trailing-dot trick", () => {
     expect(refused("https://user:pw@example.org/a.pdf")).toMatch(/credentials/);
     expect(refused("https://example.org:8443/a.pdf")).toMatch(/port 443/);

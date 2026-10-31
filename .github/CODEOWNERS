@@ -1,3 +1,5 @@
+# Last match wins: every path has an owner, and the lines below name the sensitive ones.
+* @SolarnodeCC
 .cursor/** @SolarnodeCC
 .github/** @SolarnodeCC
 /AGENTS.md @SolarnodeCC

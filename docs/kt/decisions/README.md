@@ -43,6 +43,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0030](0030-alert-delivery-in-phase-1.md) | Alert delivery in phase 1 | Accepted |
 | [0031](0031-author-erasure-list.md) | Author erasure keeps a keyed-hash list | Accepted |
 | [0032](0032-phase-1-cost-per-publication-is-an-estimate.md) | The phase 1 cost per publication is an estimate from real data | Accepted |
+| [0033](0033-repository-hardening-guardrails.md) | Repository hardening is enforced by a CI check | Accepted |
 
 ## When an ADR is needed
 
