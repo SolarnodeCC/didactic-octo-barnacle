@@ -40,10 +40,10 @@ Do not invent credentials, commit secrets, or add a second license. Open a pull 
 
 ## Cursor Cloud specific instructions
 
-- The Cloud Agent base is Cursor's default image. There is no Dockerfile and no `start` command, because nothing needs to stay running.
-- `install` in `.cursor/environment.json` checks that `README.md` and `LICENSE` are present, that `git`, `node`, and `python3` are on `PATH`, and installs `scripts/requirements.txt`. Run that same command from the repository root to confirm the workspace. It is safe to run more than once.
-- `.cursor/worktrees.json` runs the same README, LICENSE, and tool checks when Cursor creates a worktree. `.cursor/mcp.json` has no project MCP servers. There is no `hooks.json` until a hook script exists.
-- There is no dev server, test suite, or application package install yet. Reading `docs/kt/` is the product check, `scripts/check-config.py` is the configuration check, and `scripts/check-kt.py` is the KT check.
-- When a lockfile arrives, add its package-manager install to `install` and keep the command idempotent. Start dev servers from `start`.
+- The Cloud Agent base is Cursor's default image. There is no Dockerfile and no `start` command, because nothing needs to stay running. Add `start` only when a long-running process exists.
+- `install` in `.cursor/environment.json` checks that `README.md` and `LICENSE` are present, that `git`, `node`, and `python3` are on `PATH`, requires Node 24 (ADR 0008; uses nvm when available), enables Corepack and prepares pnpm `10.18.2`, installs `scripts/requirements.txt`, and runs `pnpm install --frozen-lockfile`. Run that same command from the repository root to confirm the workspace. It is safe to run more than once; keep it idempotent when you extend it.
+- `.cursor/worktrees.json` runs the same README, LICENSE, Node 24, Corepack/pnpm, and `pnpm install --frozen-lockfile` steps when Cursor creates a worktree (it does not reinstall `scripts/requirements.txt`).
+- `.cursor/mcp.json` has no project MCP servers until agents need a live external system. There is no `hooks.json` until a hook script exists. Do not add empty project skills, hooks, or MCP servers for completeness.
+- Product guidance lives in `docs/kt/`. Configuration, KT, and hardening checks are `python3 scripts/check-config.py`, `python3 scripts/check-kt.py`, and `python3 scripts/check-hardening.py`. Workspace toolchain gates are `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm build`, `pnpm test:unit`, and `pnpm check:traceability`.
 - Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environment Secrets tab. Do not write them into this file or into `environment.json`.
 - A saved Cloud Agent environment uses this file only after its environment.json location points at `.cursor/environment.json`. Until then, the saved install command remains the one stored in the dashboard.
