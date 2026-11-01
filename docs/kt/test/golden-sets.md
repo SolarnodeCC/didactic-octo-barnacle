@@ -2,7 +2,7 @@
 title: Golden sets and reviewers
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-11-01
 related: [REQ-TEST-004, REQ-TEST-005, REQ-SCORE-006, REQ-AGENT-001]
 ---
 
@@ -33,6 +33,22 @@ Each industry slot owns that industry's golden-set labels. R5 and R6 both label 
 | Calibration (phase 4) | 60 scored opportunities | `packages/scoring/evals/calibration/` |
 
 Threshold files hold `{ "metric": "...", "minimum": number, "tolerance": number }` and are written before the first eval run for that step (REQ-TEST-005). Until written, the agent's REQ-AGENT-* "meets its eval threshold" AC is not runnable.
+
+## Threshold values
+
+The first values are the owner's decision of 2026-11-01 and count as approved when the pull request that adds the files is merged (REQ-TEST-005, criterion 4). They apply to every model tested for a step, so a model change is judged against the same bar (REQ-TEST-004, [model benchmark plan](model-benchmark-plan.md)).
+
+- `metric` is `entry-pass-rate`: the share of golden-set entries on which all checks of [AI evals](ai-evals.md) pass.
+- `minimum` is the required share.
+- `tolerance` is the allowed shortfall. A run fails when the share is below `minimum` minus `tolerance`. At 20 entries, 0.05 is exactly one entry.
+
+| Tier | Steps | Minimum | Entries to pass at 20 | Why |
+|---|---|---|---|---|
+| 1 | Triage, opportunity extraction, Relevance | 0.85 | 16 | Mostly mechanical checks: accept or reject, verbatim quotes, enums, and ranges. Evidence errors weigh on the explainability target (at least 95 %, [overview](../overview.md)). |
+| 2 | Research Analyst, Problem Discovery, Market Analysis, Competition | 0.75 | 14 | Judgment checked against acceptable ranges and required facts. |
+| 3 | Startup Generator | 0.7 | 13 | Free text graded by a model judge with a rubric. |
+
+The tiers follow the kind of check, not measured model quality. They serve the provisional targets of the overview (explainability and precision of High and Exceptional opportunities). After the first eval runs the thresholds are reviewed once with data ([AI evals](ai-evals.md)); until then they are not tuned to first results. Each file has the same `tolerance` of 0.05, so grow a golden set before tightening a threshold in steps smaller than one entry.
 
 ## Item format
 
