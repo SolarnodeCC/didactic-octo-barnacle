@@ -21,6 +21,7 @@ The owner decided the following on 2026-11-01.
 | Critic step | Out of scope. The pipeline stays as in [orchestration](../architecture/orchestration.md). A model judge for Startup Generator stays in the evals. |
 | Pass rule | The eval thresholds of REQ-TEST-005, written before the first run (see [Thresholds](#thresholds)). |
 | Benchmark budget | Model cost of at most 50 euro in total. |
+| Account plan | The account is on Workers Free today. Upgrade to Workers Paid before round one (see [Account plan](#account-plan)). |
 
 ## Scope
 
@@ -56,14 +57,28 @@ Cloudflare model pages as read on 2026-11-01. Prices are US dollars per million 
 | Relevance | `glm-5.3-flash`, `deepseek-v4.1-flash-1017` | No publication text, no search. |
 | Startup Generator | `glm-5.3`, `kimi-k2.6` | Synthesis of three earlier outputs. |
 
-Also worth a price and capability check before the run, not yet read: `gpt-oss-120b`, `gpt-oss-20b`, `gemma-4-26b-a4b-it`, and `nemotron-3-120b-a12b`.
+Also eligible, read on 2026-11-01. None of their pages shows a paid-plan notice, so the default limit of 300 requests per minute should apply (confirm in the first run). Add one to a step only to replace a candidate above.
+
+| Model | Context | Input / output | Notes |
+|---|---|---|---|
+| `gemma-4-26b-a4b-it` | 256k | $0.10 / $0.30 | Vision, reasoning, function calling, batch. Gemma licence. On the Workers Free plan. |
+| `gpt-oss-20b` | 128k | $0.20 / $0.30 | Reasoning, function calling, batch. |
+| `gpt-oss-120b` | 128k | $0.35 / $0.75 | Reasoning, function calling, batch. Possible for Market Analysis and Competition without the paid-model limit. |
+| `nemotron-3-120b-a12b` | 256k on the model page, 32k in the launch post | $0.50 / $1.50 | Reasoning, function calling. NVIDIA open model licence. Check the context before use. |
 
 Notes:
 
 - Keep two or three candidates per step. Every extra model multiplies the cost of a run.
 - Clairic is a preview. Its terms let Cloudflare stop it without compensation, so it is never the only model of a production step.
 - The largest candidate of a step serves as the reference for that step. There is no third-party reference.
-- Models marked as needing the Workers Paid plan or prepaid AI Gateway credit have a limit of 20 requests per minute per model (50 with prepaid credit). Check that the account has one of them before the run.
+- These candidates require the Workers Paid plan or prepaid AI Gateway credit, and have a limit of 20 requests per minute per account and model (50 with prepaid credit): `glm-5.3`, `glm-5.3-flash`, `deepseek-v4-pro-0813`, `deepseek-v4-flash-0731`, `deepseek-v4.1-flash-1017`, and `kimi-k2.6`. On the Workers Free plan they return a 403 (see [Account plan](#account-plan)).
+- `glm-4.7-flash` and `qwen3-30b-a3b-fp8` fall under the default limit of 300 requests per minute for text generation, as far as the pages show.
+
+## Account plan
+
+- The Cloudflare account is on Workers Free (owner, 2026-11-01). That plan includes 10,000 Workers AI neurons per day and blocks the models that need a paid plan with an HTTP 403.
+- Decision of 2026-11-01: upgrade to Workers Paid ($5 per month) before round one. The plan keeps the 10,000 free neurons per day and bills further use at $0.011 per 1,000 neurons. The upgrade is an action of the account owner. This plan does not do it, and a model that returns a 403 before the upgrade is not a finding.
+- Production needs the upgrade anyway. With the assumed 3k input and 1k output tokens per analysis agent, six agents for 300 candidates a day come to about 100,000 neurons per day on `gemma-4-26b-a4b-it` (about $1) and about 300,000 on `gpt-oss-120b` (about $3), against 10,000 free. Neuron prices come from the Workers AI pricing page. This is an assumption, not a measurement.
 
 ## Test data
 
@@ -126,7 +141,7 @@ Fixed before the first run.
 
 ## Extra measurements
 
-- **Rate limit:** measure requests per minute at 8 concurrent calls for each model that needs a paid plan. Check whether `glm-5.3-flash` falls under the 20-per-minute limit.
+- **Rate limit:** measure requests per minute at 8 concurrent calls for each model that needs a paid plan. REQ-AGENT-012 limits concurrent calls per provider, while these models limit requests per minute per model. Check whether the retry on 429 with `Retry-After` is enough, or whether the model-call helper needs a per-model request rate. This plan changes no requirement; report the result in the ADR.
 - **Cost:** fill `infrastructure/cloudflare/measure/cost-assumptions.json` with real prices and measured tokens, and compare with the ceiling of 2 euro per complete opportunity. Check whether AI Gateway returns cost for Workers AI models, or whether the price table of REQ-NFR-011 is needed.
 - **Batch:** test the asynchronous batch API for triage and extraction, where real time is not needed.
 - **Errors:** record 429 responses, timeouts, and `Retry-After` values.
@@ -148,7 +163,7 @@ Stop and ask the owner before the total model cost passes the budget of 50 euro.
 ## Steps
 
 1. Approve the threshold files (done by merging the pull request that adds them).
-2. Check the account plan, the rate limits, and the candidate list.
+2. Upgrade the account to Workers Paid (owner action), then confirm the rate limits and the candidate list.
 3. Prepare the golden sets: agent drafts, owner reviews, sample re-labeled.
 4. Build the harness on the shared model-call helper and the eval runner, with cost recording.
 5. Round one: all candidates, fixed prompt.
@@ -181,4 +196,4 @@ Status: **confirmed** (KT documents or Cloudflare documentation), **assumption**
 
 **Is Clairic a fit for extraction?** Not directly. It returns typed field values, while extraction returns a free sentence with a verbatim quote. Worth testing for Research Analyst fields. Assumption.
 
-**What stays open?** Which models the account may use (Workers Paid plan or prepaid credit), the rate limit of `glm-5.3-flash`, the golden sets with their labels, and the ADR with the result. See OQ-036.
+**What stays open?** The upgrade to Workers Paid (decided, not yet done), the golden sets with their labels, and the ADR with the result. See OQ-036.
