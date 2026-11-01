@@ -81,8 +81,9 @@ Ingestion runs on a schedule and fetches only what is new or changed since the l
 - Acceptance criteria:
   1. Each source has a configured schedule and a stored cursor or date of its last successful run. Only a run that finished without failed items moves the cursor, so the next run covers the items that failed.
   2. A run fetches records published or updated after that cursor, with a configured overlap window.
-  3. A first run backfills a configured window, for example the last 30 days.
-  4. Every run stores its start, end, record counts, and failures.
+  3. A first run backfills a configured window, by default the last 90 days. No run stores a publication dated more than that many days before the day of the run, also not a run that continues an earlier one.
+  4. A run that stops at the page cap without a failed item is continued by the next run of that source from the saved cursor, so the whole window is covered over several runs without fetching the same first pages again. Only the run that finishes the window moves the cursor of AC1, to the day the window began being fetched.
+  5. Every run stores its start, end, record counts, and failures.
 - Verification: integration test that runs ingestion twice over fixtures
 
 ## Document processing

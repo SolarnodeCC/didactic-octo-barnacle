@@ -39,7 +39,7 @@ export type IngestConfig = {
 
 export const DEFAULT_INGEST_CONFIG: IngestConfig = {
   OverlapDays: 2,
-  BackfillDays: 30,
+  BackfillDays: 90,
   MaxPagesPerRun: 50,
   PageSize: 100,
   RunTimeoutHours: 6,

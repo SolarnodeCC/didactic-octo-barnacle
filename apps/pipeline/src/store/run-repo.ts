@@ -17,6 +17,8 @@ export type RunRow = {
   StartedAt: string;
   EndedAt: string | null;
   WindowFrom: string | null;
+  /** End date of the window; a continued run keeps the one of the run it continues. */
+  WindowEnd: string | null;
   PageCursor: string | null;
   PagesDone: number;
   Counts: IngestionRunCounts;
@@ -30,6 +32,7 @@ type DbRun = {
   started_at: string;
   ended_at: string | null;
   window_from: string | null;
+  window_end: string | null;
   page_cursor: string | null;
   pages_done: number;
   counts_json: string;
@@ -59,7 +62,7 @@ export function appendFailures(
 }
 
 const RUN_COLUMNS =
-  "id, source, status, started_at, ended_at, window_from, page_cursor, pages_done, counts_json, failures_json";
+  "id, source, status, started_at, ended_at, window_from, window_end, page_cursor, pages_done, counts_json, failures_json";
 
 function toRun(row: DbRun): RunRow {
   return {
@@ -69,6 +72,7 @@ function toRun(row: DbRun): RunRow {
     StartedAt: row.started_at,
     EndedAt: row.ended_at,
     WindowFrom: row.window_from,
+    WindowEnd: row.window_end,
     PageCursor: row.page_cursor,
     PagesDone: row.pages_done,
     Counts: JSON.parse(row.counts_json) as IngestionRunCounts,
@@ -98,6 +102,23 @@ export async function findRunningRun(
   return row ? toRun(row) : null;
 }
 
+/**
+ * The newest run of a source that has ended, whatever its status. A `partial` run with a
+ * page cursor is continued by the next start (REQ-DATA-009).
+ */
+export async function lastFinishedRun(
+  db: SqlDatabase,
+  source: RunRow["Source"],
+): Promise<RunRow | null> {
+  const row = await db
+    .prepare(
+      `SELECT ${RUN_COLUMNS} FROM ingestion_run WHERE source = ? AND status != 'running' ORDER BY started_at DESC LIMIT 1`,
+    )
+    .bind(source)
+    .first<DbRun>();
+  return row ? toRun(row) : null;
+}
+
 /** End of the window of the last successful run (REQ-DATA-009 AC1). */
 export async function lastSuccessfulWindowEnd(
   db: SqlDatabase,
@@ -114,13 +135,29 @@ export async function lastSuccessfulWindowEnd(
 
 export async function createRun(
   db: SqlDatabase,
-  run: { Id: string; Source: RunRow["Source"]; StartedAt: string; WindowFrom: string },
+  run: {
+    Id: string;
+    Source: RunRow["Source"];
+    StartedAt: string;
+    WindowFrom: string;
+    WindowEnd: string;
+    /** Where the first page starts when this run continues an earlier one. */
+    PageCursor?: string;
+  },
 ): Promise<void> {
   await db
     .prepare(
-      "INSERT INTO ingestion_run (id, source, cursor, started_at, ended_at, counts_json, failures_json, status, window_from, page_cursor, pages_done) VALUES (?, ?, NULL, ?, NULL, ?, '[]', 'running', ?, NULL, 0)",
+      "INSERT INTO ingestion_run (id, source, cursor, started_at, ended_at, counts_json, failures_json, status, window_from, window_end, page_cursor, pages_done) VALUES (?, ?, NULL, ?, NULL, ?, '[]', 'running', ?, ?, ?, 0)",
     )
-    .bind(run.Id, run.Source, run.StartedAt, JSON.stringify(emptyCounts()), run.WindowFrom)
+    .bind(
+      run.Id,
+      run.Source,
+      run.StartedAt,
+      JSON.stringify(emptyCounts()),
+      run.WindowFrom,
+      run.WindowEnd,
+      run.PageCursor ?? null,
+    )
     .run();
 }
 

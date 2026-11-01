@@ -28,7 +28,7 @@ FROM ingestion_run GROUP BY day, source ORDER BY day, source`,
   },
   {
     // The arrival rate by publication date does not depend on when we ingested, so the
-    // 30-day backfill of the first run already gives a daily rate.
+    // 90-day backfill of the first run already gives a daily rate.
     Name: "publications_per_publication_day",
     Sql: `SELECT p.published_at AS day, s.source AS source, COUNT(DISTINCT p.id) AS publications
 FROM publication p JOIN source_record s ON s.publication_id = p.id

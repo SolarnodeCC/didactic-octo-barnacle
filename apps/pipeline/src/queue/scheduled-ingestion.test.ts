@@ -45,8 +45,8 @@ describe("REQ-DATA-009: scheduled ingestion through the queue", () => {
 
     expect(h.Count("publication")).toBe(3);
     expect(h.OpenAlexRequests).toEqual([
-      { FromDate: "2026-09-30", SubfieldIds: [] },
-      { FromDate: "2026-09-30", SubfieldIds: [], Cursor: "cursor-2" },
+      { FromDate: "2026-08-01", SubfieldIds: [] },
+      { FromDate: "2026-08-01", SubfieldIds: [], Cursor: "cursor-2" },
     ]);
     const run = h.Run();
     expect(run["status"]).toBe("succeeded");
@@ -58,13 +58,13 @@ describe("REQ-DATA-009: scheduled ingestion through the queue", () => {
     });
   });
 
-  it("REQ-DATA-009: a first run backfills 30 days and stores its start, end, counts, and failures", async () => {
+  it("REQ-DATA-009: a first run backfills 90 days and stores its start, end, counts, and failures", async () => {
     scriptTwoPages();
     await runScheduled(h.Deps, OPENALEX_CRON);
     await h.Drain();
 
     const run = h.Run();
-    expect(run["window_from"]).toBe("2026-09-30");
+    expect(run["window_from"]).toBe("2026-08-01");
     expect(run["started_at"]).toBe("2026-10-30T06:00:00.000Z");
     expect(run["ended_at"]).not.toBeNull();
     expect(run["cursor"]).toBe("2026-10-30");
@@ -318,7 +318,7 @@ describe("REQ-DATA-002: arXiv runs page by date and respect the delay", () => {
   it("REQ-DATA-002: an entry updated before the window ends the run and is not stored", async () => {
     const paged = createHarness({ PageSize: 2 });
     paged.SetArxivPages([
-      arxivPage([makeEntry(1, "2026-10-29T10:00:00Z"), makeEntry(2, "2026-08-01T10:00:00Z")]),
+      arxivPage([makeEntry(1, "2026-10-29T10:00:00Z"), makeEntry(2, "2026-07-15T10:00:00Z")]),
       arxivPage([makeEntry(3, "2026-07-01T10:00:00Z")]),
     ]);
     await runScheduled(paged.Deps, ARXIV_CRON);
@@ -327,6 +327,111 @@ describe("REQ-DATA-002: arXiv runs page by date and respect the delay", () => {
     expect(paged.ArxivRequests).toHaveLength(1);
     expect(paged.Count("publication")).toBe(1);
     expect(paged.Run()["status"]).toBe("succeeded");
+  });
+});
+
+describe("REQ-DATA-009: a run that stops at the page cap is continued by the next run", () => {
+  const capped = () => createHarness({ MaxPagesPerRun: 2 });
+
+  it("REQ-DATA-009: the next run continues at the saved cursor and the window closes once", async () => {
+    const c = capped();
+    c.SetOpenAlexPages([
+      openAlexPage([makeWork(1)], "c2"),
+      openAlexPage([makeWork(2)], "c3"),
+      openAlexPage([makeWork(3)], null),
+    ]);
+    await runScheduled(c.Deps, OPENALEX_CRON);
+    await c.Drain();
+    const first = c.Run();
+    expect(first["status"]).toBe("partial");
+    expect(first["page_cursor"]).toBe("c3");
+    expect(first["cursor"]).toBeNull();
+
+    c.Clock.Now = "2026-11-02T06:00:00.000Z";
+    await runScheduled(c.Deps, OPENALEX_CRON);
+    await c.Drain();
+
+    expect(c.OpenAlexRequests.map((request) => [request.FromDate, request.Cursor])).toEqual([
+      ["2026-08-01", undefined],
+      ["2026-08-01", "c2"],
+      ["2026-08-01", "c3"],
+    ]);
+    const second = c.Run();
+    expect(second["status"]).toBe("succeeded");
+    // The window ends on the day the chain began, so the next window overlaps all of it.
+    expect(second["cursor"]).toBe("2026-10-30");
+    expect(c.Count("publication")).toBe(3);
+
+    c.Clock.Now = "2026-11-03T06:00:00.000Z";
+    c.SetOpenAlexPages([openAlexPage([makeWork(3)], null)]);
+    await runScheduled(c.Deps, OPENALEX_CRON);
+    await c.Drain();
+    expect(c.Run()["window_from"]).toBe("2026-10-28");
+    expect(c.Count("publication")).toBe(3);
+  });
+
+  it("REQ-DATA-009: a continued run stores nothing older than 90 days before its own day", async () => {
+    const c = capped();
+    c.SetOpenAlexPages([
+      openAlexPage([makeWork(1)], "c2"),
+      openAlexPage([makeWork(2)], "c3"),
+      openAlexPage(
+        [
+          { ...makeWork(3), publication_date: "2026-08-05" },
+          { ...makeWork(4), publication_date: "2026-08-10" },
+        ],
+        null,
+      ),
+    ]);
+    await runScheduled(c.Deps, OPENALEX_CRON);
+    await c.Drain();
+
+    // 2026-08-07 is 90 days before 2026-11-05. The window of the first run began 2026-08-01.
+    c.Clock.Now = "2026-11-05T06:00:00.000Z";
+    await runScheduled(c.Deps, OPENALEX_CRON);
+    await c.Drain();
+
+    expect(c.OpenAlexRequests[2]).toMatchObject({ FromDate: "2026-08-01", Cursor: "c3" });
+    expect(c.Count("publication")).toBe(3);
+    expect(JSON.parse(c.Run()["counts_json"] as string)).toMatchObject({ Created: 1, Skipped: 1 });
+  });
+
+  it("REQ-DATA-009: a capped run with a failed item is not continued, so the item is covered again", async () => {
+    const c = capped();
+    c.SetOpenAlexPages([
+      openAlexPage([makeWork(1), makeBrokenWork()], "c2"),
+      openAlexPage([makeWork(2)], "c3"),
+    ]);
+    await runScheduled(c.Deps, OPENALEX_CRON);
+    await c.Drain();
+    expect(c.Run()["status"]).toBe("partial");
+
+    c.Clock.Now = "2026-10-31T06:00:00.000Z";
+    c.SetOpenAlexPages([openAlexPage([makeWork(1)], null)]);
+    await runScheduled(c.Deps, OPENALEX_CRON);
+    await c.Drain();
+
+    expect(c.OpenAlexRequests[2]?.Cursor).toBeUndefined();
+    expect(c.Run()["window_from"]).toBe("2026-08-02");
+  });
+
+  it("REQ-DATA-002: an arXiv run continues at the saved offset without storing an entry twice", async () => {
+    const a = createHarness({ PageSize: 2, MaxPagesPerRun: 1 });
+    a.SetArxivPages([
+      arxivPage([makeEntry(1, "2026-10-29T10:00:00Z"), makeEntry(2, "2026-10-29T09:00:00Z")]),
+      arxivPage([makeEntry(2, "2026-10-29T09:00:00Z"), makeEntry(3, "2026-10-28T09:00:00Z")], 1),
+    ]);
+    await runScheduled(a.Deps, ARXIV_CRON);
+    await a.Drain();
+    expect(a.Run()["status"]).toBe("partial");
+    expect(a.Run()["page_cursor"]).toBe("2");
+
+    a.Clock.Now = "2026-10-31T07:30:00.000Z";
+    await runScheduled(a.Deps, ARXIV_CRON);
+    await a.Drain();
+
+    expect(a.ArxivRequests.map((request) => request.Start)).toEqual([0, 2]);
+    expect(a.Count("publication")).toBe(3);
   });
 });
 

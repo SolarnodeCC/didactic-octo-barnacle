@@ -7,6 +7,7 @@ import {
   ingestOpenAlexWorks,
   type IngestResult,
 } from "../ingest/ingest-page.js";
+import { earliestWindowStart } from "../schedule/window.js";
 import { pendingDocumentIds } from "../store/document-repo.js";
 import { finishRunStatement, getRun, recordPageStatement, type RunRow } from "../store/run-repo.js";
 
@@ -18,7 +19,11 @@ type FetchedPage = {
   NextCursor: string | null;
 };
 
-async function fetchAndIngest(deps: PipelineDeps, run: RunRow, page: number): Promise<FetchedPage> {
+function max(left: string, right: string): string {
+  return left >= right ? left : right;
+}
+
+async function fetchAndIngest(deps: PipelineDeps, run: RunRow): Promise<FetchedPage> {
   const guard = deps.AuthorGuard;
   const ingestDeps = {
     Db: deps.Db,
@@ -26,11 +31,16 @@ async function fetchAndIngest(deps: PipelineDeps, run: RunRow, page: number): Pr
     NewId: deps.NewId,
     ...(guard ? { SuppressedAuthors: (ids: string[]) => guard.Suppressed(ids) } : {}),
   };
-  const from = run.WindowFrom ?? deps.Now().slice(0, 10);
+  const runDay = run.StartedAt.slice(0, 10);
+  // A run that continues an earlier one keeps that run's window so its saved cursor stays
+  // valid, but it never stores anything older than `BackfillDays` before its own day.
+  const requestFrom = run.WindowFrom ?? runDay;
+  const limit = earliestWindowStart(runDay, deps.Config.BackfillDays);
+  const from = max(requestFrom, limit);
 
   if (run.Source === "openalex") {
     const fetched = await deps.Sources.FetchOpenAlexPage({
-      FromDate: from,
+      FromDate: requestFrom,
       SubfieldIds: deps.Config.OpenAlexScope.SubfieldIds,
       ...(run.PageCursor ? { Cursor: run.PageCursor } : {}),
     });
@@ -39,24 +49,28 @@ async function fetchAndIngest(deps: PipelineDeps, run: RunRow, page: number): Pr
         ingestDeps,
         fetched.Works,
         deps.Config.OpenAlexScope.TopicNames,
+        limit,
       ),
       HasMore: fetched.NextCursor !== null && fetched.Works.length > 0,
       NextCursor: fetched.NextCursor,
     };
   }
 
+  // The offset of this page: kept in the run row, so a run that continues an earlier
+  // one starts where that one stopped.
   const pageSize = deps.Config.PageSize;
-  const fetched = await deps.Sources.FetchArxivPage({
-    Start: page * pageSize,
-    MaxResults: pageSize,
-  });
+  const start = Number(run.PageCursor ?? 0);
+  if (!Number.isInteger(start) || start < 0) {
+    throw new Error("the saved arXiv page offset is not a number");
+  }
+  const fetched = await deps.Sources.FetchArxivPage({ Start: start, MaxResults: pageSize });
   // The feed is newest first: an entry updated before the window ends the run.
   const inWindow = fetched.Entries.filter((entry) => entry.updated.slice(0, 10) >= from);
   const reachedOlder = inWindow.length < fetched.Entries.length;
   return {
     Result: await ingestArxivEntries(ingestDeps, inWindow),
     HasMore: fetched.Returned >= pageSize && !reachedOlder,
-    NextCursor: null,
+    NextCursor: String(start + pageSize),
   };
 }
 
@@ -74,7 +88,7 @@ async function processPage(
     return "skipped";
   }
 
-  const fetched = await fetchAndIngest(deps, run, page);
+  const fetched = await fetchAndIngest(deps, run);
   const nextPage = page + 1;
   const continuing = fetched.HasMore && nextPage < deps.Config.MaxPagesPerRun;
   const failures: IngestionRunFailure[] = [...fetched.Result.Failures];
@@ -95,7 +109,8 @@ async function processPage(
     recordPageStatement(deps.Db, run, {
       Counts: fetched.Result.Counts,
       Failures: failures,
-      NextCursor: continuing ? fetched.NextCursor : null,
+      // At the page cap the cursor stays in the row: the next run continues there.
+      NextCursor: fetched.HasMore ? fetched.NextCursor : null,
     }),
   ];
 
@@ -115,7 +130,7 @@ async function processPage(
         Id: run.Id,
         Status: hadProblems ? "partial" : "succeeded",
         EndedAt: now,
-        WindowEnd: run.StartedAt.slice(0, 10),
+        WindowEnd: run.WindowEnd ?? run.StartedAt.slice(0, 10),
       }),
     );
   }

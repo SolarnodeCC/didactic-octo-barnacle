@@ -19,8 +19,8 @@ Starter configuration values. Stored as versioned config in `infrastructure/clou
 | `extraction.max_candidates_per_publication` | `3` | Hard cap (REQ-PROC-004) |
 | `arxiv.min_request_interval_ms` | `3000` | At most one request per 3 seconds; the next arXiv page is delivered after 3 seconds |
 | `ingestion.overlap_days` | `2` | A run starts this many days before the end of the last successful window (REQ-DATA-009) |
-| `ingestion.backfill_days` | `30` | A first run fetches this many days, and no window is longer (REQ-DATA-009) |
-| `ingestion.max_pages_per_run` | `50` | Pages (100 each) one run may fetch; a run that hits the cap is `partial` |
+| `ingestion.backfill_days` | `90` | A first run fetches this many days. No run stores a publication dated more than this many days before the day of the run (REQ-DATA-009, ADR 0035) |
+| `ingestion.max_pages_per_run` | `50` | Pages (100 each) one run may fetch; a run that hits the cap is `partial` and the next run continues where it stopped (ADR 0035) |
 | `ingestion.run_timeout_hours` | `6` | A run still `running` after this long is closed as `failed` when the next one starts |
 
 ## Pipeline concurrency
