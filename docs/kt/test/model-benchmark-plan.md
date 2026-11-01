@@ -78,7 +78,8 @@ Notes:
 
 - The Cloudflare account has an active Workers Paid subscription (owner's screenshot of the billing page, 2026-11-01; renews on 2026-11-05, together with R2 Paid, Images Stream Basic, Teams Free Base, and Beta Analytics Engine API). An earlier statement that the account was on Workers Free was wrong, and the upgrade decision that followed from it is void.
 - Workers Paid keeps the 10,000 free Workers AI neurons per day and bills further use at $0.011 per 1,000 neurons. The paid-model candidates are available, with the limit of 20 requests per minute per account and model.
-- The screenshot shows the subscription list of a Cloudflare account, not which account it is. Check on the first run that the project's gateway and Workers belong to that account: a 403 with internal error 5035 would mean they do not.
+- The owner confirmed that the subscriptions belong to the project's Cloudflare account. A 403 with internal error 5035 on the first call to a paid-model candidate would still mean the gateway or Worker runs under another account.
+- R2 Paid is active on the same account. R2 is object storage, not a database (the databases are D1). The benchmark can keep the raw model responses of each run in R2, in a staging bucket under a benchmark prefix with no production data, so a run can be graded again without new model calls (see [Method](#method)).
 - Production needs the paid plan. With the assumed 3k input and 1k output tokens per analysis agent, six agents for 300 candidates a day come to about 100,000 neurons per day on `gemma-4-26b-a4b-it` (about $1) and about 300,000 on `gpt-oss-120b` (about $3), against 10,000 free. Neuron prices come from the Workers AI pricing page. This is an assumption, not a measurement.
 
 ## Test data
@@ -108,6 +109,7 @@ For each pair of step and model:
 4. Record per call: exact model version, `OutputMode`, attempts, repairs, input and output tokens, latency, cost, and outcome (REQ-NFR-011).
 5. Keep the default reasoning setting in round one. Test one alternative setting only for finalists in round two.
 6. Grade free text with a model judge that is a different model than the candidate (OQ-020), checked against human labels as described in [AI evals](ai-evals.md).
+7. Keep the raw response of every call in R2 under a benchmark prefix of a staging bucket, next to the usage record. Grading and metrics can then be recomputed without new model calls. The benchmark items are public abstracts (CC0), and the usage records hold no publication text (REQ-NFR-011).
 
 ### Metrics
 
