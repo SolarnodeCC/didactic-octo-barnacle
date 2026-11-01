@@ -5,7 +5,9 @@ import {
   createRun,
   finishRunStatement,
   findRunningRun,
+  lastFinishedRun,
   lastSuccessfulWindowEnd,
+  type RunRow,
 } from "../store/run-repo.js";
 import { windowStart } from "./window.js";
 
@@ -24,6 +26,27 @@ export class StartRunError extends Error {
     super(message);
     this.name = "StartRunError";
   }
+}
+
+/**
+ * The earlier run this one continues, if any (REQ-DATA-009). A run that stopped at the
+ * page cap saved the cursor of the page it did not fetch; continuing there reaches the
+ * rest of its window instead of fetching the same first pages again. Not continued: a run
+ * with failed items: the fresh window covers them again. The continued run still stores
+ * nothing older than `BackfillDays` before its own day (see `fetch-page.ts`).
+ */
+function continuableRun(previous: RunRow | null) {
+  if (
+    previous?.Status !== "partial" ||
+    !previous.PageCursor ||
+    !previous.WindowFrom ||
+    !previous.WindowEnd ||
+    previous.Counts.Failed > 0 ||
+    previous.Counts.DeadLettered > 0
+  ) {
+    return null;
+  }
+  return previous;
 }
 
 /**
@@ -65,14 +88,25 @@ export async function startRun(deps: PipelineDeps, source: RunSource): Promise<S
     });
   }
 
-  const from = windowStart({
-    LastWindowEnd: await lastSuccessfulWindowEnd(deps.Db, source),
-    Today: now.slice(0, 10),
-    OverlapDays: deps.Config.OverlapDays,
-    BackfillDays: deps.Config.BackfillDays,
-  });
+  const today = now.slice(0, 10);
+  const continued = continuableRun(await lastFinishedRun(deps.Db, source));
+  const from =
+    continued?.WindowFrom ??
+    windowStart({
+      LastWindowEnd: await lastSuccessfulWindowEnd(deps.Db, source),
+      Today: today,
+      OverlapDays: deps.Config.OverlapDays,
+      BackfillDays: deps.Config.BackfillDays,
+    });
   const runId = `run_${source}_${now.replace(/\D/g, "").slice(0, 14)}_${deps.NewId().slice(0, 8)}`;
-  await createRun(deps.Db, { Id: runId, Source: source, StartedAt: now, WindowFrom: from });
+  await createRun(deps.Db, {
+    Id: runId,
+    Source: source,
+    StartedAt: now,
+    WindowFrom: from,
+    WindowEnd: continued?.WindowEnd ?? today,
+    ...(continued?.PageCursor ? { PageCursor: continued.PageCursor } : {}),
+  });
 
   try {
     await deps.Queue.send(fetchPageEnvelope(runId, source, 0));
@@ -90,6 +124,11 @@ export async function startRun(deps: PipelineDeps, source: RunSource): Promise<S
       runId,
     );
   }
-  deps.Log?.("run.started", { runId, source, windowFrom: from });
+  deps.Log?.("run.started", {
+    runId,
+    source,
+    windowFrom: from,
+    continuedRunId: continued?.Id,
+  });
   return { Outcome: "started", RunId: runId, WindowFrom: from };
 }

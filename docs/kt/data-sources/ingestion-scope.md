@@ -15,7 +15,7 @@ The locked pilot scope for phase 1. It is deliberately narrow: measure volume an
 | Setting | Pilot value | Locked? |
 |---|---|---|
 | arXiv categories | `cs.AI`, `cs.SE`, `cs.HC`, `cs.CY` (primary or cross-listed) | locked for phase 1 |
-| OpenAlex window | works published in the last 30 days at the first run (REQ-DATA-009), then incremental | locked for phase 1 |
+| OpenAlex window | works published in the last 90 days at the first run (REQ-DATA-009, ADR 0035), then incremental; never older than 90 days before the day of a run | locked for phase 1 |
 | OpenAlex topics | topics whose field or subfield appears in the topic map below | locked names; subfield IDs still to be filled (see below) |
 | Languages | English only (also the language of the interface, agent outputs, and briefs) | locked |
 | Daily limit to extraction | 100 publications | provisional until phase 1 volume is measured |

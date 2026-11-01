@@ -82,6 +82,7 @@ export const EXPECTED_PHASE1_TABLES: ExpectedTable[] = [
       "window_from",
       "page_cursor",
       "pages_done",
+      "window_end",
     ],
   },
   {

@@ -34,7 +34,7 @@ describe("REQ-NFR-008: run report", () => {
       RunId: id,
       Source: "openalex",
       Status: "succeeded",
-      WindowFrom: "2026-09-30",
+      WindowFrom: "2026-08-01",
       PagesDone: 1,
       Counts: { Fetched: 2, Created: 2, Failed: 0 },
       Failures: [],

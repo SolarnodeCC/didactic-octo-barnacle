@@ -1,7 +1,16 @@
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-function shiftDays(date: string, days: number): string {
+/** The day `days` before `date` (YYYY-MM-DD). */
+export function shiftDays(date: string, days: number): string {
   return new Date(Date.parse(`${date}T00:00:00Z`) + days * DAY_MS).toISOString().slice(0, 10);
+}
+
+/**
+ * The oldest day any run may fetch: `BackfillDays` before the day of the run. No window,
+ * fresh or continued, starts before it (REQ-DATA-009 AC3).
+ */
+export function earliestWindowStart(today: string, backfillDays: number): string {
+  return shiftDays(today, -backfillDays);
 }
 
 /**
@@ -18,7 +27,7 @@ export function windowStart(options: {
   OverlapDays: number;
   BackfillDays: number;
 }): string {
-  const earliest = shiftDays(options.Today, -options.BackfillDays);
+  const earliest = earliestWindowStart(options.Today, options.BackfillDays);
   if (options.LastWindowEnd === null) {
     return earliest;
   }

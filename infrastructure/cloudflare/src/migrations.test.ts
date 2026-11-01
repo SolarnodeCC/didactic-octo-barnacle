@@ -28,6 +28,7 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
       "0004_ingestion_run_state.sql",
       "0005_alert_state.sql",
       "0006_author_erasure.sql",
+      "0007_ingestion_run_window_end.sql",
     ]);
   });
 
@@ -43,6 +44,7 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
       "0004_ingestion_run_state.sql",
       "0005_alert_state.sql",
       "0006_author_erasure.sql",
+      "0007_ingestion_run_window_end.sql",
     ]);
 
     for (const table of EXPECTED_PHASE1_TABLES) {

@@ -89,11 +89,17 @@ export async function ingestOpenAlexWorks(
   deps: IngestDeps,
   works: OpenAlexWork[],
   topicNames: readonly string[],
+  /** Oldest publication date to store (YYYY-MM-DD); an older work is skipped. */
+  earliestDate?: string,
 ): Promise<IngestResult> {
   const result = emptyResult();
   const fetchedAt = deps.Now();
   for (const work of works) {
-    if (!isOpenAlexTopicsInScope(openAlexTopicNames(work), topicNames)) {
+    const published = work.publication_date ?? null;
+    if (
+      !isOpenAlexTopicsInScope(openAlexTopicNames(work), topicNames) ||
+      (earliestDate !== undefined && published !== null && published < earliestDate)
+    ) {
       result.Counts.Fetched += 1;
       result.Counts.Skipped += 1;
       continue;

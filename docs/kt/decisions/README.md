@@ -45,6 +45,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0032](0032-phase-1-cost-per-publication-is-an-estimate.md) | The phase 1 cost per publication is an estimate from real data | Accepted |
 | [0033](0033-repository-hardening-guardrails.md) | Repository hardening is enforced by a CI check | Accepted |
 | [0034](0034-openalex-free-api-key.md) | OpenAlex free API key for cursor paging | Accepted |
+| [0035](0035-ninety-day-window-and-resumable-runs.md) | 90-day window and resumable runs | Accepted |
 
 ## When an ADR is needed
 
