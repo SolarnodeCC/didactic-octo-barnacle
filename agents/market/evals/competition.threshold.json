@@ -1,0 +1,5 @@
+{
+  "metric": "entry-pass-rate",
+  "minimum": 0.75,
+  "tolerance": 0.05
+}

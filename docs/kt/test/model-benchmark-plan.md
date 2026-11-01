@@ -19,7 +19,7 @@ The owner decided the following on 2026-11-01.
 | Hosting | Cloudflare only. Every candidate is hosted on Workers AI. No third-party provider is benchmarked in this round. |
 | Labels | The owner labels the golden sets, and an agent prepares the draft labels (see [Labeling](#labeling)). |
 | Critic step | Out of scope. The pipeline stays as in [orchestration](../architecture/orchestration.md). A model judge for Startup Generator stays in the evals. |
-| Pass rule | The existing eval thresholds (REQ-TEST-005), which must be written before the first run (see [Thresholds](#thresholds)). |
+| Pass rule | The eval thresholds of REQ-TEST-005, written before the first run (see [Thresholds](#thresholds)). |
 | Benchmark budget | Model cost of at most 50 euro in total. |
 
 ## Scope
@@ -110,7 +110,7 @@ For every step also report first-attempt schema validity, repair rate, share tha
 
 ## Thresholds
 
-[AI evals](ai-evals.md) requires a pass threshold per agent, written down and approved by a code owner before the first eval run, and taken from what the product needs, not from first results. These files do not exist yet (`agents/` is not implemented). Writing them is the first step of this plan. Without them the "meets its eval threshold" criteria of REQ-AGENT-001 to REQ-AGENT-006 cannot run.
+[AI evals](ai-evals.md) requires a pass threshold per agent, written down and approved by a code owner before the first eval run, and taken from what the product needs, not from first results. The files and their values are in [golden sets](golden-sets.md#threshold-values): one file per step under `agents/<area>/evals/`, in three tiers (0.85, 0.75, and 0.7, with a tolerance of 0.05). The same threshold applies to every candidate of a step.
 
 With 20 entries, one entry is five percentage points. Grow the set before tightening a threshold in smaller steps.
 
@@ -147,7 +147,7 @@ Stop and ask the owner before the total model cost passes the budget of 50 euro.
 
 ## Steps
 
-1. Write and approve the threshold files.
+1. Approve the threshold files (done by merging the pull request that adds them).
 2. Check the account plan, the rate limits, and the candidate list.
 3. Prepare the golden sets: agent drafts, owner reviews, sample re-labeled.
 4. Build the harness on the shared model-call helper and the eval runner, with cost recording.
@@ -181,4 +181,4 @@ Status: **confirmed** (KT documents or Cloudflare documentation), **assumption**
 
 **Is Clairic a fit for extraction?** Not directly. It returns typed field values, while extraction returns a free sentence with a verbatim quote. Worth testing for Research Analyst fields. Assumption.
 
-**What stays open?** Which models the account may use (Workers Paid plan or prepaid credit), the rate limit of `glm-5.3-flash`, the threshold files, and the ADR with the result. See OQ-036.
+**What stays open?** Which models the account may use (Workers Paid plan or prepaid credit), the rate limit of `glm-5.3-flash`, the golden sets with their labels, and the ADR with the result. See OQ-036.
