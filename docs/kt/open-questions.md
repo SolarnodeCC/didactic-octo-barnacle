@@ -16,6 +16,12 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-014 | May we widen full-text use (transient processing, quotes from non-redistributable papers), and do the source and model provider terms allow commercial use? | Legal contact named by `@SolarnodeCC` answers the [review brief](legal/review-brief.md). Phase 1 stays abstract-first (ADR 0014). Phase 2 does not start until phase-2 gate questions are signed | before phase 2 starts |
 | OQ-015 | Who are the named golden-set and calibration reviewers? | Fill the six slots in [golden sets](test/golden-sets.md); structure and sizes are fixed | before phase 3 |
 
+## Models
+
+| ID | Question | Proposal | Decide before |
+|---|---|---|---|
+| OQ-036 | Which model runs each model-backed step? | Cloudflare-hosted models only. Run the [model benchmark plan](test/model-benchmark-plan.md) on the golden sets, pick the cheapest model that meets each step's threshold, and record the result in an ADR | triage and extraction before phase 2 starts; the six analysis agents before phase 3 |
+
 ## Ownership
 
 | ID | Question | Proposal | Decide before |
