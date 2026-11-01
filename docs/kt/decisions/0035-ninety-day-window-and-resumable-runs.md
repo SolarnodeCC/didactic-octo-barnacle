@@ -29,6 +29,7 @@ Duplicates are not the issue: unique indexes on DOI, arXiv ID, and `(source, sou
 - `ingestion.backfill_days` is 90. It is the longest a window can reach back, and also the limit of what a run stores: a publication dated more than 90 days before the day of the run is skipped, also by a run that continues an earlier one.
 - A run that ends `partial` only because it hit the page cap (no failed item, nothing dead-lettered) keeps its cursor and window. The next run of that source continues there. A run with failed items is not continued: the fresh window covers them again.
 - The run that finishes a continued window is `succeeded` and stores the window end of the first run of the chain (`ingestion_run.window_end`, migration 0007), so the next window overlaps everything published since the chain began.
+- The limit applies to every source that fetches external publications (REQ-DATA-009 AC6). Each source names the date it measures: OpenAlex the publication date, arXiv the date of the last update. Enrichment and PDF fetching follow stored publications and have no window.
 - An existing database is not backfilled automatically; days beyond its last window need a separate, deliberate action.
 
 ## Consequences

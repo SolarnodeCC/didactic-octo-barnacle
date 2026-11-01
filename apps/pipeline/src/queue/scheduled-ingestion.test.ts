@@ -433,6 +433,24 @@ describe("REQ-DATA-009: a run that stops at the page cap is continued by the nex
     expect(a.ArxivRequests.map((request) => request.Start)).toEqual([0, 2]);
     expect(a.Count("publication")).toBe(3);
   });
+
+  it("REQ-DATA-009: a continued arXiv run stores nothing last updated more than 90 days before its own day", async () => {
+    const a = createHarness({ PageSize: 2, MaxPagesPerRun: 1 });
+    a.SetArxivPages([
+      arxivPage([makeEntry(1, "2026-10-29T10:00:00Z"), makeEntry(2, "2026-10-29T09:00:00Z")]),
+      arxivPage([makeEntry(3, "2026-08-10T09:00:00Z"), makeEntry(4, "2026-08-05T09:00:00Z")]),
+    ]);
+    await runScheduled(a.Deps, ARXIV_CRON);
+    await a.Drain();
+
+    // 2026-08-07 is 90 days before 2026-11-05; the first window began 2026-08-01.
+    a.Clock.Now = "2026-11-05T07:30:00.000Z";
+    await runScheduled(a.Deps, ARXIV_CRON);
+    await a.Drain();
+
+    expect(a.Count("publication")).toBe(3);
+    expect(a.Run()["status"]).toBe("succeeded");
+  });
 });
 
 describe("REQ-TEST-003: scheduled ingestion tests never reach the network", () => {
