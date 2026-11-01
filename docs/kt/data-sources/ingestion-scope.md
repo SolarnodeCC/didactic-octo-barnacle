@@ -21,6 +21,8 @@ The locked pilot scope for phase 1. It is deliberately narrow: measure volume an
 | Daily limit to extraction | 100 publications | provisional until phase 1 volume is measured |
 | Day boundary | UTC | locked |
 
+The manual workflow `OpenAlex scope lookup` (`.github/workflows/openalex-scope-lookup.yml`, `pnpm --filter @roi/pipeline scope-lookup`) reads the OpenAlex taxonomy with the staging key and prints, for each topic-map name, the matching fields and subfields with their IDs, which names have no exact match, and the number of works per subfield in a window. It stores nothing and downloads no works.
+
 The OpenAlex request filters on subfield IDs, but the IDs are not looked up yet: `OpenAlexScope.SubfieldIds` in `apps/pipeline/src/config.ts` is empty. Until it is filled, only the name check keeps out-of-scope works from being stored, and the collector still downloads them (they count as `Skipped`). Look the IDs up in the OpenAlex taxonomy with an API key, store them in that setting, and compare the `Skipped` share of `Staging measure` before and after. The names in the map must also match the names OpenAlex returns; a name that never matches silently drops its works, so check the `Skipped` share on the first staging runs.
 
 The limit and the map are configuration, not code. Changing them is a reviewed pull request that records the reason.

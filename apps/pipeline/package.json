@@ -7,7 +7,8 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "test:unit": "vitest run"
+    "test:unit": "vitest run",
+    "scope-lookup": "node ./dist/scope/lookup-cli.js"
   },
   "dependencies": {
     "@roi/models": "workspace:*",
@@ -19,5 +20,8 @@
     "better-sqlite3": "^11.10.0",
     "typescript": "^5.9.3",
     "vitest": "^4.1.12"
+  },
+  "bin": {
+    "roi-scope-lookup": "./dist/scope/lookup-cli.js"
   }
 }

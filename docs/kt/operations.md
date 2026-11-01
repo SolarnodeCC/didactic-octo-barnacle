@@ -75,7 +75,7 @@ Set these in the GitHub environment `staging` before the first run:
 | Secret | `ALERT_GITHUB_TOKEN`, `RESEND_API_KEY` | for alerts; without them that channel is off |
 | Variable | `ALERT_EMAIL_TO` | for alert emails |
 
-Also create the GitHub label `alert` once. The first scheduled runs start at the next 06:00 UTC (OpenAlex) and 07:30 UTC (arXiv); a run cannot be started by hand before phase 4. After a few runs, `Staging measure` reports the volume, the data quality, and the cost estimate (ADR 0032).
+Also create the GitHub label `alert` once. The first scheduled runs start at the next 06:00 UTC (OpenAlex) and 07:30 UTC (arXiv); a run cannot be started by hand before phase 4. The manual workflow `.github/workflows/openalex-scope-lookup.yml` looks up the OpenAlex subfield IDs of the topic map and the volume per subfield with the staging `OPENALEX_API_KEY` (read-only; see [ingestion scope](data-sources/ingestion-scope.md)). After a few runs, `Staging measure` reports the volume, the data quality, and the cost estimate (ADR 0032).
 
 ## Schedules
 
