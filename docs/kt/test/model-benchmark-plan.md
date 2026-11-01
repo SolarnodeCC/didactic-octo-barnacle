@@ -21,6 +21,7 @@ The owner decided the following on 2026-11-01.
 | Critic step | Out of scope. The pipeline stays as in [orchestration](../architecture/orchestration.md). A model judge for Startup Generator stays in the evals. |
 | Pass rule | The eval thresholds of REQ-TEST-005, written before the first run (see [Thresholds](#thresholds)). |
 | Benchmark budget | Model cost of at most 50 euro in total. |
+| Account plan | The account is on Workers Free today. Upgrade to Workers Paid before round one (see [Account plan](#account-plan)). |
 
 ## Scope
 
@@ -70,8 +71,14 @@ Notes:
 - Keep two or three candidates per step. Every extra model multiplies the cost of a run.
 - Clairic is a preview. Its terms let Cloudflare stop it without compensation, so it is never the only model of a production step.
 - The largest candidate of a step serves as the reference for that step. There is no third-party reference.
-- These candidates require the Workers Paid plan or prepaid AI Gateway credit, and have a limit of 20 requests per minute per account and model (50 with prepaid credit): `glm-5.3`, `glm-5.3-flash`, `deepseek-v4-pro-0813`, `deepseek-v4-flash-0731`, `deepseek-v4.1-flash-1017`, and `kimi-k2.6`. Check that the account has one of the two before the run (OQ-036).
+- These candidates require the Workers Paid plan or prepaid AI Gateway credit, and have a limit of 20 requests per minute per account and model (50 with prepaid credit): `glm-5.3`, `glm-5.3-flash`, `deepseek-v4-pro-0813`, `deepseek-v4-flash-0731`, `deepseek-v4.1-flash-1017`, and `kimi-k2.6`. On the Workers Free plan they return a 403 (see [Account plan](#account-plan)).
 - `glm-4.7-flash` and `qwen3-30b-a3b-fp8` fall under the default limit of 300 requests per minute for text generation, as far as the pages show.
+
+## Account plan
+
+- The Cloudflare account is on Workers Free (owner, 2026-11-01). That plan includes 10,000 Workers AI neurons per day and blocks the models that need a paid plan with an HTTP 403.
+- Decision of 2026-11-01: upgrade to Workers Paid ($5 per month) before round one. The plan keeps the 10,000 free neurons per day and bills further use at $0.011 per 1,000 neurons. The upgrade is an action of the account owner. This plan does not do it, and a model that returns a 403 before the upgrade is not a finding.
+- Production needs the upgrade anyway. With the assumed 3k input and 1k output tokens per analysis agent, six agents for 300 candidates a day come to about 100,000 neurons per day on `gemma-4-26b-a4b-it` (about $1) and about 300,000 on `gpt-oss-120b` (about $3), against 10,000 free. Neuron prices come from the Workers AI pricing page. This is an assumption, not a measurement.
 
 ## Test data
 
@@ -156,7 +163,7 @@ Stop and ask the owner before the total model cost passes the budget of 50 euro.
 ## Steps
 
 1. Approve the threshold files (done by merging the pull request that adds them).
-2. Check the account plan, the rate limits, and the candidate list.
+2. Upgrade the account to Workers Paid (owner action), then confirm the rate limits and the candidate list.
 3. Prepare the golden sets: agent drafts, owner reviews, sample re-labeled.
 4. Build the harness on the shared model-call helper and the eval runner, with cost recording.
 5. Round one: all candidates, fixed prompt.
@@ -189,4 +196,4 @@ Status: **confirmed** (KT documents or Cloudflare documentation), **assumption**
 
 **Is Clairic a fit for extraction?** Not directly. It returns typed field values, while extraction returns a free sentence with a verbatim quote. Worth testing for Research Analyst fields. Assumption.
 
-**What stays open?** Which Cloudflare plan the account has (Workers Paid or prepaid credit, needed for most candidates), the golden sets with their labels, and the ADR with the result. See OQ-036.
+**What stays open?** The upgrade to Workers Paid (decided, not yet done), the golden sets with their labels, and the ADR with the result. See OQ-036.
