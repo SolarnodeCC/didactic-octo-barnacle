@@ -1,0 +1,60 @@
+name: OpenAlex scope lookup
+
+# Manual, read-only lookup of the OpenAlex taxonomy for the topic map of
+# docs/kt/data-sources/ingestion-scope.md (REQ-DATA-001). It prints the subfield IDs that
+# match the topic-map names and the number of works per subfield in the window, as the job
+# summary and in the log. It stores nothing and downloads no works. Use the result to fill
+# `OpenAlexScope.SubfieldIds` in apps/pipeline/src/config.ts in a reviewed pull request.
+# The key is the secret OPENALEX_API_KEY of the GitHub environment `staging` (ADR 0034).
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Days back for the volume count (1 to 365)"
+        type: string
+        default: "90"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: openalex-scope-lookup
+  cancel-in-progress: false
+
+jobs:
+  lookup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Enable Corepack and pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.18.2 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Look up the scope
+        working-directory: apps/pipeline
+        env:
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          DAYS: ${{ inputs.days }}
+        run: |
+          node dist/scope/lookup-cli.js --days "$DAYS" --json-out "$RUNNER_TEMP/scope.json" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "::group::Raw report (JSON)"
+          cat "$RUNNER_TEMP/scope.json"
+          echo
+          echo "::endgroup::"
