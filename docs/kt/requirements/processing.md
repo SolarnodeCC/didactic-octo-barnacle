@@ -111,3 +111,38 @@ One publication runs through every layer with stubbed agents, so the value of th
   3. The stubbed agent outputs are the examples of [examples](../examples/README.md), so the slice shows the final output shape.
   4. Stubs are replaced agent by agent in phase 3 without changing the pipeline.
 - Verification: integration test of the slice with local bindings
+
+### REQ-PROC-008: Triage decides from five signals
+
+The triage model reports five yes/no signals read from the title and abstract, and plain code derives the score and the decision. The signals are defined in [triage](../agents/triage.md), and the decision is recorded in ADR 0036.
+
+- Phase: 2
+- Priority: must
+- Status: planned
+- Source: ADR 0036
+- Depends on: REQ-PROC-005, REQ-PROC-006
+- Acceptance criteria:
+  1. The model returns `Signals` with `NamedParty`, `StatedHarm`, `Trigger`, `ExistingAlternative`, and `Adoptable` as booleans, and `Notes`. It does not return `TriageScore` or `Accepted`.
+  2. Plain code sets `TriageScore` to the number of true signals divided by five. It sets `Accepted` to true only when `NamedParty` and `StatedHarm` are both true, `TriageScore` is at or above `triage.accept_score_cut`, and the daily limit is not reached.
+  3. A publication that fails the signal rule gets `Reason: low-score`. The other reasons keep their meaning from REQ-PROC-006.
+  4. Publications above the daily limit are ranked by `TriageScore`, ties break by publication date (newest first) and then by publication ID, and a run with the same input gives the same order.
+  5. A generic or implied party does not make `NamedParty` true, and a quality gain on a benchmark does not make `StatedHarm` true.
+  6. Each golden-set entry holds the expected value of every signal. The eval reports agreement per signal and the precision and recall of the accept decision (REQ-TEST-005).
+- Verification: unit tests of the decision rule with stubbed signals, contract test, and eval on the golden set
+
+### REQ-PROC-009: Extraction requires a quotable problem and customer
+
+Every candidate opportunity names the customer who has the problem, and the problem and the customer are quoted from the publication. The contract is in [opportunity extraction](../agents/opportunity-extraction.md), and the decision is recorded in ADR 0036.
+
+- Phase: 2
+- Priority: must
+- Status: planned
+- Source: ADR 0036
+- Depends on: REQ-PROC-004, REQ-PROC-008
+- Acceptance criteria:
+  1. Each candidate holds `Finding`, `EvidenceQuote`, `Customer`, and `CustomerQuote`. A candidate for which the model cannot quote both a problem and a customer is not returned.
+  2. `WhyNow` and `CurrentAlternative` are optional. When set, each has a quote (`WhyNowQuote`, `AlternativeQuote`). Otherwise they are empty, and the step never infers them.
+  3. The pipeline rejects an output when any quote does not occur in the publication text the step received (REQ-AGENT-008).
+  4. A generic or implied party ("users", "people") does not count as `Customer`.
+  5. A publication that passes triage and has no quotable problem and customer yields an empty list with a Notes reason. The golden set holds at least three such entries (REQ-TEST-005).
+- Verification: contract test with stubbed responses that omit a customer or quote text that is not in the publication, and eval on the golden set

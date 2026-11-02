@@ -58,8 +58,27 @@ Each golden-set item is YAML next to the agent:
 id: gs-triage-001
 publicationFixture: fixtures/openalex/work-001.json
 expected:
-  accepted: true
-  reasonContains: "software"
+  signals:                      # the five triage signals (REQ-PROC-008)
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: true                # follows from the signals by the triage rule; checked for consistency
+notes: "Reviewer R4, 2026-.."
+```
+
+An extraction item lists the expected candidates, or an empty list with the reason (REQ-PROC-009):
+
+```yaml
+id: gs-extraction-001
+publicationFixture: fixtures/openalex/work-001.json
+expected:
+  candidates:
+    - finding: "One sentence that states the problem."
+      evidenceQuote: "Verbatim from the abstract."
+      customer: "regulatory bodies"
+      customerQuote: "Verbatim from the abstract."
 notes: "Reviewer R4, 2026-.."
 ```
 

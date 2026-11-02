@@ -40,7 +40,7 @@ erDiagram
 | Document | Stored PDF key, content hash, license, extracted text key, extractor version | REQ-DATA-004, REQ-DATA-006, REQ-DATA-010 |
 | Embedding | Vector ID, model name and version, created date | REQ-PROC-001, REQ-PROC-002 |
 | Ingestion run | Source, cursor, start, end, counts, failures | REQ-DATA-009, REQ-NFR-008 |
-| Triage decision | Publication, triage score, accepted or rejected, reason | REQ-PROC-005 |
+| Triage decision | Publication, the five triage signals, triage score, accepted or rejected, reason | REQ-PROC-005, REQ-PROC-008 |
 | Candidate | Exactly one publication, finding, evidence quote | REQ-PROC-004 |
 | Pipeline run | Candidate, status, start, end, cost | REQ-AGENT-007, REQ-NFR-005 |
 | Agent output | Envelope and output (see [contract conventions](../agents/contract-conventions.md)) | REQ-AGENT-007, REQ-AGENT-008 |

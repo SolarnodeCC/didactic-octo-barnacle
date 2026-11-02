@@ -15,7 +15,8 @@ Starter configuration values. Stored as versioned config in `infrastructure/clou
 | Key | Default | Notes |
 |---|---|---|
 | `ingestion.daily_extraction_limit` | `100` | Provisional; see [ingestion scope](../data-sources/ingestion-scope.md) |
-| `triage.accept_score_cut` | `0.55` | Inclusive; publications at or above are accepted (REQ-PROC-005) |
+| `triage.accept_score_cut` | `0.55` | Inclusive; publications at or above are accepted (REQ-PROC-005). `TriageScore` is true signals divided by five, so three signals give 0.6 and pass, and two give 0.4 (REQ-PROC-008) |
+| `triage.required_signals` | `NamedParty`, `StatedHarm` | Both must be true for a publication to be accepted (REQ-PROC-008) |
 | `extraction.max_candidates_per_publication` | `3` | Hard cap (REQ-PROC-004) |
 | `arxiv.min_request_interval_ms` | `3000` | At most one request per 3 seconds; the next arXiv page is delivered after 3 seconds |
 | `ingestion.overlap_days` | `2` | A run starts this many days before the end of the last successful window (REQ-DATA-009) |
