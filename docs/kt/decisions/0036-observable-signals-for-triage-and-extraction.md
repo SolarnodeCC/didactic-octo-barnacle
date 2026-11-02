@@ -1,14 +1,14 @@
 ---
 title: "0036: Decide triage and extraction from observable signals"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-02
 related: [REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-PROC-008, REQ-PROC-009, REQ-TEST-005]
 ---
 
 # 0036: Decide triage and extraction from observable signals
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-11-02
 
 ## Context
@@ -32,7 +32,7 @@ Option A now. Option B is designed for phase 3 (OQ-037). Option C is rejected fo
 
 **Extraction.** Every candidate names a `Customer` and quotes both the problem and the customer from the text. `WhyNow` and `CurrentAlternative` are optional and quoted, and stay empty when the text does not name them. A candidate without a quotable problem and customer is not returned (REQ-PROC-009).
 
-**Strictness.** These choices set how strict the rule is. The owner confirms or changes them in review of this pull request:
+**Strictness.** These choices set how strict the rule is. The owner confirmed them on 2026-11-02:
 
 - `NamedParty` needs a role or organization type in the text. A generic or implied party does not count.
 - `StatedHarm` needs a cost, delay, loss, or risk stated in the text. A number is a plus and not required.
