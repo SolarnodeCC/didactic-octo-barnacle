@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2610.39634v1",
+  "title": "Evaluating Conversational Explainability in Healthcare: Comparing the Explainability Assistant and a Traditional XAI Dashboard",
+  "summary": "Conversational interfaces may make explainable AI (XAI) more accessible to users without machine learning expertise, but their benefits over dashboards remain insufficiently characterised in healthcare. Existing systems have typically been evaluated in isolation, leaving unclear whether conversational interaction improves interpretability beyond the underlying explanation methods. We report a within-subjects user study comparing the Explainability Assistant, an LLM function-calling conversational XAI system, with a traditional dashboard for explaining a heart disease classification model trained on the Cleveland Heart Disease dataset. Both interfaces expose the same Decision Tree classifier and post-hoc explanation methods: SHAP feature attribution, DiCE counterfactuals, and what-if analysis. This design supports comparison of interaction modalities while holding the model and explanation methods constant. Five participants with healthcare backgrounds, from medical students to practising clinicians and public health researchers, completed parallel task blocks on both interfaces; three participated in follow-up interviews. Task accuracy, Likert ratings, free-text questionnaire responses, and interviews revealed complementary strengths and weaknesses rather than a clear preference for either modality. The assistant offered easier entry and patient-specific explanations, while the dashboard supported simultaneous inspection of global and local information. All three interview participants recommended integrating conversational and dashboard elements within a single clinical workflow.",
+  "published": "2026-10-29T08:57:21Z",
+  "categories": ["cs.HC"],
+  "primaryCategory": "cs.HC",
+  "pdfUrl": "https://arxiv.org/pdf/2610.39634",
+  "withdrawn": false
+}

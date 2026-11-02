@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2610.18679v1",
+  "title": "Communicating Uncertainty in AI-Supported Nurse Scheduling: Expert Co-Design and Evaluation of an Explainable AI Prototype",
+  "summary": "Nurse scheduling is a complex optimization problem in which nurses are assigned to shifts to meet staffing demands while complying with working-time limits, qualification requirements, and other operational and regulatory constraints. Artificial intelligence is increasingly being used to support this process by forecasting future staffing needs and providing advice on how to improve shift scheduling. Effective human-AI collaboration in nurse scheduling requires users to understand, interpret, and appropriately act on AI forecasts and advice. However, it remains insufficiently understood how healthcare professionals use transparency mechanisms like uncertainty communication and AI advice explanations when making staffing decisions. Applying a human-centered design approach, we iteratively developed a prototype decision support system for nurse scheduling and evaluated it through a mixed-methods user study with expert users. Using thematic analysis, questionnaire data, and eye tracking, we examine how healthcare professionals interact with the system and how uncertainty communication and explanations of AI advice influence understanding, decision confidence, trust, and usability. We found that the uncertainty communicated in AI forecasts was frequently misinterpreted and reduced decision confidence. Explanations were generally perceived positively, but did not significantly affect decision confidence or advice acceptance. We conclude with eight design implications derived from our findings, providing insights for the design of more transparent and effective AI-supported decision support tools in healthcare.",
+  "published": "2026-10-13T16:37:17Z",
+  "categories": ["cs.HC"],
+  "primaryCategory": "cs.HC",
+  "pdfUrl": "https://arxiv.org/pdf/2610.18679",
+  "withdrawn": false
+}

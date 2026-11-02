@@ -1,0 +1,6 @@
+id: gs-extraction-022
+publicationFixture: fixtures/arxiv/2605.21035.json
+expected:
+  candidates: []
+  reason: "Research findings on worker-AI misalignment in incident reports; no specific problem that a named customer states it carries and wants solved."
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

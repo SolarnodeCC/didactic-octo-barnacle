@@ -1,0 +1,18 @@
+id: gs-triage-039
+publicationFixture: fixtures/arxiv/2609.39537.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: true
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "deployers of high-risk AI systems"
+  statedHarm: "evidence for the required assessments is fragmented"
+  trigger: "the EU AI Act (Art. 27) requires assessments"
+  existingAlternative: "fragmented incident repositories and legal texts"
+  adoptable: "a reusable Semantic Web framework"
+notes: "All five signals; a regulatory trigger. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

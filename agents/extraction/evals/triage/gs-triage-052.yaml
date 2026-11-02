@@ -1,0 +1,18 @@
+id: gs-triage-052
+publicationFixture: fixtures/arxiv/2606.17555.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "banks; compliance officers"
+  statedHarm: "fraud and laundering that resemble legitimate activity"
+  trigger: "none"
+  existingAlternative: "static rule engines"
+  adoptable: "an autonomous AI security agent"
+notes: "All signals except a trigger. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

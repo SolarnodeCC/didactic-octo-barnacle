@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2602.11223v1",
+  "title": "Patient Digital Twins for Chronic Care: Technical Hurdles, Lessons Learned, and the Road Ahead",
+  "summary": "Chronic diseases constitute the principal burden of morbidity, mortality, and healthcare costs worldwide, yet current health systems remain fragmented and predominantly reactive. Patient Medical Digital Twins (PMDTs) offer a paradigm shift: holistic, continuously updated digital counterparts of patients that integrate clinical, genomic, lifestyle, and quality-of-life data. We report early implementations of PMDTs via ontology-driven modeling and federated analytics pilots. Insights from the QUALITOP oncology study and a distributed AI platform confirm both feasibility and challenges: aligning with HL7 FHIR and OMOP standards, embedding privacy governance, scaling federated queries, and designing intuitive clinician interfaces. We also highlight technical gains, such as automated reasoning over multimodal blueprints and predictive analytics for patient outcomes. By reflecting on these experiences, we outline actionable insights for software engineers and identify opportunities, such as DSLs and model-driven engineering, to advance PMDTs toward trustworthy, adaptive chronic care ecosystems.",
+  "published": "2026-02-11T13:07:00Z",
+  "categories": ["cs.SE", "cs.HC"],
+  "primaryCategory": "cs.SE",
+  "pdfUrl": "https://arxiv.org/pdf/2602.11223",
+  "withdrawn": false
+}

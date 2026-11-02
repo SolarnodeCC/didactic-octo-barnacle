@@ -1,0 +1,18 @@
+id: gs-triage-053
+publicationFixture: fixtures/arxiv/2608.22389.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: true
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "European payment service providers"
+  statedHarm: "no overnight batch window; ten-second settlement"
+  trigger: "Regulation (EU) 2024/886"
+  existingAlternative: "overnight batch AML analytics"
+  adoptable: "the KONTOGRAPH pipeline"
+notes: "All five signals, with a regulatory trigger. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

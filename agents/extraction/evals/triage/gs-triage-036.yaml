@@ -1,0 +1,18 @@
+id: gs-triage-036
+publicationFixture: fixtures/arxiv/2610.05947.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: false
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "a Swedish public sector organization"
+  statedHarm: "challenges: lack of open culture, siloed practices"
+  trigger: "none"
+  existingAlternative: "siloed practices"
+  adoptable: "none: a case study"
+notes: "Named organization, stated challenges, and a current practice. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

@@ -1,0 +1,13 @@
+id: gs-extraction-012
+publicationFixture: fixtures/arxiv/2610.18679.json
+expected:
+  candidates:
+    - finding: "Healthcare professionals who use AI forecasts for nurse scheduling frequently misinterpret the communicated uncertainty, which reduces their decision confidence."
+      evidenceQuote: "the uncertainty communicated in AI forecasts was frequently misinterpreted and reduced decision confidence"
+      customer: "healthcare professionals"
+      customerQuote: "healthcare professionals"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: null
+      alternativeQuote: null
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

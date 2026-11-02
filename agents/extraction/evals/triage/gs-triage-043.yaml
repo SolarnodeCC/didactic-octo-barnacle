@@ -1,0 +1,18 @@
+id: gs-triage-043
+publicationFixture: fixtures/arxiv/2609.09356.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "our nurses; clinicians"
+  statedHarm: "50,000 queries a month; opaque classifier; costly evaluation"
+  trigger: "none"
+  existingAlternative: "a decision tree that was never documented"
+  adoptable: "a rule engine over LLM-extracted symptoms"
+notes: "All signals except a trigger. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

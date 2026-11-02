@@ -1,0 +1,18 @@
+id: gs-triage-030
+publicationFixture: fixtures/arxiv/2609.32835.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: false
+    trigger: true
+    existingAlternative: false
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: the financial services industry"
+  statedHarm: "none"
+  trigger: "agents are becoming widely adopted in financial services"
+  existingAlternative: "none"
+  adoptable: "none: a benchmark"
+notes: "Benchmark; no named party. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

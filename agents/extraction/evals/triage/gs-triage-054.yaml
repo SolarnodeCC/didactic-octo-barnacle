@@ -1,0 +1,18 @@
+id: gs-triage-054
+publicationFixture: fixtures/arxiv/2610.00287.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: only participants"
+  statedHarm: "flat maximum verification over-collects and excludes"
+  trigger: "none"
+  existingAlternative: "flat maximum verification"
+  adoptable: "none: a design proposal"
+notes: "Design proposal; no named party. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

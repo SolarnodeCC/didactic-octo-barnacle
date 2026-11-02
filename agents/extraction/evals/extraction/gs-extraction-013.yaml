@@ -1,0 +1,13 @@
+id: gs-extraction-013
+publicationFixture: fixtures/arxiv/2609.10421.json
+expected:
+  candidates:
+    - finding: "Hospital quality teams review only emergency department revisits within about 48-72 hours to limit chart-review burden, which may miss quality improvement opportunities."
+      evidenceQuote: "Those limitations may lead to missed quality improvement opportunities"
+      customer: "a multihospital health system"
+      customerQuote: "a multihospital health system"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "ED return visits are reviewed, but only those within 48-72 hours."
+      alternativeQuote: "Emergency Department (ED) return visits are commonly reviewed for quality assurance, but are often limited (e.g., to revisits within 48-72 hours)"
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

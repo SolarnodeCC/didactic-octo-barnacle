@@ -1,0 +1,18 @@
+id: gs-triage-023
+publicationFixture: fixtures/arxiv/2610.37271.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: false
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "surgeons"
+  statedHarm: "none: precise port placement is called vital, but no harm or cost is stated"
+  trigger: "none"
+  existingAlternative: "surgeon experience and mental mapping of imaging"
+  adoptable: "the HILMARTS iPad AR system"
+notes: "Owner resolved the doubt on statedHarm in favour of false: the text calls precision vital but states no risk or cost; rejected because StatedHarm is required. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

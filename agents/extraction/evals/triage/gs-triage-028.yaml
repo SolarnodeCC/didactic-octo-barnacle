@@ -1,0 +1,18 @@
+id: gs-triage-028
+publicationFixture: fixtures/arxiv/2610.29178.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: no role named"
+  statedHarm: "fooled monitors approve fraud; correct payments blocked"
+  trigger: "none"
+  existingAlternative: "score and vote aggregation"
+  adoptable: "a rule that counts sources"
+notes: "Three signals but no named party. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

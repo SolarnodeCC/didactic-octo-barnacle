@@ -1,0 +1,18 @@
+id: gs-triage-038
+publicationFixture: fixtures/arxiv/2610.16916.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: false
+    trigger: true
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "Provider, Deployer, and public-sector organization"
+  statedHarm: "none: a limitation of assessments, no cost or risk"
+  trigger: "the EU AI Act introduces a framework"
+  existingAlternative: "monolithic views and disconnected checklists"
+  adoptable: "the Information Flow Methodology"
+notes: "Four signals true, but no stated harm. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

@@ -1,0 +1,13 @@
+id: gs-extraction-014
+publicationFixture: fixtures/arxiv/2609.21149.json
+expected:
+  candidates:
+    - finding: "Health systems that deploy AI-assisted psychiatric intake need a practical way to evaluate it against their clinical standards without burdening clinicians."
+      evidenceQuote: "health systems need practical ways to routinely evaluate these tools against their clinical standards for quality assurance"
+      customer: "health systems"
+      customerQuote: "health systems"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: null
+      alternativeQuote: null
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

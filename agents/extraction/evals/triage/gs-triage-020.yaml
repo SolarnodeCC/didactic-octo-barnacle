@@ -1,0 +1,18 @@
+id: gs-triage-020
+publicationFixture: fixtures/arxiv/2610.40476.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: false
+    trigger: false
+    existingAlternative: false
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "psychiatrists"
+  statedHarm: "none stated"
+  trigger: "none"
+  existingAlternative: "none"
+  adoptable: "an RL-trained intake agent"
+notes: "Party and an agent, but no stated harm. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

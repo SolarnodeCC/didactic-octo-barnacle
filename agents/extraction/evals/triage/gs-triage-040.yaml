@@ -1,0 +1,18 @@
+id: gs-triage-040
+publicationFixture: fixtures/arxiv/2610.03932.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: false
+    trigger: false
+    existingAlternative: true
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "public sector agencies"
+  statedHarm: "none: the harm falls on communities"
+  trigger: "none"
+  existingAlternative: "participatory design"
+  adoptable: "none: a critical analysis"
+notes: "Named agencies, but the harm is carried by communities. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

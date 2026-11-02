@@ -1,0 +1,13 @@
+id: gs-extraction-019
+publicationFixture: fixtures/arxiv/2608.22389.json
+expected:
+  candidates:
+    - finding: "European payment service providers must settle euro credit transfers in under ten seconds, which removes the overnight batch window for anti-money-laundering analytics and forces detection, explanation, and decision into a single-digit-second envelope."
+      evidenceQuote: "This removes both the overnight batch window in which anti-money-laundering (AML) analytics traditionally ran and the settlement delay that made recovery possible, forcing detection, explanation and decision inside a single-digit-second envelope."
+      customer: "European payment service providers"
+      customerQuote: "European payment service providers"
+      whyNow: "Regulation (EU) 2024/886 obliges them to settle euro credit transfers in under ten seconds, around the clock."
+      whyNowQuote: "Regulation (EU) 2024/886 obliges European payment service providers to settle euro credit transfers in under ten seconds, around the clock."
+      currentAlternative: "An overnight batch window in which AML analytics traditionally ran."
+      alternativeQuote: "the overnight batch window in which anti-money-laundering (AML) analytics traditionally ran"
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

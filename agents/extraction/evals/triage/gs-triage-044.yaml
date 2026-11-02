@@ -1,0 +1,18 @@
+id: gs-triage-044
+publicationFixture: fixtures/arxiv/2608.30419.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: false
+    existingAlternative: false
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: nurses only as sample size"
+  statedHarm: "cannot guarantee regulatory compliance"
+  trigger: "none"
+  existingAlternative: "none"
+  adoptable: "the CP-SAT formulation"
+notes: "Scheduling method; no named party. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

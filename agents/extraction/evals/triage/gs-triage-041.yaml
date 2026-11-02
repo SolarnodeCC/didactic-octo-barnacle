@@ -1,0 +1,18 @@
+id: gs-triage-041
+publicationFixture: fixtures/arxiv/2610.04485.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: false
+    existingAlternative: false
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: no role named"
+  statedHarm: "data colonisation and loss of oversight"
+  trigger: "none"
+  existingAlternative: "none"
+  adoptable: "none"
+notes: "Legal policy analysis. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

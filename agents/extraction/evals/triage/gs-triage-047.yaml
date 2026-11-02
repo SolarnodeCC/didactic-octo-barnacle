@@ -1,0 +1,18 @@
+id: gs-triage-047
+publicationFixture: fixtures/arxiv/2609.10421.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "a multihospital health system; clinicians"
+  statedHarm: "missed quality improvement opportunities"
+  trigger: "none"
+  existingAlternative: "reviews limited to 48-72 hour revisits"
+  adoptable: "an LLM knowledge-graph screening algorithm"
+notes: "All signals except a trigger. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

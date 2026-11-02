@@ -1,0 +1,18 @@
+id: gs-triage-032
+publicationFixture: fixtures/arxiv/2610.38631.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: false
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "the investor"
+  statedHarm: "answers that sound factual but answer a different question"
+  trigger: "none"
+  existingAlternative: "checks against the data pass these answers"
+  adoptable: "none: controls proposed"
+notes: "Failure study of financial assistants. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

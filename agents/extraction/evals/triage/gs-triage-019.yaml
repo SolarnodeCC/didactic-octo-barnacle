@@ -1,0 +1,18 @@
+id: gs-triage-019
+publicationFixture: fixtures/arxiv/2610.41437.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: true
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "patients and clinicians"
+  statedHarm: "brief, time-constrained clinical visits"
+  trigger: "millions of adults now turn to general-purpose AI chatbots"
+  existingAlternative: "general-purpose AI chatbots"
+  adoptable: "an LLM visit-preparation agent"
+notes: "All five signals; the party is the patient. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

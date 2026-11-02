@@ -1,0 +1,6 @@
+id: gs-extraction-015
+publicationFixture: fixtures/arxiv/2602.11223.json
+expected:
+  candidates: []
+  reason: "A population-level burden of chronic disease and lessons from pilots; no specific problem that a named customer carries and acts on."
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

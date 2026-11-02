@@ -1,0 +1,18 @@
+id: gs-triage-058
+publicationFixture: fixtures/arxiv/2605.21035.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: true
+    existingAlternative: false
+    adoptable: false
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "workers; developers"
+  statedHarm: "83% of workplace AI incidents stem from misalignment"
+  trigger: "generative AI now causes incidents"
+  existingAlternative: "none"
+  adoptable: "none: an analysis"
+notes: "Named workers, a stated harm, and a trigger; research findings. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

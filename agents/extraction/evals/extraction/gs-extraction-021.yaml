@@ -1,0 +1,13 @@
+id: gs-extraction-021
+publicationFixture: fixtures/arxiv/2605.06703.json
+expected:
+  candidates:
+    - finding: "Enterprise modernization programs fail at a documented and costly rate because organizations lack structured, repeatable routines to plan, execute, validate, and hand off technology change."
+      evidenceQuote: "The primary failure mode is a governance deficit: the absence of structured, repeatable operating routines for how organizations plan, execute, validate, and hand off complex technology change."
+      customer: "organizations that run enterprise modernization programs"
+      customerQuote: "how organizations plan, execute, validate, and hand off complex technology change"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Existing frameworks such as ITIL, COBIT, TOGAF, scaled agile, and cloud well-architected frameworks."
+      alternativeQuote: "Existing frameworks -- ITIL, COBIT, TOGAF, scaled agile methodologies, and cloud provider well-architected frameworks"
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

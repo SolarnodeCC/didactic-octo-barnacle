@@ -1,0 +1,18 @@
+id: gs-triage-018
+publicationFixture: fixtures/arxiv/2610.41680.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: false
+    trigger: false
+    existingAlternative: false
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "physiotherapists, carers, and clinicians"
+  statedHarm: "none stated"
+  trigger: "none"
+  existingAlternative: "none"
+  adoptable: "none: requirements only"
+notes: "User-requirements study without a stated harm. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

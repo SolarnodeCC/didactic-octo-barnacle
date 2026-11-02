@@ -1,0 +1,18 @@
+id: gs-triage-021
+publicationFixture: fixtures/arxiv/2610.41784.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: true
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: only the sector Healthcare"
+  statedHarm: "cybersecurity risks across clinical workflows"
+  trigger: "AI-enabled capabilities accelerate vulnerability discovery"
+  existingAlternative: "connected architectures"
+  adoptable: "a clinical-protocol-aware framework"
+notes: "Four signals true, but no named party. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."
