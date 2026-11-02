@@ -1,0 +1,18 @@
+id: gs-triage-011
+publicationFixture: fixtures/arxiv/2610.39846.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: true
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: no role named"
+  statedHarm: "published figures differ by two orders of magnitude"
+  trigger: "electricity supply is becoming a binding constraint on AI"
+  existingAlternative: "scattered public evidence"
+  adoptable: "an open database and an online calculator"
+notes: "Four signals true but no named party; rejected because NamedParty is required. Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request."

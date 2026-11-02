@@ -1,0 +1,18 @@
+id: gs-triage-006
+publicationFixture: fixtures/arxiv/2610.39949.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: false
+    trigger: false
+    existingAlternative: true
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: no role named"
+  statedHarm: "none: a data gap, no harm to a party"
+  trigger: "none"
+  existingAlternative: "carry-forward baseline"
+  adoptable: "none: the authors state no deployment claims"
+notes: "Price-reconstruction method; the authors state that the findings do not support deployment claims. Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request."

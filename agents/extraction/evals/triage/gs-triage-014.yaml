@@ -1,0 +1,18 @@
+id: gs-triage-014
+publicationFixture: fixtures/arxiv/2610.40006.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: false
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: no role named"
+  statedHarm: "none: only a qualitative harm"
+  trigger: "none"
+  existingAlternative: "transient prompt-response exchanges"
+  adoptable: "the HAIDL-X middleware for JupyterLab"
+notes: "Adoptable middleware, but no named party or stated harm; rejected. Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request."

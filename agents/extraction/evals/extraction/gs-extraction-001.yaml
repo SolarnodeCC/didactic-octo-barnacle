@@ -1,0 +1,13 @@
+id: gs-extraction-001
+publicationFixture: fixtures/arxiv/2610.40641.json
+expected:
+  candidates:
+    - finding: "Governments and growers cannot quickly tell which crops will lose how much from a forecast extreme-weather event; an agent that predicts crop loss as a share of expected season value, with sourced numbers, would speed up disaster response."
+      evidenceQuote: "Extreme weather is forecast days ahead, yet its consequences for agriculture remain hard to predict: a forecast says where a storm will strike, not which crops will suffer or how much is at risk, and the records that could tell span many sources."
+      customer: "governments, growers and scientists"
+      customerQuote: "so that governments, growers and scientists respond to agricultural disasters quickly"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Weather forecasts that say where a storm will strike, with crop records spread across many sources."
+      alternativeQuote: "the records that could tell span many sources"
+notes: "Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request."

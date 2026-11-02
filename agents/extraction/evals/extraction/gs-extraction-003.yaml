@@ -1,0 +1,13 @@
+id: gs-extraction-003
+publicationFixture: fixtures/arxiv/2610.40071.json
+expected:
+  candidates:
+    - finding: "AI coding agents leave no durable record of what they did, which model and tools they used, or who was accountable, so audit and compliance controls built for human commits fail; signed attestations of agent sessions could close the gap."
+      evidenceQuote: "It shows what changed. It does not show what an AI agent did, which model it used, which tools it called, or whether anyone was accountable for the outcome."
+      customer: "the organization that runs agentic coders"
+      customerQuote: "compliant with the policies of the organization"
+      whyNow: "AI agents now create pull requests, select dependencies, refactor codebases, and change infrastructure across the SDLC."
+      whyNowQuote: "AI agents now create pull requests, select dependencies, refactor codebases, interpret test failures, and execute infrastructure changes across the entire Software Development Life Cycle (SDLC)."
+      currentAlternative: "The git log, which was designed for human commits."
+      alternativeQuote: "The git log was designed for human commits."
+notes: "Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request."

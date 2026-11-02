@@ -1,0 +1,13 @@
+id: gs-extraction-002
+publicationFixture: fixtures/arxiv/2610.40164.json
+expected:
+  candidates:
+    - finding: "National regulators lack consistent data to compare media ownership concentration across countries, and AI search systems may concentrate attention on news outlets further; a harmonised ownership dataset with concentration indices would let them monitor it."
+      evidenceQuote: "Yet, the lack of a consistent data collection infrastructure between national-level regulatory bodies has hindered between-country comparative analysis of media concentration"
+      customer: "national-level regulatory bodies"
+      customerQuote: "national-level regulatory bodies"
+      whyNow: "Search engines with generative AI systems increasingly decide where audience attention and revenue go."
+      whyNowQuote: "Search engines equipped with generative AI systems such as Google's AI overviews increasingly decide where that attention goes, as well as the revenue it represents."
+      currentAlternative: "Outlet-level concentration measures, which understate concentration."
+      alternativeQuote: "outlet-level measures understate concentration"
+notes: "Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request."

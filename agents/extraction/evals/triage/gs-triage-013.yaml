@@ -1,0 +1,18 @@
+id: gs-triage-013
+publicationFixture: fixtures/arxiv/2610.39890.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: false
+    trigger: false
+    existingAlternative: false
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none"
+  statedHarm: "none"
+  trigger: "none"
+  existingAlternative: "none"
+  adoptable: "none"
+notes: "Benchmark dataset for AI code generation; a research resource. Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request."

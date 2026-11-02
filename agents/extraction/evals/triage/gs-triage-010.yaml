@@ -1,0 +1,18 @@
+id: gs-triage-010
+publicationFixture: fixtures/arxiv/2610.40398.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: no role named"
+  statedHarm: "session hijacking and behavioral anomalies"
+  trigger: "none"
+  existingAlternative: "fixed-text password authentication"
+  adoptable: "a two-level keystroke authentication system"
+notes: "Stated harm and an adoptable system, but no named party; rejected because NamedParty is required. Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request."

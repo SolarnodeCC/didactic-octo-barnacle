@@ -1,0 +1,18 @@
+id: gs-triage-001
+publicationFixture: fixtures/arxiv/2610.40649.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: false
+    trigger: false
+    existingAlternative: false
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none"
+  statedHarm: "none"
+  trigger: "none"
+  existingAlternative: "none"
+  adoptable: "none"
+notes: "Method analysis of inference-time ensembling; no party, harm, or adoptable output. Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request."
