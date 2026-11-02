@@ -21,7 +21,7 @@ The owner decided the following on 2026-11-01.
 | Critic step | Out of scope. The pipeline stays as in [orchestration](../architecture/orchestration.md). A model judge for Startup Generator stays in the evals. |
 | Pass rule | The eval thresholds of REQ-TEST-005, written before the first run (see [Thresholds](#thresholds)). |
 | Benchmark budget | Model cost of at most 50 euro in total. |
-| Account plan | The account is on Workers Free today. Upgrade to Workers Paid before round one (see [Account plan](#account-plan)). |
+| Account plan | The account has an active Workers Paid subscription, so no upgrade is needed (see [Account plan](#account-plan)). |
 
 ## Scope
 
@@ -61,7 +61,7 @@ Also eligible, read on 2026-11-01. None of their pages shows a paid-plan notice,
 
 | Model | Context | Input / output | Notes |
 |---|---|---|---|
-| `gemma-4-26b-a4b-it` | 256k | $0.10 / $0.30 | Vision, reasoning, function calling, batch. Gemma licence. On the Workers Free plan. |
+| `gemma-4-26b-a4b-it` | 256k | $0.10 / $0.30 | Vision, reasoning, function calling, batch. Gemma licence. Also on the Workers Free plan. |
 | `gpt-oss-20b` | 128k | $0.20 / $0.30 | Reasoning, function calling, batch. |
 | `gpt-oss-120b` | 128k | $0.35 / $0.75 | Reasoning, function calling, batch. Possible for Market Analysis and Competition without the paid-model limit. |
 | `nemotron-3-120b-a12b` | 256k on the model page, 32k in the launch post | $0.50 / $1.50 | Reasoning, function calling. NVIDIA open model licence. Check the context before use. |
@@ -71,14 +71,16 @@ Notes:
 - Keep two or three candidates per step. Every extra model multiplies the cost of a run.
 - Clairic is a preview. Its terms let Cloudflare stop it without compensation, so it is never the only model of a production step.
 - The largest candidate of a step serves as the reference for that step. There is no third-party reference.
-- These candidates require the Workers Paid plan or prepaid AI Gateway credit, and have a limit of 20 requests per minute per account and model (50 with prepaid credit): `glm-5.3`, `glm-5.3-flash`, `deepseek-v4-pro-0813`, `deepseek-v4-flash-0731`, `deepseek-v4.1-flash-1017`, and `kimi-k2.6`. On the Workers Free plan they return a 403 (see [Account plan](#account-plan)).
+- These candidates require the Workers Paid plan or prepaid AI Gateway credit, and have a limit of 20 requests per minute per account and model (50 with prepaid credit): `glm-5.3`, `glm-5.3-flash`, `deepseek-v4-pro-0813`, `deepseek-v4-flash-0731`, `deepseek-v4.1-flash-1017`, and `kimi-k2.6`. The account has a Workers Paid subscription, so they are available (see [Account plan](#account-plan)); on Workers Free they would return a 403.
 - `glm-4.7-flash` and `qwen3-30b-a3b-fp8` fall under the default limit of 300 requests per minute for text generation, as far as the pages show.
 
 ## Account plan
 
-- The Cloudflare account is on Workers Free (owner, 2026-11-01). That plan includes 10,000 Workers AI neurons per day and blocks the models that need a paid plan with an HTTP 403.
-- Decision of 2026-11-01: upgrade to Workers Paid ($5 per month) before round one. The plan keeps the 10,000 free neurons per day and bills further use at $0.011 per 1,000 neurons. The upgrade is an action of the account owner. This plan does not do it, and a model that returns a 403 before the upgrade is not a finding.
-- Production needs the upgrade anyway. With the assumed 3k input and 1k output tokens per analysis agent, six agents for 300 candidates a day come to about 100,000 neurons per day on `gemma-4-26b-a4b-it` (about $1) and about 300,000 on `gpt-oss-120b` (about $3), against 10,000 free. Neuron prices come from the Workers AI pricing page. This is an assumption, not a measurement.
+- The Cloudflare account has an active Workers Paid subscription (owner's screenshot of the billing page, 2026-11-01; renews on 2026-11-05, together with R2 Paid, Images Stream Basic, Teams Free Base, and Beta Analytics Engine API). An earlier statement that the account was on Workers Free was wrong, and the upgrade decision that followed from it is void.
+- Workers Paid keeps the 10,000 free Workers AI neurons per day and bills further use at $0.011 per 1,000 neurons. The paid-model candidates are available, with the limit of 20 requests per minute per account and model.
+- The owner confirmed that the subscriptions belong to the project's Cloudflare account. A 403 with internal error 5035 on the first call to a paid-model candidate would still mean the gateway or Worker runs under another account.
+- R2 Paid is active on the same account. R2 is object storage, not a database (the databases are D1). The benchmark can keep the raw model responses of each run in R2, in a staging bucket under a benchmark prefix with no production data, so a run can be graded again without new model calls (see [Method](#method)).
+- Production needs the paid plan. With the assumed 3k input and 1k output tokens per analysis agent, six agents for 300 candidates a day come to about 100,000 neurons per day on `gemma-4-26b-a4b-it` (about $1) and about 300,000 on `gpt-oss-120b` (about $3), against 10,000 free. Neuron prices come from the Workers AI pricing page. This is an assumption, not a measurement.
 
 ## Test data
 
@@ -107,6 +109,7 @@ For each pair of step and model:
 4. Record per call: exact model version, `OutputMode`, attempts, repairs, input and output tokens, latency, cost, and outcome (REQ-NFR-011).
 5. Keep the default reasoning setting in round one. Test one alternative setting only for finalists in round two.
 6. Grade free text with a model judge that is a different model than the candidate (OQ-020), checked against human labels as described in [AI evals](ai-evals.md).
+7. Keep the raw response of every call in R2 under a benchmark prefix of a staging bucket, next to the usage record. Grading and metrics can then be recomputed without new model calls. The benchmark items are public abstracts (CC0), and the usage records hold no publication text (REQ-NFR-011).
 
 ### Metrics
 
@@ -163,7 +166,7 @@ Stop and ask the owner before the total model cost passes the budget of 50 euro.
 ## Steps
 
 1. Approve the threshold files (done by merging the pull request that adds them).
-2. Upgrade the account to Workers Paid (owner action), then confirm the rate limits and the candidate list.
+2. Confirm the rate limits and the candidate list on the first calls (the account is on Workers Paid).
 3. Prepare the golden sets: agent drafts, owner reviews, sample re-labeled.
 4. Build the harness on the shared model-call helper and the eval runner, with cost recording.
 5. Round one: all candidates, fixed prompt.
@@ -196,4 +199,4 @@ Status: **confirmed** (KT documents or Cloudflare documentation), **assumption**
 
 **Is Clairic a fit for extraction?** Not directly. It returns typed field values, while extraction returns a free sentence with a verbatim quote. Worth testing for Research Analyst fields. Assumption.
 
-**What stays open?** The upgrade to Workers Paid (decided, not yet done), the golden sets with their labels, and the ADR with the result. See OQ-036.
+**What stays open?** The golden sets with their labels, the first calls that confirm the limits, and the ADR with the result. See OQ-036.
