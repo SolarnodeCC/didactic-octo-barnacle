@@ -1,0 +1,13 @@
+id: gs-extraction-010
+publicationFixture: fixtures/arxiv/2609.09356.json
+expected:
+  candidates:
+    - finding: "Nurses at Noora Health triage more than 50,000 WhatsApp queries a month, and an opaque LLM classifier made mistakes hard to analyze and prompt changes costly to evaluate; a rule engine over LLM-extracted symptoms raised recall from 0.565 to 0.810."
+      evidenceQuote: "But the system was opaque: analyzing mistakes meant reading reasoning chains for each message, which is infeasible at our scale. Prompt changes meant re-running a full evaluation to prevent regressions, which was both costly and operationally challenging."
+      customer: "nurses"
+      customerQuote: "our nurses answer more than 50,000 medical queries per month"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Clinicians follow a decision tree that was never documented or passed to the model."
+      alternativeQuote: "Clinicians follow a decision tree to make this call, but it was never documented or passed to the model"
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

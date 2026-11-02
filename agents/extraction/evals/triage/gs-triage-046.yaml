@@ -1,0 +1,18 @@
+id: gs-triage-046
+publicationFixture: fixtures/arxiv/2610.18679.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: false
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "nurses; healthcare professionals"
+  statedHarm: "uncertainty was misinterpreted and reduced decision confidence"
+  trigger: "none"
+  existingAlternative: "none"
+  adoptable: "a prototype decision support system"
+notes: "Named professionals, a found harm, and a prototype. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

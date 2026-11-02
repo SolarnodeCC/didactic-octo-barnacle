@@ -1,0 +1,13 @@
+id: gs-extraction-023
+publicationFixture: fixtures/arxiv/2605.15165.json
+expected:
+  candidates:
+    - finding: "Congested SNAP call centers in Missouri caused nearly half of application denials to be procedural, because applicants could not complete required interviews, and standard Erlang-A staffing guidance understaffs by ignoring redials and abandonment."
+      evidenceQuote: "Missouri's SNAP call centers were so congested that nearly half of all application denials were procedural, caused by applicants' inability to complete required interviews, rather than underlying ineligibility."
+      customer: "agencies that run SNAP call centers"
+      customerQuote: "Missouri's SNAP call centers"
+      whyNow: "A court ruled that these system failures violated procedural due process."
+      whyNowQuote: "The judge ruled these system failures led to a violation of procedural due process."
+      currentAlternative: "Standard Erlang-A queueing guidance, which understaffs."
+      alternativeQuote: "Standard queueing guidance from Erlang-A that does not address endogenous congestion fundamentally understaffs"
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2609.32835v1",
+  "title": "FinancialAuditBench: Benchmark Construction under Differential Privacy Using Real-World Priors",
+  "summary": "As AI agents are becoming widely adopted in the financial services industry, careful measurement is essential to understand where they can be reliably deployed and where oversight and professional review remain necessary. Such measurement, however, is constrained by limited access to proprietary or privacy-sensitive data. Existing benchmarks therefore often rely on publicly available data, human- and/or LLM-authored tasks, or simplified settings. We introduce FinancialAuditBench, a benchmark for evaluating agents on financial statement audit tasks, along with a framework for systematically generating synthetic engagements. Our task generation framework leverages differentially private aggregate statistics from historical audits along with audit expertise contributed through over 1,100 hours of benchmark development and review. FinancialAuditBench consists of 90 tasks spanning workpaper completion and review across six synthetic audit engagements, each containing an average of 179 files. Evaluation on eleven frontier models shows that while agents complete substantial portions of staff-level audit tasks well, they sometimes perform inappropriate procedures or produce incorrect documentation. Beyond financial auditing, our framework offers an approach for systematically generating synthetic tasks for model evaluation and training in privacy-sensitive domains.",
+  "published": "2026-09-26T18:07:58Z",
+  "categories": ["cs.AI"],
+  "primaryCategory": "cs.AI",
+  "pdfUrl": "https://arxiv.org/pdf/2609.32835",
+  "withdrawn": false
+}

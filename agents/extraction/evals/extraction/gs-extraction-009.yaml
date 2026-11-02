@@ -1,0 +1,13 @@
+id: gs-extraction-009
+publicationFixture: fixtures/arxiv/2609.39537.json
+expected:
+  candidates:
+    - finding: "Deployers of high-risk AI systems must run fundamental rights impact assessments before deployment, but the evidence is fragmented across incompatible incident repositories, risk vocabularies, and legal texts."
+      evidenceQuote: "yet the evidence needed for credible assessments is fragmented across incompatible incident repositories, risk vocabularies, and legal texts."
+      customer: "deployers of high-risk AI systems"
+      customerQuote: "deployers of high-risk AI systems"
+      whyNow: "The EU AI Act (Art. 27) requires fundamental rights impact assessments before deployment."
+      whyNowQuote: "The EU AI Act (Art. 27) requires deployers of high-risk AI systems to conduct Fundamental Rights Impact Assessments (FRIAs) before deployment"
+      currentAlternative: "Evidence fragmented across incompatible incident repositories, risk vocabularies, and legal texts."
+      alternativeQuote: "fragmented across incompatible incident repositories, risk vocabularies, and legal texts"
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

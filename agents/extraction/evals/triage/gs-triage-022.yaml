@@ -1,0 +1,18 @@
+id: gs-triage-022
+publicationFixture: fixtures/arxiv/2610.39634.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: false
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: users without ML expertise"
+  statedHarm: "none"
+  trigger: "none"
+  existingAlternative: "a traditional dashboard"
+  adoptable: "the Explainability Assistant"
+notes: "User study of an explanation interface; no named party or harm. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

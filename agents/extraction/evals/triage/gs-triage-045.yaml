@@ -1,0 +1,18 @@
+id: gs-triage-045
+publicationFixture: fixtures/arxiv/2610.26913.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "radiologists"
+  statedHarm: "cloud or GPU-heavy models are a bottleneck for private offline use"
+  trigger: "none"
+  existingAlternative: "proprietary cloud models or large open models"
+  adoptable: "the MedPAO-Assist edge system"
+notes: "Named party, a bottleneck, an alternative, and a system. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

@@ -1,0 +1,13 @@
+id: gs-extraction-016
+publicationFixture: fixtures/arxiv/2610.32469.json
+expected:
+  candidates:
+    - finding: "Telephone triage nurses must decide from a brief intake note whether a caller needs an ambulance, an emergency department, an appointment, or self care, and raw LLMs over-escalate routine cases and cannot justify their recommendations against an auditable clinical standard."
+      evidenceQuote: "Queried directly, large language models (LLMs) are unreliable: they over-escalate routine cases and cannot justify their recommendations against an auditable clinical standard."
+      customer: "nurses"
+      customerQuote: "a nurse must decide whether a caller needs an ambulance, an emergency department, an appointment, or self care at home"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "The commercially maintained telehealth guidelines that nurses use."
+      alternativeQuote: "the same commercially maintained telehealth guidelines nurses use"
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

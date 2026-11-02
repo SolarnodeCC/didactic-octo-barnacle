@@ -1,0 +1,18 @@
+id: gs-triage-037
+publicationFixture: fixtures/arxiv/2610.41090.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: no role named"
+  statedHarm: "144 of 192 query-definition cells are nonconforming"
+  trigger: "none"
+  existingAlternative: "successful SQL execution as the check"
+  adoptable: "an executable verification profile"
+notes: "Three signals but no named party. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

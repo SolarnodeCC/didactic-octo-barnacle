@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2605.06703v1",
+  "title": "EMRGF: A Practitioner Framework for Governance-Driven Enterprise Technology Modernization",
+  "summary": "Enterprise technology modernization programs fail at a documented and costly rate, yet the dominant explanation -- inadequate engineering capability -- is incorrect. The primary failure mode is a governance deficit: the absence of structured, repeatable operating routines for how organizations plan, execute, validate, and hand off complex technology change. Existing frameworks -- ITIL, COBIT, TOGAF, scaled agile methodologies, and cloud provider well-architected frameworks -- address adjacent concerns but do not provide an integrated, portable institutional operating model for controlled modernization across migrations, data platforms, and AI-enabled automation. This article presents the Enterprise Modernization Reliability and Governance Framework (EMRGF), a practitioner-developed governance operating model derived from 24 years of applied delivery experience across financial services, industrial manufacturing, and retail enterprises. EMRGF comprises four interlocking modules -- Cloud and Legacy Modernization Governance, Data Platform Reliability and Evidence Integrity, AI-Enabled Automation Governance, and Mission-Critical Reliability and Root-Cause Routines -- operationalized through five implementation tools and a training-of-trainers institutionalization model. Empirical application at scale has produced a 30% reduction in development effort, a 35% reduction in testing cycles, zero-disruption migrations across high-volume data estates, and 99.9% data reliability in mission-critical analytics pipelines. The framework is explicitly aligned with U.S. national policy mandates including NIST CSF 2.0, NIST AI RMF, and Executive Orders 14028 and 14110, and is designed for institutional adoption without ongoing external dependency.",
+  "published": "2026-05-06T03:37:20Z",
+  "categories": ["cs.SE"],
+  "primaryCategory": "cs.SE",
+  "pdfUrl": "https://arxiv.org/pdf/2605.06703",
+  "withdrawn": false
+}

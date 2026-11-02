@@ -1,0 +1,18 @@
+id: gs-triage-059
+publicationFixture: fixtures/arxiv/2605.15165.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: true
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "SNAP call centers; applicants"
+  statedHarm: "nearly half of denials were procedural"
+  trigger: "a court ruling on procedural due process"
+  existingAlternative: "standard Erlang-A staffing guidance"
+  adoptable: "a queueing evaluation framework"
+notes: "All five signals. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

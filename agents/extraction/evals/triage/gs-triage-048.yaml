@@ -1,0 +1,18 @@
+id: gs-triage-048
+publicationFixture: fixtures/arxiv/2609.21149.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: false
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "health systems"
+  statedHarm: "clinician burden; LLM misses safety concerns"
+  trigger: "none"
+  existingAlternative: "none"
+  adoptable: "the InterviewPlayground evaluation platform"
+notes: "Named health systems, a stated burden, and a platform. Score is exactly 0.6, on the boundary of the cut. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

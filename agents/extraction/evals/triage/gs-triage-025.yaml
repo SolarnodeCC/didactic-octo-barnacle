@@ -1,0 +1,18 @@
+id: gs-triage-025
+publicationFixture: fixtures/arxiv/2610.39733.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: false
+    existingAlternative: false
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: banking workflows, no role"
+  statedHarm: "agents charge fees twice and pay while approval is pending"
+  trigger: "none"
+  existingAlternative: "none"
+  adoptable: "none: a private benchmark"
+notes: "Benchmark of agent failures; no named party. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

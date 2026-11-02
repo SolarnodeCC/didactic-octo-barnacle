@@ -1,0 +1,13 @@
+id: gs-extraction-004
+publicationFixture: fixtures/arxiv/2610.41437.json
+expected:
+  candidates:
+    - finding: "Patients arrive at brief, time-constrained clinical visits unsure of what to expect or ask, and turn to general-purpose AI chatbots to prepare beforehand."
+      evidenceQuote: "Patients often arrive at brief, time-constrained clinical visits unsure of what to expect or ask"
+      customer: "patients"
+      customerQuote: "Patients often arrive at brief, time-constrained clinical visits"
+      whyNow: "Millions of adults now turn to general-purpose AI chatbots to prepare."
+      whyNowQuote: "millions of adults now turn to general-purpose AI chatbots to prepare beforehand"
+      currentAlternative: "General-purpose AI chatbots."
+      alternativeQuote: "general-purpose AI chatbots"
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

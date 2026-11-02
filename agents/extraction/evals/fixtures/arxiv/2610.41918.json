@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2610.41918v1",
+  "title": "A Multimodal Type 2 Diabetes Registry on DHIS2: A Design and Feasibility Study with the AI-READI Dataset",
+  "summary": "Care for type 2 diabetes increasingly draws on continuous glucose monitors, wearable devices, home sensors, clinical records and retinal images, yet few open platforms have been shown to hold all of these for the same person. We asked three questions of DHIS2, the open-source health information system that ministries of health in about 80 countries run nationally: whether an unmodified Tracker program can represent these modalities together (RQ1), which design choices its row-per-event data model forces for dense sensor streams (RQ2), and what a bulk loader must do to load such data correctly (RQ3). We designed a registry of 27 program stages and 445 data elements, loaded the AI-READI dataset of 2,280 participants into it, and verified the result field by field against the source files. The program held every loaded modality in 8.09 million events. Dense streams were stored as hourly summaries aligned across modalities; electrocardiograms, diagnoses and 118,480 retinal images were stored as one event per record. The event model ruled out storing raw readings, and hourly summaries reduced the wearable and glucose volume about 26-fold. An audit of the loader found defects that shared one pattern: a failure that looked like success. We state five lessons for DHIS2 Tracker clients that address this pattern. Verification of all 64.9 million stored values found four defects, all missing, duplicated or artifactual records rather than wrong values, and none after their repair; an independent recomputation of the glucose summaries agreed on all 464,210 values compared. The paper offers implementation guidance for DHIS2 implementers and for users of AI-READI; it does not evaluate clinical use. Analytics at this scale, use by clinicians and live device feeds remain to be shown.",
+  "published": "2026-10-30T15:51:06Z",
+  "categories": ["cs.CY", "cs.DB"],
+  "primaryCategory": "cs.CY",
+  "pdfUrl": "https://arxiv.org/pdf/2610.41918",
+  "withdrawn": false
+}

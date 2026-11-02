@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2610.03932v1",
+  "title": "Govern, Map, Measure, Absorb: The Legibility Trap in Public Sector Participatory AI Governance",
+  "summary": "Public sector agencies have adopted participatory design as a prominent procedural safeguard proposed against algorithmic harm. Across methods, institutional contexts, and well-intentioned implementations, the participation gap persists. Communities engage, input is documented, and systems are deployed largely unchanged. This paper locates the persistence of that gap in the mechanism institutions use to document participation itself. We develop the concept of the legibility trap, in which institutional mechanisms for documenting participation systematically select for forms of community input that fit institutional categories and filter out the forms that would most constrain state power, including foundational dissent, demands for non-deployment, and what Kelly Oliver calls witnessing to structural conditions of harm. Drawing on James Scott's theory of state simplification, we demonstrate the legibility trap through critical discourse analysis of twenty-two official, community-produced, and public-record documents across three public sector AI deployments: the Allegheny Family Screening Tool, Detroit Project Green Light, and the Community Control Over Police Surveillance (CCOPS) ordinances in Oakland. We identify the structural conditions under which participation partially escapes the trap, and we theorize that repeated non-response constitutes a harm to community subjectivity that AI ethics frameworks have not yet named.",
+  "published": "2026-10-02T18:45:42Z",
+  "categories": ["cs.CY", "cs.HC"],
+  "primaryCategory": "cs.CY",
+  "pdfUrl": "https://arxiv.org/pdf/2610.03932",
+  "withdrawn": false
+}

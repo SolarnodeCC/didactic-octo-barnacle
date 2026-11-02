@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2602.02964v1",
+  "title": "Testing Framework Migration with Large Language Models",
+  "summary": "Python developers rely on two major testing frameworks: \\texttt{unittest} and \\texttt{Pytest}. While \\texttt{Pytest} offers simpler assertions, reusable fixtures, and better interoperability, migrating existing suites from \\texttt{unittest} remains a manual and time-consuming process. Automating this migration could substantially reduce effort and accelerate test modernization. In this paper, we investigate the capability of Large Language Models (LLMs) to automate test framework migrations from \\texttt{unittest} to \\texttt{Pytest}. We evaluate GPT 4o and Claude Sonnet 4 under three prompting strategies (Zero-shot, One-shot, and Chain-of-Thought) and two temperature settings (0.0 and 1.0). To support this analysis, we first introduce a curated dataset of real-world migrations extracted from the top 100 Python open-source projects. Next, we actually execute the LLM-generated test migrations in their respective test suites. Overall, we find that 51.5% of the LLM-generated test migrations failed, while 48.5% passed. The results suggest that LLMs can accelerate test migration, but there are often caveats. For example, Claude Sonnet 4 exhibited more conservative migrations (e.g., preserving class-based tests and legacy \\texttt{unittest} references), while GPT-4o favored more transformations (e.g., to function-based tests). We conclude by discussing multiple implications for practitioners and researchers.",
+  "published": "2026-02-03T01:04:09Z",
+  "categories": ["cs.SE"],
+  "primaryCategory": "cs.SE",
+  "pdfUrl": "https://arxiv.org/pdf/2602.02964",
+  "withdrawn": false
+}

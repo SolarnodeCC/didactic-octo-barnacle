@@ -1,0 +1,13 @@
+id: gs-extraction-007
+publicationFixture: fixtures/arxiv/2610.17523.json
+expected:
+  candidates:
+    - finding: "Financial institutions that train fraud-detection models together by federated learning are exposed to malicious clients that poison local data or model updates and degrade the shared model."
+      evidenceQuote: "FL schemes are prone to security vulnerabilities, where malicious clients can poison local data or model updates and degrade the global model, and hence the performance of the resulting model might be affected."
+      customer: "financial institutions"
+      customerQuote: "such as financial services, because it enables institutions"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Federated learning without a defense against poisoning."
+      alternativeQuote: "FL enables multiple entities to collaboratively train AI models without sharing local data"
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

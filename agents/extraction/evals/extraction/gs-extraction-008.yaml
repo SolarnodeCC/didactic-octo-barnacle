@@ -1,0 +1,13 @@
+id: gs-extraction-008
+publicationFixture: fixtures/arxiv/2610.05947.json
+expected:
+  candidates:
+    - finding: "A Swedish public sector organization adopting InnerSource faces a lack of an open culture and mindset, hard-to-manage reusable assets, and siloed practices with limited time for contributions."
+      evidenceQuote: "Key challenges relate to a lack of an open culture and mindset, management of reusable assets (e.g., ownership, documentation, and code visibility), and ways of working (e.g., siloed practices and limited time for contributions)."
+      customer: "a Swedish public sector organization"
+      customerQuote: "a Swedish Public Sector Organization"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: null
+      alternativeQuote: null
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

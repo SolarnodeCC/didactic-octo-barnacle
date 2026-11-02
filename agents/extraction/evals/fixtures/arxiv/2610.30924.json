@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2610.30924v1",
+  "title": "REGATTA: A Cross-Domain Measurement Framework and Fault-Injection Harness for Enterprise AI Agents",
+  "summary": "Enterprise AI-agent evaluation needs evidence about whether test suites expose specified faults and whether their reference rules are trustworthy. We introduce REGATTA (Regulatory Evaluation of Agents via Two-stage Testing and Assurance), a measurement framework with three instruments. A 125-item source-cited checklist spans five industry-by-jurisdiction cells across the United States and Vietnam. A 25-fault corpus covers five categories, and a harness scores suite-level fault detection at the design and execution stages. We examine four measurement diagnostics on 180 generated suites (5,400 scenarios) from three LLM generators. A source audit finds 24 items misstating the rule in force, 46 additional citation defects, 31 items with only non-binding, unidentifiable, or unverifiable sources, and 24 verified clean. Only initially substance-flagged items received author review; all 24 clean rows received AI review only. Results therefore describe the instruments as written, not legal compliance. Item coverage varies, execution-stage fault profiles are stable across generators, and the historical stages agree on $66$--$69\\%$ of fault--suite pairs. A current-model US-insurance retest finds stage disagreement above repeated-execution variation, but stage agreement $.536$ falls below pooled chance $.549$, failing V3's lower inequality. Blind adjudication by one expert supports the design-stage judging protocol ($κ=.72$, 95% interval $[.52,.88]$); 40 current-model execution probes give $κ=.75$. The instruments, audit, and reusable code are released.",
+  "published": "2026-10-22T08:42:35Z",
+  "categories": ["cs.SE"],
+  "primaryCategory": "cs.SE",
+  "pdfUrl": "https://arxiv.org/pdf/2610.30924",
+  "withdrawn": false
+}

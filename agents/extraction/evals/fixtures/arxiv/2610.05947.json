@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2610.05947v1",
+  "title": "Adopting InnerSource in a Public Sector Organization: A Case Study",
+  "summary": "InnerSource (IS) is increasingly viewed as a way to improve large-scale software development. However, evidence on its adoption in public sector organizations remains limited. This paper reports a study of IS adoption in a Swedish Public Sector Organization. Drawing on nine semi-structured interviews and an internal workshop with 13 participants, we examine motivations, challenges, and improvement strategies for IS adoption. The results show that the main motivations are improving reuse, strengthening cross-team collaboration, and enabling faster and more cost-efficient development. Key challenges relate to a lack of an open culture and mindset, management of reusable assets (e.g., ownership, documentation, and code visibility), and ways of working (e.g., siloed practices and limited time for contributions). The study also identified improvements to address challenges, including fostering an enabling culture and mindset for IS and knowledge sharing, strengthening management support, and establishing internal platforms and governance for reusable assets.",
+  "published": "2026-10-05T08:02:44Z",
+  "categories": ["cs.SE"],
+  "primaryCategory": "cs.SE",
+  "pdfUrl": "https://arxiv.org/pdf/2610.05947",
+  "withdrawn": false
+}

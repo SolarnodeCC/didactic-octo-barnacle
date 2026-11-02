@@ -1,0 +1,18 @@
+id: gs-triage-057
+publicationFixture: fixtures/arxiv/2602.02964.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: false
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "Python developers"
+  statedHarm: "migration is manual and time-consuming; 51.5% of LLM migrations fail"
+  trigger: "none"
+  existingAlternative: "none: manual migration is the baseline, not a tool in use"
+  adoptable: "none: an empirical study"
+notes: "Owner changed existingAlternative to false: an empirical study with no artifact and no named alternative; score 0.4, so rejected (compare gs-triage-001 of round 1 for the same study type). Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

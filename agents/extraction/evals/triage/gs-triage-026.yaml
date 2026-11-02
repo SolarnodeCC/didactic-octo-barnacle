@@ -1,0 +1,18 @@
+id: gs-triage-026
+publicationFixture: fixtures/arxiv/2610.41085.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: only analyst rules"
+  statedHarm: "payroll fraud"
+  trigger: "none"
+  existingAlternative: "analyst rules"
+  adoptable: "none: a synthetic study"
+notes: "Fraud screening method on synthetic data; no named party. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

@@ -1,0 +1,18 @@
+id: gs-triage-049
+publicationFixture: fixtures/arxiv/2602.11223.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: false
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "health systems"
+  statedHarm: "morbidity, mortality, and healthcare costs"
+  trigger: "none"
+  existingAlternative: "fragmented, reactive health systems"
+  adoptable: "none: lessons learned"
+notes: "Population-level burden and pilot lessons. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

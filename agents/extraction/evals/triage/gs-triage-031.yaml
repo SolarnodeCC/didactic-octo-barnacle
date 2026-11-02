@@ -1,0 +1,18 @@
+id: gs-triage-031
+publicationFixture: fixtures/arxiv/2610.41988.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: false
+    trigger: false
+    existingAlternative: false
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none"
+  statedHarm: "none"
+  trigger: "none"
+  existingAlternative: "none"
+  adoptable: "none"
+notes: "Pretraining method for transaction models. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

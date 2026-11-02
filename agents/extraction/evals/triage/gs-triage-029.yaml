@@ -1,0 +1,18 @@
+id: gs-triage-029
+publicationFixture: fixtures/arxiv/2610.04123.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: false
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "financial institutions, vendors, and regulators"
+  statedHarm: "hard to assess and trust agents, which limits adoption"
+  trigger: "none"
+  existingAlternative: "none"
+  adoptable: "the Agent Reliability Profile"
+notes: "Named parties, a stated limit on adoption, and a standard. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

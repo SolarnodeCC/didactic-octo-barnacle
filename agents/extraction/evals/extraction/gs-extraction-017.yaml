@@ -1,0 +1,13 @@
+id: gs-extraction-017
+publicationFixture: fixtures/arxiv/2610.27684.json
+expected:
+  candidates:
+    - finding: "Healthcare providers lose substantial revenue to systematic payer underpayments and claim denials, and identifying the recurring, correctable patterns behind them is largely manual and does not scale to hospital claim volumes."
+      evidenceQuote: "Healthcare providers lose substantial revenue to systematic payer underpayments and claim denials, yet identifying the recurring, correctable patterns behind them remains largely manual and does not scale to hospital claim volumes."
+      customer: "healthcare providers"
+      customerQuote: "Healthcare providers"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Manual identification of recurring, correctable patterns."
+      alternativeQuote: "remains largely manual and does not scale to hospital claim volumes"
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

@@ -1,0 +1,18 @@
+id: gs-triage-024
+publicationFixture: fixtures/arxiv/2610.39045.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: no role owns the problem"
+  statedHarm: "nearly 30% of recovered kidneys are never transplanted"
+  trigger: "none"
+  existingAlternative: "the standard waitlist sequence"
+  adoptable: "the Arbitrator framework"
+notes: "Strong harm and a framework, but no named party. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

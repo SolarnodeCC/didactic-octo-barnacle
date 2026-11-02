@@ -86,6 +86,14 @@ expected:
 notes: "Reviewer R4, 2026-.."
 ```
 
+An entry for a publication that passes triage but yields no candidate has `candidates: []` and a `reason` string under `expected`:
+
+```yaml
+expected:
+  candidates: []
+  reason: "A population-level burden with no named party that acts on it."
+```
+
 Evidence envelopes are required on agent expected outputs (unlike the short product examples). Injection fixtures live under `fixtures/injection/` (REQ-NFR-006).
 
 ## Closing OQ-015

@@ -1,0 +1,13 @@
+id: gs-extraction-011
+publicationFixture: fixtures/arxiv/2610.26913.json
+expected:
+  candidates:
+    - finding: "Radiology workflows that need data privacy and offline operation cannot adopt proprietary cloud or GPU-hungry LLM report structuring; an edge system structures reports from radiologist dictation on a laptop CPU in about 31 seconds."
+      evidenceQuote: "which is a critical bottleneck for clinical adoption in radiology workflows that demand data privacy and offline operation."
+      customer: "radiologists"
+      customerQuote: "radiologist dictation and voice commands"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Proprietary cloud-based models or large open models requiring high-end GPUs."
+      alternativeQuote: "either proprietary cloud-based models or large open models requiring high-end GPUs"
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

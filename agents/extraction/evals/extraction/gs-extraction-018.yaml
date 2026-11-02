@@ -1,0 +1,13 @@
+id: gs-extraction-018
+publicationFixture: fixtures/arxiv/2606.17555.json
+expected:
+  candidates:
+    - finding: "Banks face fraud and money-laundering behavior that is engineered to resemble legitimate activity, and static rule engines remain blind to payment redirection, session hijacking, and laundering layering."
+      evidenceQuote: "Static rule engines catch high-velocity events but remain blind to BEC payment redirection, session hijacking, and laundering layering"
+      customer: "banks"
+      customerQuote: "Banks face two threat families"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Static rule engines."
+      alternativeQuote: "Static rule engines catch high-velocity events"
+notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

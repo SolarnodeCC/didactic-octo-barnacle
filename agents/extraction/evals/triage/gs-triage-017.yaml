@@ -1,0 +1,18 @@
+id: gs-triage-017
+publicationFixture: fixtures/arxiv/2610.41918.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: false
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "ministries of health"
+  statedHarm: "none stated"
+  trigger: "none"
+  existingAlternative: "the DHIS2 Tracker program"
+  adoptable: "a registry design and bulk-loader lessons"
+notes: "Party and an adoptable design, but no stated harm. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."
