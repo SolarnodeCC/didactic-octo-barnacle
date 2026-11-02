@@ -1,0 +1,11 @@
+id: gs-relevance-008
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2609.39537.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-009.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-008.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-008.yaml
+expected:
+  bestIndustry: government
+  strategicRelevanceRange: [50, 80]
+  technicalFeasibilityRange: [55, 80]
+  implementationEffort: M
+notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."

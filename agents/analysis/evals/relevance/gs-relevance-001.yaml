@@ -1,0 +1,11 @@
+id: gs-relevance-001
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.40641.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-001.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-001.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-001.yaml
+expected:
+  bestIndustry: government
+  strategicRelevanceRange: [35, 65]
+  technicalFeasibilityRange: [50, 75]
+  implementationEffort: L
+notes: "Agricultural disasters are not a listed focus area, so relevance is low to medium; effort L for data integrations. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."

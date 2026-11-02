@@ -125,6 +125,21 @@ expected:
   painLevelRange: [3, 4]      # at most 2 wide
 ```
 
+A Relevance item reads the frozen outputs of the two agents before it and lists acceptable ranges, because the strategic relevance score is computed by code from the model's industry fit and focus match:
+
+```yaml
+id: gs-relevance-001
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.40641.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-001.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-001.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-001.yaml
+expected:
+  bestIndustry: government
+  strategicRelevanceRange: [35, 65]    # at most 30 wide
+  technicalFeasibilityRange: [50, 75]  # at most 30 wide
+  implementationEffort: L              # S, M, L, or XL
+```
+
 Evidence envelopes are required on agent expected outputs (unlike the short product examples). Injection fixtures live under `fixtures/injection/` (REQ-NFR-006).
 
 ## Closing OQ-015

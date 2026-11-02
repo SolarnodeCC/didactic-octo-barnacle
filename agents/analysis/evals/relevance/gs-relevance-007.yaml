@@ -1,0 +1,11 @@
+id: gs-relevance-007
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.05947.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-008.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-007.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-007.yaml
+expected:
+  bestIndustry: government
+  strategicRelevanceRange: [30, 60]
+  technicalFeasibilityRange: [50, 80]
+  implementationEffort: M
+notes: "A way of working, not a product; feasibility and relevance are uncertain. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."

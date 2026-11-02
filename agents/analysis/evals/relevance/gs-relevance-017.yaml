@@ -1,0 +1,11 @@
+id: gs-relevance-017
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2608.22389.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-019.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-017.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-017.yaml
+expected:
+  bestIndustry: financial-services
+  strategicRelevanceRange: [75, 100]
+  technicalFeasibilityRange: [45, 75]
+  implementationEffort: L
+notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."
