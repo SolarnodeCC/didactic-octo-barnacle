@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2610.40224v1",
+  "title": "\"It Feels Weird to Just Rely on AI\": How Experienced Healthcare Professionals Work With Decision Support Systems in Clinical Practice",
+  "summary": "Decision support systems (DSS) assist with clinical decision-making. Little is known, however, about the decision-making process with DSS in clinical practice and the extent to which clinicians consider or rely on the predictions. Studies on human-AI decision-making usually focus on laypeople, simplified decision tasks, or one-shot interactions with prototypes that are not integrated into existing workflows. To gain insights from real-world practice, we conducted an online survey (n=12) and semi-structured interviews (n=10) with clinicians from two different medical cohorts each working with a DSS. Findings show, amongst other things, that the interaction with DSS changes as experience increases, the predictions become more important in complex cases, that decisions are discussed with colleagues, and that workflow integration affects decision-making. Our findings on human, technical, contextual, and organisational factors contribute to a socio-technical perspective on DSS reliance behaviour. We conclude by discussing the implications of our findings for the design of DSS.",
+  "published": "2026-10-29T15:04:32Z",
+  "categories": ["cs.HC"],
+  "primaryCategory": "cs.HC",
+  "pdfUrl": "https://arxiv.org/pdf/2610.40224v1",
+  "withdrawn": false
+}

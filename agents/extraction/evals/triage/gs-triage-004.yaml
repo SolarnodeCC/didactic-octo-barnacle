@@ -1,0 +1,18 @@
+id: gs-triage-004
+publicationFixture: fixtures/arxiv/2610.40269.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: no role named"
+  statedHarm: "each model breaks 32-51 working files"
+  trigger: "none"
+  existingAlternative: "the rule-based tool Rector"
+  adoptable: "none: an empirical study"
+notes: "Stated harm and an alternative, but no named party; rejected because NamedParty is required. Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request."

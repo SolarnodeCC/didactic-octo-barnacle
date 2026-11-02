@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2610.39949v1",
+  "title": "Reconstructing Missing Mandi Prices in North-East India with Regional Factors",
+  "summary": "Agricultural price panels contain prolonged and clustered reporting gaps, yet their reconstruction is often evaluated by deleting isolated observations. We investigate a regional-factor approach to weekly mandi-price reconstruction in five North-East Indian states, with Bihar and Goa as additional comparison states. The model combines a common price path with persistent market-specific deviations; an adaptive ensemble weights alternative borrowing structures using internally masked reports. On a matched retrospective benchmark against ten baselines, pooled North-East mean absolute percentage error is 19.3%, compared with 26.5% for SAITS. The corresponding calendar-aligned panel/time-block bootstrap interval for the error difference is 2.8-12.7 percentage points. Removing the target state's monthly aggregate leaves pooled error at 19.4%, but eliminates the apparent advantage in Goa. An origin-restricted pipeline combining week-close input processing with revised ensemble validation yields 19.7% error, compared with 30.8% for carry-forward; this contrast does not isolate individual pipeline changes. Gains vary across states, and uncertainty intervals remain too narrow in several small panels. These findings support further study of structured retrospective reconstruction, not deployment claims: model development used earlier results, publication dates for monthly inputs are assumed, and confirmatory evaluation on untouched data remains outstanding.",
+  "published": "2026-10-29T12:46:31Z",
+  "categories": ["cs.CY"],
+  "primaryCategory": "cs.CY",
+  "pdfUrl": "https://arxiv.org/pdf/2610.39949v1",
+  "withdrawn": false
+}

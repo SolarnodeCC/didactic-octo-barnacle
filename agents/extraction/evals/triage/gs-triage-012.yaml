@@ -1,0 +1,18 @@
+id: gs-triage-012
+publicationFixture: fixtures/arxiv/2610.40071.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: true
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "the organization (policies and compliance)"
+  statedHarm: "insider threat and supply-chain risk"
+  trigger: "AI agents now create pull requests and change infrastructure across the SDLC"
+  existingAlternative: "the git log"
+  adoptable: "the APE attestation protocol"
+notes: "All five signals true. Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request."

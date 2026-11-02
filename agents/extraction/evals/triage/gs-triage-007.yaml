@@ -1,0 +1,18 @@
+id: gs-triage-007
+publicationFixture: fixtures/arxiv/2610.40164.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: true
+    existingAlternative: true
+    adoptable: false
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "national-level regulatory bodies"
+  statedHarm: "AI citations up to 2.08x more concentrated than traffic"
+  trigger: "generative AI search increasingly decides where attention and revenue go"
+  existingAlternative: "no consistent data collection infrastructure between regulators"
+  adoptable: "none: a dataset for research use"
+notes: "Regulators with a stated, measured risk, a trigger, and a current gap; accepted without an adoptable tool. Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request."

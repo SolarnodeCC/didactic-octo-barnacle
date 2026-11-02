@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2610.39890v1",
+  "title": "PR4Code: A Pull Requests Dataset for AI Code Generation",
+  "summary": "AI-driven code generation is evolving from handling small, localized code-completion tasks toward supporting the implementation of full software features. To support this transition, this paper introduces PR4Code, a dataset of 4,508 Java and 8,831 Python curated Pull Requests (PRs) collected from GitHub, each enriched with metadata, commit histories, and detailed code changes. Unlike resources focused on isolated code fragments, PR4Code captures the feature implementation process, delivering a large and diverse collection of real-world development tasks that can be used to assess AI-driven solutions. Our analysis reveals substantial variability in PR structure, commit granularity, and textual content. In addition, we release scripts to regenerate and update the dataset, ensuring reproducibility and maintainability.",
+  "published": "2026-10-29T12:05:40Z",
+  "categories": ["cs.SE"],
+  "primaryCategory": "cs.SE",
+  "pdfUrl": "https://arxiv.org/pdf/2610.39890v1",
+  "withdrawn": false
+}

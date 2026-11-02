@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2610.40269v1",
+  "title": "When Modernization Breaks Working Code: A Single-File Study of LLMs on Legacy PHP",
+  "summary": "Pasting a legacy file into an LLM and asking it to \"modernize this\" is an easy shortcut. But is the result better than leaving the code alone? In this paper, we study this single-file setting with five LLMs, each asked to modernize 100 WordPress 4.0 PHP files to PHP 8.3 while preserving behavior, with no project context or execution feedback. We evaluate every output with 630 hidden behavioral checks and 511 Rector-detected modernization findings. We compare against two baselines: the unchanged originals and the rule-based tool Rector. Often, the answer is no. Untouched, 83 files already pass every check; the best LLM leaves only 59. Each model breaks 32-51 working files while repairing at most 10, whereas Rector breaks 7 and repairs 6. Most of this damage is unnecessary. Only 37 findings (7 percent) require a change under PHP 8.3, yet in compatible files with no required change, the LLMs break 36-60 percent (Rector: 8 percent). The model with the highest modernization score is no more compatible than its closest competitors. Most regressed checks come from files that no longer load at all, often because of type declarations PHP itself rejects. These are errors that need no project context to avoid. Evaluations of LLM-based modernization should therefore measure against a no-change baseline and report modernization and behavioral preservation separately.",
+  "published": "2026-10-29T15:29:45Z",
+  "categories": ["cs.SE"],
+  "primaryCategory": "cs.SE",
+  "pdfUrl": "https://arxiv.org/pdf/2610.40269v1",
+  "withdrawn": false
+}

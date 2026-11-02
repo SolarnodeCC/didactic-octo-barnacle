@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2610.40164v1",
+  "title": "Who Owns Digital News, and Who Gets Cited: Measuring Media Concentration Across 77 Countries and Seven AI Systems",
+  "summary": "Digital news outlets compete for audience attention. Search engines equipped with generative AI systems such as Google's AI overviews increasingly decide where that attention goes, as well as the revenue it represents. Yet, the lack of a consistent data collection infrastructure between national-level regulatory bodies has hindered between-country comparative analysis of media concentration, and with it any assessment of how these intermediaries reshape digital news markets. To address this issue, we compile an ownership dataset for 9,761 digital news outlets drawn from Wikipedia and Wikidata, achieving high agreement with independently compiled US and UK news directories. Using this dataset, we derive traffic-weighted concentration indices for 77 countries. We find that journalists report more owner pressure in countries with higher concentration, and that outlet-level measures understate concentration, with owner-level indices a median 1.30x higher. Applying concentration measures to AI-mediated news discovery, we find that citation distributions from major AI systems are up to 2.08x more concentrated than traffic, and that if Google AI Overviews mediated all organic search, the resulting rise in US concentration would be several times that associated with highly regulated media mergers and acquisitions. Finally, our analyses indicate that AI systems preferentially cite state-controlled media outlets when prompted in that country's native language. Together, these findings raise concerns about the effect AI systems may have on digital media. We release the dataset to enable the monitoring of digital news globally, so that the impact of disruptive technologies on digital media markets can be tracked as they emerge.",
+  "published": "2026-10-29T14:38:06Z",
+  "categories": ["cs.CY"],
+  "primaryCategory": "cs.CY",
+  "pdfUrl": "https://arxiv.org/pdf/2610.40164v1",
+  "withdrawn": false
+}

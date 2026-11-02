@@ -65,6 +65,10 @@ expected:
     existingAlternative: true
     adoptable: true
   accepted: true                # follows from the signals by the triage rule; checked for consistency
+  reason: accepted              # accepted, or low-score when the signal rule fails
+basis:                          # optional: the words or the reason behind each signal
+  namedParty: "governments, growers and scientists"
+  statedHarm: "crop loss"
 notes: "Reviewer R4, 2026-.."
 ```
 
