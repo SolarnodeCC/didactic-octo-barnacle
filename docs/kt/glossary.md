@@ -50,4 +50,5 @@ last_reviewed: 2026-10-29
 | Startup concept | The output of the Startup Generator: name, model, pricing, USP, features, and next steps. |
 | TAM | Total addressable market. |
 | Triage | The cheap filter that decides which publications go through the agent pipeline (REQ-PROC-005). |
+| Triage signal | One of five yes/no readings of a title and abstract that triage uses: named party, stated harm, trigger, existing alternative, and adoptable. See [triage](agents/triage.md) (REQ-PROC-008). |
 | USP | Unique selling proposition. |

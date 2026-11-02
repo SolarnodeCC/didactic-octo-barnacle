@@ -1,19 +1,28 @@
-# A publication that yields no opportunity. The publication and IDs are
-# illustrative and do not refer to a real record. Extraction fields follow
+# A publication that passes triage but yields no candidate opportunity. The
+# publication and IDs are illustrative and do not refer to a real record.
+# Triage fields follow docs/kt/agents/triage.md and extraction fields follow
 # docs/kt/agents/opportunity-extraction.md. Golden sets include entries like
 # this one (REQ-TEST-005).
 Publication:
   Id: pub-example-0002
-  Title: A tighter bound for a combinatorial identity
+  Title: "Procurement delays in public hospitals: a comparative survey"
   Source: arxiv
   SourceId: "0000.00000v1"
   PublicationDate: "2026-09-20"
   InputMode: abstract
 Triage:
+  Signals:
+    NamedParty: true
+    StatedHarm: true
+    Trigger: false
+    ExistingAlternative: true
+    Adoptable: false
+  TriageScore: 0.6
   Accepted: true
-  TriageScore: 0.31
+  Reason: accepted
+  Notes: Hospitals and procurement delays are named, and current paper procedures are described.
 Extraction:
   Candidates: []
-  Confidence: 0.8
-  Notes: The result is a theoretical proof with no stated application or user problem.
+  Confidence: 0.7
+  Notes: The delays are survey results, not a problem the procurement officers state they carry, and the findings offer nothing to adopt. No quotable problem and customer.
 Opportunity: null

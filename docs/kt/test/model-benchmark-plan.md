@@ -112,8 +112,8 @@ For each pair of step and model:
 
 | Step | Main metrics |
 |---|---|
-| Triage | Precision and recall at the cut 0.55, calibration of `TriageScore`, theory-only papers rejected |
-| Extraction | Share of quotes found verbatim in the input, recall of expected findings, empty cases returned empty |
+| Triage | Agreement per signal with the labels (REQ-PROC-008), precision and recall of the accept decision that code derives from them, theory-only papers rejected |
+| Extraction | Share of quotes found verbatim in the input, recall of expected findings, a named customer with a quote on every candidate (REQ-PROC-009), empty cases returned empty |
 | Research Analyst | Industry and technology match, novelty against the labels, calibration of `Confidence` (capped at 0.7 for abstract-only) |
 | Problem Discovery | Agreement with the `PainLevel` rubric, consistency of Problem and Customer |
 | Market Analysis | Within one order of magnitude of the expected SAM and growth, correct `Basis`, share of cited sources that support the figure |

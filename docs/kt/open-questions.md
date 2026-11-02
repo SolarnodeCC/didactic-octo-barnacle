@@ -22,6 +22,12 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 |---|---|---|---|
 | OQ-036 | Which model runs each model-backed step? | Cloudflare-hosted models only. Run the [model benchmark plan](test/model-benchmark-plan.md) on the golden sets, pick the cheapest model that meets each step's threshold, and record the result in an ADR | triage and extraction before phase 2 starts; the six analysis agents before phase 3 |
 
+## Selection and validation
+
+| ID | Question | Proposal | Decide before |
+|---|---|---|---|
+| OQ-037 | How are evidence levels, the validation brief, and the readiness label specified (option B of ADR 0036)? | Write a design document before phase 3 starts: four evidence levels per element (absent, assumption, documentary evidence, validated by a person), the four elements plus why-now and a stop criterion per candidate, who enters validated evidence, and a readiness label next to the score that leaves the score weights unchanged | before phase 3 starts |
+
 ## Ownership
 
 | ID | Question | Proposal | Decide before |
