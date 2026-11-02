@@ -1,0 +1,19 @@
+id: gs-research-analyst-005
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.04123.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-005.yaml#0
+neighborsFixture: fixtures/neighbors/2610.04123.json
+expected:
+  noveltyRange: [40, 70]
+  maturity: prototype
+  industriesInclude:
+    - financial-services
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 55
+  maturity: prototype
+  industry:
+    - financial-services
+  technology:
+    - "agent reliability profile"
+    - "assurance evidence schema"
+    - "AI agents"
+notes: "Maturity is a boundary case: a schema with a builder and a validator, no field result in the abstract. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

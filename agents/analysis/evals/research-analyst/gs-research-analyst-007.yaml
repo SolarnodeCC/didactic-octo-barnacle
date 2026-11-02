@@ -1,0 +1,18 @@
+id: gs-research-analyst-007
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.05947.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-008.yaml#0
+neighborsFixture: fixtures/neighbors/2610.05947.json
+expected:
+  noveltyRange: [20, 50]
+  maturity: field-tested
+  industriesInclude:
+    - government
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 35
+  maturity: field-tested
+  industry:
+    - government
+  technology:
+    - "InnerSource"
+    - "reusable asset management"
+notes: "Maturity is a boundary case: a qualitative field study with no technology. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

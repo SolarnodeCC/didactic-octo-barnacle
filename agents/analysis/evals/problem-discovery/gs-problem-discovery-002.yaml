@@ -1,0 +1,11 @@
+id: gs-problem-discovery-002
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.40164.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-002.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-002.yaml
+expected:
+  requiredFacts:
+    - "national regulators have no consistent data collection to compare media concentration across countries"
+    - "AI search systems may concentrate attention on fewer news outlets"
+  customerIndustry: government
+  painLevelRange: [2, 3]
+notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

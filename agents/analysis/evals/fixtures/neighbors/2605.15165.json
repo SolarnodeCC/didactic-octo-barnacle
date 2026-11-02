@@ -1,0 +1,18 @@
+[
+  {
+    "id": "http://arxiv.org/abs/1808.01795v2",
+    "title": "Blockchain Queueing Theory",
+    "summary": "Blockchain has many benefits including decentralization, availability, persistency, consistency, anonymity, auditability and accountability, and it also covers a wide spectrum of applications ranging from cryptocurrency, financial services, reputation system, Internet of Things, sharing economy to public and social services. Not only may blockchain be regarded as a by-product of Bitcoin cryptocurrency systems, but also it is a type of distributed ledger technology through using a trustworthy, decentralized log of totally ordered transactions. By summarizing the literature of blockchain, it is found that more papers focus on engineering implementation and realization, while little work has been done on basic theory, for example, mathematical models (Markov processes, queueing theory and game models), performance analysis and optimization of blockchain systems. In this paper, we develop queueing theory of blockchain systems and provide system performance evaluation. To do this, we design a Markovian batch-service queueing system with two different service stages, while the two stages are suitable to well express the mining process in the miners pool and the building of a new blockchain. By using the matrix-geometric solution, we obtain a system stable condition and express three key performance measures: (a) The number of transactions in the queue, (b) the number of transactions in a block, and (c) the transaction-confirmation time. Finally, We use numerical examples to verify computability of our theoretical results. Although our queueing model is simple under exponential or Poisson assumptions, our analytic method will open a series of potentially promising research in queueing theory of blockchain systems.",
+    "published": "2018-08-06T09:32:19Z",
+    "categories": ["cs.CE", "math.PR"],
+    "primaryCategory": "cs.CE"
+  },
+  {
+    "id": "http://arxiv.org/abs/2005.07253v3",
+    "title": "Information Design for Congested Social Services: Optimal Need-Based Persuasion",
+    "summary": "We study the effectiveness of information design in reducing congestion in social services catering to users with varied levels of need. In the absence of price discrimination and centralized admission, the provider relies on sharing information about wait times to improve welfare. We consider a stylized model with heterogeneous users who differ in their private outside options: low-need users have an acceptable outside option to the social service, whereas high-need users have no viable outside option. Upon arrival, a user decides to wait for the service by joining an unobservable first-come-first-serve queue, or leave and seek her outside option. To reduce congestion and improve social outcomes, the service provider seeks to persuade more low-need users to avail their outside option, and thus better serve high-need users. We characterize the Pareto-optimal signaling mechanisms and compare their welfare outcomes against several benchmarks. We show that if either type is the overwhelming majority of the population, information design does not provide improvement over sharing full information or no information. On the other hand, when the population is a mixture of the two types, information design not only Pareto dominates full-information and no-information mechanisms, in some regimes it also achieves the same welfare as the \"first-best\", i.e., the Pareto-optimal centralized admission policy with knowledge of users' types.",
+    "published": "2020-05-14T20:47:10Z",
+    "categories": ["cs.GT", "econ.TH"],
+    "primaryCategory": "cs.GT"
+  }
+]

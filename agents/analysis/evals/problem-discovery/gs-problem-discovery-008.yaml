@@ -1,0 +1,11 @@
+id: gs-problem-discovery-008
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2609.39537.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-009.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-008.yaml
+expected:
+  requiredFacts:
+    - "deployers of high-risk AI must run fundamental rights impact assessments before deployment"
+    - "the evidence is fragmented across incompatible incident repositories and legal texts"
+  customerIndustry: government
+  painLevelRange: [4, 5]
+notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

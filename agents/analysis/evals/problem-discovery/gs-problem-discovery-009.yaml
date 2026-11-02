@@ -1,0 +1,11 @@
+id: gs-problem-discovery-009
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2609.09356.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-010.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-009.yaml
+expected:
+  requiredFacts:
+    - "nurses triage more than 50,000 WhatsApp queries a month"
+    - "the LLM triage is opaque so errors and prompt changes are costly to analyse"
+  customerIndustry: healthcare
+  painLevelRange: [4, 5]
+notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

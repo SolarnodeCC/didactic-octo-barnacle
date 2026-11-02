@@ -1,0 +1,11 @@
+id: gs-problem-discovery-005
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.04123.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-005.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-005.yaml
+expected:
+  requiredFacts:
+    - "no shared framework or language to describe, validate and benchmark agent reliability"
+    - "this slows assessment and adoption of agents by institutions, vendors and regulators"
+  customerIndustry: financial-services
+  painLevelRange: [3, 4]
+notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

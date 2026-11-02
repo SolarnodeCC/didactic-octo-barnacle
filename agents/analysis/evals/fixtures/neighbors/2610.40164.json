@@ -1,0 +1,82 @@
+[
+  {
+    "id": "http://arxiv.org/abs/1710.06347v1",
+    "title": "Power Structure in Chilean News Media",
+    "summary": "Even democracies endowed with the most active free press struggle to maintain the diversity of news coverage. Consolidation and market forces may cause only a few dominant players to control the news cycle. Editorial policies may be biased by corporate ownership relations, narrowing news coverage and focus. To an increasing degree, this problem also applies to social media news distribution, since it is subject to the same socio-economic drivers. To study the effects of consolidation and ownership on news diversity, we model the diversity of Chilean coverage on the basis of ownership records and social media data. We create similarity networks of news outlets on the basis of their ownership and the topics they cover. We then examine the relationships between the topology of ownership networks and content similarity to characterize how ownership affects news coverage. A network analysis reveals that Chilean media is highly concentrated both in terms of ownership as well as in terms of topics covered. Our method can be used to determine which groups of outlets and ownership exert the greatest influence on news coverage.",
+    "published": "2017-10-17T15:41:24Z",
+    "categories": ["cs.SI"],
+    "primaryCategory": "cs.SI"
+  },
+  {
+    "id": "http://arxiv.org/abs/1904.07539v1",
+    "title": "A Dynamic Embedding Model of the Media Landscape",
+    "summary": "Information about world events is disseminated through a wide variety of news channels, each with specific considerations in the choice of their reporting. Although the multiplicity of these outlets should ensure a variety of viewpoints, recent reports suggest that the rising concentration of media ownership may void this assumption. This observation motivates the study of the impact of ownership on the global media landscape and its influence on the coverage the actual viewer receives. To this end, the selection of reported events has been shown to be informative about the high-level structure of the news ecosystem. However, existing methods only provide a static view into an inherently dynamic system, providing underperforming statistical models and hindering our understanding of the media landscape as a whole. In this work, we present a dynamic embedding method that learns to capture the decision process of individual news sources in their selection of reported events while also enabling the systematic detection of large-scale transformations in the media landscape over prolonged periods of time. In an experiment covering over 580M real-world event mentions, we show our approach to outperform static embedding methods in predictive terms. We demonstrate the potential of the method for news monitoring applications and investigative journalism by shedding light on important changes in programming induced by mergers and acquisitions, policy changes, or network-wide content diffusion. These findings offer evidence of strong content convergence trends inside large broadcasting groups, influencing the news ecosystem in a time of increasing media ownership concentration.",
+    "published": "2019-04-16T08:57:33Z",
+    "categories": ["cs.SI", "cs.CY"],
+    "primaryCategory": "cs.SI"
+  },
+  {
+    "id": "http://arxiv.org/abs/2608.14141v1",
+    "title": "Who Owns the Online Media?",
+    "summary": "Ownership matters for the media's watchdog role. We map the ownership networks behind thousands of online news outlets in the U.S., Canada, and Europe. The networks reveal who is ultimately responsible for the news: for over half of the outlets, a single entity. The rest sit behind multi-layered structures, making responsibility hard to trace. Market concentration, measured comparably across countries, is largely low to moderate. Looking at content, we find that co-owned outlets report more similarly, even within fixed outlet pairs, as ownership changes -- not least in the U.S., where reader demand is often thought dominant.",
+    "published": "2026-08-14T09:46:38Z",
+    "categories": ["econ.GN"],
+    "primaryCategory": "econ.GN"
+  },
+  {
+    "id": "http://arxiv.org/abs/2602.18455v7",
+    "title": "Impact of AI Search Summaries on Website Traffic: Evidence from Google AI Overviews and Wikipedia",
+    "summary": "Search engines increasingly display AI-generated answers above organic links, potentially displacing traffic to upstream publishers. We estimate the impact of Google's AI Overviews (AIO) on Wikipedia's search traffic using AIO's staggered geographic rollout and Wikipedia's multilingual structure. Our difference-in-differences design compares monthly external-search referrals to English Wikipedia articles with referrals to the same articles in German and French, and finds that default AIO availability reduced English search traffic by 5.45% and 4.82%, respectively. Our results suggest that answer-producing digital intermediaries can materially reallocate attention away from informational publishers, with implications for content monetization, search platform design, and policy.",
+    "published": "2026-02-05T01:31:44Z",
+    "categories": ["cs.CY", "cs.AI"],
+    "primaryCategory": "cs.CY"
+  },
+  {
+    "id": "http://arxiv.org/abs/2404.17095v2",
+    "title": "The Web unpacked: a quantitative analysis of global Web usage",
+    "summary": "This paper presents a comprehensive analysis of global web usage patterns based on data from SimilarWeb, a leading source for estimating web traffic. Leveraging a dataset comprising over 250,000 websites, we estimate the total web traffic and investigate its distribution among domains and industry sectors. We detail the characteristics of the top 116 domains, which comprise an estimated one-third of all web traffic. Our analysis scrutinizes various attributes of these domains, including their content sources and types, access requirements, offline presence, and ownership features. Our analysis reveals a significant concentration of web traffic, with a diminutive number of top websites capturing the majority of visits. Search engines, news and media, social networks, streaming, and adult content emerge as primary attractors of web traffic, which is also highly concentrated on platforms and USA-owned websites. Much of the traffic goes to for-profit but mostly free-of-charge websites, highlighting the dominance of business models not based on paywalls.",
+    "published": "2024-04-26T01:05:47Z",
+    "categories": ["cs.CY"],
+    "primaryCategory": "cs.CY"
+  },
+  {
+    "id": "http://arxiv.org/abs/2603.16138v2",
+    "title": "Answer Bubbles: Information Exposure in AI-Mediated Search",
+    "summary": "Generative search systems are increasingly replacing link-based retrieval with AI-generated summaries, yet little is known about how these systems differ in sources, language, and fidelity to cited material. We examine responses to 11,000 real search queries across five systems---vanilla GPT, Search GPT, Perplexity Search with Grok, Google AI Overviews, and traditional Google Search---at three levels: source diversity, linguistic characterization of the generated summary, and source-summary fidelity. We find that generative search systems exhibit significant \\textit{source-selection} biases in their citations, favoring certain sources over others. Incorporating search also selectively attenuates epistemic markers, reducing hedging by up to 60\\% while preserving confidence language in the AI-generated summaries. At the same time, AI summaries further compound the citation biases: Wikipedia and longer sources are disproportionately overrepresented, whereas cited social media content and negatively framed sources are substantially underrepresented. Our findings highlight the potential for \\textit{answer bubbles}, in which identical queries yield structurally different information realities across systems, with implications for user trust, source visibility, and the transparency of AI-mediated information access.",
+    "published": "2026-03-17T05:41:39Z",
+    "categories": ["cs.IR", "cs.CL"],
+    "primaryCategory": "cs.IR"
+  },
+  {
+    "id": "http://arxiv.org/abs/2608.04831v1",
+    "title": "Investigating Click Behaviors On Google Search Result Pages That Produce an AI Overview",
+    "summary": "In 2024, Google introduced \"AI Overviews,\" a feature that displays an AI-generated result summary at the top of many Google search pages. This study investigates the role of AI in Google search using one month of web browsing data from a representative panel of 900 U.S. adults. Our analysis of the panelists' Google searches sheds light on AI Overviews, when they appear in Google search results, and what user behaviors are associated with AI Overviews. We identify several attributes that make a search query more likely to generate an AI Overview, including the length of a query, whether the query begins with a question word, and whether the query contains both a noun and verb. When it comes to user behavior, we find that clicks to sources cited in AI Overviews are very rare, occurring in only about 1% of visits to AI Overviews. We also find that AI Overviews are associated with fewer clicks and higher rates of ending browsing sessions. Importantly, results from a mixed-effects logistic regression model indicate that these associations hold when controlling for random effects by panelist and query attributes that make AI Overviews more likely to appear.",
+    "published": "2026-08-05T13:33:17Z",
+    "categories": ["cs.HC"],
+    "primaryCategory": "cs.HC"
+  },
+  {
+    "id": "http://arxiv.org/abs/2609.06798v1",
+    "title": "Who Anchors AI Overviews in Health? Baidu, Google, and the Geography of Authority",
+    "summary": "Artificial intelligence is being rapidly incorporated into traditional search systems, yet scant work audits the information disparities across platforms, geography, and languages. We address this gap by comparing Google and Baidu's AI Overview systems for health queries, and measure informational anchors that emerge. Auditing 1,920 health queries across 12 countries and 4 languages, we find that Google and Baidu exhibit vertical integration, routing users toward their own company platforms in AI Overviews rather than a diverse set of primary sources. Smaller, lower-localization countries receive fewer domestically sourced references for health queries. Issuing the same query in a country's official language rather than English raises the share of locally sourced citations approximately 3.5- to 13.5-fold. Comparing queries across health topics of varying severity and controversy, including Traditional Chinese Medicine as an example, we also show that health disclaimers are multidimensional and vary across language and culture. We discuss how generative search influences access to health information, and the urgent need for culturally-aware oversight of these systems that influence critical health decisions.",
+    "published": "2026-09-06T19:37:27Z",
+    "categories": ["cs.IR", "cs.CY"],
+    "primaryCategory": "cs.IR"
+  },
+  {
+    "id": "http://arxiv.org/abs/2510.11560v2",
+    "title": "Characterizing Web Search in The Age of Generative AI",
+    "summary": "The advent of LLMs has given rise to generative search, a new search paradigm in which LLMs retrieve information from the web related to a query and synthesize it into a single, coherent response. This paradigm differs fundamentally from traditional web search, where results are returned as a ranked list of independent web pages. In this paper, we ask: Along what dimensions does generative search differ from traditional search? We conduct a systematic comparison between Google organic search and five generative search systems from three providers: Google, OpenAI, and Perplexity. Our analysis reveals substantial variation among engines in their reliance on internal v.s. external knowledge, source diversity, and stability. While generative systems often achieve topical coverage comparable to traditional search, they do so using markedly different retrieval footprints and synthesis strategies. We further show that the outputs of generative search can vary across time and executions, raising new challenges for robustness. Our findings demonstrate that generative search introduces new dimensions that are not captured by existing evaluation paradigms, motivating the development of evaluations that explicitly account for retrieval behavior, synthesis, and stability in generative search systems.",
+    "published": "2025-10-13T16:04:03Z",
+    "categories": ["cs.IR", "cs.AI"],
+    "primaryCategory": "cs.IR"
+  },
+  {
+    "id": "http://arxiv.org/abs/2602.22221v2",
+    "title": "Evaluating Reliability Asymmetries in Chinese Factual Search and AI Answers",
+    "summary": "Search engines and AI-powered systems increasingly mediate access to factual information, yet their reliability remains difficult to evaluate in realistic information-seeking settings. We study this problem in the Chinese web ecosystem by constructing a query-based fact-checking dataset from real Chinese search logs and comparing nine systems across traditional search engines, standalone large language models, and search-integrated AI Overviews. Focusing on factual Chinese-language factual Yes/No questions, we evaluate whether systems provide correct, incorrect, or uncertain decisions against evidence-derived ground truth. We find that systems are similarly accurate when they provide definitive answers, but differ sharply in how often they do so. Conditional accuracy ranges from 73.2% to 78.9%, yet search engines answer definitively on over 83% of queries, while Qwen-Max does so on fewer than half. We also find a consistent polarity gap: all systems perform better on yes-labeled queries than on no-labeled queries. We also use Baidu Index data to identify Chinese provinces with higher health-related search attention, which may indicate greater potential exposure to misinformation. Overall, our results show that reliability depends not only on whether systems are correct when they answer, but also on how often they answer, how they handle negative claims, and where information demand may increase exposure risks.",
+    "published": "2025-12-15T15:36:13Z",
+    "categories": ["cs.IR", "cs.AI", "cs.CL", "cs.CY"],
+    "primaryCategory": "cs.IR"
+  }
+]

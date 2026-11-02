@@ -1,0 +1,19 @@
+id: gs-research-analyst-016
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2606.17555.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-018.yaml#0
+neighborsFixture: fixtures/neighbors/2606.17555.json
+expected:
+  noveltyRange: [20, 50]
+  maturity: lab-result
+  industriesInclude:
+    - financial-services
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 35
+  maturity: lab-result
+  industry:
+    - financial-services
+  technology:
+    - "LSTM sequence model"
+    - "graph module"
+    - "autonomous AI agent"
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

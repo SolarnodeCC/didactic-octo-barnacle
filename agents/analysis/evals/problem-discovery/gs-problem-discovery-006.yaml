@@ -1,0 +1,11 @@
+id: gs-problem-discovery-006
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.17523.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-007.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-006.yaml
+expected:
+  requiredFacts:
+    - "malicious clients can poison federated learning updates and degrade the fraud-detection model"
+    - "banks train fraud models jointly without sharing transaction data"
+  customerIndustry: financial-services
+  painLevelRange: [3, 4]
+notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

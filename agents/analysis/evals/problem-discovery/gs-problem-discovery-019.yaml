@@ -1,0 +1,11 @@
+id: gs-problem-discovery-019
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2605.15165.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-023.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-019.yaml
+expected:
+  requiredFacts:
+    - "congested SNAP call centers caused nearly half of application denials to be procedural"
+    - "applicants could not complete required interviews"
+  customerIndustry: government
+  painLevelRange: [4, 5]
+notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

@@ -1,0 +1,34 @@
+[
+  {
+    "id": "http://arxiv.org/abs/2311.04937v1",
+    "title": "Multimodal Clinical Benchmark for Emergency Care (MC-BEC): A Comprehensive Benchmark for Evaluating Foundation Models in Emergency Medicine",
+    "summary": "We propose the Multimodal Clinical Benchmark for Emergency Care (MC-BEC), a comprehensive benchmark for evaluating foundation models in Emergency Medicine using a dataset of 100K+ continuously monitored Emergency Department visits from 2020-2022. MC-BEC focuses on clinically relevant prediction tasks at timescales from minutes to days, including predicting patient decompensation, disposition, and emergency department (ED) revisit, and includes a standardized evaluation framework with train-test splits and evaluation metrics. The multimodal dataset includes a wide range of detailed clinical data, including triage information, prior diagnoses and medications, continuously measured vital signs, electrocardiogram and photoplethysmograph waveforms, orders placed and medications administered throughout the visit, free-text reports of imaging studies, and information on ED diagnosis, disposition, and subsequent revisits. We provide performance baselines for each prediction task to enable the evaluation of multimodal, multitask models. We believe that MC-BEC will encourage researchers to develop more effective, generalizable, and accessible foundation models for multimodal clinical data.",
+    "published": "2023-11-07T20:56:19Z",
+    "categories": ["cs.LG", "cs.AI"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/1910.01116v1",
+    "title": "Robustly Extracting Medical Knowledge from EHRs: A Case Study of Learning a Health Knowledge Graph",
+    "summary": "Increasingly large electronic health records (EHRs) provide an opportunity to algorithmically learn medical knowledge. In one prominent example, a causal health knowledge graph could learn relationships between diseases and symptoms and then serve as a diagnostic tool to be refined with additional clinical input. Prior research has demonstrated the ability to construct such a graph from over 270,000 emergency department patient visits. In this work, we describe methods to evaluate a health knowledge graph for robustness. Moving beyond precision and recall, we analyze for which diseases and for which patients the graph is most accurate. We identify sample size and unmeasured confounders as major sources of error in the health knowledge graph. We introduce a method to leverage non-linear functions in building the causal graph to better understand existing model assumptions. Finally, to assess model generalizability, we extend to a larger set of complete patient visits within a hospital system. We conclude with a discussion on how to robustly extract medical knowledge from EHRs.",
+    "published": "2019-10-02T03:42:03Z",
+    "categories": ["stat.AP", "cs.LG", "stat.ML"],
+    "primaryCategory": "stat.AP"
+  },
+  {
+    "id": "http://arxiv.org/abs/2203.04372v1",
+    "title": "Average Response Curves for Treatment Time in the Emergency Department",
+    "summary": "We estimate average responses curves for treatment time in the Emergency Department (ED). Extending treatment time is considered a promising solution for improving admission decisions. Providing empirical support for this solution, however, is difficult because this intervention (treatment) is a continuous time-to-event; is strongly influenced by unmeasured patient health needs and is jointly determined with the admission decision (admit vs. discharge); and may be only modifiable up to a shift in the realized time. We formalize the admission process as a directed acyclic graph and show that average responses curves for treatment time cannot be identified nonparametrically due to unmeasured confounding from patient health needs. We thus use a parametric model that includes a latent variable for health needs and a threshold regression model for the admission process. We fit this model to observational data (n = 28,862) from abdominal pain patients at a large tertiary teaching hospital. We estimate that fixing ED treatment time to 2 hours rather than 1 hour decreases admission rates from 41.6% (95% CI: [40.6, 42.7]) to 32.7% (95% CI: [32.2, 33.2]) and that increasing the realized treatment time by 30 minutes can reduce admission rates by 1.1% (95% CI: [-1.1, 3.2]), with little change to 30-day revisit and readmission rates.",
+    "published": "2022-03-08T19:51:33Z",
+    "categories": ["stat.AP"],
+    "primaryCategory": "stat.AP"
+  },
+  {
+    "id": "http://arxiv.org/abs/2202.00736v1",
+    "title": "Evaluation of a Split Flow Model for the Emergency Department",
+    "summary": "Split flow models, in which a physician rather than a nurse performs triage, are increasingly being used in hospital emergency departments (EDs) to improve patient flow. Before deciding whether such interventions should be adopted, it is important to understand how split flows causally impact patient flow and outcomes. We employ causal inference methodology to estimate average causal effects of a split flow model on time to be roomed, time to disposition after being roomed, admission decisions, and ED revisits at a large tertiary teaching hospital that uses a split flow model during certain hours each day. We propose a regression discontinuity (RD) design to identify average causal effects, which we formalize with causal diagrams. Using electronic health records data (n = 21,570), we estimate that split flow increases average time to be roomed by about 4.6 minutes (95% CI: [2.9,6.2] minutes) but decreases average time to disposition by 14.4 minutes (95% CI: [4.1,24.7] minutes), leading to an overall reduction in length of stay. Split flow is also found to decrease admission rates by 5.9% (95% CI: [2.3%, 9.4%]) but not at the expense of a significant change in revisit rates. Lastly, we find that the split flow model is especially effective at reducing length of stay during low congestion levels, which mediation analysis partly attributes to early task initiation by the physician assigned to triage.",
+    "published": "2022-02-01T20:18:58Z",
+    "categories": ["stat.AP"],
+    "primaryCategory": "stat.AP"
+  }
+]

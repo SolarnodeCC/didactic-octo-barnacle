@@ -1,0 +1,82 @@
+[
+  {
+    "id": "http://arxiv.org/abs/1905.07546v2",
+    "title": "Hedging crop yields against weather uncertainties -- a weather derivative perspective",
+    "summary": "The effects of weather on agriculture in recent years have become a major global concern. Hence, the need for an effective weather risk management tool (i.e., weather derivatives) that can hedge crop yields against weather uncertainties. However, most smallholder farmers and agricultural stakeholders are unwilling to pay for the price of weather derivatives (WD) because of the presence of basis risks (product-design and geographical) in the pricing models. To eliminate product-design basis risks, a machine learning ensemble technique was used to determine the relationship between maize yield and weather variables. The results revealed that the most significant weather variable that affected the yield of maize was average temperature. A mean-reverting model with a time-varying speed of mean reversion, seasonal mean, and local volatility that depended on the local average temperature was then proposed. The model was extended to a multi-dimensional model for different but correlated locations. Based on these average temperature models, pricing models for futures, options on futures, and basket futures for cumulative average temperature and growing degree-days are presented. Pricing futures on baskets reduces geographical basis risk, as buyers have the opportunity to select the most appropriate weather stations with their desired weight preference. With these pricing models, farmers and agricultural stakeholders can hedge their crops against the perils of extreme weather.",
+    "published": "2019-05-18T07:31:21Z",
+    "categories": ["q-fin.MF", "q-fin.PR"],
+    "primaryCategory": "q-fin.MF"
+  },
+  {
+    "id": "http://arxiv.org/abs/2610.31003v1",
+    "title": "Agri-SCHOLAR: Simulation-Grounded In-Season Rolling Advisories for Agricultural Crops Using LLM-Bounded Optimization",
+    "summary": "Existing agricultural advisories to farmers suffer from several limitations: (a) remain largely expert-driven, (b) do not adequately account for in-season weather, and (c) do not scale to individual farms. In this paper, our objective is to close these gaps by developing Agri-SCHOLAR (Simulation-Grounded Crop Harvest Optimization with LLM-Guided In-Season Advisory Rollouts). Agri-SCHOLAR is a rolling, in-season advisory framework that issues, at intervals of every few days or every week, a personalized advisory using the following information: soil and crop properties, observed weather to date, short-range forecast of weather, and a season extrapolation of weather based on historical analogs. The novelty and depth of Agri-SCHOLAR lies in each advisory being produced by a closed-loop system which couples multiple LLM agents with a powerful crop simulator (such as APSIM in our case). The simulator crucially serves as an evaluation oracle. In Agri-SCHOLAR, the LLM agents propose agronomically sound and feasible bounds on actionable parameters and an optimizer searches within those bounds against a multi-objective reward spanning yield, resource utilization, and economic feasibility. We conduct a detailed 11-year analysis of the maize crop in two selected locations of South Asia and show that Agri-SCHOLAR consistently outperforms the region's standard packages of practice and satisfactorily addresses the limitations of existing agricultural advisories.",
+    "published": "2026-10-22T09:43:19Z",
+    "categories": ["cs.AI", "cs.MA"],
+    "primaryCategory": "cs.AI"
+  },
+  {
+    "id": "http://arxiv.org/abs/2503.22807v1",
+    "title": "Probabilistic Crop Yields Forecasts With Spatio-Temporal Conditional Copula Using Extreme Weather Covariates",
+    "summary": "We introduce a novel forecasting model for crop yields that explicitly accounts for spatio-temporal dependence and the influence of extreme weather and climatic events. Our approach combines Bayesian Structural Time Series for modeling marginal crop yields, ensuring a more robust quantification of uncertainty given the typically short historical records. To capture dynamic dependencies between regions, we develop a time-varying conditional copula model, where the copula parameter evolves over time as a function of its previous lag and extreme weather covariates. Unlike traditional approaches that treat climatic factors as fixed inputs, we incorporate dynamic Generalized Extreme Value models to characterize extreme weather events, enabling a more accurate reflection of their impact on crop yields. Furthermore, to ensure scalability for large-scale applications, we build on the existing Partitioning Around Medoids clustering algorithm and introduce a novel dissimilarity measure that integrates both spatial and copula-based dependence, enabling an effective reduction of the dimensionality in the dependence structure.",
+    "published": "2025-03-28T18:10:52Z",
+    "categories": ["stat.ME"],
+    "primaryCategory": "stat.ME"
+  },
+  {
+    "id": "http://arxiv.org/abs/2501.00502v1",
+    "title": "Exploring Physics-Informed Neural Networks for Crop Yield Loss Forecasting",
+    "summary": "In response to climate change, assessing crop productivity under extreme weather conditions is essential to enhance food security. Crop simulation models, which align with physical processes, offer explainability but often perform poorly. Conversely, machine learning (ML) models for crop modeling are powerful and scalable yet operate as black boxes and lack adherence to crop growths physical principles. To bridge this gap, we propose a novel method that combines the strengths of both approaches by estimating the water use and the crop sensitivity to water scarcity at the pixel level. This approach enables yield loss estimation grounded in physical principles by sequentially solving the equation for crop yield response to water scarcity, using an enhanced loss function. Leveraging Sentinel-2 satellite imagery, climate data, simulated water use data, and pixel-level yield data, our model demonstrates high accuracy, achieving an R2 of up to 0.77, matching or surpassing state-of-the-art models like RNNs and Transformers. Additionally, it provides interpretable and physical consistent outputs, supporting industry, policymakers, and farmers in adapting to extreme weather conditions.",
+    "published": "2024-12-31T15:21:50Z",
+    "categories": ["cs.LG", "cs.AI"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/2401.01273v2",
+    "title": "Learning-based agricultural management in partially observable environments subject to climate variability",
+    "summary": "Agricultural management, with a particular focus on fertilization strategies, holds a central role in shaping crop yield, economic profitability, and environmental sustainability. While conventional guidelines offer valuable insights, their efficacy diminishes when confronted with extreme weather conditions, such as heatwaves and droughts. In this study, we introduce an innovative framework that integrates Deep Reinforcement Learning (DRL) with Recurrent Neural Networks (RNNs). Leveraging the Gym-DSSAT simulator, we train an intelligent agent to master optimal nitrogen fertilization management. Through a series of simulation experiments conducted on corn crops in Iowa, we compare Partially Observable Markov Decision Process (POMDP) models with Markov Decision Process (MDP) models. Our research underscores the advantages of utilizing sequential observations in developing more efficient nitrogen input policies. Additionally, we explore the impact of climate variability, particularly during extreme weather events, on agricultural outcomes and management. Our findings demonstrate the adaptability of fertilization policies to varying climate conditions. Notably, a fixed policy exhibits resilience in the face of minor climate fluctuations, leading to commendable corn yields, cost-effectiveness, and environmental conservation. However, our study illuminates the need for agent retraining to acquire new optimal policies under extreme weather events. This research charts a promising course toward adaptable fertilization strategies that can seamlessly align with dynamic climate scenarios, ultimately contributing to the optimization of crop management practices.",
+    "published": "2024-01-02T16:18:53Z",
+    "categories": ["cs.LG"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/2402.08832v1",
+    "title": "Intelligent Agricultural Management Considering N$_2$O Emission and Climate Variability with Uncertainties",
+    "summary": "This study examines how artificial intelligence (AI), especially Reinforcement Learning (RL), can be used in farming to boost crop yields, fine-tune nitrogen use and watering, and reduce nitrate runoff and greenhouse gases, focusing on Nitrous Oxide (N$_2$O) emissions from soil. Facing climate change and limited agricultural knowledge, we use Partially Observable Markov Decision Processes (POMDPs) with a crop simulator to model AI agents' interactions with farming environments. We apply deep Q-learning with Recurrent Neural Network (RNN)-based Q networks for training agents on optimal actions. Also, we develop Machine Learning (ML) models to predict N$_2$O emissions, integrating these predictions into the simulator. Our research tackles uncertainties in N$_2$O emission estimates with a probabilistic ML approach and climate variability through a stochastic weather model, offering a range of emission outcomes to improve forecast reliability and decision-making. By incorporating climate change effects, we enhance agents' climate adaptability, aiming for resilient agricultural practices. Results show these agents can align crop productivity with environmental concerns by penalizing N$_2$O emissions, adapting effectively to climate shifts like warmer temperatures and less rain. This strategy improves farm management under climate change, highlighting AI's role in sustainable agriculture.",
+    "published": "2024-02-13T22:29:40Z",
+    "categories": ["cs.LG", "cs.AI", "cs.CY"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/2408.04640v1",
+    "title": "LLMs for Enhanced Agricultural Meteorological Recommendations",
+    "summary": "Agricultural meteorological recommendations are crucial for enhancing crop productivity and sustainability by providing farmers with actionable insights based on weather forecasts, soil conditions, and crop-specific data. This paper presents a novel approach that leverages large language models (LLMs) and prompt engineering to improve the accuracy and relevance of these recommendations. We designed a multi-round prompt framework to iteratively refine recommendations using updated data and feedback, implemented on ChatGPT, Claude2, and GPT-4. Our method was evaluated against baseline models and a Chain-of-Thought (CoT) approach using manually collected datasets. The results demonstrate significant improvements in accuracy and contextual relevance, with our approach achieving up to 90\\% accuracy and high GPT-4 scores. Additional validation through real-world pilot studies further confirmed the practical benefits of our method, highlighting its potential to transform agricultural practices and decision-making.",
+    "published": "2024-07-30T18:10:49Z",
+    "categories": ["cs.CL"],
+    "primaryCategory": "cs.CL"
+  },
+  {
+    "id": "http://arxiv.org/abs/1907.03697v1",
+    "title": "Prediction of Soil Moisture Content Based On Satellite Data and Sequence-to-Sequence Networks",
+    "summary": "The main objective of this study is to combine remote sensing and machine learning to detect soil moisture content. Growing population and food consumption has led to the need to improve agricultural yield and to reduce wastage of natural resources. In this paper, we propose a neural network architecture, based on recent work by the research community, that can make a strong social impact and aid United Nations Sustainable Development Goal of Zero Hunger. The main aims here are to: improve efficiency of water usage; reduce dependence on irrigation; increase overall crop yield; minimise risk of crop loss due to drought and extreme weather conditions. We achieve this by applying satellite imagery, crop segmentation, soil classification and NDVI and soil moisture prediction on satellite data, ground truth and climate data records. By applying machine learning to sensor data and ground data, farm management systems can evolve into a real time AI enabled platform that can provide actionable recommendations and decision support tools to the farmers.",
+    "published": "2019-06-05T11:03:17Z",
+    "categories": ["eess.IV", "cs.CV", "cs.LG"],
+    "primaryCategory": "eess.IV"
+  },
+  {
+    "id": "http://arxiv.org/abs/2104.10066v1",
+    "title": "EarthNet2021: A large-scale dataset and challenge for Earth surface forecasting as a guided video prediction task",
+    "summary": "Satellite images are snapshots of the Earth surface. We propose to forecast them. We frame Earth surface forecasting as the task of predicting satellite imagery conditioned on future weather. EarthNet2021 is a large dataset suitable for training deep neural networks on the task. It contains Sentinel 2 satellite imagery at 20m resolution, matching topography and mesoscale (1.28km) meteorological variables packaged into 32000 samples. Additionally we frame EarthNet2021 as a challenge allowing for model intercomparison. Resulting forecasts will greatly improve (>x50) over the spatial resolution found in numerical models. This allows localized impacts from extreme weather to be predicted, thus supporting downstream applications such as crop yield prediction, forest health assessments or biodiversity monitoring. Find data, code, and how to participate at www.earthnet.tech",
+    "published": "2021-04-16T09:47:30Z",
+    "categories": ["cs.LG", "cs.AI"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/2109.01031v2",
+    "title": "Land use change in agricultural systems: an integrated ecological-social simulation model of farmer decisions and cropping system performance based on a cellular automata approach",
+    "summary": "Agricultural systems experience land-use changes that are driven by population growth and intensification of technological inputs. This results in land-use and cover change (LUCC) dynamics representing a complex landscape transformation process. In order to study the LUCC process we developed a spatially explicit agent-based model in the form of a Cellular Automata implemented with the Cell-DEVS formalism. The resulting model called AgroDEVS is used for predicting LUCC dynamics along with their associated economic and environmental changes. AgroDEVS is structured using behavioral rules and functions representing a) crop yields, b) weather conditions, c) economic profit, d) farmer preferences, e) technology level adoption and f) natural resources consumption based on embodied energy accounting. Using data from a typical location of the Pampa region (Argentina) for the 1988-2015 period, simulation exercises showed that the economic goals were achieved, on average, each 6 out of 10 years, but the environmental thresholds were only achieved in 1.9 out of 10 years. In a set of 50-years simulations, LUCC patterns quickly converge towards the most profitable crop sequences, with no noticeable tradeoff between the economic and environmental conditions.",
+    "published": "2021-08-10T21:22:49Z",
+    "categories": ["econ.GN", "cs.MA"],
+    "primaryCategory": "econ.GN"
+  }
+]

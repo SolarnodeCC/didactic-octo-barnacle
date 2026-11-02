@@ -1,0 +1,11 @@
+id: gs-problem-discovery-003
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.40071.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-003.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-003.yaml
+expected:
+  requiredFacts:
+    - "AI coding agents leave no durable record of what they did, which model and tools they used"
+    - "audit and compliance controls assume a human made the decision"
+  customerIndustry: enterprise
+  painLevelRange: [3, 4]
+notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

@@ -1,0 +1,20 @@
+id: gs-research-analyst-020
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.40071.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-003.yaml#1
+neighborsFixture: fixtures/neighbors/2610.40071.json
+expected:
+  noveltyRange: [30, 60]
+  maturity: prototype
+  industriesInclude:
+    - enterprise
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 45
+  maturity: prototype
+  industry:
+    - enterprise
+  technology:
+    - "agentic process attestation"
+    - "in-toto attestation"
+    - "policy-as-code"
+    - "compliancy"
+notes: "Second candidate of the same publication; the customer quote is weak. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

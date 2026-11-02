@@ -1,0 +1,82 @@
+[
+  {
+    "id": "http://arxiv.org/abs/2302.09459v2",
+    "title": "Nurse Scheduling Problem via PyQUBO",
+    "summary": "The nurse scheduling problem is a critical optimization challenge in healthcare management. It aims to balance staffing demands, nurse satisfaction, and patient care quality. Corresponding to the constraints inherent in this scheduling problem, we detail the mathematical formulation step-by-step. We then utilize a quantum-inspired technique, the simulated annealing algorithm, and a quadratic unconstrained binary optimization model to optimize workload and increase nurse preferences. Numerical experiments are implemented to show the capacity of our proposed techniques. Our findings indicate a promising direction for future research, with potential applications extending beyond nurse scheduling to other complex optimization problems.",
+    "published": "2023-02-19T02:22:42Z",
+    "categories": ["math.OC"],
+    "primaryCategory": "math.OC"
+  },
+  {
+    "id": "http://arxiv.org/abs/2605.28571v1",
+    "title": "Not All Uncertainty Is Equal: How Uncertainty Granularity Shapes Human Verification in LLM-Assisted Decision Making",
+    "summary": "Despite warnings that LLMs can make mistakes, users often develop inappropriate trust and accept incorrect answers without critical evaluation. Uncertainty quantification (UQ), displaying LLMs' confidence, has emerged as a promising approach to calibrate user trust. However, prior empirical studies on uncertainty communication have treated uncertainty as a single numerical score or simple natural language expression. This simplification fails to capture a key property of LLM outputs: a single response often comprises multiple claims and reasoning steps, each with distinct levels of uncertainty. To address this gap, this study investigates uncertainty granularity (i.e., the extent to which uncertainty is expressed at different levels within an LLM response) and examines its impact on LLM-assisted decision-making. We conducted a large-scale, between-subjects study (N=192) in which participants answered medical questions using LLMs that displayed uncertainty at three different granularities: output-level (entire response), relation-level (individual reasoning steps), and token-level (specific words). Our findings reveal distinct behavioral effects as a function of uncertainty granularity. Token-level uncertainty increased users' agreement with the AI, whereas output- and relation-level uncertainty did not increase agreement but instead reduced users' confidence in their own answers. Notably, relation-level uncertainty also reduced external verification (i.e., internet searches, checking provided URLs), steering users away from independent fact-checking and toward reliance on the LLM and its accompanying uncertainty cues. Our findings demonstrate that uncertainty granularity significantly shapes how users interact with and verify LLM outputs, providing concrete design guidance for building responsible LLM applications that encourage appropriate skepticism and verification behaviors.",
+    "published": "2026-05-27T14:56:23Z",
+    "categories": ["cs.HC"],
+    "primaryCategory": "cs.HC"
+  },
+  {
+    "id": "http://arxiv.org/abs/2401.13835v2",
+    "title": "What Large Language Models Know and What People Think They Know",
+    "summary": "As artificial intelligence (AI) systems, particularly large language models (LLMs), become increasingly integrated into decision-making processes, the ability to trust their outputs is crucial. To earn human trust, LLMs must be well calibrated such that they can accurately assess and communicate the likelihood of their predictions being correct. Whereas recent work has focused on LLMs' internal confidence, less is understood about how effectively they convey uncertainty to users. Here we explore the calibration gap, which refers to the difference between human confidence in LLM-generated answers and the models' actual confidence, and the discrimination gap, which reflects how well humans and models can distinguish between correct and incorrect answers. Our experiments with multiple-choice and short-answer questions reveal that users tend to overestimate the accuracy of LLM responses when provided with default explanations. Moreover, longer explanations increased user confidence, even when the extra length did not improve answer accuracy. By adjusting LLM explanations to better reflect the models' internal confidence, both the calibration gap and the discrimination gap narrowed, significantly improving user perception of LLM accuracy. These findings underscore the importance of accurate uncertainty communication and highlight the effect of explanation length in influencing user trust in AI-assisted decision-making environments. Code and Data can be found at https://osf.io/y7pr6/ . Journal publication can be found on Nature Machine Intelligence at https://www.nature.com/articles/s42256-024-00976-7 .",
+    "published": "2024-01-24T22:21:04Z",
+    "categories": ["cs.LG", "cs.AI", "cs.CL", "cs.HC"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/2506.13600v2",
+    "title": "The ASP-based Nurse Scheduling System at the University of Yamanashi Hospital",
+    "summary": "We present the design principles of a nurse scheduling system built using Answer Set Programming (ASP) and successfully deployed at the University of Yamanashi Hospital. Nurse scheduling is a complex optimization problem requiring the reconciliation of individual nurse preferences with hospital staffing needs across various wards. This involves balancing hard and soft constraints and the flexibility of interactive adjustments. While extensively studied in academia, real-world nurse scheduling presents unique challenges that go beyond typical benchmark problems and competitions. This paper details the practical application of ASP to address these challenges at the University of Yamanashi Hospital, focusing on the insights gained and the advancements in ASP technology necessary to effectively manage the complexities of real-world deployment.",
+    "published": "2025-06-16T15:25:06Z",
+    "categories": ["cs.AI"],
+    "primaryCategory": "cs.AI"
+  },
+  {
+    "id": "http://arxiv.org/abs/1902.01193v1",
+    "title": "Solving Nurse Scheduling Problem Using Constraint Programming Technique",
+    "summary": "Staff scheduling is a universal problem that can be encountered in many organizations, such as call centers, educational institution, industry, hospital, and any other public services. It is one of the most important aspects of workforce management strategy and the one that is most prone to errors or issues as there are many entities should be considered, such as the staff turnover, employee availability, time between rotations, unusual periods of activity, and even the last-minute shift changes. The nurse scheduling problem is a variant of staff scheduling problems which appoints nurses to shifts as well as rooms per day taking both hard constraints, i.e., hospital requirements, and soft constraints, i.e., nurse preferences, into account. Most algorithms used for scheduling problems fall short when it comes to the number of inputs they can handle. In this paper, constraint programming was developed to solve the nurse scheduling problem. The developed constraint programming model was then implemented using python programming language.",
+    "published": "2019-02-04T14:09:29Z",
+    "categories": ["cs.AI"],
+    "primaryCategory": "cs.AI"
+  },
+  {
+    "id": "http://arxiv.org/abs/2507.05182v1",
+    "title": "A Two-Stage Scheduling Method for Nurse Scheduling and Its Practical Application",
+    "summary": "The creation of nurses' schedules is a critical task that directly impacts the quality and safety of patient care as well as the quality of life for nurses. In most hospitals in Japan, this responsibility falls to the head nurse of each ward. The physical and mental burden of this task is considerable, and recent challenges such as the growing shortage of nurses and increasingly diverse working styles have further complicated the scheduling process. Consequently, there is a growing demand for automated nurse scheduling systems. Technically, modern integer programming solvers can generate feasible schedules within a practical timeframe. However, in many hospitals, schedules are still created manually. This is largely because tacit knowledge, considerations unconsciously applied by head nurses, cannot be fully formalized into explicit constraints, often resulting in automatically generated schedules that are not practically usable. To address this issue, we propose a novel \"two-stage scheduling method.\" This approach divides the scheduling task into night shift and day shift stages, allowing head nurses to make manual adjustments after the first stage. This interactive process makes it possible to produce nurse schedules that are suitable for real-world implementation. Furthermore, to promote the practical adoption of nurse scheduling, we present case studies from acute and chronic care hospitals where systems based on the proposed method were deployed. We also discuss the challenges encountered during implementation and the corresponding solutions.",
+    "published": "2025-07-07T16:36:46Z",
+    "categories": ["math.OC"],
+    "primaryCategory": "math.OC"
+  },
+  {
+    "id": "http://arxiv.org/abs/0804.0580v1",
+    "title": "Explicit Learning: an Effort towards Human Scheduling Algorithms",
+    "summary": "Scheduling problems are generally NP-hard combinatorial problems, and a lot of research has been done to solve these problems heuristically. However, most of the previous approaches are problem-specific and research into the development of a general scheduling algorithm is still in its infancy. Mimicking the natural evolutionary process of the survival of the fittest, Genetic Algorithms (GAs) have attracted much attention in solving difficult scheduling problems in recent years. Some obstacles exist when using GAs: there is no canonical mechanism to deal with constraints, which are commonly met in most real-world scheduling problems, and small changes to a solution are difficult. To overcome both difficulties, indirect approaches have been presented (in [1] and [2]) for nurse scheduling and driver scheduling, where GAs are used by mapping the solution space, and separate decoding routines then build solutions to the original problem.",
+    "published": "2008-04-03T15:31:52Z",
+    "categories": ["cs.NE", "cs.AI"],
+    "primaryCategory": "cs.NE"
+  },
+  {
+    "id": "http://arxiv.org/abs/0804.0524v1",
+    "title": "Bayesian Optimisation Algorithm for Nurse Scheduling",
+    "summary": "Our research has shown that schedules can be built mimicking a human scheduler by using a set of rules that involve domain knowledge. This chapter presents a Bayesian Optimization Algorithm (BOA) for the nurse scheduling problem that chooses such suitable scheduling rules from a set for each nurses assignment. Based on the idea of using probabilistic models, the BOA builds a Bayesian network for the set of promising solutions and samples these networks to generate new candidate solutions. Computational results from 52 real data instances demonstrate the success of this approach. It is also suggested that the learning mechanism in the proposed algorithm may be suitable for other scheduling problems.",
+    "published": "2008-04-03T11:14:11Z",
+    "categories": ["cs.NE", "cs.CE"],
+    "primaryCategory": "cs.NE"
+  },
+  {
+    "id": "http://arxiv.org/abs/0803.1994v1",
+    "title": "The Application of Bayesian Optimization and Classifier Systems in Nurse Scheduling",
+    "summary": "Two ideas taken from Bayesian optimization and classifier systems are presented for personnel scheduling based on choosing a suitable scheduling rule from a set for each persons assignment. Unlike our previous work of using genetic algorithms whose learning is implicit, the learning in both approaches is explicit, i.e. we are able to identify building blocks directly. To achieve this target, the Bayesian optimization algorithm builds a Bayesian network of the joint probability distribution of the rules used to construct solutions, while the adapted classifier system assigns each rule a strength value that is constantly updated according to its usefulness in the current situation. Computational results from 52 real data instances of nurse scheduling demonstrate the success of both approaches. It is also suggested that the learning mechanism in the proposed approaches might be suitable for other scheduling problems.",
+    "published": "2008-03-13T15:43:34Z",
+    "categories": ["cs.NE", "cs.CE"],
+    "primaryCategory": "cs.NE"
+  },
+  {
+    "id": "http://arxiv.org/abs/1205.2200v1",
+    "title": "A Greedy Double Swap Heuristic for Nurse Scheduling",
+    "summary": "One of the key challenges of nurse scheduling problem (NSP) is the number of constraints placed on preparing the timetable, both from the regulatory requirements as well as the patients' demand for the appropriate nursing care specialists. In addition, the preferences of the nursing staffs related to their work schedules add another dimension of complexity. Most solutions proposed for solving nurse scheduling involve the use of mathematical programming and generally considers only the hard constraints. However, the psychological needs of the nurses are ignored and this resulted in subsequent interventions by the nursing staffs to remedy any deficiency and often results in last minute changes to the schedule. In this paper, we present a staff preference optimization framework which is solved with a greedy double swap heuristic. The heuristic yields good performance in speed at solving the problem. The heuristic is simple and we will demonstrate its performance by implementing it on open source spreadsheet software.",
+    "published": "2012-05-10T08:54:57Z",
+    "categories": ["cs.OH"],
+    "primaryCategory": "cs.OH"
+  }
+]

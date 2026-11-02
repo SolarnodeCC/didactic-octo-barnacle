@@ -1,0 +1,11 @@
+id: gs-problem-discovery-001
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.40641.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-001.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-001.yaml
+expected:
+  requiredFacts:
+    - "forecasts say where a storm hits, not which crops suffer or how much is at risk"
+    - "governments and growers need to respond quickly to agricultural disasters"
+  customerIndustry: government
+  painLevelRange: [3, 4]
+notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

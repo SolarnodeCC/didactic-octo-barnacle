@@ -1,0 +1,82 @@
+[
+  {
+    "id": "http://arxiv.org/abs/2107.08402v1",
+    "title": "RobustFed: A Truth Inference Approach for Robust Federated Learning",
+    "summary": "Federated learning is a prominent framework that enables clients (e.g., mobile devices or organizations) to train a collaboratively global model under a central server's orchestration while keeping local training datasets' privacy. However, the aggregation step in federated learning is vulnerable to adversarial attacks as the central server cannot manage clients' behavior. Therefore, the global model's performance and convergence of the training process will be affected under such attacks.To mitigate this vulnerability issue, we propose a novel robust aggregation algorithm inspired by the truth inference methods in crowdsourcing via incorporating the worker's reliability into aggregation. We evaluate our solution on three real-world datasets with a variety of machine learning models. Experimental results show that our solution ensures robust federated learning and is resilient to various types of attacks, including noisy data attacks, Byzantine attacks, and label flipping attacks.",
+    "published": "2021-07-18T09:34:57Z",
+    "categories": ["cs.LG", "cs.AI", "cs.DC"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/2205.01184v1",
+    "title": "Performance Weighting for Robust Federated Learning Against Corrupted Sources",
+    "summary": "Federated Learning has emerged as a dominant computational paradigm for distributed machine learning. Its unique data privacy properties allow us to collaboratively train models while offering participating clients certain privacy-preserving guarantees. However, in real-world applications, a federated environment may consist of a mixture of benevolent and malicious clients, with the latter aiming to corrupt and degrade federated model's performance. Different corruption schemes may be applied such as model poisoning and data corruption. Here, we focus on the latter, the susceptibility of federated learning to various data corruption attacks. We show that the standard global aggregation scheme of local weights is inefficient in the presence of corrupted clients. To mitigate this problem, we propose a class of task-oriented performance-based methods computed over a distributed validation dataset with the goal to detect and mitigate corrupted clients. Specifically, we construct a robust weight aggregation scheme based on geometric mean and demonstrate its effectiveness under random label shuffling and targeted label flipping attacks.",
+    "published": "2022-05-02T20:01:44Z",
+    "categories": ["cs.LG", "cs.CR"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/2303.11337v1",
+    "title": "Recursive Euclidean Distance Based Robust Aggregation Technique For Federated Learning",
+    "summary": "Federated learning has gained popularity as a solution to data availability and privacy challenges in machine learning. However, the aggregation process of local model updates to obtain a global model in federated learning is susceptible to malicious attacks, such as backdoor poisoning, label-flipping, and membership inference. Malicious users aim to sabotage the collaborative learning process by training the local model with malicious data. In this paper, we propose a novel robust aggregation approach based on recursive Euclidean distance calculation. Our approach measures the distance of the local models from the previous global model and assigns weights accordingly. Local models far away from the global model are assigned smaller weights to minimize the data poisoning effect during aggregation. Our experiments demonstrate that the proposed algorithm outperforms state-of-the-art algorithms by at least $5\\%$ in accuracy while reducing time complexity by less than $55\\%$. Our contribution is significant as it addresses the critical issue of malicious attacks in federated learning while improving the accuracy of the global model.",
+    "published": "2023-03-20T06:48:43Z",
+    "categories": ["cs.LG", "cs.AI"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/2308.07387v1",
+    "title": "DISBELIEVE: Distance Between Client Models is Very Essential for Effective Local Model Poisoning Attacks",
+    "summary": "Federated learning is a promising direction to tackle the privacy issues related to sharing patients' sensitive data. Often, federated systems in the medical image analysis domain assume that the participating local clients are \\textit{honest}. Several studies report mechanisms through which a set of malicious clients can be introduced that can poison the federated setup, hampering the performance of the global model. To overcome this, robust aggregation methods have been proposed that defend against those attacks. We observe that most of the state-of-the-art robust aggregation methods are heavily dependent on the distance between the parameters or gradients of malicious clients and benign clients, which makes them prone to local model poisoning attacks when the parameters or gradients of malicious and benign clients are close. Leveraging this, we introduce DISBELIEVE, a local model poisoning attack that creates malicious parameters or gradients such that their distance to benign clients' parameters or gradients is low respectively but at the same time their adverse effect on the global model's performance is high. Experiments on three publicly available medical image datasets demonstrate the efficacy of the proposed DISBELIEVE attack as it significantly lowers the performance of the state-of-the-art \\textit{robust aggregation} methods for medical image analysis. Furthermore, compared to state-of-the-art local model poisoning attacks, DISBELIEVE attack is also effective on natural images where we observe a severe drop in classification performance of the global model for multi-class classification on benchmark dataset CIFAR-10.",
+    "published": "2023-08-14T18:09:58Z",
+    "categories": ["cs.LG", "cs.CR", "cs.CV", "cs.DC"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/2509.08746v1",
+    "title": "Stealth by Conformity: Evading Robust Aggregation through Adaptive Poisoning",
+    "summary": "Federated Learning (FL) is a distributed learning paradigm designed to address privacy concerns. However, FL is vulnerable to poisoning attacks, where Byzantine clients compromise the integrity of the global model by submitting malicious updates. Robust aggregation methods have been widely adopted to mitigate such threats, relying on the core assumption that malicious updates are inherently out-of-distribution and can therefore be identified and excluded before aggregating client updates. In this paper, we challenge this underlying assumption by showing that a model can be poisoned while keeping malicious updates within the main distribution. We propose Chameleon Poisoning (CHAMP), an adaptive and evasive poisoning strategy that exploits side-channel feedback from the aggregation process to guide the attack. Specifically, the adversary continuously infers whether its malicious contribution has been incorporated into the global model and adapts accordingly. This enables a dynamic adjustment of the local loss function, balancing a malicious component with a camouflaging component, thereby increasing the effectiveness of the poisoning while evading robust aggregation defenses. CHAMP enables more effective and evasive poisoning, highlighting a fundamental limitation of existing robust aggregation defenses and underscoring the need for new strategies to secure federated learning against sophisticated adversaries. Our approach is evaluated in two datasets reaching an average increase of 47.07% in attack success rate against nine robust aggregation defenses.",
+    "published": "2025-09-03T13:40:54Z",
+    "categories": ["cs.CR"],
+    "primaryCategory": "cs.CR"
+  },
+  {
+    "id": "http://arxiv.org/abs/2406.14217v2",
+    "title": "Defending Against Sophisticated Poisoning Attacks with RL-based Aggregation in Federated Learning",
+    "summary": "Federated learning is highly susceptible to model poisoning attacks, especially those meticulously crafted for servers. Traditional defense methods mainly focus on updating assessments or robust aggregation against manually crafted myopic attacks. When facing advanced attacks, their defense stability is notably insufficient. Therefore, it is imperative to develop adaptive defenses against such advanced poisoning attacks. We find that benign clients exhibit significantly higher data distribution stability than malicious clients in federated learning in both CV and NLP tasks. Therefore, the malicious clients can be recognized by observing the stability of their data distribution. In this paper, we propose AdaAggRL, an RL-based Adaptive Aggregation method, to defend against sophisticated poisoning attacks. Specifically, we first utilize distribution learning to simulate the clients' data distributions. Then, we use the maximum mean discrepancy (MMD) to calculate the pairwise similarity of the current local model data distribution, its historical data distribution, and global model data distribution. Finally, we use policy learning to adaptively determine the aggregation weights based on the above similarities. Experiments on four real-world datasets demonstrate that the proposed defense model significantly outperforms widely adopted defense models for sophisticated attacks.",
+    "published": "2024-06-20T11:33:14Z",
+    "categories": ["cs.LG", "cs.CR"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/2405.15182v2",
+    "title": "RFLPA: A Robust Federated Learning Framework against Poisoning Attacks with Secure Aggregation",
+    "summary": "Federated learning (FL) allows multiple devices to train a model collaboratively without sharing their data. Despite its benefits, FL is vulnerable to privacy leakage and poisoning attacks. To address the privacy concern, secure aggregation (SecAgg) is often used to obtain the aggregation of gradients on sever without inspecting individual user updates. Unfortunately, existing defense strategies against poisoning attacks rely on the analysis of local updates in plaintext, making them incompatible with SecAgg. To reconcile the conflicts, we propose a robust federated learning framework against poisoning attacks (RFLPA) based on SecAgg protocol. Our framework computes the cosine similarity between local updates and server updates to conduct robust aggregation. Furthermore, we leverage verifiable packed Shamir secret sharing to achieve reduced communication cost of $O(M+N)$ per user, and design a novel dot product aggregation algorithm to resolve the issue of increased information leakage. Our experimental results show that RFLPA significantly reduces communication and computation overhead by over $75\\%$ compared to the state-of-the-art secret sharing method, BREA, while maintaining competitive accuracy.",
+    "published": "2024-05-24T03:31:10Z",
+    "categories": ["cs.CR", "cs.AI"],
+    "primaryCategory": "cs.CR"
+  },
+  {
+    "id": "http://arxiv.org/abs/1909.05125v1",
+    "title": "Byzantine-Robust Federated Machine Learning through Adaptive Model Averaging",
+    "summary": "Federated learning enables training collaborative machine learning models at scale with many participants whilst preserving the privacy of their datasets. Standard federated learning techniques are vulnerable to Byzantine failures, biased local datasets, and poisoning attacks. In this paper we introduce Adaptive Federated Averaging, a novel algorithm for robust federated learning that is designed to detect failures, attacks, and bad updates provided by participants in a collaborative model. We propose a Hidden Markov Model to model and learn the quality of model updates provided by each participant during training. In contrast to existing robust federated learning schemes, we propose a robust aggregation rule that detects and discards bad or malicious local model updates at each training iteration. This includes a mechanism that blocks unwanted participants, which also increases the computational and communication efficiency. Our experimental evaluation on 4 real datasets show that our algorithm is significantly more robust to faulty, noisy and malicious participants, whilst being computationally more efficient than other state-of-the-art robust federated learning methods such as Multi-KRUM and coordinate-wise median.",
+    "published": "2019-09-11T15:19:36Z",
+    "categories": ["stat.ML", "cs.DC", "cs.LG"],
+    "primaryCategory": "stat.ML"
+  },
+  {
+    "id": "http://arxiv.org/abs/2312.04587v1",
+    "title": "FedBayes: A Zero-Trust Federated Learning Aggregation to Defend Against Adversarial Attacks",
+    "summary": "Federated learning has created a decentralized method to train a machine learning model without needing direct access to client data. The main goal of a federated learning architecture is to protect the privacy of each client while still contributing to the training of the global model. However, the main advantage of privacy in federated learning is also the easiest aspect to exploit. Without being able to see the clients' data, it is difficult to determine the quality of the data. By utilizing data poisoning methods, such as backdoor or label-flipping attacks, or by sending manipulated information about their data back to the server, malicious clients are able to corrupt the global model and degrade performance across all clients within a federation. Our novel aggregation method, FedBayes, mitigates the effect of a malicious client by calculating the probabilities of a client's model weights given to the prior model's weights using Bayesian statistics. Our results show that this approach negates the effects of malicious clients and protects the overall federation.",
+    "published": "2023-12-04T21:37:50Z",
+    "categories": ["cs.CR", "cs.LG"],
+    "primaryCategory": "cs.CR"
+  },
+  {
+    "id": "http://arxiv.org/abs/2110.13864v1",
+    "title": "FL-WBC: Enhancing Robustness against Model Poisoning Attacks in Federated Learning from a Client Perspective",
+    "summary": "Federated learning (FL) is a popular distributed learning framework that trains a global model through iterative communications between a central server and edge devices. Recent works have demonstrated that FL is vulnerable to model poisoning attacks. Several server-based defense approaches (e.g. robust aggregation), have been proposed to mitigate such attacks. However, we empirically show that under extremely strong attacks, these defensive methods fail to guarantee the robustness of FL. More importantly, we observe that as long as the global model is polluted, the impact of attacks on the global model will remain in subsequent rounds even if there are no subsequent attacks. In this work, we propose a client-based defense, named White Blood Cell for Federated Learning (FL-WBC), which can mitigate model poisoning attacks that have already polluted the global model. The key idea of FL-WBC is to identify the parameter space where long-lasting attack effect on parameters resides and perturb that space during local training. Furthermore, we derive a certified robustness guarantee against model poisoning attacks and a convergence guarantee to FedAvg after applying our FL-WBC. We conduct experiments on FasionMNIST and CIFAR10 to evaluate the defense against state-of-the-art model poisoning attacks. The results demonstrate that our method can effectively mitigate model poisoning attack impact on the global model within 5 communication rounds with nearly no accuracy drop under both IID and Non-IID settings. Our defense is also complementary to existing server-based robust aggregation approaches and can further improve the robustness of FL under extremely strong attacks.",
+    "published": "2021-10-26T17:13:35Z",
+    "categories": ["cs.LG", "cs.AI", "cs.CV", "cs.DC"],
+    "primaryCategory": "cs.LG"
+  }
+]

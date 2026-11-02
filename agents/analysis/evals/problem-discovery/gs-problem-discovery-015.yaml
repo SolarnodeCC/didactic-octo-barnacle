@@ -1,0 +1,11 @@
+id: gs-problem-discovery-015
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.27684.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-017.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-015.yaml
+expected:
+  requiredFacts:
+    - "providers lose substantial revenue to payer underpayments and claim denials"
+    - "finding the recurring patterns is manual and does not scale to claim volumes"
+  customerIndustry: healthcare
+  painLevelRange: [3, 4]
+notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

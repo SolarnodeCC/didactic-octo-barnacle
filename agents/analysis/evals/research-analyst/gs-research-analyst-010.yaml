@@ -1,0 +1,20 @@
+id: gs-research-analyst-010
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.26913.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-011.yaml#0
+neighborsFixture: fixtures/neighbors/2610.26913.json
+expected:
+  noveltyRange: [40, 70]
+  maturity: prototype
+  industriesInclude:
+    - healthcare
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 55
+  maturity: prototype
+  industry:
+    - healthcare
+  technology:
+    - "small language model"
+    - "edge deployment"
+    - "SNOMED-CT grounding"
+    - "speech-driven reporting"
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
