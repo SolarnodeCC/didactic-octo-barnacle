@@ -1,0 +1,11 @@
+id: gs-problem-discovery-014
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.32469.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-016.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-014.yaml
+expected:
+  requiredFacts:
+    - "telephone triage is safety critical and nurses decide from a brief intake note"
+    - "direct LLMs over-escalate and cannot justify against an auditable clinical standard"
+  customerIndustry: healthcare
+  painLevelRange: [4, 5]
+notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

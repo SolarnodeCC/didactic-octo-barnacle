@@ -1,0 +1,11 @@
+id: gs-problem-discovery-012
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2609.10421.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-013.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-012.yaml
+expected:
+  requiredFacts:
+    - "hospitals review only emergency revisits within 48-72 hours"
+    - "this may miss quality improvement opportunities and manual review is burdensome"
+  customerIndustry: healthcare
+  painLevelRange: [3, 4]
+notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

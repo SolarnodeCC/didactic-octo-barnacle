@@ -1,0 +1,11 @@
+id: gs-problem-discovery-020
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.40071.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-003.yaml#1
+researchAnalystRef: research-analyst/gs-research-analyst-020.yaml
+expected:
+  requiredFacts:
+    - "the agentic coder is software and therefore a supply-chain security risk"
+    - "AI agents select dependencies and run tools that leave no durable record"
+  customerIndustry: enterprise
+  painLevelRange: [3, 4]
+notes: "Second candidate of the same publication; the customer quote is weak. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

@@ -1,0 +1,19 @@
+id: gs-research-analyst-015
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.27684.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-017.yaml#0
+neighborsFixture: fixtures/neighbors/2610.27684.json
+expected:
+  noveltyRange: [30, 60]
+  maturity: field-tested
+  industriesInclude:
+    - healthcare
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 45
+  maturity: field-tested
+  industry:
+    - healthcare
+  technology:
+    - "HDBSCAN clustering"
+    - "claim embeddings"
+    - "LLM cluster interpretation"
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

@@ -1,0 +1,11 @@
+id: gs-problem-discovery-013
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2609.21149.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-014.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-013.yaml
+expected:
+  requiredFacts:
+    - "health systems need practical ways to routinely evaluate AI-assisted psychiatric intake against clinical standards"
+    - "clinicians differ in intake style and evaluation burden must be low"
+  customerIndustry: healthcare
+  painLevelRange: [3, 4]
+notes: "Pain level is a boundary case between 3 and 4. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

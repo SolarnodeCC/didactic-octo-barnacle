@@ -1,0 +1,18 @@
+id: gs-research-analyst-018
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2605.06703.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-021.yaml#0
+neighborsFixture: fixtures/neighbors/2605.06703.json
+expected:
+  noveltyRange: [20, 50]
+  maturity: field-tested
+  industriesInclude:
+    - enterprise
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 35
+  maturity: field-tested
+  industry:
+    - enterprise
+  technology:
+    - "governance framework"
+    - "modernization operating model"
+notes: "Maturity is a boundary case: a practitioner framework without a measured evaluation. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

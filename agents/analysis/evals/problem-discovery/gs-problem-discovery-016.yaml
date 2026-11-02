@@ -1,0 +1,11 @@
+id: gs-problem-discovery-016
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2606.17555.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-018.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-016.yaml
+expected:
+  requiredFacts:
+    - "fraud and money laundering is engineered to resemble legitimate activity"
+    - "static rule engines are blind to these patterns"
+  customerIndustry: financial-services
+  painLevelRange: [4, 5]
+notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

@@ -1,0 +1,19 @@
+id: gs-research-analyst-001
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.40641.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-001.yaml#0
+neighborsFixture: fixtures/neighbors/2610.40641.json
+expected:
+  noveltyRange: [40, 70]
+  maturity: prototype
+  industriesInclude:
+    - government
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 55
+  maturity: prototype
+  industry:
+    - government
+  technology:
+    - "agentic AI"
+    - "causal analysis of weather indices"
+    - "crop loss prediction"
+notes: "Maturity and industry judged from the abstract; agriculture is not a target industry, so government is the required industry. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

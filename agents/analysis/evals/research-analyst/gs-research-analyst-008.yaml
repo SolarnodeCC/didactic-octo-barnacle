@@ -1,0 +1,19 @@
+id: gs-research-analyst-008
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2609.39537.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-009.yaml#0
+neighborsFixture: fixtures/neighbors/2609.39537.json
+expected:
+  noveltyRange: [20, 50]
+  maturity: prototype
+  industriesInclude:
+    - government
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 35
+  maturity: prototype
+  industry:
+    - government
+  technology:
+    - "Semantic Web"
+    - "knowledge graph"
+    - "LLM-assisted classification"
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."

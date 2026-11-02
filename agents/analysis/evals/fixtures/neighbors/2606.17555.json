@@ -1,0 +1,82 @@
+[
+  {
+    "id": "http://arxiv.org/abs/2509.20339v1",
+    "title": "Spatio-Temporal Directed Graph Learning for Account Takeover Fraud Detection",
+    "summary": "Account Takeover (ATO) fraud poses a significant challenge in consumer banking, requiring high recall under strict latency while minimizing friction for legitimate users. Production systems typically rely on tabular gradient-boosted decision trees (e.g., XGBoost) that score sessions independently, overlooking the relational and temporal structure of online activity that characterizes coordinated attacks and \"fraud rings.\" We introduce ATLAS (Account Takeover Learning Across Spatio-Temporal Directed Graph), a framework that reformulates ATO detection as spatio-temporal node classification on a time-respecting directed session graph. ATLAS links entities via shared identifiers (account, device, IP) and regulates connectivity with time-window and recency constraints, enabling causal, time-respecting message passing and latency-aware label propagation that uses only labels available at scoring time, non-anticipative and leakage-free. We operationalize ATLAS with inductive GraphSAGE variants trained via neighbor sampling, at scale on a sessions graph with more than 100M nodes and around 1B edges. On a high-risk digital product at Capital One, ATLAS delivers 6.38 percent AUC improvement and more than 50 percent reduction in customer friction, improving fraud capture while reducing user friction.",
+    "published": "2025-09-24T17:32:24Z",
+    "categories": ["cs.LG"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/2601.05578v1",
+    "title": "Reinforcement Learning of Large Language Models for Interpretable Credit Card Fraud Detection",
+    "summary": "E-commerce platforms and payment solution providers face increasingly sophisticated fraud schemes, ranging from identity theft and account takeovers to complex money laundering operations that exploit the speed and anonymity of digital transactions. However, despite their theoretical promise, the application of Large Language Models (LLMs) to fraud detection in real-world financial contexts remains largely unexploited, and their practical effectiveness in handling domain-specific e-commerce transaction data has yet to be empirically validated. To bridge this gap between conventional machine learning limitations and the untapped potential of LLMs in fraud detection, this paper proposes a novel approach that employs Reinforcement Learning (RL) to post-train lightweight language models specifically for fraud detection tasks using only raw transaction data. We utilize the Group Sequence Policy Optimization (GSPO) algorithm combined with a rule-based reward system to fine-tune language models of various sizes on a real-life transaction dataset provided by a Chinese global payment solution company. Through this reinforcement learning framework, the language models are encouraged to explore diverse trust and risk signals embedded within the textual transaction data, including patterns in customer information, shipping details, product descriptions, and order history. Our experimental results demonstrate the effectiveness of this approach, with post-trained language models achieving substantial F1-score improvements on held-out test data. Our findings demonstrate that the observed performance improvements are primarily attributable to the exploration mechanism inherent in reinforcement learning, which allows models to discover novel fraud indicators beyond those captured by traditional engineered features.",
+    "published": "2026-01-09T06:56:27Z",
+    "categories": ["cs.AI", "cs.CE"],
+    "primaryCategory": "cs.AI"
+  },
+  {
+    "id": "http://arxiv.org/abs/2412.18287v1",
+    "title": "Semi-supervised Credit Card Fraud Detection via Attribute-Driven Graph Representation",
+    "summary": "Credit card fraud incurs a considerable cost for both cardholders and issuing banks. Contemporary methods apply machine learning-based classifiers to detect fraudulent behavior from labeled transaction records. But labeled data are usually a small proportion of billions of real transactions due to expensive labeling costs, which implies that they do not well exploit many natural features from unlabeled data. Therefore, we propose a semi-supervised graph neural network for fraud detection. Specifically, we leverage transaction records to construct a temporal transaction graph, which is composed of temporal transactions (nodes) and interactions (edges) among them. Then we pass messages among the nodes through a Gated Temporal Attention Network (GTAN) to learn the transaction representation. We further model the fraud patterns through risk propagation among transactions. The extensive experiments are conducted on a real-world transaction dataset and two publicly available fraud detection datasets. The result shows that our proposed method, namely GTAN, outperforms other state-of-the-art baselines on three fraud detection datasets. Semi-supervised experiments demonstrate the excellent fraud detection performance of our model with only a tiny proportion of labeled data.",
+    "published": "2024-12-24T08:48:48Z",
+    "categories": ["cs.LG", "cs.AI", "cs.SI"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/2205.04626v1",
+    "title": "On some studies of Fraud Detection Pipeline and related issues from the scope of Ensemble Learning and Graph-based Learning",
+    "summary": "The UK anti-fraud charity Fraud Advisory Panel (FAP) in their review of 2016 estimates business costs of fraud at 144 billion, and its individual counterpart at 9.7 billion. Banking, insurance, manufacturing, and government are the most common industries affected by fraud activities. Designing an efficient fraud detection system could avoid losing the money; however, building this system is challenging due to many difficult problems, e.g.imbalanced data, computing costs, etc. Over the last three decades, there are various research relates to fraud detection but no agreement on what is the best approach to build the fraud detection system. In this thesis, we aim to answer some questions such as i) how to build a simplified and effective Fraud Detection System that not only easy to implement but also providing reliable results and our proposed Fraud Detection Pipeline is a potential backbone of the system and is easy to be extended or upgraded, ii) when to update models in our system (and keep the accuracy stable) in order to reduce the cost of updating process, iii) how to deal with an extreme imbalance in big data classification problem, e.g. fraud detection, since this is the gap between two difficult problems, iv) further, how to apply graph-based semi-supervised learning to detect fraudulent transactions.",
+    "published": "2022-05-10T02:13:58Z",
+    "categories": ["cs.LG"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/2108.04494v1",
+    "title": "Finding NeMo: Fishing in banking networks using network motifs",
+    "summary": "Banking fraud causes billion-dollar losses for banks worldwide. In fraud detection, graphs help understand complex transaction patterns and discovering new fraud schemes. This work explores graph patterns in a real-world transaction dataset by extracting and analyzing its network motifs. Since banking graphs are heterogeneous, we focus on heterogeneous network motifs. Additionally, we propose a novel network randomization process that generates valid banking graphs. From our exploratory analysis, we conclude that network motifs extract insightful and interpretable patterns.",
+    "published": "2021-08-10T08:00:28Z",
+    "categories": ["cs.SI"],
+    "primaryCategory": "cs.SI"
+  },
+  {
+    "id": "http://arxiv.org/abs/2601.22800v1",
+    "title": "Trackly: A Unified SaaS Platform for User Behavior Analytics and Real Time Rule Based Anomaly Detection",
+    "summary": "Understanding user behavior is essential for improving digital experiences, optimizing business conversions, and mitigating threats like account takeovers, fraud, and bot attacks. Most platforms separate product analytics and security, creating fragmented visibility and delayed threat detection. Trackly, a scalable SaaS platform, unifies comprehensive user behavior analytics with real time, rule based anomaly detection. It tracks sessions, IP based geo location, device browser fingerprints, and granular events such as page views, add to cart, and checkouts. Suspicious activities logins from new devices or locations, impossible travel (Haversine formula), rapid bot like actions, VPN proxy usage, or multiple accounts per IP are flagged via configurable rules with weighted risk scoring, enabling transparent, explainable decisions. A real time dashboard provides global session maps, DAU MAU, bounce rates, and session durations. Integration is simplified with a lightweight JavaScript SDK and secure REST APIs. Implemented on a multi tenant microservices stack (ASP.NET Core, MongoDB, RabbitMQ, Next.js), Trackly achieved 98.1% accuracy, 97.7% precision, and 2.25% false positives on synthetic datasets, proving its efficiency for SMEs and ecommerce.",
+    "published": "2026-01-30T10:31:26Z",
+    "categories": ["cs.CR", "cs.LG"],
+    "primaryCategory": "cs.CR"
+  },
+  {
+    "id": "http://arxiv.org/abs/2509.12255v1",
+    "title": "Representation Learning on Large Non-Bipartite Transaction Networks using GraphSAGE",
+    "summary": "Financial institutions increasingly require scalable tools to analyse complex transactional networks, yet traditional graph embedding methods struggle with dynamic, real-world banking data. This paper demonstrates the practical application of GraphSAGE, an inductive Graph Neural Network framework, to non-bipartite heterogeneous transaction networks within a banking context. Unlike transductive approaches, GraphSAGE scales well to large networks and can generalise to unseen nodes which is critical for institutions working with temporally evolving transactional data. We construct a transaction network using anonymised customer and merchant transactions and train a GraphSAGE model to generate node embeddings. Our exploratory work on the embeddings reveals interpretable clusters aligned with geographic and demographic attributes. Additionally, we illustrate their utility in downstream classification tasks by applying them to a money mule detection model where using these embeddings improves the prioritisation of high-risk accounts. Beyond fraud detection, our work highlights the adaptability of this framework to banking-scale networks, emphasising its inductive capability, scalability, and interpretability. This study provides a blueprint for financial organisations to harness graph machine learning for actionable insights in transactional ecosystems.",
+    "published": "2025-09-12T14:09:16Z",
+    "categories": ["cs.LG", "cs.AI", "cs.SI"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/2306.16424v3",
+    "title": "Realistic Synthetic Financial Transactions for Anti-Money Laundering Models",
+    "summary": "With the widespread digitization of finance and the increasing popularity of cryptocurrencies, the sophistication of fraud schemes devised by cybercriminals is growing. Money laundering -- the movement of illicit funds to conceal their origins -- can cross bank and national boundaries, producing complex transaction patterns. The UN estimates 2-5\\% of global GDP or \\$0.8 - \\$2.0 trillion dollars are laundered globally each year. Unfortunately, real data to train machine learning models to detect laundering is generally not available, and previous synthetic data generators have had significant shortcomings. A realistic, standardized, publicly-available benchmark is needed for comparing models and for the advancement of the area. To this end, this paper contributes a synthetic financial transaction dataset generator and a set of synthetically generated AML (Anti-Money Laundering) datasets. We have calibrated this agent-based generator to match real transactions as closely as possible and made the datasets public. We describe the generator in detail and demonstrate how the datasets generated can help compare different machine learning models in terms of their AML abilities. In a key way, using synthetic data in these comparisons can be even better than using real data: the ground truth labels are complete, whilst many laundering transactions in real data are never detected.",
+    "published": "2023-06-22T10:32:51Z",
+    "categories": ["cs.AI", "cs.LG", "q-fin.CP"],
+    "primaryCategory": "cs.AI"
+  },
+  {
+    "id": "http://arxiv.org/abs/2101.01689v1",
+    "title": "Label Augmentation via Time-based Knowledge Distillation for Financial Anomaly Detection",
+    "summary": "Detecting anomalies has become increasingly critical to the financial service industry. Anomalous events are often indicative of illegal activities such as fraud, identity theft, network intrusion, account takeover, and money laundering. Financial anomaly detection use cases face serious challenges due to the dynamic nature of the underlying patterns especially in adversarial environments such as constantly changing fraud tactics. While retraining the models with the new patterns is absolutely essential; keeping up with the rapid changes introduces other challenges as it moves the model away from older patterns or continuously grows the size of the training data. The resulting data growth is hard to manage and it reduces the agility of the models' response to the latest attacks. Due to the data size limitations and the need to track the latest patterns, older time periods are often dropped in practice, which in turn, causes vulnerabilities. In this study, we propose a label augmentation approach to utilize the learning from older models to boost the latest. Experimental results show that the proposed approach provides a significant reduction in training time, while providing potential performance improvement.",
+    "published": "2021-01-05T18:24:13Z",
+    "categories": ["cs.LG"],
+    "primaryCategory": "cs.LG"
+  },
+  {
+    "id": "http://arxiv.org/abs/2411.19457v1",
+    "title": "Multi-task CNN Behavioral Embedding Model For Transaction Fraud Detection",
+    "summary": "The burgeoning e-Commerce sector requires advanced solutions for the detection of transaction fraud. With an increasing risk of financial information theft and account takeovers, deep learning methods have become integral to the embedding of behavior sequence data in fraud detection. However, these methods often struggle to balance modeling capabilities and efficiency and incorporate domain knowledge. To address these issues, we introduce the multitask CNN behavioral Embedding Model for Transaction Fraud Detection. Our contributions include 1) introducing a single-layer CNN design featuring multirange kernels which outperform LSTM and Transformer models in terms of scalability and domain-focused inductive bias, and 2) the integration of positional encoding with CNN to introduce sequence-order signals enhancing overall performance, and 3) implementing multitask learning with randomly assigned label weights, thus removing the need for manual tuning. Testing on real-world data reveals our model's enhanced performance of downstream transaction models and comparable competitiveness with the Transformer Time Series (TST) model.",
+    "published": "2024-11-29T03:58:11Z",
+    "categories": ["cs.LG"],
+    "primaryCategory": "cs.LG"
+  }
+]

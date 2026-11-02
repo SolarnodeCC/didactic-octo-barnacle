@@ -94,6 +94,37 @@ expected:
   reason: "A population-level burden with no named party that acts on it."
 ```
 
+## Analysis agent items
+
+Research Analyst and Problem Discovery items point to a candidate of the extraction golden set, so every agent works on the same publications. The nearest publications are frozen fixtures, and a Research Analyst entry freezes the output that the next agents receive:
+
+```yaml
+id: gs-research-analyst-001
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.40641.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-001.yaml#0
+neighborsFixture: fixtures/neighbors/2610.40641.json
+expected:
+  noveltyRange: [40, 70]       # at most 30 points wide
+  maturity: prototype
+  industriesInclude: [government]
+handoff:                       # the input of Problem Discovery and later agents
+  novelty: 55
+  maturity: prototype
+  industry: [government]
+  technology: ["agentic AI"]
+```
+
+```yaml
+id: gs-problem-discovery-001
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.40641.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-001.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-001.yaml
+expected:
+  requiredFacts: ["facts the Problem field must state, judged against a rubric"]
+  customerIndustry: government
+  painLevelRange: [3, 4]      # at most 2 wide
+```
+
 Evidence envelopes are required on agent expected outputs (unlike the short product examples). Injection fixtures live under `fixtures/injection/` (REQ-NFR-006).
 
 ## Closing OQ-015

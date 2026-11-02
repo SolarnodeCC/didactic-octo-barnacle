@@ -1,0 +1,11 @@
+id: gs-problem-discovery-017
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2608.22389.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-019.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-017.yaml
+expected:
+  requiredFacts:
+    - "euro credit transfers must settle in under ten seconds"
+    - "AML detection and explanation must fit inside the settlement window"
+  customerIndustry: financial-services
+  painLevelRange: [4, 5]
+notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
