@@ -1,0 +1,11 @@
+id: gs-problem-discovery-029
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2608.18465.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-032.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-029.yaml
+expected:
+  requiredFacts:
+    - "technicians avoid the aircraft maintenance manual because it is hard to navigate and slow to use under strict schedules"
+    - "existing retrieval models cover text only and miss diagrams"
+  customerIndustry: aerospace-defense
+  painLevelRange: [3, 4]
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

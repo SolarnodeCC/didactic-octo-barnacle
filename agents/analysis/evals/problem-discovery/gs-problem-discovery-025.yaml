@@ -1,0 +1,11 @@
+id: gs-problem-discovery-025
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2606.13741.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-028.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-025.yaml
+expected:
+  requiredFacts:
+    - "sales-campaign pricing at weekly granularity or by a manual-algorithmic hybrid took hours per decision"
+    - "a daily forecast-then-optimize tool raised profit by about 6% in A/B tests and runs in production"
+  customerIndustry: consumer-retail
+  painLevelRange: [3, 4]
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

@@ -1,0 +1,11 @@
+id: gs-problem-discovery-027
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2608.18611.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-030.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-027.yaml
+expected:
+  requiredFacts:
+    - "power networks are increasingly exposed to weather-sensitive failures such as vegetation and lightning"
+    - "utility risk models must stay maintainable as data sources and hazards change"
+  customerIndustry: energy-utilities
+  painLevelRange: [3, 4]
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

@@ -1,0 +1,19 @@
+id: gs-research-analyst-031
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2609.20080.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-034.yaml#0
+neighborsFixture: fixtures/neighbors/2609.20080.json
+expected:
+  noveltyRange: [40, 70]
+  maturity: theoretical
+  industriesInclude:
+    - aerospace-defense
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 55
+  maturity: theoretical
+  industry:
+    - aerospace-defense
+  technology:
+    - "agentic AI"
+    - "command-and-control decision support"
+    - "tool-using agents"
+notes: "The paper calls its architecture conceptual, so theoretical. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

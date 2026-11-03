@@ -1,0 +1,11 @@
+id: gs-relevance-024
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2602.04464.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-027.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-024.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-024.yaml
+expected:
+  bestIndustry: consumer-retail
+  strategicRelevanceRange: [55, 85]
+  technicalFeasibilityRange: [45, 75]
+  implementationEffort: M
+notes: "Demand forecasting is a clear focus area; a correction inside an existing forecast pipeline is effort M. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

@@ -1,0 +1,19 @@
+id: gs-research-analyst-024
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2602.04464.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-027.yaml#0
+neighborsFixture: fixtures/neighbors/2602.04464.json
+expected:
+  noveltyRange: [20, 50]
+  maturity: lab-result
+  industriesInclude:
+    - consumer-retail
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 35
+  maturity: lab-result
+  industry:
+    - consumer-retail
+  technology:
+    - "demand forecasting"
+    - "two-step regression"
+    - "perishables"
+notes: "An analysis on retailer data with no tool, so lab-result. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

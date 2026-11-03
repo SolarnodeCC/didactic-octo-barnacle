@@ -1,0 +1,11 @@
+id: gs-relevance-028
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2604.26150.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-031.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-028.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-028.yaml
+expected:
+  bestIndustry: energy-utilities
+  strategicRelevanceRange: [55, 85]
+  technicalFeasibilityRange: [30, 60]
+  implementationEffort: L
+notes: "Safety and regulatory constraints on grid operations; XL is defensible. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

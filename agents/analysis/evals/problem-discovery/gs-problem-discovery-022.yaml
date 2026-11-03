@@ -1,0 +1,11 @@
+id: gs-problem-discovery-022
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2608.26911.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-025.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-022.yaml
+expected:
+  requiredFacts:
+    - "independent workshops cannot use diagnostic capabilities that were limited to manufacturer tools"
+    - "workshops need trusted data exchange and technician upskilling to compete"
+  customerIndustry: automotive
+  painLevelRange: [3, 4]
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

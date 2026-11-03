@@ -1,0 +1,11 @@
+id: gs-problem-discovery-021
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2607.06170.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-024.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-021.yaml
+expected:
+  requiredFacts:
+    - "Indian EV makers carry a new and fast growing burden of compliance evidence such as type approval reports, battery safety records, and supplier quality packages"
+    - "the compliance document lifecycle has manual bottlenecks and retention horizons that reach a decade past end of production"
+  customerIndustry: automotive
+  painLevelRange: [3, 4]
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

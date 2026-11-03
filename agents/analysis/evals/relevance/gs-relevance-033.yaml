@@ -1,0 +1,11 @@
+id: gs-relevance-033
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2606.06089.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-036.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-033.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-033.yaml
+expected:
+  bestIndustry: insurance
+  strategicRelevanceRange: [60, 90]
+  technicalFeasibilityRange: [55, 85]
+  implementationEffort: L
+notes: "Claims automation and risk assessment are clear focus areas; health data in claims makes effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

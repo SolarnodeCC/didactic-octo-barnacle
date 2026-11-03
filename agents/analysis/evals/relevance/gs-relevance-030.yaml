@@ -1,0 +1,11 @@
+id: gs-relevance-030
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2608.22569.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-033.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-030.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-030.yaml
+expected:
+  bestIndustry: aerospace-defense
+  strategicRelevanceRange: [50, 80]
+  technicalFeasibilityRange: [35, 65]
+  implementationEffort: L
+notes: "Maintenance planning fits aerospace-defense; airline operations are a partial fit; effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

@@ -1,0 +1,19 @@
+id: gs-research-analyst-032
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2609.37454.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-035.yaml#0
+neighborsFixture: fixtures/neighbors/2609.37454.json
+expected:
+  noveltyRange: [30, 60]
+  maturity: prototype
+  industriesInclude:
+    - insurance
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 45
+  maturity: prototype
+  industry:
+    - insurance
+  technology:
+    - "multi-agent workflow"
+    - "local and cloud model split"
+    - "compliance rules on graph edges"
+notes: "Synthetic stubs and a 20-scenario benchmark, so prototype. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

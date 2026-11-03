@@ -1,0 +1,11 @@
+id: gs-relevance-023
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2604.05987.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-026.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-023.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-023.yaml
+expected:
+  bestIndustry: consumer-retail
+  strategicRelevanceRange: [60, 90]
+  technicalFeasibilityRange: [55, 85]
+  implementationEffort: L
+notes: "Inventory and supply chain is a clear focus area; integrations with outlets and suppliers make effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

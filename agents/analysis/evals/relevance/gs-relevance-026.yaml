@@ -1,0 +1,11 @@
+id: gs-relevance-026
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.28167.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-029.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-026.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-026.yaml
+expected:
+  bestIndustry: energy-utilities
+  strategicRelevanceRange: [55, 85]
+  technicalFeasibilityRange: [40, 70]
+  implementationEffort: L
+notes: "Predictive maintenance is a clear focus area; grid and market data integrations make effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
