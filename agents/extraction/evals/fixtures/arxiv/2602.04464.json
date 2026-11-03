@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2602.04464v1",
+  "title": "Discounted Sales of Expiring Perishables: Challenges for Demand Forecasting in Grocery Retail Practice",
+  "summary": "Grocery retailers frequently apply price discounts to stimulate demand for expiring perishables. However, integrating these discounted sales into future demand forecasts presents a significant challenge. This study investigates the effectiveness of incorporating a fixed share of these sales as \\textit{regular} demand into the forecast, as commonly applied in practice. We employ a two-step regression approach on data from a major European grocery retailer, covering over 1,700 products across 676 stores. We reveal that forecasts underestimate actual demand for most SKUs when discounted sales occur. This residual uplift effect is significantly influenced by the number of sales at reduced prices. Our findings underscore the necessity for more precise approaches to integrate discounted sales into demand forecasts, thereby preventing excess inventory and the associated economic and environmental impacts of spoilage in the grocery sector.",
+  "published": "2026-02-04T11:49:56Z",
+  "categories": ["econ.GN"],
+  "primaryCategory": "econ.GN",
+  "pdfUrl": "https://arxiv.org/pdf/2602.04464v1",
+  "withdrawn": false
+}

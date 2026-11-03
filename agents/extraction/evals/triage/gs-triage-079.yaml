@@ -1,0 +1,18 @@
+id: gs-triage-079
+publicationFixture: fixtures/arxiv/2608.22569.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "airline operations"
+  statedHarm: "downstream disruption costs and flight cancellations"
+  trigger: "none"
+  existingAlternative: "typically optimized separately or sequentially"
+  adoptable: "a unified optimisation framework"
+notes: "Airline predictive maintenance and fleet scheduling (MRO). Industry: aerospace-defense. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

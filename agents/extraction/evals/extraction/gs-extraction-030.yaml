@@ -1,0 +1,13 @@
+id: gs-extraction-030
+publicationFixture: fixtures/arxiv/2608.18611.json
+expected:
+  candidates:
+    - finding: "Utilities face weather-sensitive failures of power-line assets, from vegetation and lightning, and need asset-level risk models that stay maintainable as data sources and hazards change."
+      evidenceQuote: "Electric power networks are increasingly exposed to weather-sensitive failure mechanisms that require asset-level, spatially explicit risk modelling for effective intervention planning."
+      customer: "utilities"
+      customerQuote: "probability-of-failure (PoF) modelling framework for utility asset management"
+      whyNow: "Climate-driven hazards and changing data availability keep shifting the failure risk of network assets."
+      whyNowQuote: "changing data availability, asset-management priorities, and climate-driven hazard conditions"
+      currentAlternative: null
+      alternativeQuote: null
+notes: "Industry: energy-utilities. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

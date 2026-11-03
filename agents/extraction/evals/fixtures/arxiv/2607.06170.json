@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2607.06170v1",
+  "title": "The Documentation and Traceability Burden of the Indian EV Transition",
+  "summary": "The electric vehicle transition in India is usually told through batteries, cost and charging. Less visibly, it is a story about documentation. Electrification layers a new and fast growing burden of compliance evidence, type approval test reports, battery safety and thermal propagation records, cyber security and software update documentation, and supplier quality packages, on top of the evidence apparatus the automotive industry already carries, with retention horizons that now reach a decade past end of production. This burden is studied from the testing side but has never been systematised as an information systems problem, so its verification bottlenecks, architecture requirements and open questions remain unmapped. We close that gap for the Indian EV OEM with four contributions. These include a two layer systematisation of evidence obligations organised by artefact, producer, verifier, trigger and retention, a lifecycle model of the compliance document with manual bottlenecks and four observed failure loci marked, an analytic lens, documentation exergy destruction, that classifies document families and explains systematic under resourcing, and a research agenda spanning reconciliation accuracy, human in the loop reliability, cross party provenance, long horizon integrity, burden measurement and machine verifiable regulation. Three Indian failure cases and one Japanese ground the analysis.",
+  "published": "2026-07-07T11:48:14Z",
+  "categories": ["cs.CE"],
+  "primaryCategory": "cs.CE",
+  "pdfUrl": "https://arxiv.org/pdf/2607.06170v1",
+  "withdrawn": false
+}

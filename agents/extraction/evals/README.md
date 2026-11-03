@@ -8,13 +8,14 @@ triage/gs-triage-NNN.yaml         the five expected signals and the decision (RE
 extraction/gs-extraction-NNN.yaml the expected candidates with quotes (REQ-PROC-009)
 ```
 
-## State after round 2
+## State after round 3
 
 | Set | Entries | Minimum (REQ-TEST-005) |
 |---|---|---|
-| Triage | 59 | 20 |
-| Extraction | 23 | 20 |
+| Triage | 83 | 20 |
+| Extraction | 34 | 20 |
 
+- Round 3 (draft, awaiting owner review) adds 24 triage and 11 extraction entries for automotive, consumer products and retail, energy and utilities, and aerospace and defense: 6 publications per industry, 11 accepted and 13 rejected. The industry of each new entry is in its `notes`; older entries carry none.
 - Both sets reach the minimum, so the eval thresholds of triage and extraction are runnable once the harness exists.
 - Triage: 23 accepted and 36 rejected. Three entries from round 1 (`gs-triage-009`, `-010`, `-011`) reach the score cut but are rejected because `namedParty` is false.
 - Extraction: 23 entries for the 23 accepted publications. 19 have candidates (`gs-extraction-003` has two, added in the agent pilot) and 4 pass triage and yield no candidate (`gs-extraction-006`, `-015`, `-020`, `-022`, each with `candidates: []` and a `reason`).

@@ -1,0 +1,18 @@
+id: gs-triage-081
+publicationFixture: fixtures/arxiv/2608.19299.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: false
+    trigger: false
+    existingAlternative: true
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none"
+  statedHarm: "none"
+  trigger: "none"
+  existingAlternative: "remains largely human-driven"
+  adoptable: "none: an experiment with prompts"
+notes: "Evaluation of LLMs on air traffic control transcripts; research only. Industry: aerospace-defense. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

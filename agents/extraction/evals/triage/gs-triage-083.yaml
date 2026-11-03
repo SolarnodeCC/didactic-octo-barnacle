@@ -1,0 +1,18 @@
+id: gs-triage-083
+publicationFixture: fixtures/arxiv/2609.15022.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: false
+    trigger: false
+    existingAlternative: false
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none"
+  statedHarm: "none"
+  trigger: "none"
+  existingAlternative: "none: only other language technologies"
+  adoptable: "none: benchmarking and adaptation resources for research"
+notes: "Benchmark and model adaptation for research; no party. Industry: aerospace-defense. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

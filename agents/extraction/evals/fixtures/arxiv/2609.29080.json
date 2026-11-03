@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2609.29080v1",
+  "title": "Don't Fake It If You Can't Make It: Driver Misconduct in Last-Mile Delivery",
+  "summary": "In the last two decades, last-mile delivery (LMD) firms have seen immense growth fueled by the success of e-commerce, leading to faster and cheaper deliveries. Operating on thin margins, LMD firms strive for successful first-time deliveries to avoid the financial and reputational costs of reattempts. Delivery Agents (DAs) are integral to LMD efficiency, influencing customer experience, delivery success, and productivity. However, most LMD performance enhancement research focuses on process, technology, and incentives, which presume workers will conform to procedures and monitoring tools will function flawlessly. Nevertheless, in practice, DAs deviate from expected behaviors, i.e., indulge in misconduct, negatively affecting delivery efficiency, often resulting in returned parcels. One of the major misconducts is fake remarked deliveries, wherein DAs intentionally do not deliver the parcels and provide a fake reason for it. For instance, even without reaching a delivery address, a DA remarks 'customer unavailable' and records a delivery failure. In this study, we collaborated with a leading Indian LMD firm and, using instrumental variable regression, find that such misconduct leads to a spillover productivity loss. This effect reduces the next day's successful deliveries by 1.60% and first-time-right deliveries by 1.86%. We discuss misconduct's correlation with factors such as task complexity and offer novel insights into how opportunistic circumstances can influence worker behavior.",
+  "published": "2026-09-24T06:08:57Z",
+  "categories": ["econ.GN"],
+  "primaryCategory": "econ.GN",
+  "pdfUrl": "https://arxiv.org/pdf/2609.29080v1",
+  "withdrawn": false
+}

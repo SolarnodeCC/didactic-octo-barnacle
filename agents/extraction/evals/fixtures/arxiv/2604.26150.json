@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2604.26150v1",
+  "title": "Reinforcement Learning for Public Safety Power Shutoffs Under Decision-Dependent Uncertainty and Nonlinear Wildfire Ignition Models",
+  "summary": "Power grid infrastructure is an increasingly significant source of wildfire ignitions and poses severe risks to communities in fire-prone regions. Public Safety Power Shutoffs (PSPS) have emerged as a critical operational tool for utilities to mitigate this risk by proactively de-energizing portions of the grid under high-threat conditions. These shutoffs, however, impose costs on affected communities, and it is therefore essential that PSPS decisions be informed by realistic models of wildfire ignition risk. Current Mixed Integer Programming based methods require restrictive structural assumptions about the probability models for line failures caused by power line ignitions. While these simplifications yield tractable solutions, the resulting models may differ significantly from the true underlying dynamics. In this paper, we propose a reinforcement learning framework based on Proximal Policy Optimization that learns to adjust the topology of a distribution system by interacting directly with a simulator that accommodates any line failure probability model without imposing such restrictions. We test our methodology on 54-bus and 138-bus distribution systems and demonstrate its ability to lower operational costs compared to existing methods while allowing only marginally increased compute times as network size grows.",
+  "published": "2026-04-28T22:21:20Z",
+  "categories": ["math.OC"],
+  "primaryCategory": "math.OC",
+  "pdfUrl": "https://arxiv.org/pdf/2604.26150v1",
+  "withdrawn": false
+}

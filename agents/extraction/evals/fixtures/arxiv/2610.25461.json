@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2610.25461v1",
+  "title": "Selling in the Wild: Benchmark and Randomized Field Evidence for a Sales Agent Trained on Commercial Conversations",
+  "summary": "We test whether Javo, a sales agent fine-tuned on 4.6 million consented, de-identified commercial conversations, sells better than a frontier general-purpose model and better than human sales associates. The evaluation has four parts. Study 1 scores the agent on two public sales benchmarks, SalesLLM and SmartSalesBench, against 10 frontier and open-weight models. Study 2 is a randomized controlled trial on 100 live websites in 14 industries (e-commerce, travel and hospitality, and high-consideration services), run from 1 May to 30 September 2026, in which 14.8 million visitors were randomized to no agent, Javo, or a frontier-model agent with an identical interface, catalog tools and guardrails. Study 3 isolates the effect of the model by comparing those two agent arms. Study 4 compares Javo with each site's own human associates on 20 sites with staffed live chat. Relative to no agent, Javo changed revenue per visitor by +10.0% (95% CI +5.1 to +14.9). Among engaged visitors, it changed conversion by +21.6% relative to the frontier-model agent (95% CI +16.9 to +26.3). Against human associates, its engaged conversion was 11.26% versus 11.20% (non-inferior, margin -7%, one-sided p = 0.004; no significant superiority), at 1.8% of the cost per conversation. Return rates, unsupported product claims and complaint rates met the prespecified safety guardrails.",
+  "published": "2026-10-18T18:45:04Z",
+  "categories": ["cs.IR", "cs.CY"],
+  "primaryCategory": "cs.IR",
+  "pdfUrl": "https://arxiv.org/pdf/2610.25461v1",
+  "withdrawn": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2605.12719v1",
+  "title": "A Five-Layer MLOps Architecture for Connected Automated Driving",
+  "summary": "The continual assurance of safety and performance of automated driving systems (ADSs) poses significant challenges. ADSs operate in complex, dynamic, open-world environments allowing a wide range of scenarios, including ones that are rare or not foreseen during initial development. While the incorporation of artificial intelligence (AI) and machine learning (ML) technology allows ADSs to learn from data gathered during operation and thus enables them to adapt over time, these approaches come with their own challenges. A key advantage of ADSs compared to human drivers is their greater ability to gather data collectively across a fleet of vehicles, or even across multiple fleets operated by different entities, and to learn from this data collectively. Vehicles can share and combine their data to identify additional learning opportunities otherwise missed by individual vehicles. This creates new opportunities to tackle the challenges of continual assurance of safety and performance, but requires the implementation of architectures that leverage the collective learning potential. Based on established MLOps principles and existing work in the field of connected automated driving, this paper presents a five-layer architecture for collective learning-enabled MLOps processes for ADSs. The goal of this architecture is to provide a conceptual blueprint for the design and implementation of MLOps processes by fleet operators and other relevant stakeholders. The paper describes the main responsibilities of each layer, their interactions, and how multi-level self-assessments enabled by the architecture can support the detection and reduction of edge cases including black swan events.",
+  "published": "2026-05-12T20:26:55Z",
+  "categories": ["cs.RO", "cs.LG"],
+  "primaryCategory": "cs.RO",
+  "pdfUrl": "https://arxiv.org/pdf/2605.12719v1",
+  "withdrawn": false
+}

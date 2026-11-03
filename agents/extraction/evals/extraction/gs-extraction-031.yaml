@@ -1,0 +1,13 @@
+id: gs-extraction-031
+publicationFixture: fixtures/arxiv/2604.26150.json
+expected:
+  candidates:
+    - finding: "Utilities de-energize parts of the grid to prevent wildfire ignitions, but mixed-integer planning methods rest on restrictive assumptions about line-failure probabilities, so shutoff decisions may follow unrealistic risk models and impose costs on communities."
+      evidenceQuote: "Current Mixed Integer Programming based methods require restrictive structural assumptions about the probability models for line failures caused by power line ignitions."
+      customer: "utilities"
+      customerQuote: "Public Safety Power Shutoffs (PSPS) have emerged as a critical operational tool for utilities to mitigate this risk"
+      whyNow: "Power grid infrastructure is an increasingly significant source of wildfire ignitions."
+      whyNowQuote: "Power grid infrastructure is an increasingly significant source of wildfire ignitions"
+      currentAlternative: "Mixed Integer Programming based methods for shutoff decisions."
+      alternativeQuote: "Current Mixed Integer Programming based methods require restrictive structural assumptions"
+notes: "Industry: energy-utilities. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

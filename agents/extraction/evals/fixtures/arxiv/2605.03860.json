@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2605.03860v1",
+  "title": "A Welfarist Perspective on Fair Generation Curtailment",
+  "summary": "This paper presents a welfarist approach to fair active power curtailment in distribution grids with distributed photovoltaics. We address the lack of consistent axiomatic foundations in existing ad-hoc curtailment rules by modeling the decision as a social choice problem over feasible operating points and by deriving curtailment objectives from a set of foundational axioms that express principled stances on fairness and grid access rights. Rather than relying on the typically assumed full comparability of utilities, which can lead to undesirable outcomes in heterogeneous residential systems, we adopt a cardinal non-comparability stance on utilities. This approach requires far fewer assumptions about prosumers' private preferences while providing a rigorous basis for fair social ranking. We then present a unified framework that demonstrates that existing curtailment schemes represent specific instances of the Kalai-Smorodinsky rule applied to different normative reference points. This perspective offers grid operators an auditable, axiomatic foundation for justifying fairness in local energy systems.",
+  "published": "2026-05-05T15:23:36Z",
+  "categories": ["eess.SY"],
+  "primaryCategory": "eess.SY",
+  "pdfUrl": "https://arxiv.org/pdf/2605.03860v1",
+  "withdrawn": false
+}

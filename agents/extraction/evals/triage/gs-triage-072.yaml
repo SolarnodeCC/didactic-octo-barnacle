@@ -1,0 +1,18 @@
+id: gs-triage-072
+publicationFixture: fixtures/arxiv/2610.28167.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "power producers"
+  statedHarm: "reduces annual maintenance costs by up to 10%"
+  trigger: "none"
+  existingAlternative: "power producers primarily rely on farm-level information"
+  adoptable: "a grid-informed opportunistic maintenance scheduling model"
+notes: "Boundary case: the harm is the maintenance cost of offshore wind fleets, stated through the saving. Industry: energy-utilities. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

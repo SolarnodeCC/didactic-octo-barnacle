@@ -1,0 +1,13 @@
+id: gs-extraction-029
+publicationFixture: fixtures/arxiv/2610.28167.json
+expected:
+  candidates:
+    - finding: "Offshore wind power producers plan turbine maintenance from farm-level signals alone and ignore grid-level curtailment and negative prices, when assets are idle anyway; a grid-informed schedule cuts annual maintenance costs by up to 10% on a 600-MW farm."
+      evidenceQuote: "To date, power producers primarily rely on farm-level information (e.g., health signals, power generation, weather conditions) for maintenance planning of wind turbine fleets."
+      customer: "power producers"
+      customerQuote: "power producers primarily rely on farm-level information"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Maintenance planning from farm-level health, generation, and weather signals only."
+      alternativeQuote: "primarily rely on farm-level information (e.g., health signals, power generation, weather conditions) for maintenance planning of wind turbine fleets"
+notes: "Industry: energy-utilities. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

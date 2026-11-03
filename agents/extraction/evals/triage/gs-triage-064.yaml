@@ -1,0 +1,18 @@
+id: gs-triage-064
+publicationFixture: fixtures/arxiv/2605.12719.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: false
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "fleet operators and other relevant stakeholders"
+  statedHarm: "The continual assurance of safety and performance of automated driving systems (ADSs) poses significant challenges."
+  trigger: "none"
+  existingAlternative: "none"
+  adoptable: "none: the paper offers a conceptual blueprint"
+notes: "NamedParty and StatedHarm are true but the score is 0.4; a conceptual architecture counts as not adoptable. Industry: automotive. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

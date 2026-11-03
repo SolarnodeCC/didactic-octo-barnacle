@@ -1,0 +1,18 @@
+id: gs-triage-077
+publicationFixture: fixtures/arxiv/2605.03860.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: false
+    trigger: false
+    existingAlternative: true
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "grid operators"
+  statedHarm: "none"
+  trigger: "none"
+  existingAlternative: "existing ad-hoc curtailment rules"
+  adoptable: "none: an axiomatic framework"
+notes: "Theory-only: a social-choice argument for fair curtailment. Industry: energy-utilities. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."
