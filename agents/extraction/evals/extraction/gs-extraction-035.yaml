@@ -1,0 +1,14 @@
+id: gs-extraction-035
+publicationFixture: fixtures/arxiv/2609.37454.json
+industry: insurance
+expected:
+  candidates:
+    - finding: "Commercial P&C underwriters spend 30 to 40% of their time on administrative work and need about 40 minutes by hand per submission; a multi-agent framework could cut that to minutes while keeping sensitive data local."
+      evidenceQuote: "Underwriters in commercial Property and Casualty (P&C) insurance spend 30 to 40% of their time on administrative work rather than risk judgment, and a single submission takes about 40 minutes by hand."
+      customer: "commercial P&C underwriters"
+      customerQuote: "Underwriters in commercial Property and Casualty (P&C) insurance"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Handling each submission by hand."
+      alternativeQuote: "a single submission takes about 40 minutes by hand"
+notes: "Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

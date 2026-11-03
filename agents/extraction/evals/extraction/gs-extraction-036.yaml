@@ -1,0 +1,14 @@
+id: gs-extraction-036
+publicationFixture: fixtures/arxiv/2606.06089.json
+industry: insurance
+expected:
+  candidates:
+    - finding: "Actuaries leave predictive information in medical records, adjuster notes, and call transcripts unused because manual processing is slow, inconsistent, and unscalable; an LLM pipeline can extract structured actuarial variables."
+      evidenceQuote: "Manual processing of these documents is time-consuming, inconsistent across reviewers, and unscalable."
+      customer: "actuaries"
+      customerQuote: "Actuaries rely primarily on structured numerical data for reserving and ratemaking"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Reserving and ratemaking from structured numerical data only."
+      alternativeQuote: "Actuaries rely primarily on structured numerical data for reserving and ratemaking"
+notes: "Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

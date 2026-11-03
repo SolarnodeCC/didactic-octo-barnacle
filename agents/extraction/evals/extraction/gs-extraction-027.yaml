@@ -1,5 +1,6 @@
 id: gs-extraction-027
 publicationFixture: fixtures/arxiv/2602.04464.json
+industry: consumer-retail
 expected:
   candidates:
     - finding: "Grocery retailers feed discounted sales of expiring perishables into their demand forecasts as a fixed share of regular demand, and the forecasts then underestimate demand for most products, which risks excess inventory and spoilage."

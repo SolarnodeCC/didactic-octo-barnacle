@@ -1,5 +1,6 @@
 id: gs-extraction-013
 publicationFixture: fixtures/arxiv/2609.10421.json
+industry: other
 expected:
   candidates:
     - finding: "Hospital quality teams review only emergency department revisits within about 48-72 hours to limit chart-review burden, which may miss quality improvement opportunities."

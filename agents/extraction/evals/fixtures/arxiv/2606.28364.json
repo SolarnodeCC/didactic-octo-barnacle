@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2606.28364v1",
+  "title": "LLM based Knowledge Graph Approach to Automating Medical Device Regulatory Compliance",
+  "summary": "Advanced medical devices increasingly rely on AI-driven frameworks to automate compliance processes, ensuring safety and efficacy while reducing regulatory burdens. In the United States, software-based medical devices, including those utilizing AI/ML models, are regulated by the FDA's Center for Devices and Radiological Health (CDRH) under the Code of Federal Regulations (CFR) Title 21. These regulations are extensive, cross-referenced documents that require significant human effort to parse, leading to high compliance costs for manufacturers. We propose a novel, semantically rich framework that extracts regulatory knowledge from FDA documents and translates it into a machine-processable format. Our system encodes regulatory knowledge into an OWL/RDF-based knowledge graph and uses the Mistral 7B Instruct model to dynamically generate SPARQL queries, perform compliance reasoning, and produce structured reports. This enables automated device classification (Class I, II, or III) and real-time regulatory evaluation. Validated through real-world use cases, our framework significantly reduces manual review effort, enhances interpretability, and accelerates time-to-market. The proposed approach integrates AI reasoning and semantic technologies to achieve scalable, transparent, and automated regulatory compliance.",
+  "published": "2026-06-14T14:39:28Z",
+  "categories": ["cs.IR"],
+  "primaryCategory": "cs.IR",
+  "pdfUrl": "https://arxiv.org/pdf/2606.28364v1",
+  "withdrawn": false
+}

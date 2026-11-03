@@ -1,5 +1,6 @@
 id: gs-extraction-010
 publicationFixture: fixtures/arxiv/2609.09356.json
+industry: other
 expected:
   candidates:
     - finding: "Nurses at Noora Health triage more than 50,000 WhatsApp queries a month, and an opaque LLM classifier made mistakes hard to analyze and prompt changes costly to evaluate; a rule engine over LLM-extracted symptoms raised recall from 0.565 to 0.810."

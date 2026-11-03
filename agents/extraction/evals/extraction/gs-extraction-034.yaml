@@ -1,5 +1,6 @@
 id: gs-extraction-034
 publicationFixture: fixtures/arxiv/2609.20080.json
+industry: aerospace-defense
 expected:
   candidates:
     - finding: "Command-and-control centers of the Brazilian Armed Forces receive more data, faster, than operators can integrate within the decision cycle, and the AI tools in use are reactive and isolated."

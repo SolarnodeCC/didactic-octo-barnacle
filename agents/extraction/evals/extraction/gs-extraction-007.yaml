@@ -1,5 +1,6 @@
 id: gs-extraction-007
 publicationFixture: fixtures/arxiv/2610.17523.json
+industry: banking
 expected:
   candidates:
     - finding: "Financial institutions that train fraud-detection models together by federated learning are exposed to malicious clients that poison local data or model updates and degrade the shared model."

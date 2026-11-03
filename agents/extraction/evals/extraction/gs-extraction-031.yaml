@@ -1,5 +1,6 @@
 id: gs-extraction-031
 publicationFixture: fixtures/arxiv/2604.26150.json
+industry: energy-utilities
 expected:
   candidates:
     - finding: "Utilities de-energize parts of the grid to prevent wildfire ignitions, but mixed-integer planning methods rest on restrictive assumptions about line-failure probabilities, so shutoff decisions may follow unrealistic risk models and impose costs on communities."

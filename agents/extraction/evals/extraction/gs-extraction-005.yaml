@@ -1,5 +1,6 @@
 id: gs-extraction-005
 publicationFixture: fixtures/arxiv/2610.04123.json
+industry: banking
 expected:
   candidates:
     - finding: "Financial institutions, vendors, and regulators have no shared framework or language to describe, validate, and benchmark the reliability of AI agents, which limits the pace of adoption; a standard Agent Reliability Profile would fill the gap."

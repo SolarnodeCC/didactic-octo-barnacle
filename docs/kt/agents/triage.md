@@ -2,7 +2,7 @@
 title: Triage
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-11-02
+last_reviewed: 2026-11-03
 related: [REQ-PROC-005, REQ-PROC-006, REQ-PROC-008]
 ---
 
@@ -50,7 +50,7 @@ The model judges from the title and abstract only.
 | `StatedHarm` | The text states a cost, delay, loss, or risk that the party carries. A number is a plus and not required. | A quality gain of a method on a benchmark, or "hinders research". |
 | `Trigger` | The text names why the problem is pressing now: a new regulation, a technology change, a changed budget or behavior. | "Growing interest" or "recent advances". |
 | `ExistingAlternative` | The text names what the party does today instead: a tool, a manual process, or a practice. | Baselines that are only other research methods. |
-| `Adoptable` | The work offers something an organization could adopt, such as a system, protocol, or tool. | Only knowledge, a proof, or a dataset or benchmark for research. |
+| `Adoptable` | The work offers something an organization could adopt, such as a system, protocol, or tool. | Only knowledge, a proof, or a dataset or benchmark for research. A contribution that the text itself calls conceptual (a conceptual architecture, blueprint, or proposal) with nothing built or demonstrated. |
 
 ## Rules
 

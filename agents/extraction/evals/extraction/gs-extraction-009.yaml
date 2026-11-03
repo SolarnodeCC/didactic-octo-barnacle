@@ -1,5 +1,6 @@
 id: gs-extraction-009
 publicationFixture: fixtures/arxiv/2609.39537.json
+industry: public-sector
 expected:
   candidates:
     - finding: "Deployers of high-risk AI systems must run fundamental rights impact assessments before deployment, but the evidence is fragmented across incompatible incident repositories, risk vocabularies, and legal texts."

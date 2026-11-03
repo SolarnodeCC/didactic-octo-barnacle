@@ -1,5 +1,6 @@
 id: gs-extraction-008
 publicationFixture: fixtures/arxiv/2610.05947.json
+industry: public-sector
 expected:
   candidates:
     - finding: "A Swedish public sector organization adopting InnerSource faces a lack of an open culture and mindset, hard-to-manage reusable assets, and siloed practices with limited time for contributions."

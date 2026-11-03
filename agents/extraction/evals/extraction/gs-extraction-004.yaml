@@ -1,5 +1,6 @@
 id: gs-extraction-004
 publicationFixture: fixtures/arxiv/2610.41437.json
+industry: other
 expected:
   candidates:
     - finding: "Patients arrive at brief, time-constrained clinical visits unsure of what to expect or ask, and turn to general-purpose AI chatbots to prepare beforehand."

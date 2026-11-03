@@ -1,5 +1,6 @@
 id: gs-extraction-022
 publicationFixture: fixtures/arxiv/2605.21035.json
+industry: other
 expected:
   candidates: []
   reason: "Research findings on worker-AI misalignment in incident reports; no specific problem that a named customer states it carries and wants solved."

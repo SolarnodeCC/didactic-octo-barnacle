@@ -1,5 +1,6 @@
 id: gs-extraction-015
 publicationFixture: fixtures/arxiv/2602.11223.json
+industry: other
 expected:
   candidates: []
   reason: "A population-level burden of chronic disease and lessons from pilots; no specific problem that a named customer carries and acts on."

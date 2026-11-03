@@ -1,5 +1,6 @@
 id: gs-extraction-030
 publicationFixture: fixtures/arxiv/2608.18611.json
+industry: energy-utilities
 expected:
   candidates:
     - finding: "Utilities face weather-sensitive failures of power-line assets, from vegetation and lightning, and need asset-level risk models that stay maintainable as data sources and hazards change."

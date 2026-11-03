@@ -1,0 +1,14 @@
+id: gs-extraction-038
+publicationFixture: fixtures/arxiv/2610.33279.json
+industry: life-sciences
+expected:
+  candidates:
+    - finding: "Rising volumes of individual case safety reports challenge expert-led causality assessment in pharmacovigilance; a four-agent retrieval-augmented framework supports Naranjo-based assessment."
+      evidenceQuote: "Increasing volumes of individual case safety reports (ICSRs) challenge expert-led causality assessment in pharmacovigilance."
+      customer: "pharmacovigilance experts"
+      customerQuote: "expert-led causality assessment in pharmacovigilance"
+      whyNow: "Increasing volumes of case safety reports."
+      whyNowQuote: "Increasing volumes of individual case safety reports (ICSRs)"
+      currentAlternative: "Expert-led causality assessment."
+      alternativeQuote: "expert-led causality assessment"
+notes: "Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

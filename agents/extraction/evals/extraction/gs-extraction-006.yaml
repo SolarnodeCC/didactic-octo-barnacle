@@ -1,5 +1,6 @@
 id: gs-extraction-006
 publicationFixture: fixtures/arxiv/2610.38631.json
+industry: banking
 expected:
   candidates: []
   reason: "The study shows how failures arise in financial assistants and proposes controls. It names the investor only as the person whose situation is ignored, so no customer states a problem it carries."

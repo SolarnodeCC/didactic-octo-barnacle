@@ -1,0 +1,14 @@
+id: gs-extraction-037
+publicationFixture: fixtures/arxiv/2606.28364.json
+industry: life-sciences
+expected:
+  candidates:
+    - finding: "Medical device manufacturers face high compliance costs because FDA 21 CFR regulations are extensive, cross-referenced documents that take significant human effort to parse; a knowledge-graph and LLM system can classify devices and report compliance."
+      evidenceQuote: "These regulations are extensive, cross-referenced documents that require significant human effort to parse, leading to high compliance costs for manufacturers."
+      customer: "medical device manufacturers"
+      customerQuote: "high compliance costs for manufacturers"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Parsing the regulations by hand."
+      alternativeQuote: "require significant human effort to parse"
+notes: "Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

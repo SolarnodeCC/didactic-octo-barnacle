@@ -1,5 +1,6 @@
 id: gs-extraction-028
 publicationFixture: fixtures/arxiv/2606.13741.json
+industry: consumer-retail
 expected:
   candidates:
     - finding: "Online fashion retailers set prices for sales campaigns with weekly-granularity systems and a manual-algorithmic hybrid that take hours per pricing decision; a daily forecast-then-optimize tool cut that to minutes and raised profit by about 6%."
