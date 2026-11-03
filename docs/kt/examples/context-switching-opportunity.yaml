@@ -98,8 +98,28 @@ Agents:
         Url: null
         RetrievedAt: "2026-10-01T12:00:00Z"
   Relevance:
-    IndustryFit: { automotive: 40, aerospace-defense: 35, consumer-retail: 45, energy-utilities: 40, banking: 50, insurance: 45, public-sector: 80, life-sciences: 30 }
-    FocusMatch: { automotive: none, aerospace-defense: none, consumer-retail: none, energy-utilities: none, banking: none, insurance: none, public-sector: clear, life-sciences: none }
+    IndustryFit:
+      {
+        automotive: 40,
+        aerospace-defense: 35,
+        consumer-retail: 45,
+        energy-utilities: 40,
+        banking: 50,
+        insurance: 45,
+        public-sector: 80,
+        life-sciences: 30,
+      }
+    FocusMatch:
+      {
+        automotive: none,
+        aerospace-defense: none,
+        consumer-retail: none,
+        energy-utilities: none,
+        banking: none,
+        insurance: none,
+        public-sector: clear,
+        life-sciences: none,
+      }
     StrategicRelevanceScore: 90
     TechnicalFeasibility: 80
     ImplementationEffort: M
