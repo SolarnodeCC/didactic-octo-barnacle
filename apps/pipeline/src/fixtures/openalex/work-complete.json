@@ -30,9 +30,9 @@
   ],
   "topics": [
     {
-      "display_name": "Health informatics",
+      "display_name": "Health Informatics",
       "field": { "display_name": "Medicine" },
-      "subfield": { "display_name": "Health informatics" }
+      "subfield": { "display_name": "Health Informatics" }
     }
   ],
   "cited_by_count": 3,

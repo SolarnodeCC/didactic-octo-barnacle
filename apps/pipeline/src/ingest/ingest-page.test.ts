@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import { ingestArxivEntries, ingestOpenAlexWorks, type IngestDeps } from "./ingest-page.js";
 import { parseArxivFeed } from "../collectors/arxiv/parse-feed.js";
 import { type OpenAlexWork } from "../collectors/openalex/types.js";
-import { PILOT_OPENALEX_TOPIC_NAMES } from "../normalize/scope.js";
+import { SCOPE_OPENALEX_TOPIC_NAMES } from "../normalize/scope.js";
 import { counter, createTestDatabase } from "../test/sqlite-d1.js";
 
 const fixtures = join(dirname(fileURLToPath(import.meta.url)), "../fixtures");
@@ -44,7 +44,7 @@ describe("REQ-DATA-001: OpenAlex page ingestion", () => {
     const result = await ingestOpenAlexWorks(
       deps,
       [outside, { ...outside, id: "https://openalex.org/W2", topics: [] }],
-      PILOT_OPENALEX_TOPIC_NAMES,
+      SCOPE_OPENALEX_TOPIC_NAMES,
     );
 
     expect(result.Counts).toMatchObject({ Fetched: 2, Created: 0, Skipped: 2, Failed: 0 });
@@ -60,7 +60,7 @@ describe("REQ-DATA-001: OpenAlex page ingestion", () => {
     const result = await ingestOpenAlexWorks(
       deps,
       [work("work-complete.json"), broken, work("work-no-abstract.json")],
-      PILOT_OPENALEX_TOPIC_NAMES,
+      SCOPE_OPENALEX_TOPIC_NAMES,
     );
 
     expect(result.Counts).toEqual({
@@ -78,8 +78,8 @@ describe("REQ-DATA-001: OpenAlex page ingestion", () => {
   it("REQ-DATA-001: a repeated run creates no duplicates and counts the items as skipped", async () => {
     const { deps, rows } = setup();
     const works = [work("work-complete.json"), work("work-no-abstract.json")];
-    await ingestOpenAlexWorks(deps, works, PILOT_OPENALEX_TOPIC_NAMES);
-    const again = await ingestOpenAlexWorks(deps, works, PILOT_OPENALEX_TOPIC_NAMES);
+    await ingestOpenAlexWorks(deps, works, SCOPE_OPENALEX_TOPIC_NAMES);
+    const again = await ingestOpenAlexWorks(deps, works, SCOPE_OPENALEX_TOPIC_NAMES);
 
     expect(again.Counts).toMatchObject({ Created: 0, Updated: 0, Skipped: 2, Failed: 0 });
     expect(rows("publication")).toBe(2);

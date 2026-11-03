@@ -2,7 +2,7 @@
 title: Decisions index
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-31
+last_reviewed: 2026-11-03
 ---
 
 # Architecture decision records
@@ -48,6 +48,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0035](0035-ninety-day-window-and-resumable-runs.md) | 90-day window and resumable runs | Accepted |
 | [0036](0036-observable-signals-for-triage-and-extraction.md) | Decide triage and extraction from observable signals | Accepted |
 | [0037](0037-eight-target-industries.md) | Eight target industries | Accepted |
+| [0038](0038-topic-map-for-eight-industries.md) | Topic map for the eight target industries | Accepted |
 
 ## When an ADR is needed
 

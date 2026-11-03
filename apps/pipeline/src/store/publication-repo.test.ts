@@ -164,7 +164,7 @@ describe("REQ-DATA-001: repeated runs do not duplicate publications", () => {
     expect(row["citation_count"]).toBe(3);
     expect(row["orcid"]).toBe("0000-0001-2345-6789");
     expect(row["affiliation"]).toBe("Example University");
-    expect(JSON.parse(row["topics_json"] as string)).toContain("Health informatics");
+    expect(JSON.parse(row["topics_json"] as string)).toContain("Health Informatics");
   });
 });
 

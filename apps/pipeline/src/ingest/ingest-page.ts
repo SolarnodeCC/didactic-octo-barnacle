@@ -7,7 +7,7 @@ import { type OpenAlexWork } from "../collectors/openalex/types.js";
 import {
   isArxivCategoryInScope,
   isOpenAlexTopicsInScope,
-  PILOT_ARXIV_CATEGORIES,
+  SCOPE_ARXIV_CATEGORIES,
 } from "../normalize/scope.js";
 import { ErasureConfigError } from "../privacy/author-key.js";
 import { upsertMappedRecord, type MappedRecord } from "../store/publication-repo.js";
@@ -113,7 +113,7 @@ export async function ingestOpenAlexWorks(
 export async function ingestArxivEntries(
   deps: IngestDeps,
   entries: ArxivEntry[],
-  categories: readonly string[] = PILOT_ARXIV_CATEGORIES,
+  categories: readonly string[] = SCOPE_ARXIV_CATEGORIES,
 ): Promise<IngestResult> {
   const result = emptyResult();
   const fetchedAt = deps.Now();

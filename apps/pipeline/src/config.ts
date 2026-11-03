@@ -1,4 +1,4 @@
-import { PILOT_OPENALEX_TOPIC_NAMES } from "./normalize/scope.js";
+import { SCOPE_OPENALEX_TOPIC_NAMES } from "./normalize/scope.js";
 
 /**
  * Runtime defaults for scheduled ingestion. The values are the ones in
@@ -45,7 +45,7 @@ export const DEFAULT_INGEST_CONFIG: IngestConfig = {
   RunTimeoutHours: 6,
   ArxivPageDelaySeconds: 3,
   Http: { MaxAttempts: 3, BaseMs: 500 },
-  OpenAlexScope: { TopicNames: PILOT_OPENALEX_TOPIC_NAMES, SubfieldIds: [] },
+  OpenAlexScope: { TopicNames: SCOPE_OPENALEX_TOPIC_NAMES, SubfieldIds: [] },
   Pdf: { MaxBytes: 25 * 1024 * 1024, TimeoutMs: 20_000, MaxRedirects: 3, AllowedHosts: [] },
 };
 
