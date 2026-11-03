@@ -29,7 +29,7 @@ The limit and the map are configuration, not code. Changing them is a reviewed p
 
 ## Topic map
 
-A publication is in scope (REQ-PROC-006) when at least one of its OpenAlex fields or subfields, or one of its arXiv categories, maps to a target industry. The map names OpenAlex fields and subfields; look up their IDs in OpenAlex when the collector is built and store the IDs in configuration.
+A publication is in scope (REQ-PROC-006) when at least one of its OpenAlex fields or subfields, or one of its arXiv categories, maps to a target industry. The four rows below are the interim map from before ADR 0037; the map for the eight target industries is open question OQ-039. The map names OpenAlex fields and subfields; look up their IDs in OpenAlex when the collector is built and store the IDs in configuration.
 
 | Industry | OpenAlex fields and subfields (names) | arXiv categories |
 |---|---|---|

@@ -48,7 +48,7 @@ Notes: string(max 400)?
 | 80-100 | A new direction with few or no comparable publications. |
 
 - Novelty evidence cites at least one related publication, or is a `none-found` item stating that none were found.
-- Industry uses `other` only when none of the four target industries applies.
+- Industry uses `other` only when none of the eight target industries applies.
 
 ## Evals
 

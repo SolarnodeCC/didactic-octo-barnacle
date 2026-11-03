@@ -86,7 +86,7 @@ Generates a startup concept and a short business case for an opportunity.
 
 ### REQ-AGENT-006: Relevance Agent
 
-Scores strategic relevance for the target industries, technical feasibility, and implementation effort.
+Scores strategic relevance for the eight target industries, technical feasibility, and implementation effort.
 
 - Phase: 3
 - Priority: must
@@ -94,7 +94,7 @@ Scores strategic relevance for the target industries, technical feasibility, and
 - Source: README Multi-Agent Framework
 - Depends on: REQ-AGENT-001, REQ-AGENT-002
 - Acceptance criteria:
-  1. The output matches the contract, including StrategicRelevanceScore, IndustryFit for all four target industries, TechnicalFeasibility, and ImplementationEffort.
+  1. The output matches the contract, including StrategicRelevanceScore, IndustryFit for all eight target industries, TechnicalFeasibility, and ImplementationEffort.
   2. The agent meets its eval threshold on the golden set.
 - Verification: contract test and eval
 

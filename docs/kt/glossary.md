@@ -26,7 +26,7 @@ last_reviewed: 2026-10-29
 | Fixture | A recorded response from an external API or model, stored next to the tests that use it. |
 | Golden set | A fixed set of papers with reviewed expected outcomes, used for evals. |
 | Incomplete | The status of a publication or opportunity that misses a required field or category; it is not passed on or scored. |
-| Industry fit | How well an opportunity fits one target industry, from 0 to 100, returned by the Relevance Agent. |
+| Industry fit | How well an opportunity fits one of the eight target industries, from 0 to 100, returned by the Relevance Agent. |
 | KT document | A knowledge transfer document in `docs/kt/`. The KT documents are the source of truth for the project. |
 | Model judge | A model that grades free-text agent output with a written rubric during evals. |
 | Model call | One request to a model provider through AI Gateway, recorded with its tokens, latency, cost, and outcome (REQ-NFR-011). |

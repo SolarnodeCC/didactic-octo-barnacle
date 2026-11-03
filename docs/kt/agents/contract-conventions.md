@@ -21,7 +21,7 @@ These rules apply to every agent and to the opportunity extraction step. The con
 | `list<T> (A..B)` | List of A to B items of type T. |
 | `map<K, T>` | Object with keys of type K and values of type T. |
 | `Money` | `{ Amount: number, Currency: string }`, with an ISO 4217 currency code. |
-| `Industry` | `enum [government, healthcare, financial-services, enterprise, other]` |
+| `Industry` | `enum [automotive, aerospace-defense, consumer-retail, energy-utilities, banking, insurance, public-sector, life-sciences, other]` |
 | `?` after a type | The field may be null. |
 
 Field names are PascalCase, as in the contracts.
