@@ -4,8 +4,8 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-012.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-011.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-011.yaml
 expected:
-  bestIndustry: healthcare
-  strategicRelevanceRange: [75, 100]
+  bestIndustry: life-sciences
+  strategicRelevanceRange: [25, 55]
   technicalFeasibilityRange: [60, 85]
   implementationEffort: M
-notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Hospital workforce planning fits none of the eight; life-sciences is the least poor Relevance choice. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

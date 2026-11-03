@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "healthcare professionals misinterpret AI staffing forecasts"
     - "uncertainty and explanation of AI advice are not communicated well"
-  customerIndustry: healthcare
+  customerIndustry: other
   painLevelRange: [2, 3]
-notes: "A study of uncertainty communication; boundary case. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "A study of uncertainty communication; boundary case. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

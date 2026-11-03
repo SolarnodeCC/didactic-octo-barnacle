@@ -4,8 +4,8 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-001.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-001.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-001.yaml
 expected:
-  bestIndustry: government
+  bestIndustry: public-sector
   strategicRelevanceRange: [35, 65]
   technicalFeasibilityRange: [50, 75]
   implementationEffort: L
-notes: "Agricultural disasters are not a listed focus area, so relevance is low to medium; effort L for data integrations. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."
+notes: "Agricultural disasters are not a listed focus area, so relevance is low to medium; effort L for data integrations. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Agricultural disasters are not a listed focus area; the sector stays public-sector because governments handle the disaster. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

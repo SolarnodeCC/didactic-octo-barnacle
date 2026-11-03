@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "euro credit transfers must settle in under ten seconds"
     - "AML detection and explanation must fit inside the settlement window"
-  customerIndustry: financial-services
+  customerIndustry: banking
   painLevelRange: [4, 5]
-notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

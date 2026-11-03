@@ -4,8 +4,8 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-009.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-008.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-008.yaml
 expected:
-  bestIndustry: government
+  bestIndustry: public-sector
   strategicRelevanceRange: [50, 80]
   technicalFeasibilityRange: [55, 80]
   implementationEffort: M
-notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

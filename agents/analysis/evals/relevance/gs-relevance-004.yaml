@@ -4,8 +4,8 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-004.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-004.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-004.yaml
 expected:
-  bestIndustry: healthcare
-  strategicRelevanceRange: [75, 100]
+  bestIndustry: life-sciences
+  strategicRelevanceRange: [35, 65]
   technicalFeasibilityRange: [70, 95]
   implementationEffort: L
-notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Patients and care providers fit none of the eight; life-sciences is a weak Relevance match. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

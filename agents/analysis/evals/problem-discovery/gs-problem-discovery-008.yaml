@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "deployers of high-risk AI must run fundamental rights impact assessments before deployment"
     - "the evidence is fragmented across incompatible incident repositories and legal texts"
-  customerIndustry: government
+  customerIndustry: public-sector
   painLevelRange: [4, 5]
-notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

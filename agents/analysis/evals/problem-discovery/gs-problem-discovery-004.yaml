@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "patients arrive at brief clinical visits unsure what to ask"
     - "general-purpose chatbots are the current way to prepare"
-  customerIndustry: healthcare
+  customerIndustry: other
   painLevelRange: [2, 3]
-notes: "The customer is the patient; the paying party could be a care provider. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "The customer is the patient; the paying party could be a care provider. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

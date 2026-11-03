@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "telephone triage is safety critical and nurses decide from a brief intake note"
     - "direct LLMs over-escalate and cannot justify against an auditable clinical standard"
-  customerIndustry: healthcare
+  customerIndustry: other
   painLevelRange: [4, 5]
-notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

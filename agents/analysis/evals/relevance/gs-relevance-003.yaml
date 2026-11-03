@@ -4,8 +4,8 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-003.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-003.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-003.yaml
 expected:
-  bestIndustry: enterprise
-  strategicRelevanceRange: [50, 80]
+  bestIndustry: banking
+  strategicRelevanceRange: [45, 75]
   technicalFeasibilityRange: [55, 80]
   implementationEffort: M
-notes: "Fits compliance and process automation but is not a listed focus. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."
+notes: "Fits compliance and process automation but is not a listed focus. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Cross-industry (AI coding agents); the owner notes this applies to all regulated businesses, so four regulated industries are required. Banking is the Relevance sector (compliance automation). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

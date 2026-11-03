@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "forecasts say where a storm hits, not which crops suffer or how much is at risk"
     - "governments and growers need to respond quickly to agricultural disasters"
-  customerIndustry: government
+  customerIndustry: public-sector
   painLevelRange: [3, 4]
-notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

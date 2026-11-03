@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "malicious clients can poison federated learning updates and degrade the fraud-detection model"
     - "banks train fraud models jointly without sharing transaction data"
-  customerIndustry: financial-services
+  customerIndustry: banking
   painLevelRange: [3, 4]
-notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

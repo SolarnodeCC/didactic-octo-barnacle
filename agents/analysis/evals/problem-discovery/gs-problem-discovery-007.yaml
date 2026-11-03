@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "a Swedish public organization faces a lack of open culture for InnerSource"
     - "reusable assets and siloed ways of working hinder reuse"
-  customerIndustry: government
+  customerIndustry: public-sector
   painLevelRange: [2, 3]
-notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

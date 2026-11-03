@@ -4,8 +4,8 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-018.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-016.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-016.yaml
 expected:
-  bestIndustry: financial-services
+  bestIndustry: banking
   strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [45, 75]
   implementationEffort: L
-notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). The owner added insurance: fraud and money-laundering detection applies to insurers as well. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
