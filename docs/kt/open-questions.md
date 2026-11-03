@@ -26,7 +26,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
-| OQ-037 | How are evidence levels, the validation brief, and the readiness label specified (option B of ADR 0036)? | Write a design document before phase 3 starts: four evidence levels per element (absent, assumption, documentary evidence, validated by a person), the four elements plus why-now and a stop criterion per candidate, who enters validated evidence, and a readiness label next to the score that leaves the score weights unchanged | before phase 3 starts |
+| OQ-037 | How are evidence levels, the validation brief, and the readiness label specified (option B of ADR 0036)? | A design draft is in [evidence levels and readiness label](evidence-and-readiness.md): four evidence levels per element, a brief with a kill question and a stop criterion, analyst-entered validated evidence, and a readiness label next to the score that leaves the weights unchanged. The owner answers the four decisions at its end, then requirements are added | before phase 3 starts |
 | OQ-038 | Is a burden at population or sector level, with no party that can act on it, a candidate in extraction? | Add to REQ-PROC-009: no candidate when the stated burden belongs to a population or sector and no named customer can act on it. Entries `gs-extraction-015` (2602.11223) and `gs-extraction-020` (2609.10350) show the case. Decide after the first extraction eval run, with data | before phase 2 starts |
 
 ## Ownership
