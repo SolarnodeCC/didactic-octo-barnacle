@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "providers lose substantial revenue to payer underpayments and claim denials"
     - "finding the recurring patterns is manual and does not scale to claim volumes"
-  customerIndustry: healthcare
+  customerIndustry: other
   painLevelRange: [3, 4]
-notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

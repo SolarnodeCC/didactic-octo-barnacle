@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "national regulators have no consistent data collection to compare media concentration across countries"
     - "AI search systems may concentrate attention on fewer news outlets"
-  customerIndustry: government
+  customerIndustry: public-sector
   painLevelRange: [2, 3]
-notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

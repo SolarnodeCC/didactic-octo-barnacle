@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "AI coding agents leave no durable record of what they did, which model and tools they used"
     - "audit and compliance controls assume a human made the decision"
-  customerIndustry: enterprise
+  customerIndustry: other
   painLevelRange: [3, 4]
-notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

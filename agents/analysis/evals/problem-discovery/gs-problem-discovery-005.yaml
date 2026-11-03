@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "no shared framework or language to describe, validate and benchmark agent reliability"
     - "this slows assessment and adoption of agents by institutions, vendors and regulators"
-  customerIndustry: financial-services
+  customerIndustry: banking
   painLevelRange: [3, 4]
-notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

@@ -4,8 +4,8 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-021.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-018.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-018.yaml
 expected:
-  bestIndustry: enterprise
-  strategicRelevanceRange: [50, 80]
+  bestIndustry: banking
+  strategicRelevanceRange: [30, 60]
   technicalFeasibilityRange: [50, 80]
   implementationEffort: M
-notes: "A governance framework is barely software; feasibility is uncertain. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."
+notes: "A governance framework is barely software; feasibility is uncertain. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). A cross-industry governance framework; banking is chosen because the abstract names financial services. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

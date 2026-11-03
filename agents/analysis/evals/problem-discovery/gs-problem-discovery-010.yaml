@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "radiology workflows need data privacy and offline operation"
     - "proprietary cloud models and large open models are unsuitable"
-  customerIndustry: healthcare
+  customerIndustry: life-sciences
   painLevelRange: [2, 3]
-notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

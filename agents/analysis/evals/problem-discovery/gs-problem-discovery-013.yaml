@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "health systems need practical ways to routinely evaluate AI-assisted psychiatric intake against clinical standards"
     - "clinicians differ in intake style and evaluation burden must be low"
-  customerIndustry: healthcare
+  customerIndustry: other
   painLevelRange: [3, 4]
-notes: "Pain level is a boundary case between 3 and 4. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Pain level is a boundary case between 3 and 4. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

@@ -20,7 +20,19 @@ Publications are read from `agents/extraction/evals/fixtures/arxiv/`. Candidates
 | Relevance | 20 | 20 |
 
 - The 20 candidates are the 19 publications of the extraction set that yield a candidate, plus a second candidate of `2610.40071` (`gs-extraction-003`, index 1). The two entries of that publication share its fixtures.
-- Industries covered by the candidates: healthcare, financial services, government, and enterprise.
+- Industries use the eight target industries of ADR 0037 plus `other`. Entries per value after the relabel of 2026-11-03:
+
+| Value | Research Analyst (industries that must appear) | Problem Discovery (customer industry) | Relevance (best industry) |
+|---|---|---|---|
+| `banking` | 6 | 4 | 7 |
+| `insurance` | 4 | 0 | 1 |
+| `public-sector` | 5 | 5 | 5 |
+| `life-sciences` | 3 | 1 | 7 |
+| `aerospace-defense` | 2 | 0 | 0 |
+| `other` | 7 | 10 | not allowed |
+| `automotive`, `consumer-retail`, `energy-utilities` | 0 | 0 | 0 |
+
+- Care providers (nurses, emergency departments, psychiatric intake, telephone triage) and cross-industry software are `other` for Research Analyst and Problem Discovery; Relevance scores them against `life-sciences` or `banking` with lower strategic relevance ranges. `automotive`, `consumer-retail` and `energy-utilities` have no entries yet, and `aerospace-defense` only appears as a required industry of the two entries of `2610.40071`. New rounds are needed before these sets can cover all eight industries (REQ-TEST-005).
 - Relevance reads the frozen `handoff` blocks and the Problem Discovery facts of the same entries. Its ranges are at most 30 points wide.
 - The other three agents (Market Analysis, Competition, Startup Generator) have no entries yet. Market Analysis and Competition need recorded search results first (REQ-AGENT-013).
 

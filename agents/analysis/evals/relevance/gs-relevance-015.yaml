@@ -4,8 +4,8 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-017.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-015.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-015.yaml
 expected:
-  bestIndustry: healthcare
+  bestIndustry: insurance
   strategicRelevanceRange: [55, 85]
   technicalFeasibilityRange: [70, 95]
   implementationEffort: M
-notes: "Revenue cycle is not a listed focus area; best industry healthcare or enterprise. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."
+notes: "Revenue cycle is not a listed focus area; best industry healthcare or enterprise. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). The topic is payer claims (insurance); the customer is the care provider (other). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

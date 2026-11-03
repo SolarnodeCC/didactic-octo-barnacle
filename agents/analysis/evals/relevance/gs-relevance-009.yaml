@@ -4,8 +4,8 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-010.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-009.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-009.yaml
 expected:
-  bestIndustry: healthcare
-  strategicRelevanceRange: [75, 100]
+  bestIndustry: life-sciences
+  strategicRelevanceRange: [40, 70]
   technicalFeasibilityRange: [55, 80]
   implementationEffort: L
-notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Nurses are care providers (other); life-sciences is a weak Relevance match through clinical triage. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

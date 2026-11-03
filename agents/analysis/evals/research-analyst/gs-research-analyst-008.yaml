@@ -6,14 +6,14 @@ expected:
   noveltyRange: [20, 50]
   maturity: prototype
   industriesInclude:
-    - government
+    - public-sector
 handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
   novelty: 35
   maturity: prototype
   industry:
-    - government
+    - public-sector
   technology:
     - "Semantic Web"
     - "knowledge graph"
     - "LLM-assisted classification"
-notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

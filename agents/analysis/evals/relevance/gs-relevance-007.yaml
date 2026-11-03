@@ -4,8 +4,8 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-008.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-007.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-007.yaml
 expected:
-  bestIndustry: government
+  bestIndustry: public-sector
   strategicRelevanceRange: [30, 60]
   technicalFeasibilityRange: [50, 80]
   implementationEffort: M
-notes: "A way of working, not a product; feasibility and relevance are uncertain. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."
+notes: "A way of working, not a product; feasibility and relevance are uncertain. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

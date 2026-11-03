@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "nurses triage more than 50,000 WhatsApp queries a month"
     - "the LLM triage is opaque so errors and prompt changes are costly to analyse"
-  customerIndustry: healthcare
+  customerIndustry: other
   painLevelRange: [4, 5]
-notes: " Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

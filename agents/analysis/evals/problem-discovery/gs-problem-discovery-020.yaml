@@ -6,6 +6,6 @@ expected:
   requiredFacts:
     - "the agentic coder is software and therefore a supply-chain security risk"
     - "AI agents select dependencies and run tools that leave no durable record"
-  customerIndustry: enterprise
+  customerIndustry: other
   painLevelRange: [3, 4]
-notes: "Second candidate of the same publication; the customer quote is weak. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Second candidate of the same publication; the customer quote is weak. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."

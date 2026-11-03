@@ -6,15 +6,21 @@ expected:
   noveltyRange: [30, 60]
   maturity: prototype
   industriesInclude:
-    - enterprise
+    - banking
+    - insurance
+    - life-sciences
+    - aerospace-defense
 handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
   novelty: 45
   maturity: prototype
   industry:
-    - enterprise
+    - banking
+    - insurance
+    - life-sciences
+    - aerospace-defense
   technology:
     - "agentic process attestation"
     - "in-toto attestation"
     - "policy-as-code"
     - "compliancy"
-notes: "Second candidate of the same publication; the customer quote is weak. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02)."
+notes: "Second candidate of the same publication; the customer quote is weak. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Second candidate of the same publication as the third; same expectations. The owner notes this applies to all regulated businesses. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
