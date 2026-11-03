@@ -1,0 +1,18 @@
+id: gs-triage-075
+publicationFixture: fixtures/arxiv/2603.14406.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: false
+    existingAlternative: false
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: oil and gas production systems"
+  statedHarm: "Early detection of energy losses, theft, and operational inefficiencies remains a critical challenge"
+  trigger: "none"
+  existingAlternative: "none: only traditional machine learning approaches"
+  adoptable: "a spatiotemporal graph-based deep learning framework"
+notes: "NamedParty is false, so the publication is rejected at 0.4. Industry: energy-utilities. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

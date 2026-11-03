@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2610.28167v1",
+  "title": "From Market Signals to Maintenance Decisions: Grid-Informed Maintenance Optimization in Offshore Wind Farms",
+  "summary": "The reliable and cost-effective integration of large-scale offshore wind farms into power systems is largely influenced by maintenance operations. To date, power producers primarily rely on farm-level information (e.g., health signals, power generation, weather conditions) for maintenance planning of wind turbine fleets. We propose to consider additional grid-level information in maintenance operations, such as generation curtailment and market pricing. Periods of high generation curtailment or negative electricity pricing can be viewed as opportunities for preventive maintenance, since assets are fully or partially shut down due to grid-imposed constraints. We first analytically establish that access to market information has non-negative economic value for maintenance scheduling under a stylized setting, providing a theoretical foundation for treating market and grid information as a maintenance opportunity. We then formulate a grid-informed opportunistic maintenance scheduling model as a receding-horizon mixed integer linear program that jointly leverages both farm- and grid-level signals under realistic conditions to determine a maintenance plan for offshore wind turbines. Considering a 600-MW offshore wind farm in the United States, our proposed method reduces annual maintenance costs by up to 10%, while enhancing asset availability and resource utilization, relative to advanced maintenance models that solely rely on farm-level information.",
+  "published": "2026-10-20T13:09:32Z",
+  "categories": ["eess.SY", "math.OC"],
+  "primaryCategory": "eess.SY",
+  "pdfUrl": "https://arxiv.org/pdf/2610.28167v1",
+  "withdrawn": false
+}

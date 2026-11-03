@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2603.14406v1",
+  "title": "Graph-Based Deep Learning for Intelligent Detection of Energy Losses, Theft, and Operational Inefficiencies in Oil & Gas Production Networks",
+  "summary": "Early detection of energy losses, theft, and operational inefficiencies remains a critical challenge in oil and gas production systems due to complex interdependencies among wells and facilities, evolving operating conditions, and limited labeled anomaly data. Traditional machine learning approaches often treat production units independently and struggle under temporal distribution shifts. This study proposes a spatiotemporal graph-based deep learning framework for anomaly detection in oil and gas production networks. The production system is modeled as a hierarchical graph of wells, facilities, and fields, with additional peer connections among wells sharing common infrastructure. Weakly supervised anomaly labels are derived from physically informed heuristics based on production, pressure, and flow behavior. Temporal dynamics are captured through sequence modeling, while relational dependencies are learned using a Temporal Graph Attention Network. Under time-based evaluation, the proposed model achieves an ROC-AUC of about 0.98 and anomaly recall above 0.93, demonstrating improved robustness and practical potential for proactive monitoring in real-world energy operations.",
+  "published": "2026-03-15T14:40:37Z",
+  "categories": ["cs.LG"],
+  "primaryCategory": "cs.LG",
+  "pdfUrl": "https://arxiv.org/pdf/2603.14406v1",
+  "withdrawn": false
+}

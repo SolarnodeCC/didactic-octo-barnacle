@@ -1,0 +1,18 @@
+id: gs-triage-078
+publicationFixture: fixtures/arxiv/2608.18465.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "technicians"
+  statedHarm: "technicians often avoid consulting it because it is difficult to navigate and time-consuming under strict schedules"
+  trigger: "none"
+  existingAlternative: "existing models focus solely on textual retrieval"
+  adoptable: "a multimodal manual retriever (MMR)"
+notes: "Aircraft maintenance (MRO) for general aviation. Industry: aerospace-defense. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

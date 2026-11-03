@@ -1,0 +1,18 @@
+id: gs-triage-071
+publicationFixture: fixtures/arxiv/2610.25461.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: false
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: 100 live websites in 14 industries"
+  statedHarm: "none"
+  trigger: "none"
+  existingAlternative: "each site's own human associates"
+  adoptable: "Javo, a sales agent fine-tuned on 4.6 million consented, de-identified commercial conversations"
+notes: "Sales agent trial; no single party carries a stated harm. Industry: consumer-retail. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

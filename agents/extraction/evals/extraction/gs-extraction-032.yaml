@@ -1,0 +1,13 @@
+id: gs-extraction-032
+publicationFixture: fixtures/arxiv/2608.18465.json
+expected:
+  candidates:
+    - finding: "Aircraft maintenance technicians often avoid consulting the maintenance manual because it is hard to navigate and slow to use under strict schedules; a multimodal retriever of manual pages could cut the search time."
+      evidenceQuote: "technicians often avoid consulting it because it is difficult to navigate and time-consuming under strict schedules"
+      customer: "aircraft maintenance technicians"
+      customerQuote: "technicians often avoid consulting it"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Consulting the aircraft maintenance manual directly, or text-only retrieval models."
+      alternativeQuote: "existing models focus solely on textual retrieval"
+notes: "Industry: aerospace-defense. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

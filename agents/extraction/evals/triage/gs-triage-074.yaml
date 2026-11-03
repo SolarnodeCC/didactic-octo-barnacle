@@ -1,0 +1,18 @@
+id: gs-triage-074
+publicationFixture: fixtures/arxiv/2604.26150.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: true
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "Public Safety Power Shutoffs (PSPS) have emerged as a critical operational tool for utilities"
+  statedHarm: "poses severe risks to communities in fire-prone regions"
+  trigger: "Power grid infrastructure is an increasingly significant source of wildfire ignitions"
+  existingAlternative: "Current Mixed Integer Programming based methods"
+  adoptable: "a reinforcement learning framework based on Proximal Policy Optimization"
+notes: "All five signals are true (score 1.0). Industry: energy-utilities. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

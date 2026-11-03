@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2608.22569v1",
+  "title": "Integrating Prognostics, Maintenance, and Tail Assignment under Remaining Useful Life Uncertainty: A Stochastic Optimisation Approach for Airline Reliability",
+  "summary": "Ensuring reliability, safety, and economic efficiency in airline operations requires maintenance and fleet scheduling strategies that explicitly account for uncertainty in Remaining Useful Life (RUL) predictions. However, the integration of prognostic uncertainty into operational decision-making remains a major challenge. In practice, tail assignment (TA) and maintenance scheduling (MS) are typically optimized separately or sequentially, thereby limiting the effective use of predictive health information despite their strong interdependencies. This paper proposes a unified optimisation framework that jointly integrates TA, MS, and predictive maintenance (PdM) under RUL with confidence intervals. The problem is formulated as a stochastic mixed-integer linear program, and a scalable solution approach is developed by embedding a neural network surrogate to approximate expected disruption costs resulting from RUL uncertainty. The proposed framework is evaluated using operational scenarios derived from real-world airline data. Results show that explicitly incorporating prognostic uncertainty in a joint planning model reduces operational risk, i.e., downstream disruption costs and flight cancellations, compared to deterministic and sequential approaches, at the expense of moderate increases in planning cost. These findings highlight the value of tightly coupling predictive maintenance with operational planning and demonstrate the potential of surrogate-assisted stochastic optimisation for scalable, uncertainty-aware airline decision-making.",
+  "published": "2026-08-23T19:37:38Z",
+  "categories": ["eess.SY"],
+  "primaryCategory": "eess.SY",
+  "pdfUrl": "https://arxiv.org/pdf/2608.22569v1",
+  "withdrawn": false
+}

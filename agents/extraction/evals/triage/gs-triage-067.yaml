@@ -1,0 +1,18 @@
+id: gs-triage-067
+publicationFixture: fixtures/arxiv/2602.04464.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: false
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "Grocery retailers"
+  statedHarm: "preventing excess inventory and the associated economic and environmental impacts of spoilage"
+  trigger: "none"
+  existingAlternative: "as commonly applied in practice"
+  adoptable: "none: a finding about forecast bias, not a tool"
+notes: "Boundary case: accepted at 0.6 without an adoptable output; the practice and the harm are both stated. Industry: consumer-retail. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

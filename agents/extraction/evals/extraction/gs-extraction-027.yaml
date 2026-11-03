@@ -1,0 +1,13 @@
+id: gs-extraction-027
+publicationFixture: fixtures/arxiv/2602.04464.json
+expected:
+  candidates:
+    - finding: "Grocery retailers feed discounted sales of expiring perishables into their demand forecasts as a fixed share of regular demand, and the forecasts then underestimate demand for most products, which risks excess inventory and spoilage."
+      evidenceQuote: "We reveal that forecasts underestimate actual demand for most SKUs when discounted sales occur."
+      customer: "grocery retailers"
+      customerQuote: "Grocery retailers frequently apply price discounts to stimulate demand for expiring perishables."
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "A fixed share of discounted sales is counted as regular demand in the forecast."
+      alternativeQuote: "as commonly applied in practice"
+notes: "Industry: consumer-retail. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

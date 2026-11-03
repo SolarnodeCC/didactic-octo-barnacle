@@ -1,0 +1,18 @@
+id: gs-triage-076
+publicationFixture: fixtures/arxiv/2608.18473.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: wastewater treatment facilities, landfills, and oil and gas sites are places, not a party"
+  statedHarm: "the time, labor, usability, and data-security barriers of methane field monitoring"
+  trigger: "none"
+  existingAlternative: "separate expert-driven workflows"
+  adoptable: "a locally deployable, tool-grounded large language model (LLM) multi-agent framework"
+notes: "Boundary case: the score reaches the cut (0.6) but NamedParty is false. Industry: energy-utilities. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

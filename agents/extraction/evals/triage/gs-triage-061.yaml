@@ -1,0 +1,18 @@
+id: gs-triage-061
+publicationFixture: fixtures/arxiv/2608.26911.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "independent automotive workshops"
+  statedHarm: "advanced diagnostic capabilities previously limited to manufacturer tools"
+  trigger: "none"
+  existingAlternative: "previously limited to manufacturer tools"
+  adoptable: "a modular measurement platform enabling flexible hardware integration"
+notes: "Boundary case: the harm is a capability gap that costs competitiveness, not a stated number, and the score is exactly on the cut (0.6). Industry: automotive. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

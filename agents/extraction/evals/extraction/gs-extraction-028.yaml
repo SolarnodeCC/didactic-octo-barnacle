@@ -1,0 +1,13 @@
+id: gs-extraction-028
+publicationFixture: fixtures/arxiv/2606.13741.json
+expected:
+  candidates:
+    - finding: "Online fashion retailers set prices for sales campaigns with weekly-granularity systems and a manual-algorithmic hybrid that take hours per pricing decision; a daily forecast-then-optimize tool cut that to minutes and raised profit by about 6%."
+      evidenceQuote: "Our solution addresses key limitations of existing weekly-granularity systems by implementing a forecast-then-optimize architecture that reduces pricing decision time from hours to minutes."
+      customer: "online fashion retailers"
+      customerQuote: "Zalando, one of Europe's leading online fashion retailers"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "A manual-algorithmic hybrid pricing approach at weekly granularity."
+      alternativeQuote: "compared to the previous manual-algorithmic hybrid approach"
+notes: "Industry: consumer-retail. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

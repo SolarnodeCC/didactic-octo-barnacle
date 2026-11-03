@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2609.08556v1",
+  "title": "MAD-LEO: A Maneuver-Annotated Orbital Dataset for LEO Satellites with Tiered Multi-Source Evidence",
+  "summary": "With the rapid development of aerospace technology and the large-scale deployment of low Earth orbit (LEO) constellations, the risk of orbital collisions has increased, creating a growing demand for reliable observations of satellite maneuvers. However, public datasets containing real maneuver records remain scarce. We present MAD-LEO, a Maneuver-Annotated orbital Dataset for LEO satellites. The mission-reported subset contains 1,134 maneuver events from eleven geodetic and altimetry satellites spanning 1992 to 2026, with labels taken directly from mission-published maneuver histories. Each event is checked against two-line element (TLE) data, precise orbit products, and satellite laser ranging (SLR) observations, with evidence tiers assigned according to data availability. The operational subset pairs operator-published ephemerides for 6,785 Starlink satellites with cataloged TLE records over a continuous 107-hour period. Technical validation across seven machine-readable experiment suites confirms the cross-source consistency of the labels and the evidence products.",
+  "published": "2026-09-08T10:38:26Z",
+  "categories": ["astro-ph.EP", "astro-ph.IM", "cs.DB"],
+  "primaryCategory": "astro-ph.EP",
+  "pdfUrl": "https://arxiv.org/pdf/2609.08556v1",
+  "withdrawn": false
+}

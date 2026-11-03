@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2606.13741v1",
+  "title": "High-Frequency Pricing at Scale for E-Commerce",
+  "summary": "This paper presents the design, development, and implementation of a specialized forecast-then-optimize algorithmic pricing tool for sales campaigns in fashion e-commerce. Sales events present unique challenges for pricing including volatile demand patterns, rapid pricing decisions, and the need to balance short-term revenue with long-term profitability. We describe our approach combining daily-resolution demand forecasting using gradient-boosted trees with a multi-objective optimization framework that maximizes both long-term profit and net merchandise value for more than 5 million articles. Our solution addresses key limitations of existing weekly-granularity systems by implementing a forecast-then-optimize architecture that reduces pricing decision time from hours to minutes. We validate our approach through 23 A/B tests across 12 markets during 2023-2024 sales campaigns at Zalando, one of Europe's leading online fashion retailers. Experimental results demonstrate that the new pricing system achieves approximately 6% higher profit while maintaining equivalent performance on sales and revenue compared to the previous manual-algorithmic hybrid approach. Based on these results, the algorithm was successfully deployed to production and now handles the majority of algorithmic pricing decisions for sales campaigns at the company.",
+  "published": "2026-06-11T13:01:44Z",
+  "categories": ["cs.LG"],
+  "primaryCategory": "cs.LG",
+  "pdfUrl": "https://arxiv.org/pdf/2606.13741v1",
+  "withdrawn": false
+}

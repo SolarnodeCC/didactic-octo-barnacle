@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2608.26911v2",
+  "title": "autowerkstatt4null: An Off-Board-Diagnostics Ecosystem for Car-Workshops",
+  "summary": "This paper presents autowerkstatt4null, a three-year initiative to empower independent automotive workshops with AI-driven, federated diagnostics. The project was funded by the German Federal Ministry for Economic Affairs and Climate Action. The project enhanced the initial diagnostic workflow through newly developed technologies and architectural concepts, incorporating real user feedback. The resulting demonstrator showcases key outcomes: a modular measurement platform enabling flexible hardware integration, a secure data exchange hub for trusted collaboration, asynchronous online diagnostics that decouples analysis from workshop constraints, and a digital academy supporting technician upskilling. Together, these innovations demonstrate how independent workshops can access advanced diagnostic capabilities previously limited to manufacturer tools, strengthening competitiveness and sustainability in the sector. The project repository is available at: https://github.com/nabla-B/paper_aw4null-overview.",
+  "published": "2026-08-27T10:09:40Z",
+  "categories": ["eess.SP"],
+  "primaryCategory": "eess.SP",
+  "pdfUrl": "https://arxiv.org/pdf/2608.26911v2",
+  "withdrawn": false
+}

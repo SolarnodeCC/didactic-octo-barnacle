@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2603.20534v2",
+  "title": "An Industrial-Scale Retrieval-Augmented Generation Framework for Requirements Engineering: Empirical Evaluation with Automotive Manufacturing Data",
+  "summary": "Requirements engineering in Industry 4.0 faces critical challenges with heterogeneous, unstructured documentation spanning technical specifications, supplier lists, and compliance standards. While retrieval-augmented generation (RAG) shows promise for knowledge-intensive tasks, no prior work has evaluated RAG on authentic industrial RE workflows using comprehensive production-grade performance metrics. This paper presents a comprehensive empirical evaluation of RAG for industrial requirements engineering automation using authentic automotive manufacturing documentation comprising 669 requirements across four specification standards (MBN 9666-1, MBN 9666-2, BQF 9666-5, MBN 9666-9) spanning 2015-2023, plus 49 supplier qualifications with extensive supporting documentation. Through controlled comparisons with BERT-based and ungrounded LLM approaches, the framework achieves 98.2% extraction accuracy with complete traceability, outperforming baselines by 24.4% and 19.6%, respectively. Hybrid semantic-lexical retrieval achieves MRR of 0.847. Expert quality assessment averaged 4.32/5.0 across five dimensions. The evaluation demonstrates 83% reduction in manual analysis time and 47% cost savings through multi-provider LLM orchestration. Ablation studies quantify individual component contributions. Longitudinal analysis reveals a 55% reduction in requirement volume coupled with 1,800% increase in IT security focus, identifying 10 legacy suppliers (20.4%) requiring requalification, representing potential $2.3M in avoided contract penalties.",
+  "published": "2026-03-20T22:05:08Z",
+  "categories": ["cs.SE", "cs.AI"],
+  "primaryCategory": "cs.SE",
+  "pdfUrl": "https://arxiv.org/pdf/2603.20534v2",
+  "withdrawn": false
+}

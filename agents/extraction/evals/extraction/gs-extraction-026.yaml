@@ -1,0 +1,13 @@
+id: gs-extraction-026
+publicationFixture: fixtures/arxiv/2604.05987.json
+expected:
+  candidates:
+    - finding: "Supermarket chains run demand forecasting, procurement, supplier coordination, and replenishment as continuous manual workflows that are repetitive, decision-intensive, and hard to scale; an agentic AI framework supervised by supply chain managers could automate them."
+      evidenceQuote: "processes that are repetitive, decision-intensive, and difficult to scale without significant human effort"
+      customer: "supermarket chains"
+      customerQuote: "Retail supply chain operations in supermarket chains involve continuous, high-volume manual workflows"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Manual, reactive, and fragmented coordination across outlets, distribution centers, and supplier networks."
+      alternativeQuote: "the decision-making and coordination layers of these workflows remain predominantly manual, reactive, and fragmented across outlets, distribution centers, and supplier networks"
+notes: "Industry: consumer-retail. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

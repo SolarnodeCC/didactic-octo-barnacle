@@ -1,0 +1,13 @@
+id: gs-extraction-025
+publicationFixture: fixtures/arxiv/2608.26911.json
+expected:
+  candidates:
+    - finding: "Independent car workshops cannot use the advanced diagnostic capabilities that were limited to manufacturer tools, which weighs on their competitiveness; a federated diagnostics ecosystem would give them access."
+      evidenceQuote: "independent workshops can access advanced diagnostic capabilities previously limited to manufacturer tools, strengthening competitiveness and sustainability in the sector"
+      customer: "independent automotive workshops"
+      customerQuote: "empower independent automotive workshops with AI-driven, federated diagnostics"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Manufacturer diagnostic tools that independent workshops could not use."
+      alternativeQuote: "previously limited to manufacturer tools"
+notes: "Industry: automotive. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

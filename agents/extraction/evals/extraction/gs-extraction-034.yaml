@@ -1,0 +1,13 @@
+id: gs-extraction-034
+publicationFixture: fixtures/arxiv/2609.20080.json
+expected:
+  candidates:
+    - finding: "Command-and-control centers of the Brazilian Armed Forces receive more data, faster, than operators can integrate within the decision cycle, and the AI tools in use are reactive and isolated."
+      evidenceQuote: "has increased the volume and velocity of data reaching command-and-control (C2) centers, straining the observe-orient-decide-act (OODA) decision cycle"
+      customer: "Brazilian Armed Forces"
+      customerQuote: "supporting decision-making across the three Brazilian Armed Forces (Navy, Army, and Air Force)"
+      whyNow: "Multi-domain operations produce a growing volume and velocity of data."
+      whyNowQuote: "The growing complexity of multi-domain operational environments (land, aerospace, naval, cyber, and electromagnetic spectrum) has increased the volume and velocity of data"
+      currentAlternative: "Reactive, isolated AI tools that rely on human operators to integrate information."
+      alternativeQuote: "are, in general, reactive and isolated tools that still rely heavily on human operators to integrate information, assess scenarios, and formulate courses of action"
+notes: "Industry: aerospace-defense. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

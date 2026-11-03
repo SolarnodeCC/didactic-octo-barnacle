@@ -1,0 +1,13 @@
+id: gs-extraction-024
+publicationFixture: fixtures/arxiv/2607.06170.json
+expected:
+  candidates:
+    - finding: "Indian EV makers carry a new and fast growing burden of compliance evidence (type approval reports, battery safety records, supplier quality packages) with manual bottlenecks and retention horizons that reach a decade past end of production, and no information system maps it."
+      evidenceQuote: "Electrification layers a new and fast growing burden of compliance evidence, type approval test reports, battery safety and thermal propagation records, cyber security and software update documentation, and supplier quality packages, on top of the evidence apparatus the automotive industry already carries, with retention horizons that now reach a decade past end of production."
+      customer: "Indian EV OEM"
+      customerQuote: "We close that gap for the Indian EV OEM"
+      whyNow: "The electric vehicle transition in India adds a new and fast growing compliance-evidence burden."
+      whyNowQuote: "Electrification layers a new and fast growing burden of compliance evidence"
+      currentAlternative: "A compliance document lifecycle with manual bottlenecks on top of the existing evidence apparatus of the automotive industry."
+      alternativeQuote: "a lifecycle model of the compliance document with manual bottlenecks and four observed failure loci marked"
+notes: "Industry: automotive. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

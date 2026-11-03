@@ -1,0 +1,18 @@
+id: gs-triage-070
+publicationFixture: fixtures/arxiv/2601.05033.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: false
+    trigger: false
+    existingAlternative: false
+    adoptable: false
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: the retail and vending machine sectors"
+  statedHarm: "none"
+  trigger: "none"
+  existingAlternative: "none: only other forecasting methods"
+  adoptable: "none: a comparison of four algorithms"
+notes: "Method comparison; no party, harm, or adoptable output. Industry: consumer-retail. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

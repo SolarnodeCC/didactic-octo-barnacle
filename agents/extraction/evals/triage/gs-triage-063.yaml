@@ -1,0 +1,18 @@
+id: gs-triage-063
+publicationFixture: fixtures/arxiv/2603.20534.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: requirements engineering in Industry 4.0 names no role"
+  statedHarm: "potential $2.3M in avoided contract penalties"
+  trigger: "none"
+  existingAlternative: "manual analysis time"
+  adoptable: "a comprehensive empirical evaluation of RAG for industrial requirements engineering automation"
+notes: "Boundary case: the score reaches the cut (0.6) but NamedParty is false; the text names a data source, not a party. Industry: automotive. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

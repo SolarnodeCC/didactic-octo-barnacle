@@ -1,0 +1,13 @@
+id: gs-extraction-033
+publicationFixture: fixtures/arxiv/2608.22569.json
+expected:
+  candidates:
+    - finding: "Airlines optimize tail assignment and maintenance scheduling separately or in sequence, so predictive health information goes unused, which raises downstream disruption costs and flight cancellations."
+      evidenceQuote: "In practice, tail assignment (TA) and maintenance scheduling (MS) are typically optimized separately or sequentially, thereby limiting the effective use of predictive health information despite their strong interdependencies."
+      customer: "airlines"
+      customerQuote: "Ensuring reliability, safety, and economic efficiency in airline operations"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Tail assignment and maintenance scheduling optimized separately or in sequence."
+      alternativeQuote: "typically optimized separately or sequentially"
+notes: "Industry: aerospace-defense. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

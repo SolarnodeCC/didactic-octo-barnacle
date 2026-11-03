@@ -1,0 +1,18 @@
+id: gs-triage-062
+publicationFixture: fixtures/arxiv/2610.06980.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: false
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "Ford Motor Company"
+  statedHarm: "none: the gain over the existing model is a quality gain on a benchmark"
+  trigger: "none"
+  existingAlternative: "the company's existing model"
+  adoptable: "an advanced multivariate monitoring framework"
+notes: "Boundary case: the score reaches the cut (0.6) but StatedHarm is false, so the publication is rejected. Industry: automotive. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."
