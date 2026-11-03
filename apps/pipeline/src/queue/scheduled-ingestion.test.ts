@@ -1,3 +1,4 @@
+import { SCOPE_OPENALEX_SUBFIELD_IDS } from "../normalize/scope.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { replayDeadLetter } from "./replay.js";
@@ -45,8 +46,8 @@ describe("REQ-DATA-009: scheduled ingestion through the queue", () => {
 
     expect(h.Count("publication")).toBe(3);
     expect(h.OpenAlexRequests).toEqual([
-      { FromDate: "2026-08-01", SubfieldIds: [] },
-      { FromDate: "2026-08-01", SubfieldIds: [], Cursor: "cursor-2" },
+      { FromDate: "2026-08-01", SubfieldIds: SCOPE_OPENALEX_SUBFIELD_IDS },
+      { FromDate: "2026-08-01", SubfieldIds: SCOPE_OPENALEX_SUBFIELD_IDS, Cursor: "cursor-2" },
     ]);
     const run = h.Run();
     expect(run["status"]).toBe("succeeded");

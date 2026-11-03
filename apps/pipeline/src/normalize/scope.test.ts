@@ -5,6 +5,7 @@ import {
   CROSS_INDUSTRY_OPENALEX_TOPIC_NAMES,
   INDUSTRY_TOPIC_MAP,
   SCOPE_ARXIV_CATEGORIES,
+  SCOPE_OPENALEX_SUBFIELD_IDS,
   SCOPE_OPENALEX_TOPIC_NAMES,
   TARGET_INDUSTRIES,
   industriesForTopics,
@@ -86,5 +87,18 @@ describe("REQ-PROC-006: topic map of the eight target industries (ADR 0037, ADR 
     for (const category of ["cs.AI", "cs.SE", "cs.HC", "cs.CY"]) {
       expect(isArxivCategoryInScope([category])).toBe(true);
     }
+  });
+});
+
+describe("REQ-DATA-001: OpenAlex subfield IDs of the topic map", () => {
+  it("REQ-DATA-001: every subfield name has one numeric ID and no ID is used twice", () => {
+    expect(SCOPE_OPENALEX_SUBFIELD_IDS).toHaveLength(SCOPE_OPENALEX_TOPIC_NAMES.length);
+    for (const id of SCOPE_OPENALEX_SUBFIELD_IDS) expect(id).toMatch(/^\d{4}$/);
+    expect(new Set(SCOPE_OPENALEX_SUBFIELD_IDS).size).toBe(SCOPE_OPENALEX_SUBFIELD_IDS.length);
+  });
+
+  it("REQ-DATA-001: the default ingest configuration filters the works request by these IDs", async () => {
+    const { DEFAULT_INGEST_CONFIG } = await import("../config.js");
+    expect(DEFAULT_INGEST_CONFIG.OpenAlexScope.SubfieldIds).toEqual(SCOPE_OPENALEX_SUBFIELD_IDS);
   });
 });

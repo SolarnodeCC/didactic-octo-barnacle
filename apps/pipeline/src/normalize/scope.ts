@@ -133,6 +133,62 @@ export const SCOPE_OPENALEX_TOPIC_NAMES: readonly string[] = unique([
   ...TARGET_INDUSTRIES.flatMap((industry) => INDUSTRY_TOPIC_MAP[industry].OpenAlex),
 ]);
 
+/**
+ * OpenAlex subfield IDs of the names above, looked up in the OpenAlex taxonomy on 2026-11-03.
+ * The works request filters on them (REQ-DATA-001); the names stay for the check in the ingest step.
+ */
+export const OPENALEX_SUBFIELD_IDS: Readonly<Record<string, string>> = {
+  Accounting: "1402",
+  "Aerospace Engineering": "2202",
+  "Automotive Engineering": "2203",
+  "Biomedical Engineering": "2204",
+  Biotechnology: "1305",
+  "Business and International Management": "1403",
+  "Control and Systems Engineering": "2207",
+  "Drug Discovery": "3002",
+  "Economics and Econometrics": "2002",
+  "Electrical and Electronic Engineering": "2208",
+  "Energy Engineering and Power Technology": "2102",
+  Epidemiology: "2713",
+  Finance: "2003",
+  "Food Science": "1106",
+  "Fuel Technology": "2103",
+  "Health Informatics": "2718",
+  "Human-Computer Interaction": "1709",
+  "Industrial and Manufacturing Engineering": "2209",
+  "Information Systems": "1710",
+  Law: "3308",
+  "Management Information Systems": "1404",
+  "Management Science and Operations Research": "1803",
+  Marketing: "1406",
+  "Mechanical Engineering": "2210",
+  "Molecular Medicine": "1313",
+  "Nuclear Energy and Engineering": "2104",
+  "Pharmaceutical Science": "3003",
+  Pharmacology: "3004",
+  "Political Science and International Relations": "3320",
+  "Public Administration": "3321",
+  "Radiology, Nuclear Medicine and Imaging": "2741",
+  "Renewable Energy, Sustainability and the Environment": "2105",
+  "Safety, Risk, Reliability and Quality": "2213",
+  "Signal Processing": "1711",
+  Software: "1712",
+  "Space and Planetary Science": "1912",
+  "Statistics, Probability and Uncertainty": "1804",
+  "Strategy and Management": "1408",
+  Transportation: "3313",
+  "Urban Studies": "3322",
+};
+
+/** The IDs of every subfield name in scope, in the order of `SCOPE_OPENALEX_TOPIC_NAMES`. */
+export const SCOPE_OPENALEX_SUBFIELD_IDS: readonly string[] = SCOPE_OPENALEX_TOPIC_NAMES.map(
+  (name) => {
+    const id = OPENALEX_SUBFIELD_IDS[name];
+    if (id === undefined) throw new Error(`No OpenAlex subfield ID for "${name}"`);
+    return id;
+  },
+);
+
 /** The industries whose rows contain at least one of the given OpenAlex names or arXiv categories. */
 export function industriesForTopics(topics: {
   OpenAlexNames?: readonly string[];
