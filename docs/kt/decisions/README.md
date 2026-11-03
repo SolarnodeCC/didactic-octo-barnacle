@@ -47,6 +47,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0034](0034-openalex-free-api-key.md) | OpenAlex free API key for cursor paging | Accepted |
 | [0035](0035-ninety-day-window-and-resumable-runs.md) | 90-day window and resumable runs | Accepted |
 | [0036](0036-observable-signals-for-triage-and-extraction.md) | Decide triage and extraction from observable signals | Accepted |
+| [0037](0037-eight-target-industries.md) | Eight target industries | Accepted |
 
 ## When an ADR is needed
 

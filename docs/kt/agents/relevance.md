@@ -12,7 +12,7 @@ Requirement: REQ-AGENT-006. Feeds the Strategic Relevance and Technical Feasibil
 
 ## Responsible for
 
-- government, healthcare, financial services, and enterprise fit
+- fit with each of the eight target industries
 - technical feasibility
 - implementation effort
 
@@ -25,9 +25,9 @@ Requirement: REQ-AGENT-006. Feeds the Strategic Relevance and Technical Feasibil
 ## Output contract
 
 ```yaml
-IndustryFit: map<enum [government, healthcare, financial-services, enterprise], integer 0..100>  # all four keys
+IndustryFit: map<enum [automotive, aerospace-defense, consumer-retail, energy-utilities, banking, insurance, public-sector, life-sciences], integer 0..100>  # all eight keys; `other` has no score
 StrategicRelevanceScore: integer 0..100     # computed by the pipeline from IndustryFit and the focus-area match; not written by the model
-FocusMatch: map<enum [government, healthcare, financial-services, enterprise], enum [none, partial, clear]>  # all four keys
+FocusMatch: map<enum [automotive, aerospace-defense, consumer-retail, energy-utilities, banking, insurance, public-sector, life-sciences], enum [none, partial, clear]>  # all eight keys
 TechnicalFeasibility: integer 0..100        # model estimate; basis in Notes
 ImplementationEffort: enum [S, M, L, XL]
 Constraints: list<string(max 200)> (0..5)   # for example regulation or data access

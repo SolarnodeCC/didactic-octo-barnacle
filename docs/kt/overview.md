@@ -22,7 +22,7 @@ Transform scientific research into evidence-backed software opportunities, start
 - Digital services
 - Enterprise software
 
-for these target industries: government, healthcare, financial services, and enterprise (see [Target industries](#target-industries)).
+for these target industries: automotive, aerospace and defense, consumer products and retail, energy and utilities, banking, insurance, public sector, and life sciences (see [Target industries](#target-industries)).
 
 In this documentation, an **evidence-backed** opportunity is one whose every claim cites a verifiable source or is labeled as an estimate, and whose score can be explained category by category. A **validated** opportunity is an evidence-backed one that an analyst has confirmed in a score review (REQ-SCORE-007). The platform prepares the evidence; people make the final call.
 
@@ -30,7 +30,7 @@ In this documentation, an **evidence-backed** opportunity is one whose every cla
 
 | User | Job to be done | What they need from the platform |
 |---|---|---|
-| Innovation lead in an enterprise or government organization | Decide which new developments to explore this year | A ranked, explained shortlist for their industry |
+| Innovation lead in an organization in one of the target industries | Decide which new developments to explore this year | A ranked, explained shortlist for their industry |
 | Consultant | Bring evidence-based ideas to a client | Opportunities with sources, market figures, and competitors |
 | Venture builder | Find startup concepts worth validating | Concepts with a business case and next steps |
 | Domain reviewer | Judge whether the platform's output is right | Golden sets, evidence, and a way to record feedback |
@@ -55,7 +55,7 @@ Users do not need a research background to benefit from scientific progress. The
 
 | Principle | Meaning | Requirements |
 |---|---|---|
-| **Relevance** | An opportunity matters to the user's industry. MVP relevance uses the four target industries; organization-specific strategy comes later (REQ-DASH-005). | REQ-AGENT-006 |
+| **Relevance** | An opportunity matters to the user's industry. MVP relevance uses the eight target industries; organization-specific strategy comes later (REQ-DASH-005). | REQ-AGENT-006 |
 | **Reliability** | Every recommendation cites verifiable source publications, and its score can be explained category by category. | REQ-AGENT-008, REQ-SCORE-004, REQ-API-002 |
 | **Actionability** | Every recommendation leads to a concrete decision or next step. | REQ-AGENT-005, REQ-DASH-001 |
 
@@ -65,7 +65,7 @@ The long-term objective is an autonomous platform. It ingests, analyzes, and sco
 
 Organizations should no longer have to ask "Which innovations exist?". Instead, the platform continuously answers:
 
-> Which newly published scientific discoveries have the highest probability of becoming successful software products for enterprise, government, healthcare, and financial services organizations?
+> Which newly published scientific discoveries have the highest probability of becoming successful software products for organizations in automotive, aerospace and defense, consumer products and retail, energy and utilities, banking, insurance, the public sector, and life sciences?
 
 For a single organization, that becomes: which developments will change our market, our customers, and our services in the coming years, and which opportunities should we act on today? Answering that needs an organization profile (REQ-DASH-005), which comes after the MVP.
 
@@ -112,10 +112,16 @@ Runtime order differs: triage and opportunity extraction run before the analysis
 
 | Industry | Focus areas |
 |---|---|
-| Government | Public services, digital citizens, case management, self-service platforms, fraud detection, AI assistants |
-| Healthcare | Clinical decision support, patient engagement, workforce planning, diagnostics, predictive analytics |
-| Financial services | Risk management, compliance automation, fraud prevention, customer service automation |
-| Enterprise | Employee experience, process automation, workforce optimization, knowledge management |
+| Automotive | Software-defined and connected vehicles, predictive maintenance, manufacturing quality, supply-chain resilience, driver-assistance safety validation, dealer and customer service |
+| Aerospace & Defense | Maintenance, repair and overhaul, certification and airworthiness evidence, supply-chain traceability, mission planning and decision support, secure engineering |
+| Consumer Products & Retail | Demand forecasting, personalization and merchandising, inventory and supply chain, customer service automation, product quality, loss prevention |
+| Energy & Utilities | Grid and asset monitoring, demand forecasting, predictive maintenance, field-workforce planning, regulatory and emissions reporting, customer engagement |
+| Banking (Finance) | Risk management, fraud prevention, compliance automation (AML, KYC), customer service automation, credit decisioning |
+| Insurance | Claims automation, underwriting and risk assessment, fraud detection, customer service, regulatory compliance |
+| Public Sector | Public services, digital citizens, case management, self-service platforms, fraud detection, AI assistants |
+| Life Sciences | Drug discovery and development support, clinical trials, regulatory submissions and pharmacovigilance, diagnostics and medical devices, GxP manufacturing quality, real-world evidence |
+
+A publication or opportunity that fits none of these industries has the industry value `other`. [ADR 0037](decisions/0037-eight-target-industries.md) records the list.
 
 ## Example
 

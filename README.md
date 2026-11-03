@@ -6,7 +6,7 @@ Innovation teams, consultants and venture builders spend hundreds of hours manua
 
 ## Overview
 
-The platform automatically analyzes scientific publications from OpenAlex, arXiv, and Semantic Scholar, and identifies opportunities for SaaS products, AI solutions, digital services, enterprise software, and government, healthcare, and financial services innovation.
+The platform automatically analyzes scientific publications from OpenAlex, arXiv, and Semantic Scholar, and identifies opportunities for SaaS products, AI solutions, digital services, enterprise software, across eight target industries: automotive, aerospace and defense, consumer products and retail, energy and utilities, banking, insurance, the public sector, and life sciences.
 
 ```text
 Scientific Research → Problem Discovery → Market Analysis → Competitive Analysis

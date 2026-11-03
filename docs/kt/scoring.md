@@ -16,7 +16,7 @@ Every complete opportunity receives a score from 0 to 100. The score is a weight
 | Market Potential | 25% | How large, growing, and painful is the market? | [Market Analysis](agents/market-analysis.md), [Problem Discovery](agents/problem-discovery.md) |
 | Competitive Gap | 20% | How open is the market? | [Competition](agents/competition.md) |
 | Technical Feasibility | 15% | Can it be built with today's technology? | [Relevance](agents/relevance.md) |
-| Strategic Relevance | 20% | How well does it fit the target industries? | [Relevance](agents/relevance.md) |
+| Strategic Relevance | 20% | How well does it fit the eight target industries? | [Relevance](agents/relevance.md) |
 
 The final score maps to a band:
 

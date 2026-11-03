@@ -14,14 +14,18 @@ Plan that satisfies REQ-TEST-005 and closes the structure of OQ-015. Named peopl
 
 | Slot | Industry / scope | Name | Confirmed |
 |---|---|---|---|
-| R1 | Government | _named before phase 3_ | no |
-| R2 | Healthcare | _named before phase 3_ | no |
-| R3 | Financial services | _named before phase 3_ | no |
-| R4 | Enterprise | _named before phase 3_ | no |
-| R5 | Shared sample (agreement) | _named before phase 3_ | no |
-| R6 | Shared sample (agreement) | _named before phase 3_ | no |
+| R1 | Automotive | _named before phase 3_ | no |
+| R2 | Aerospace & Defense | _named before phase 3_ | no |
+| R3 | Consumer Products & Retail | _named before phase 3_ | no |
+| R4 | Energy & Utilities | _named before phase 3_ | no |
+| R5 | Banking (Finance) | _named before phase 3_ | no |
+| R6 | Insurance | _named before phase 3_ | no |
+| R7 | Public Sector | _named before phase 3_ | no |
+| R8 | Life Sciences | _named before phase 3_ | no |
+| R9 | Shared sample (agreement) | _named before phase 3_ | no |
+| R10 | Shared sample (agreement) | _named before phase 3_ | no |
 
-Each industry slot owns that industry's golden-set labels. R5 and R6 both label a shared sample of at least 20 opportunities so inter-rater agreement can be measured.
+Each industry slot owns that industry's golden-set labels. R9 and R10 both label a shared sample of at least 20 opportunities so inter-rater agreement can be measured.
 
 ## Golden set sizes
 
@@ -69,7 +73,7 @@ expected:
 basis:                          # optional: the words or the reason behind each signal
   namedParty: "governments, growers and scientists"
   statedHarm: "crop loss"
-notes: "Reviewer R4, 2026-.."
+notes: "Reviewer R7, 2026-.."
 ```
 
 An extraction item lists the expected candidates, or an empty list with the reason (REQ-PROC-009):
@@ -83,7 +87,7 @@ expected:
       evidenceQuote: "Verbatim from the abstract."
       customer: "regulatory bodies"
       customerQuote: "Verbatim from the abstract."
-notes: "Reviewer R4, 2026-.."
+notes: "Reviewer R7, 2026-.."
 ```
 
 An entry for a publication that passes triage but yields no candidate has `candidates: []` and a `reason` string under `expected`:
@@ -106,11 +110,11 @@ neighborsFixture: fixtures/neighbors/2610.40641.json
 expected:
   noveltyRange: [40, 70]       # at most 30 points wide
   maturity: prototype
-  industriesInclude: [government]
+  industriesInclude: [public-sector]
 handoff:                       # the input of Problem Discovery and later agents
   novelty: 55
   maturity: prototype
-  industry: [government]
+  industry: [public-sector]
   technology: ["agentic AI"]
 ```
 
@@ -121,7 +125,7 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-001.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-001.yaml
 expected:
   requiredFacts: ["facts the Problem field must state, judged against a rubric"]
-  customerIndustry: government
+  customerIndustry: public-sector
   painLevelRange: [3, 4]      # at most 2 wide
 ```
 
@@ -134,7 +138,7 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-001.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-001.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-001.yaml
 expected:
-  bestIndustry: government
+  bestIndustry: public-sector
   strategicRelevanceRange: [35, 65]    # at most 30 wide
   technicalFeasibilityRange: [50, 75]  # at most 30 wide
   implementationEffort: L              # S, M, L, or XL

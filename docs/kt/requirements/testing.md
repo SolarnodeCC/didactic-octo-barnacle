@@ -73,7 +73,7 @@ Each agent and model-backed step has a reviewed golden set.
 - Status: planned
 - Source: test strategy
 - Acceptance criteria:
-  1. The golden set holds at least 20 entries per agent, covers all four target industries, and, for triage and extraction, holds at least three entries that should yield no candidate.
+  1. The golden set holds at least 20 entries per agent, covers all eight target industries (at least one entry per industry), and, for triage and extraction, holds at least three entries that should yield no candidate.
   2. Each entry names its reviewer; entries for an industry are reviewed by someone with knowledge of that industry.
   3. Changes to the golden set go through a pull request with a named reviewer.
   4. The pass threshold of each golden set is written down with a tolerance before the first eval run, and changes only through a reviewed pull request.

@@ -20,7 +20,7 @@ Agents:
     NoveltyRationale: Earlier work measured interruptions; this study links switching patterns to output over months.
     RelatedPublicationIds: [pub-example-0102, pub-example-0187]
     Maturity: field-tested
-    Industry: [enterprise, government]
+    Industry: [public-sector]
     Technology: [activity sensing, scheduling optimization]
     Confidence: 0.6
     Evidence:
@@ -37,9 +37,9 @@ Agents:
   ProblemDiscovery:
     Problem: Knowledge workers lose focus and output when they switch between tasks and meetings.
     Customer:
-      Segment: Enterprise organizations with large knowledge-worker teams
+      Segment: Public sector organizations with large knowledge-worker teams
       Role: Head of employee experience
-      Industry: enterprise
+      Industry: public-sector
     PainLevel: 4
     PainRationale: Lost focus time costs measurable output, and employers already pay for productivity tools.
     Confidence: 0.6
@@ -98,8 +98,28 @@ Agents:
         Url: null
         RetrievedAt: "2026-10-01T12:00:00Z"
   Relevance:
-    IndustryFit: { government: 60, healthcare: 55, financial-services: 50, enterprise: 80 }
-    FocusMatch: { government: none, healthcare: none, financial-services: none, enterprise: clear }
+    IndustryFit:
+      {
+        automotive: 40,
+        aerospace-defense: 35,
+        consumer-retail: 45,
+        energy-utilities: 40,
+        banking: 50,
+        insurance: 45,
+        public-sector: 80,
+        life-sciences: 30,
+      }
+    FocusMatch:
+      {
+        automotive: none,
+        aerospace-defense: none,
+        consumer-retail: none,
+        energy-utilities: none,
+        banking: none,
+        insurance: none,
+        public-sector: clear,
+        life-sciences: none,
+      }
     StrategicRelevanceScore: 90
     TechnicalFeasibility: 80
     ImplementationEffort: M
@@ -110,7 +130,7 @@ Agents:
     StartupName: AI Focus Planner
     OpportunityType: saas
     ValueProposition: Protects focus time by planning work around each person's switching patterns.
-    TargetCustomer: Enterprise organizations with large knowledge-worker teams
+    TargetCustomer: Public sector organizations with large knowledge-worker teams
     BusinessModel: subscription
     Pricing:
       Model: per-user

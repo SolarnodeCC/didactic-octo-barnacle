@@ -28,7 +28,7 @@ Depth behind the overview user table. The MVP pilot is one invited organization;
 | Role | viewer |
 | Goal | Bring evidence-based software ideas to a client workshop |
 | Frequency | Per engagement |
-| Constraints | Must cite sources and label estimates; client may be outside the four industries' focus areas |
+| Constraints | Must cite sources and label estimates; client may be outside the eight industries' focus areas |
 | Done when | Brief plus competitor and market context for 5–10 opportunities |
 | Not done when | Claims without evidence or estimate labels |
 
