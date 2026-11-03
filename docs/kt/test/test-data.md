@@ -2,8 +2,8 @@
 title: Test data
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-10-28
-related: [REQ-TEST-003, REQ-TEST-005, REQ-DATA-010]
+last_reviewed: 2026-11-03
+related: [REQ-TEST-003, REQ-TEST-005, REQ-DATA-010, REQ-AGENT-013]
 ---
 
 # Test data
@@ -14,6 +14,10 @@ related: [REQ-TEST-003, REQ-TEST-005, REQ-DATA-010]
 - Tests serve fixtures through the fetch mocking of the Workers test plugin. Unit, integration, and contract tests never call these APIs (REQ-TEST-003). A test that tries to reach the network fails.
 - Refresh fixtures deliberately, in a separate pull request, and note why. Keep each fixture to the fields the test needs. A small recording script under `scripts/` is added with the first collector.
 - Include error cases: rate limiting, timeouts, empty results, malformed records, a work without an abstract, a retracted work, and a preprint with two versions.
+
+## Search results
+
+Recordings of the search tool (REQ-AGENT-013) are not fixtures in git. They sit in a private object store, and the repository holds only a manifest per recording: query, date, provider, parameters, result count, and a SHA-256 hash of the stored response, without result text. Tests and golden-set entries name a recording by its manifest ID. Recordings are used only to test our own agents and are neither published nor used for training. The reason and the open provider questions are in ADR 0039. Scrub keys and headers before storing, as for any fixture.
 
 ## Stubbed model responses
 

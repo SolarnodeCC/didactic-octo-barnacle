@@ -2,7 +2,7 @@
 title: Legal review brief (OQ-014)
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-11-03
 related: [REQ-DATA-010, REQ-ACC-011, REQ-NFR-016]
 ---
 
@@ -36,9 +36,12 @@ Answer yes/no with conditions for each:
 8. Confirm DPAs (or equivalent) for Cloudflare, OpenAI, Anthropic, Resend, Brave Search, and Tavily.
 9. Confirm whether transient processing of non-redistributable full text (without storage) is allowed; if no, keep abstract-first permanently for those works.
 10. Confirm Semantic Scholar commercial use if REQ-DATA-003 is scheduled.
+11. Ask Tavily for written confirmation that storing API Output as private evaluation fixtures, used only to test our own agents, is allowed. The Platform Terms (2026-05-04) and Acceptable Use Policy (2026-10-21) do not address storage, evaluation, or publication of Output (ADR 0039).
+12. Ask Brave Search in writing for the right to store and evaluate results. Its terms (section 3(b)) forbid both by default.
 
 ## Engineering constraints until signed
 
 - No full-text widening beyond ADR 0014.
 - No Semantic Scholar ingestion.
+- Search result recordings stay in a private store with a manifest in the repository, and no result text is committed or published (ADR 0039).
 - Search providers may be coded behind an interface; live calls in production wait for DPA answers on items 8 and the storage-of-snippets question in ADR 0022.
