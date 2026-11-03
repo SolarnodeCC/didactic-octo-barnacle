@@ -1,0 +1,11 @@
+id: gs-relevance-002
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.40164.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-002.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-002.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-002.yaml
+expected:
+  bestIndustry: government
+  strategicRelevanceRange: [35, 65]
+  technicalFeasibilityRange: [40, 70]
+  implementationEffort: M
+notes: "Media concentration is not among the government focus areas. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."

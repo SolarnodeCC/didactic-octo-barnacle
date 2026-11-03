@@ -1,0 +1,11 @@
+id: gs-relevance-014
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.32469.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-016.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-014.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-014.yaml
+expected:
+  bestIndustry: healthcare
+  strategicRelevanceRange: [75, 100]
+  technicalFeasibilityRange: [55, 85]
+  implementationEffort: L
+notes: "Effort: licensed guidelines and safety validation make L likely, M is also defensible. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."

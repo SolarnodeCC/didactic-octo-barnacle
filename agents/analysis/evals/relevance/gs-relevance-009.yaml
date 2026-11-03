@@ -1,0 +1,11 @@
+id: gs-relevance-009
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2609.09356.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-010.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-009.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-009.yaml
+expected:
+  bestIndustry: healthcare
+  strategicRelevanceRange: [75, 100]
+  technicalFeasibilityRange: [55, 80]
+  implementationEffort: L
+notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."

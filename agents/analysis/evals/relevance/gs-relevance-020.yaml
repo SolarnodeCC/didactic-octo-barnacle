@@ -1,0 +1,11 @@
+id: gs-relevance-020
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.40071.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-003.yaml#1
+researchAnalystRef: research-analyst/gs-research-analyst-020.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-020.yaml
+expected:
+  bestIndustry: enterprise
+  strategicRelevanceRange: [50, 80]
+  technicalFeasibilityRange: [55, 80]
+  implementationEffort: M
+notes: "Same expectations as the first candidate of the same publication. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02)."
