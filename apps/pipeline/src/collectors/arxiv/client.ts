@@ -1,5 +1,5 @@
 import { fetchWithBackoff, type BackoffOptions, type FetchFn } from "../../http/retry.js";
-import { isArxivCategoryInScope, PILOT_ARXIV_CATEGORIES } from "../../normalize/scope.js";
+import { isArxivCategoryInScope, SCOPE_ARXIV_CATEGORIES } from "../../normalize/scope.js";
 import { parseArxivFeed } from "./parse-feed.js";
 import { type ArxivEntry } from "./types.js";
 
@@ -21,7 +21,7 @@ export type ArxivPage = {
 const ARXIV_API_URL = "https://export.arxiv.org/api/query";
 
 export function buildArxivUrl(request: ArxivPageRequest): string {
-  const categories = request.Categories ?? PILOT_ARXIV_CATEGORIES;
+  const categories = request.Categories ?? SCOPE_ARXIV_CATEGORIES;
   const query = categories.map((category) => `cat:${category}`).join(" OR ");
   const params = new URLSearchParams({
     search_query: query,
@@ -42,7 +42,7 @@ export async function fetchArxivPage(
   request: ArxivPageRequest,
   deps: { Fetch: FetchFn; Backoff: BackoffOptions; WaitForSlot: () => Promise<void> },
 ): Promise<ArxivPage> {
-  const categories = request.Categories ?? PILOT_ARXIV_CATEGORIES;
+  const categories = request.Categories ?? SCOPE_ARXIV_CATEGORIES;
   const rateLimitedFetch: FetchFn = async (input, init) => {
     await deps.WaitForSlot();
     return deps.Fetch(input, init);

@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { buildArxivUrl, fetchArxivPage } from "./client.js";
 import { type FetchFn } from "../../http/retry.js";
+import { SCOPE_ARXIV_CATEGORIES } from "../../normalize/scope.js";
 
 const feed = readFileSync(
   join(dirname(fileURLToPath(import.meta.url)), "../../fixtures/arxiv/feed.xml"),
@@ -25,11 +26,12 @@ describe("REQ-DATA-002: arXiv client", () => {
     vi.unstubAllGlobals();
   });
 
-  it("REQ-DATA-002: queries the four pilot categories", () => {
-    const url = new URL(buildArxivUrl({}));
-    expect(url.searchParams.get("search_query")).toBe(
-      "cat:cs.AI OR cat:cs.SE OR cat:cs.HC OR cat:cs.CY",
-    );
+  it("REQ-DATA-002: queries every category of the topic map, the cross-industry ones first", () => {
+    const query = new URL(buildArxivUrl({})).searchParams.get("search_query") ?? "";
+    expect(query).toBe(SCOPE_ARXIV_CATEGORIES.map((category) => `cat:${category}`).join(" OR "));
+    expect(query.startsWith("cat:cs.AI OR cat:cs.SE OR cat:cs.HC OR cat:cs.CY OR ")).toBe(true);
+    expect(query).toContain("cat:cs.RO");
+    expect(query).toContain("cat:q-fin.RM");
   });
 
   it("REQ-DATA-002: keeps primary and cross-listed in-scope entries and drops the rest", async () => {

@@ -1,4 +1,4 @@
-import { PILOT_OPENALEX_TOPIC_NAMES } from "../normalize/scope.js";
+import { SCOPE_OPENALEX_TOPIC_NAMES } from "../normalize/scope.js";
 
 const OPENALEX_URL = "https://api.openalex.org";
 
@@ -189,7 +189,7 @@ export async function runLookup(options: {
   Days: number;
   TopicNames?: readonly string[];
 }): Promise<LookupReport> {
-  const names = options.TopicNames ?? PILOT_OPENALEX_TOPIC_NAMES;
+  const names = options.TopicNames ?? SCOPE_OPENALEX_TOPIC_NAMES;
   const topics: TopicLookup[] = [];
   for (const name of names) {
     const candidates: Candidate[] = [];

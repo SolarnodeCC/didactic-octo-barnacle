@@ -2,7 +2,7 @@
 title: Open questions
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-11-03
 ---
 
 # Open questions
@@ -28,7 +28,6 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 |---|---|---|---|
 | OQ-037 | How are evidence levels, the validation brief, and the readiness label specified (option B of ADR 0036)? | Write a design document before phase 3 starts: four evidence levels per element (absent, assumption, documentary evidence, validated by a person), the four elements plus why-now and a stop criterion per candidate, who enters validated evidence, and a readiness label next to the score that leaves the score weights unchanged | before phase 3 starts |
 | OQ-038 | Is a burden at population or sector level, with no party that can act on it, a candidate in extraction? | Add to REQ-PROC-009: no candidate when the stated burden belongs to a population or sector and no named customer can act on it. Entries `gs-extraction-015` (2602.11223) and `gs-extraction-020` (2609.10350) show the case. Decide after the first extraction eval run, with data | before phase 2 starts |
-| OQ-039 | Which OpenAlex fields and subfields and which arXiv categories map to each of the eight target industries (ADR 0037)? | Replace the four-row topic map in [ingestion scope](data-sources/ingestion-scope.md) by eight rows; Automotive, Aerospace & Defense, Energy & Utilities, and Consumer Products & Retail have no mapping yet. Review the map with the phase-1 volume measurements | before the first ingest beyond the pilot topic map |
 
 ## Ownership
 

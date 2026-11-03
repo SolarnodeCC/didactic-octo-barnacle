@@ -2,7 +2,7 @@
 title: Ingestion scope
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-11-03
 related: [REQ-DATA-001, REQ-DATA-002, REQ-DATA-009, REQ-PROC-005, REQ-PROC-006]
 ---
 
@@ -29,14 +29,23 @@ The limit and the map are configuration, not code. Changing them is a reviewed p
 
 ## Topic map
 
-A publication is in scope (REQ-PROC-006) when at least one of its OpenAlex fields or subfields, or one of its arXiv categories, maps to a target industry. The four rows below are the interim map from before ADR 0037; the map for the eight target industries is open question OQ-039. The map names OpenAlex fields and subfields; look up their IDs in OpenAlex when the collector is built and store the IDs in configuration.
+A publication is in scope (REQ-PROC-006) when at least one of its OpenAlex subfields, or one of its arXiv categories, maps to a target industry or is a cross-industry computing category. The map covers the eight target industries of ADR 0037 and is recorded in [ADR 0038](../decisions/0038-topic-map-for-eight-industries.md). The code mirrors it in `apps/pipeline/src/normalize/scope.ts`. The names are OpenAlex subfield names, spelled as the taxonomy spells them (checked against the taxonomy on 2026-11-03); look up their IDs when the collector is configured and store the IDs in configuration. A publication that fits none of the eight industries (`other`) has no row and is in scope only through a cross-industry category.
 
-| Industry | OpenAlex fields and subfields (names) | arXiv categories |
+| Industry | OpenAlex subfields (names) | arXiv categories |
 |---|---|---|
-| Government | Public administration; Law; Political science; Information systems | `cs.CY` |
-| Healthcare | Health informatics; Radiology and imaging; Public health; Clinical medicine | `cs.AI`, `cs.HC` |
-| Financial services | Finance; Accounting; Economics and econometrics; Information systems | `cs.CY`, `cs.AI` |
-| Enterprise | Management information systems; Software engineering; Human-computer interaction; Organizational behavior | `cs.SE`, `cs.HC`, `cs.AI` |
+| Automotive | Automotive Engineering; Control and Systems Engineering; Mechanical Engineering; Industrial and Manufacturing Engineering; Safety, Risk, Reliability and Quality; Transportation | `cs.RO`, `eess.SY` |
+| Aerospace & Defense | Aerospace Engineering; Space and Planetary Science; Control and Systems Engineering; Safety, Risk, Reliability and Quality; Signal Processing | `cs.RO`, `eess.SY`, `eess.SP`, `astro-ph.IM`, `physics.space-ph` |
+| Consumer Products & Retail | Marketing; Strategy and Management; Business and International Management; Management Science and Operations Research; Food Science | `cs.IR`, `econ.GN`, `stat.AP` |
+| Energy & Utilities | Energy Engineering and Power Technology; Renewable Energy, Sustainability and the Environment; Fuel Technology; Nuclear Energy and Engineering; Electrical and Electronic Engineering | `eess.SY`, `math.OC` |
+| Banking (Finance) | Finance; Accounting; Economics and Econometrics; Management Information Systems; Information Systems | `q-fin.CP`, `q-fin.GN`, `q-fin.PM`, `q-fin.RM`, `q-fin.ST`, `q-fin.TR`, `econ.GN` |
+| Insurance | Finance; Economics and Econometrics; Statistics, Probability and Uncertainty | `q-fin.RM`, `stat.AP` |
+| Public Sector | Public Administration; Law; Political Science and International Relations; Information Systems; Urban Studies | `cs.CY` |
+| Life Sciences | Pharmaceutical Science; Drug Discovery; Pharmacology; Biotechnology; Molecular Medicine; Biomedical Engineering; Health Informatics; Radiology, Nuclear Medicine and Imaging; Epidemiology | `q-bio.QM`, `q-bio.BM`, `q-bio.GN`, `physics.med-ph`, `eess.IV` |
+| Cross-industry (no single industry) | Software; Human-Computer Interaction | `cs.AI`, `cs.SE`, `cs.HC`, `cs.CY` |
+
+- The cross-industry row keeps the computing categories of the pilot map, so the move to eight industries does not narrow what arXiv delivers. Industry-agnostic AI work reaches the pipeline through it, and the Relevance agent decides the industry (REQ-AGENT-006).
+- The pilot map used names that OpenAlex does not return as subfields (for example `Software engineering`, `Public health`, `Clinical medicine`, `Political science`, and `Radiology and imaging`). Works with those subfields were skipped by the name check. The new map uses only names that exist in the taxonomy.
+- The map widens the arXiv query from 4 to 24 categories. The volume per category is not measured. Review the map with the `Staging measure` report before the first ingest beyond the pilot, and drop or narrow a row whose share of publications that pass triage is too low.
 
 ## Measure in phase 1
 

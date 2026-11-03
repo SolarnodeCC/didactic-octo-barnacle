@@ -3,7 +3,7 @@ export { mapOpenAlexWork } from "./collectors/openalex/map-work.js";
 export { mapArxivEntry } from "./collectors/arxiv/map-entry.js";
 export { decideMerge } from "./normalize/dedupe-merge.js";
 export { normalizePdfLicense } from "./normalize/license.js";
-export { isArxivCategoryInScope, PILOT_ARXIV_CATEGORIES } from "./normalize/scope.js";
+export { isArxivCategoryInScope, SCOPE_ARXIV_CATEGORIES } from "./normalize/scope.js";
 export { fetchWithBackoff, HttpRequestError } from "./http/retry.js";
 export { ARXIV_MIN_REQUEST_INTERVAL_MS, createRateLimiter } from "./http/rate-limit.js";
 export { fetchOpenAlexPage } from "./collectors/openalex/client.js";
