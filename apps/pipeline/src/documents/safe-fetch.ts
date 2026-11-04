@@ -32,7 +32,7 @@ export class PdfFetchError extends Error {
   }
 }
 
-export type FetchedPdf = { Bytes: Uint8Array; FinalUrl: string };
+export type FetchedPdf = { Bytes: Uint8Array<ArrayBuffer>; FinalUrl: string };
 
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
 const PDF_MAGIC = [0x25, 0x50, 0x44, 0x46, 0x2d]; // "%PDF-"
@@ -45,7 +45,7 @@ async function readCapped(
   response: Response,
   maxBytes: number,
   signal: AbortSignal,
-): Promise<Uint8Array> {
+): Promise<Uint8Array<ArrayBuffer>> {
   const reader = response.body?.getReader();
   if (!reader) {
     throw new PdfFetchError("response has no body", "not-pdf", true);
