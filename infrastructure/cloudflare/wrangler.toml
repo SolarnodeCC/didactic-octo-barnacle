@@ -93,6 +93,11 @@ migrations_dir = "migrations"
 binding = "DOCUMENTS"
 bucket_name = "roi-documents-staging"
 
+# Private store for recorded search results (ADR 0039, REQ-AGENT-013). Never public; git holds only manifests.
+[[env.staging.r2_buckets]]
+binding = "SEARCH_FIXTURES"
+bucket_name = "roi-search-fixtures-staging"
+
 [[env.staging.queues.producers]]
 binding = "PUBLICATION_QUEUE"
 queue = "roi-publications-staging"
