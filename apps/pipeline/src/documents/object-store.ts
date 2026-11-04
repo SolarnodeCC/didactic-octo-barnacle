@@ -15,7 +15,7 @@ export interface ObjectStore {
 }
 
 /** Hex SHA-256 of the file: the content hash that keys a stored PDF (REQ-DATA-004 AC2). */
-export async function sha256Hex(bytes: Uint8Array): Promise<string> {
+export async function sha256Hex(bytes: Uint8Array<ArrayBuffer>): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", bytes);
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
