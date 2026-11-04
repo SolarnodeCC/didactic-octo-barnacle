@@ -222,3 +222,20 @@ Every agent uses an exact model version, and a version change goes through the e
   3. The nightly eval run reports a provider deprecation or a behavior change for any pinned version, and the envelope stores the exact version used (see [contract conventions](../agents/contract-conventions.md)).
   4. A model that the provider retires is replaced before its retirement date; the run report lists pinned versions with their announced retirement dates.
 - Verification: unit test of the configuration check and CI job
+
+### REQ-AGENT-015: Validation brief
+
+The Startup Generator writes a validation brief for each opportunity (ADR 0040).
+
+- Phase: 3
+- Priority: should
+- Status: planned
+- Source: ADR 0036 option B, ADR 0040, and [evidence levels](../evidence-and-readiness.md)
+- Depends on: REQ-AGENT-005
+- Acceptance criteria:
+  1. The Startup Generator contract holds a `ValidationBrief` with one entry for each of problem, customer, market, reason to win, and why now. Each entry has a `KillQuestion` and a `StopCriterion`.
+  2. The brief is generated text with no evidence. It is labeled as such, is not scored, and is not read by any score category or by the readiness label (REQ-SCORE-008).
+  3. A brief entry for an element is consistent with the Problem Discovery, Market Analysis, Competition, and Relevance outputs it was given.
+  4. No new agent or pipeline step is added; the brief is part of the Startup Generator call (REQ-AGENT-007).
+  5. The golden set for the Startup Generator holds a rubric for the kill question and the stop criterion, graded by a model judge (REQ-TEST-005).
+- Verification: contract test and eval

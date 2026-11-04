@@ -21,6 +21,7 @@ The API returns scored opportunities with sorting, filtering, and pagination.
   1. The list supports the sort order and filters of REQ-DASH-002.
   2. Pagination uses a cursor and a maximum page size of 100 (default 25).
   3. Each item holds the score, band, the five category values, title, startup name, industries, and source publication.
+  4. An item holds no readiness label, evidence level, or validation brief (ADR 0040).
 - Verification: integration test and contract test
 
 ### REQ-API-002: Opportunity detail with provenance
@@ -34,6 +35,7 @@ The API returns one opportunity with everything it was built from.
 - Acceptance criteria:
   1. The response holds the category values and their explanation (REQ-SCORE-004), every agent output with its model and prompt version, and the source publication (one per opportunity, ADR 0015) with the related publications used as context.
   2. An unknown opportunity ID returns a not-found error.
+  3. The response holds the five evidence levels, the readiness label (REQ-SCORE-008), and the validation brief (REQ-AGENT-015). The brief is marked as generated text with no evidence.
 - Verification: integration test and contract test
 
 ### REQ-API-003: Versioned API contract

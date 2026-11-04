@@ -2,7 +2,7 @@
 title: Open questions
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-03
+last_reviewed: 2026-11-04
 ---
 
 # Open questions
@@ -26,7 +26,6 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
-| OQ-037 | How are evidence levels, the validation brief, and the readiness label specified (option B of ADR 0036)? | A design draft is in [evidence levels and readiness label](evidence-and-readiness.md): four evidence levels per element, a brief with a kill question and a stop criterion, analyst-entered validated evidence, and a readiness label next to the score that leaves the weights unchanged. The owner answers the four decisions at its end, then requirements are added | before phase 3 starts |
 | OQ-038 | Is a burden at population or sector level, with no party that can act on it, a candidate in extraction? | Add to REQ-PROC-009: no candidate when the stated burden belongs to a population or sector and no named customer can act on it. Entries `gs-extraction-015` (2602.11223) and `gs-extraction-020` (2609.10350) show the case. Decide after the first extraction eval run, with data | before phase 2 starts |
 
 ## Ownership
@@ -70,4 +69,5 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-005 | Build against `bge-base-en-v1.5`; run the ADR 0010 benchmark at the start of phase 2 | ADR 0010, [defaults](architecture/defaults.md) |
 | OQ-033 | Benchmark Brave Search and Tavily; pick the winner on a competitor-recall set at the start of phase 3 | ADR 0022 |
 | OQ-021 | Daily budget = expected daily complete opportunities × measured cost × 1.25, locked before phase 4 scoring | ADR 0023 |
+| OQ-037 | Option B of ADR 0036: one analyst sets E3, `validated` needs all four elements at E3, the Startup Generator writes the brief, the label shows on the detail page only | ADR 0040, [evidence levels](evidence-and-readiness.md) |
 | OQ-017 | Organization profiles and organization-wide feedback come after the MVP | REQ-DASH-005 |

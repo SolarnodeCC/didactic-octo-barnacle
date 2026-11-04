@@ -3,7 +3,7 @@ title: Screen inventory and navigation
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-10-29
-related: [REQ-DASH-001, REQ-DASH-002, REQ-DASH-003, REQ-DASH-004, REQ-DASH-007, REQ-DASH-008, REQ-DASH-009, REQ-DASH-010, REQ-DASH-011, REQ-DASH-012, REQ-DASH-014, REQ-ACC-003, REQ-ACC-004, REQ-ACC-010, REQ-ACC-011, REQ-ADM-001, REQ-ADM-002, REQ-ADM-003]
+related: [REQ-DASH-001, REQ-DASH-002, REQ-DASH-003, REQ-DASH-004, REQ-DASH-007, REQ-DASH-008, REQ-DASH-009, REQ-DASH-010, REQ-DASH-011, REQ-DASH-012, REQ-DASH-014, REQ-DASH-016, REQ-ACC-003, REQ-ACC-004, REQ-ACC-010, REQ-ACC-011, REQ-ADM-001, REQ-ADM-002, REQ-ADM-003]
 ---
 
 # Screen inventory and navigation
@@ -19,7 +19,7 @@ related: [REQ-DASH-001, REQ-DASH-002, REQ-DASH-003, REQ-DASH-004, REQ-DASH-007, 
 | 5 | Create account | `/welcome` | invited | REQ-ACC-003 |
 | 6 | Home | `/` | all | REQ-DASH-011 |
 | 7 | Opportunities | `/opportunities` | all | REQ-DASH-002, REQ-DASH-007, REQ-DASH-015 |
-| 8 | Opportunity detail | `/opportunities/:id` | all | REQ-DASH-001, REQ-DASH-007, REQ-DASH-009 |
+| 8 | Opportunity detail | `/opportunities/:id` | all | REQ-DASH-001, REQ-DASH-007, REQ-DASH-009, REQ-DASH-016 |
 | 9 | Priority matrix | `/matrix` | all | REQ-DASH-010 |
 | 10 | Trends | `/trends` | all | REQ-DASH-003 |
 | 11 | Account settings | `/settings` | all | REQ-ACC-010, REQ-ACC-008 |

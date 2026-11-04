@@ -111,3 +111,38 @@ An analyst can confirm or dispute the score of an opportunity. The review is sto
   5. Reviews can be exported together with the score and its category values, for calibration (REQ-SCORE-006).
   6. A user with the viewer role cannot review (REQ-NFR-012).
 - Verification: unit tests and integration test
+
+### REQ-SCORE-008: Evidence levels and readiness label
+
+Plain code derives an evidence level for each element of an opportunity and a readiness label from them. The label sits next to the score and leaves the score unchanged (ADR 0040).
+
+- Phase: 4
+- Priority: should
+- Status: planned
+- Source: ADR 0036 option B, ADR 0040, and [evidence levels](../evidence-and-readiness.md)
+- Depends on: REQ-SCORE-004, REQ-AGENT-002, REQ-AGENT-003, REQ-AGENT-004, REQ-PROC-009
+- Acceptance criteria:
+  1. Each of problem, customer, market, reason to win, and why now has a level E0 (absent), E1 (assumption), E2 (documentary evidence), or E3 (validated by a person), derived from stored agent output and evidence by the rules in the design document. The derivation uses no model call.
+  2. The pipeline never sets E3. A candidate with `WhyNow` empty has E0 for why now (REQ-PROC-009).
+  3. The label is `unproven` when problem, customer, market, or reason to win is E0. Otherwise it is `assumed` when one of the four is E1, `documented` when all four are E2 or higher, and `validated` when all four are E3. A market at E2 does not give `validated`. Why now does not change the label.
+  4. The label and the levels do not change the score, the band, the category values, or the position in a ranking, and are not a filter or sort key.
+  5. The levels and the label are stored with the score ID they apply to and are recomputed on a rescore (REQ-ADM-003).
+  6. A validation brief (REQ-AGENT-015) has no effect on any level.
+- Verification: unit tests with fixed inputs for every label and boundary
+
+### REQ-SCORE-009: Analyst-validated evidence
+
+A named analyst can record first-hand validation for one element, which sets its level to E3 (ADR 0040).
+
+- Phase: later
+- Priority: could
+- Status: planned
+- Source: ADR 0036 option B and ADR 0040
+- Depends on: REQ-SCORE-008, REQ-SCORE-007, REQ-NFR-012
+- Acceptance criteria:
+  1. An analyst or admin enters the element, a short description, a reference (a document, a note, or a link), and the date. One entry sets the element to E3.
+  2. The entry stores the analyst's ID and follows the erasure rules of score reviews (REQ-SCORE-007).
+  3. A second analyst may confirm an entry. The confirmation is stored as a flag and does not change the level.
+  4. An entry never changes the score, the band, or the category values. A user with the viewer role cannot enter evidence (REQ-NFR-012).
+  5. The write route is the third write of the data API and needs an ADR that supersedes ADR 0021 in that respect before it is built.
+- Verification: unit tests and integration test

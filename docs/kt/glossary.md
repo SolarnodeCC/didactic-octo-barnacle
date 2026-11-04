@@ -21,6 +21,7 @@ last_reviewed: 2026-10-29
 | Contract test | A test that validates an agent's output against its output contract. |
 | Core workflow | The eight conceptual steps from research to scoring in the [overview](overview.md). Not the same as a Cloudflare Workflow. |
 | Eval | A repeatable evaluation of model output against a golden set, with a pass threshold. See [AI evals](test/ai-evals.md). |
+| Evidence level | E0 (absent), E1 (assumption), E2 (documentary evidence), or E3 (validated by a person), set per element of an opportunity (REQ-SCORE-008). |
 | Evidence | A quote, related publication, or external URL that supports a field of an agent output (REQ-AGENT-008). |
 | Finding | The research result that a candidate opportunity is based on, stated in one sentence. |
 | Fixture | A recorded response from an external API or model, stored next to the tests that use it. |
@@ -41,6 +42,7 @@ last_reviewed: 2026-10-29
 | Preprint | A paper published on arXiv before or without peer review. |
 | Publication | The canonical record of one paper, possibly found in several sources. See [data model](architecture/data-model.md). |
 | REQ-ID | A requirement identifier in the form `REQ-<AREA>-<NNN>`, for example `REQ-DATA-001`. |
+| Readiness label | `unproven`, `assumed`, `documented`, or `validated`, derived from the evidence levels and shown next to the score on the detail page only (REQ-SCORE-008, ADR 0040). `validated` means first-hand proof for all four elements; it is not the overview's "validated opportunity". |
 | Repair | A fix by plain code of output that is correct but wrapped wrongly, such as an array returned as a JSON string (REQ-AGENT-011). |
 | Role | Viewer, analyst, or admin: what an authenticated user may do (REQ-NFR-012). |
 | SAM | Serviceable addressable market: the part of the TAM the opportunity can reach. |

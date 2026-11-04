@@ -240,3 +240,20 @@ A user can search opportunities by describing a problem or technology in words.
   3. A query with no results shows the empty state; a query that is too short or too long shows the validation message (see [screen states](../ux/states.md)).
   4. The search box is keyboard operable and labeled for screen readers (REQ-DASH-006).
 - Verification: end-to-end test
+
+### REQ-DASH-016: Evidence levels and readiness label on the detail page
+
+The opportunity detail page shows the evidence level of each element, the readiness label, and the validation brief, and no other screen does (ADR 0040).
+
+- Phase: 4
+- Priority: should
+- Status: planned
+- Source: ADR 0040 and [evidence levels](../evidence-and-readiness.md)
+- Depends on: REQ-DASH-001, REQ-API-002, REQ-SCORE-008
+- Acceptance criteria:
+  1. The detail page shows the levels E0 to E3 of problem, customer, market, reason to win, and why now, each with its name in text, and the readiness label next to the score.
+  2. The validation brief lists the kill question and the stop criterion per element and is labeled as generated text with no evidence (REQ-NFR-013).
+  3. The label is not shown in the list, ranking, priority matrix, home, search results, or filter bar, and is not a sort key.
+  4. A level and the label are conveyed by text in addition to color (REQ-DASH-006).
+  5. The page states that the label is not the score and does not rank.
+- Verification: end-to-end test

@@ -24,7 +24,7 @@ Concrete routes for `apps/api`. Request and response bodies are Zod schemas in `
 |---|---|---|---|---|
 | GET | `/api/v1/opportunities` | viewer, analyst, admin | List with sort, filters (industry, band, publication date, review state, status), cursor | REQ-API-001, REQ-DASH-002, REQ-DASH-004 |
 | GET | `/api/v1/opportunities/search` | viewer, analyst, admin | Semantic search `q` (3–300 chars) plus list filters | REQ-API-006 |
-| GET | `/api/v1/opportunities/:id` | viewer, analyst, admin | Detail with provenance, agent outputs, review history, status history | REQ-API-002 |
+| GET | `/api/v1/opportunities/:id` | viewer, analyst, admin | Detail with provenance, agent outputs, review history, status history, evidence levels, readiness label, validation brief | REQ-API-002, REQ-SCORE-008 |
 | POST | `/api/v1/opportunities/:id/reviews` | analyst, admin | Body: `{ scoreId, state, reason? }`; conflict if score not current | REQ-API-004 |
 | POST | `/api/v1/opportunities/:id/status` | analyst, admin | Body: `{ status, note? }`; status is `pursued`, `parked`, or `rejected` | REQ-DASH-004 |
 | GET | `/api/v1/opportunities/:id/brief` | viewer, analyst, admin | Print-ready HTML brief (also served as a dashboard route) | REQ-DASH-009 |
