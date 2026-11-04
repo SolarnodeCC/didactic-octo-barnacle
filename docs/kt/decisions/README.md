@@ -2,7 +2,7 @@
 title: Decisions index
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-03
+last_reviewed: 2026-11-04
 ---
 
 # Architecture decision records
@@ -50,6 +50,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0037](0037-eight-target-industries.md) | Eight target industries | Accepted |
 | [0038](0038-topic-map-for-eight-industries.md) | Topic map for the eight target industries | Accepted |
 | [0039](0039-private-search-fixtures-from-tavily.md) | Record search results as private fixtures, from Tavily | Accepted |
+| [0040](0040-evidence-levels-and-readiness-label.md) | Evidence levels and a readiness label next to the score | Accepted |
 
 ## When an ADR is needed
 

@@ -1,14 +1,14 @@
 ---
 title: Evidence levels and readiness label
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-11-03
-related: [REQ-PROC-009, REQ-AGENT-013, REQ-SCORE-004, REQ-SCORE-007, REQ-DASH-004]
+status: approved
+last_reviewed: 2026-11-04
+related: [REQ-PROC-009, REQ-AGENT-013, REQ-AGENT-015, REQ-SCORE-004, REQ-SCORE-007, REQ-SCORE-008, REQ-SCORE-009, REQ-DASH-016]
 ---
 
 # Evidence levels and readiness label
 
-Design draft for option B of [ADR 0036](decisions/0036-observable-signals-for-triage-and-extraction.md) and open question OQ-037. It adds no requirement yet. When the owner approves it, requirement IDs are added in the same pull request that changes behavior, and the open question is removed.
+Design for option B of [ADR 0036](decisions/0036-observable-signals-for-triage-and-extraction.md). The owner answered the four open decisions on 2026-11-04 ([ADR 0040](decisions/0040-evidence-levels-and-readiness-label.md)). The requirements are REQ-AGENT-015, REQ-SCORE-008, REQ-SCORE-009, and REQ-DASH-016.
 
 ## Purpose
 
@@ -43,12 +43,13 @@ For each opportunity, a brief lists per element its level, its evidence items (p
 
 - The kill question is the single question whose answer would show the element false, for example "Does a named buyer at a bank budget for this fraud workflow?".
 - The stop criterion states when to drop the opportunity, for example "Stop if five of ten interviewed compliance leads already use a tool that covers the case".
-- Both are written by a model and labeled as generated text with no evidence. They guide the reviewer and are not scored.
+- The Startup Generator writes both as part of its output (REQ-AGENT-015); there is no separate step. They are labeled as generated text with no evidence. They guide the reviewer and are not scored.
 
 ## Who enters E3
 
 - An analyst enters validated evidence on the opportunity page: the element, a short description, a reference (a document, a note, a link), and the date. The record keeps the analyst's ID, like a score review (REQ-SCORE-007), and follows the same erasure rules.
-- A second analyst may confirm. Whether one entry is enough is an open decision (see below).
+- One entry by one analyst sets E3. A second analyst may confirm; the confirmation is a flag and does not change the level (ADR 0040).
+- The entry route is a third write of the data API, so REQ-SCORE-009 is phase `later` and needs an ADR that supersedes ADR 0021 in that respect. Until then the pipeline gives at most `documented`.
 - The entry never changes the score. It changes the level of the element.
 
 ## Readiness label
@@ -60,19 +61,21 @@ A readiness label sits next to the score. Plain code derives it from the five el
 | `unproven` | At least one of problem, customer, market, or reason to win is E0. |
 | `assumed` | None is E0, and at least one of the four is E1. |
 | `documented` | All four are E2 or higher. |
-| `validated` | All four are E3. |
+| `validated` | All four are E3. A market at E2 does not suffice. |
 
 - Why now does not change the label. It shows as its own level.
-- The label does not filter or rank. A reviewer can sort by it.
+- The label does not filter, sort, or rank, and it shows on the opportunity detail page only. The API returns it on the detail endpoint and not in lists (REQ-API-001, REQ-API-002, REQ-DASH-016).
 - The label is not the overview's term "validated opportunity" (an evidence-backed opportunity that an analyst confirmed in a score review). `validated` here means first-hand proof for all four elements.
 
 ## Evals
 
-Golden-set entries for Problem Discovery, Market Analysis, and Competition would add the expected level per element, and the check is the share of entries where code derives the expected label. The kill question and the stop criterion are judged with a rubric, as free text.
+Golden-set entries for Problem Discovery, Market Analysis, and Competition add the expected level per element, and the check is the share of entries where code derives the expected label. The kill question and the stop criterion are judged with a rubric in the Startup Generator golden set, as free text (REQ-AGENT-015).
 
-## Decisions for the owner
+## Decisions
 
-1. Does one analyst entry set E3, or are two needed?
-2. Is `validated` meant to require all four elements at E3, or may a market at E2 suffice?
-3. Which agent writes the brief, a new step or the Startup Generator?
-4. Should the label show in the API and the dashboard from the first phase-3 release, or only in the detail view?
+The owner answered these on 2026-11-04 (ADR 0040):
+
+1. One analyst entry sets E3. A second analyst may confirm.
+2. `validated` requires all four elements at E3. `documented` is the intermediate step.
+3. The Startup Generator writes the brief. No new step.
+4. The label shows on the detail page only, not in the list.

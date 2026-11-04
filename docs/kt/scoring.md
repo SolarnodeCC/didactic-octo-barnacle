@@ -46,6 +46,10 @@ The weights and derivation rules together form a score model version. A change t
 
 An analyst can confirm or dispute the current score and give a reason (REQ-SCORE-007). A review is stored next to the score and never changes the score, the band, or the ranking (ADR 0007). A new score from a rerun or a new score model version starts as unreviewed. Disputed scores feed calibration.
 
+## Readiness label
+
+A readiness label (`unproven`, `assumed`, `documented`, or `validated`) sits next to the score on the opportunity detail page (REQ-SCORE-008, ADR 0040). Plain code derives it from the evidence levels of problem, customer, market, and reason to win; why now has its own level. The label never changes the score, the weights, or the ranking, and it is not in lists. See [evidence levels and readiness label](evidence-and-readiness.md).
+
 ## Calibration
 
 Scores are checked against expert judgment on a calibration set of at least 60 opportunities (REQ-SCORE-006). The calibration report shows the rank correlation with its 95 % confidence interval and the band distribution. Most opportunities are expected in Low and Medium; if many land in Exceptional, the rules are too generous.

@@ -17,7 +17,7 @@ The documents in `docs/kt/` are the source of truth for the Research Opportunity
 4. [Data sources](data-sources/README.md): OpenAlex, arXiv, Semantic Scholar, and the ingestion scope.
 5. [Agents](agents/README.md): the multi-agent framework, contract conventions, and each agent's typed output contract.
 6. [Scoring](scoring.md): the opportunity scoring model.
-   - [Evidence levels and readiness label](evidence-and-readiness.md): design draft for option B of ADR 0036 (OQ-037).
+   - [Evidence levels and readiness label](evidence-and-readiness.md): design for option B of ADR 0036 (ADR 0040).
 7. [Roadmap](roadmap.md): MVP phases, requirements per phase, Definition of Ready, and exit criteria.
 8. [Requirements](requirements/README.md): numbered, testable requirements.
 9. [UX specification](ux/README.md): screen inventory, journeys, screen states, and wireframes.
