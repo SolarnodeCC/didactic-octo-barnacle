@@ -1,5 +1,6 @@
 id: gs-extraction-011
 publicationFixture: fixtures/arxiv/2610.26913.json
+industry: life-sciences
 expected:
   candidates:
     - finding: "Radiology workflows that need data privacy and offline operation cannot adopt proprietary cloud or GPU-hungry LLM report structuring; an edge system structures reports from radiologist dictation on a laptop CPU in about 31 seconds."

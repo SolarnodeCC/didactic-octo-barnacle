@@ -1,0 +1,19 @@
+id: gs-research-analyst-034
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2606.28364.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-037.yaml#0
+neighborsFixture: fixtures/neighbors/2606.28364.json
+expected:
+  noveltyRange: [40, 70]
+  maturity: prototype
+  industriesInclude:
+    - life-sciences
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 55
+  maturity: prototype
+  industry:
+    - life-sciences
+  technology:
+    - "OWL/RDF knowledge graph"
+    - "LLM-generated SPARQL"
+    - "regulatory classification"
+notes: "Validated on real-world use cases per the abstract, so prototype. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

@@ -1,0 +1,18 @@
+id: gs-triage-091
+publicationFixture: fixtures/arxiv/2608.16890.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: false
+    existingAlternative: false
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: clinical trial programming names no role"
+  statedHarm: "is a bottleneck in regulatory submissions"
+  trigger: "none"
+  existingAlternative: "none: the baselines are other LLM approaches"
+  adoptable: "GxP-Agent, a multi-agent system"
+notes: "NamedParty is false, so the publication is rejected at 0.4. Industry: life-sciences. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

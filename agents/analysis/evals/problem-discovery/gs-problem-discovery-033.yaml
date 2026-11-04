@@ -1,0 +1,11 @@
+id: gs-problem-discovery-033
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2606.06089.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-036.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-033.yaml
+expected:
+  requiredFacts:
+    - "actuaries leave predictive information in medical records, adjuster notes, and call transcripts unused"
+    - "manual processing of claims documents is time-consuming, inconsistent across reviewers, and unscalable"
+  customerIndustry: insurance
+  painLevelRange: [3, 4]
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

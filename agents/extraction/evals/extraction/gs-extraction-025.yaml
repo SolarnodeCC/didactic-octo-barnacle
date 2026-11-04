@@ -1,5 +1,6 @@
 id: gs-extraction-025
 publicationFixture: fixtures/arxiv/2608.26911.json
+industry: automotive
 expected:
   candidates:
     - finding: "Independent car workshops cannot use the advanced diagnostic capabilities that were limited to manufacturer tools, which weighs on their competitiveness; a federated diagnostics ecosystem would give them access."

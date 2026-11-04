@@ -1,0 +1,11 @@
+id: gs-relevance-021
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2607.06170.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-024.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-021.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-021.yaml
+expected:
+  bestIndustry: automotive
+  strategicRelevanceRange: [45, 75]
+  technicalFeasibilityRange: [10, 40]
+  implementationEffort: L
+notes: "Feasibility starts low because nothing is built; effort L for integrations with regulated records. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

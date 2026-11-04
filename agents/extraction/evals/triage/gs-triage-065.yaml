@@ -4,7 +4,7 @@ expected:
   signals:
     namedParty: false
     statedHarm: false
-    trigger: true
+    trigger: false
     existingAlternative: false
     adoptable: false
   accepted: false
@@ -12,7 +12,7 @@ expected:
 basis:
   namedParty: "none"
   statedHarm: "none"
-  trigger: "Large language models (LLMs) are increasingly considered for safety-critical engineering"
+  trigger: "none: increasing consideration of LLMs is not a named change"
   existingAlternative: "none"
   adoptable: "none: a benchmark"
 notes: "Benchmark for research; no party and no harm. Industry: automotive. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

@@ -1,0 +1,11 @@
+id: gs-relevance-025
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2606.13741.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-028.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-025.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-025.yaml
+expected:
+  bestIndustry: consumer-retail
+  strategicRelevanceRange: [55, 85]
+  technicalFeasibilityRange: [70, 95]
+  implementationEffort: L
+notes: "Merchandising and pricing fit consumer-retail; scale across markets makes effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

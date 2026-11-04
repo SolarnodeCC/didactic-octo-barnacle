@@ -1,0 +1,11 @@
+id: gs-problem-discovery-024
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2602.04464.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-027.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-024.yaml
+expected:
+  requiredFacts:
+    - "forecasts underestimate demand for most products when discounted sales of expiring perishables occur"
+    - "the bias leads to excess inventory and spoilage"
+  customerIndustry: consumer-retail
+  painLevelRange: [3, 4]
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

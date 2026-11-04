@@ -12,14 +12,14 @@ extraction/gs-extraction-NNN.yaml the expected candidates with quotes (REQ-PROC-
 
 | Set | Entries | Minimum (REQ-TEST-005) |
 |---|---|---|
-| Triage | 83 | 20 |
-| Extraction | 34 | 20 |
+| Triage | 91 | 20 |
+| Extraction | 38 | 20 |
 
-- Round 3 (draft, awaiting owner review) adds 24 triage and 11 extraction entries for automotive, consumer products and retail, energy and utilities, and aerospace and defense: 6 publications per industry, 11 accepted and 13 rejected. The industry of each new entry is in its `notes`; older entries carry none.
+- Round 3 (draft, awaiting owner review) adds 32 triage and 15 extraction entries: 6 publications each for automotive, consumer products and retail, energy and utilities, and aerospace and defense, and 4 each for insurance and life sciences, which had too few entries. Of the 32, 15 are accepted and 17 rejected.
 - Both sets reach the minimum, so the eval thresholds of triage and extraction are runnable once the harness exists.
-- Triage: 23 accepted and 36 rejected. Three entries from round 1 (`gs-triage-009`, `-010`, `-011`) reach the score cut but are rejected because `namedParty` is false.
-- Extraction: 23 entries for the 23 accepted publications. 19 have candidates (`gs-extraction-003` has two, added in the agent pilot) and 4 pass triage and yield no candidate (`gs-extraction-006`, `-015`, `-020`, `-022`, each with `candidates: []` and a `reason`).
-- Industries: the entries were labeled before the eight target industries of ADR 0037 and carry no industry field. The analysis sets use the new values (see `agents/analysis/evals/README.md`); extraction needs new publications for automotive, consumer products and retail, energy and utilities, and aerospace and defense.
+- Triage: 38 accepted and 53 rejected. Three entries from round 1 (`gs-triage-009`, `-010`, `-011`) reach the score cut but are rejected because `namedParty` is false.
+- Extraction: 38 entries for the 38 accepted publications. 34 have candidates (`gs-extraction-003` has two, added in the agent pilot) and 4 pass triage and yield no candidate (`gs-extraction-006`, `-015`, `-020`, `-022`, each with `candidates: []` and a `reason`).
+- Industries: every extraction entry has an `industry` field (the eight values of ADR 0037 or `other`). Entries per value: automotive 2, aerospace-defense 3, consumer-retail 3, energy-utilities 3, banking 6, insurance 2, public-sector 5, life-sciences 3, other 11. Triage entries carry the industry only in the notes of the round 3 entries.
 - Boundary cases are marked in the notes, for example a method paper that passes the rule and a score exactly on the cut.
 
 ## How the labels were made

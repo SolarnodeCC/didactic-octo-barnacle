@@ -1,0 +1,18 @@
+[
+  {
+    "id": "http://arxiv.org/abs/2510.27493v2",
+    "title": "Mapping Regional Disparities in Discounted Grocery Products",
+    "summary": "Food waste represents a major challenge to global climate resilience, accounting for almost 10% of annual greenhouse gas emissions. The retail sector is a critical player, mediating product flows between producers and consumers, where supply chain inefficiencies can shape which items are put on sale. Yet how these dynamics vary across geographic contexts remains largely unexplored. Here, we analyze data from Denmark's largest retail group on near-expiry products put on sale. We uncover the geospatial variations using a dual-clustering approach. We characterize multi-scale spatial relationships in retail organization by correlating store clustering -- measured using shortest-path distances along the street network -- with product clustering based on promotion co-occurrence patterns. Using a bipartite network approach, we identify three regional store clusters, and use percolation thresholds to corroborate the scale of their spatial separation. We find that stores in rural communities put meat and dairy products on sale up to 2.2 times more frequently than metropolitan areas. In contrast, metropolitan and capital regions lean toward convenience products, which have more balanced nutritional profiles but less favorable environmental impacts. By linking geographic context to retail inventory, we provide evidence that reducing food waste requires interventions tailored to local retail dynamics, highlighting the importance of region-specific sustainability strategies.",
+    "published": "2025-10-31T14:12:24Z",
+    "categories": ["physics.soc-ph", "cs.SI"],
+    "primaryCategory": "physics.soc-ph"
+  },
+  {
+    "id": "http://arxiv.org/abs/2509.24720v1",
+    "title": "Dynamic Pricing of an Expiring Item under Strategic Buyers with Stochastic Arrival",
+    "summary": "We study the optimal dynamic pricing of an expiring ticket or voucher, sold by a time-sensitive seller to strategic buyers who arrive stochastically with private values. The expiring nature creates a conflict: the seller's urgency to sell before expiration drives price reductions, which in turn incentivize buyers to wait. We seek the seller's optimal pricing policy that resolves this tension. The main analytical challenge is that buyer type is two-dimensional (valuation and arrival time), which makes equilibrium intractable under general strategies. To address this, we introduce the Value-Based Threshold (VBT) strategy, a tractable framework that decouples these two dimensions. Using this framework, we prove equilibrium existence via an ordinary differential equation and provide a constructive procedure for its characterization. We then derive near-optimal pricing policies for two stylized regimes: a constant price in thin markets and a linear discount in thick markets. Numerical frontier analysis confirms these benchmarks and shows how optimal policy adapts as the seller's time sensitivity changes. Our findings clarify the conflict between quick sales and strategic waiting. Sellers facing thick markets or high time sensitivity benefit from linear discounts, while in thin markets a constant price neutralizes buyers' incentive to wait. We also show this simple policy remains robust across broad conditions. For patient sellers, a quasi-auction schedule that maintains a high price until a sharp final drop is most effective in aggregating demand.",
+    "published": "2025-09-29T12:48:03Z",
+    "categories": ["cs.GT"],
+    "primaryCategory": "cs.GT"
+  }
+]

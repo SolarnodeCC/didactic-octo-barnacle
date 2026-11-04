@@ -1,0 +1,34 @@
+[
+  {
+    "id": "http://arxiv.org/abs/2606.12065v1",
+    "title": "Automating Geometry-Intensive Compliance Checking in BIM: Graph-Based Semantic Reasoning Framework",
+    "summary": "Automating compliance check for geometry-intensive regulations remains a significant technical bottleneck in Building Information Modeling (BIM), primarily due to the semantic disparity between high-level regulatory logic and structured IFC data. Existing methods, often reliant on static rule templates, struggle to traverse multi-hop reasoning chains or resolve latent spatial dependencies across multiple building entities. To address these challenges, a Spatial-Geometric Reasoning System for Building Information Modeling (SGR-BIM) is proposed as an integrative graph-driven reasoning framework. SGR-BIM dynamically constructs a cross-modal knowledge graph that aligns user intent, regulatory semantics, and BIM geometry, enabling interpretable reasoning without rigid hard-coding. Validated on 679 expert-verified queries from fire safety codes, the framework achieves 84.3% accuracy, representing an 8.6% improvement over enhanced-tool single-agent baselines. This research provides a graph-based semantic reasoning paradigm, enhancing the transparency and flexibility of automated geometric compliance check workflows in the Architecture, Engineering, and Construction (AEC) industry.",
+    "published": "2026-06-10T13:31:43Z",
+    "categories": ["cs.AI", "cs.MA"],
+    "primaryCategory": "cs.AI"
+  },
+  {
+    "id": "http://arxiv.org/abs/2508.20144v3",
+    "title": "Navigating the EU AI Act: Foreseeable Challenges in Qualifying Deep Learning-Based Automated Inspections of Class III Medical Devices",
+    "summary": "As deep learning (DL) technologies advance, their application in automated visual inspection for Class III medical devices offers significant potential to enhance quality assurance and reduce human error. However, the adoption of such AI-based systems introduces new regulatory complexities-particularly under the EU Artificial Intelligence (AI) Act, which imposes high-risk system obligations that differ in scope and depth from established regulatory frameworks such as the Medical Device Regulation (MDR) and the U.S. FDA Quality System Regulation (QSR). This paper presents a high-level technical assessment of the foreseeable challenges that manufacturers are likely to encounter when qualifying DL-based automated inspections -- specifically static models -- within the existing medical device compliance landscape. It examines divergences in risk management principles, dataset governance, model validation, explainability requirements, and post-deployment monitoring obligations. The discussion also explores potential implementation strategies and highlights areas of uncertainty, including data retention burdens, global compliance implications, and the practical difficulties of achieving statistical significance in validation with limited defect data. Disclaimer: This paper presents a technical perspective and does not constitute legal or regulatory advice.",
+    "published": "2025-08-27T09:17:03Z",
+    "categories": ["cs.CY", "cs.AI"],
+    "primaryCategory": "cs.CY"
+  },
+  {
+    "id": "http://arxiv.org/abs/2605.29742v2",
+    "title": "Citation-Closure Retrieval and Per-Rule Attribution for Real-World Regulatory Compliance Question Answering",
+    "summary": "Deploying Large Language Models (LLMs) for regulatory compliance demands rigorous traceability via comprehensive citations across multi-tiered authority structures. Unlike traditional multi-hop or legal QA, this task requires structured procedural lookups and evidence-set closure rather than entity resolution or case-law reasoning. Existing RAG systems struggle here due to flattened citation edges, fragmented retrieval expansions, and fragile post-hoc attribution. We formalize Regulatory Compliance QA with RegOps-Bench, a novel benchmark featuring an Operational Knowledge Graph derived from complex national R\\&D regulations. To address these bottlenecks, we propose RefWalk, a unified framework driven by a shared topic anchor. RefWalk traverses cross-document citations, fuses multi-view candidates via max-based aggregation, and enforces per-rule attribution to explicitly map claims to sources. We establish a strong baseline with substantial improvements in retrieval recall and citation accuracy. Finally, a contrastive evaluation on a U.S. health compliance dataset (HIPAA) reveals that existing systems exhibit saturation on flat-structure rules, underscoring the need for RegOps-Bench. Our code is available at https://github.com/yeongjoonJu/RefWalk.",
+    "published": "2026-05-28T10:38:38Z",
+    "categories": ["cs.AI"],
+    "primaryCategory": "cs.AI"
+  },
+  {
+    "id": "http://arxiv.org/abs/2606.01208v1",
+    "title": "Schema-Agnostic Knowledge Graph Construction via Hybrid Ontology Discovery for Cyber Threat Intelligence",
+    "summary": "Cyber threat intelligence (CTI) reports now serve as essential resources for capturing adversary tactics, techniques, and procedures observed in modern attack campaigns. While traditional CTI platforms reduce this intelligence to isolated indicators through fixed schemas such as STIX, ontology-based representations preserve the semantic relationships needed for structured threat analysis. However, existing approaches for ontology-aligned CTI extraction face three challenges: (i) schema-specific pipelines that require manual reconfiguration whenever the schema changes, (ii) prompt-based schema inclusion that fails to scale on large ontologies such as UCO, and (iii) reliance on enterprise LLM APIs that conflicts with privacy constraints when integrating sensitive internal incident data. In this paper, we present ANCHOR, a schema-agnostic CTI knowledge graph construction system that bridges LLMs and formal ontology schemas. At the core of ANCHOR is hybrid ontology discovery, a search-and-navigate mechanism that dynamically explores large-scale ontology schemas, combined with SHACL-based validation to enforce schema-compliant type assignments. Experimental results on the UCO, STIX, and MALOnt schemas show that ANCHOR outperforms existing baselines in ontology typing and schema compliance. In addition, ANCHOR with a local LLM closely matches enterprise LLM typing performance, enabling privacy-preserving CTI analysis with high fidelity.",
+    "published": "2026-05-31T12:56:37Z",
+    "categories": ["cs.CR"],
+    "primaryCategory": "cs.CR"
+  }
+]

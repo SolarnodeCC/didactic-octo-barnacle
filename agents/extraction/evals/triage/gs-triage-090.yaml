@@ -1,0 +1,18 @@
+id: gs-triage-090
+publicationFixture: fixtures/arxiv/2606.27174.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: true
+    existingAlternative: false
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: the text names no party that triages recalls"
+  statedHarm: "The growing volume of FDA recall records presents challenges in post-report recall triage, severity assessment, and root-cause interpretation"
+  trigger: "The growing volume of FDA recall records"
+  existingAlternative: "none: only other models"
+  adoptable: "an automated recall triage framework"
+notes: "Boundary case: the score reaches the cut (0.6) but NamedParty is false. Industry: life-sciences. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

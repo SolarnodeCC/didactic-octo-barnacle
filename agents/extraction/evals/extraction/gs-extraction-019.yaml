@@ -1,5 +1,6 @@
 id: gs-extraction-019
 publicationFixture: fixtures/arxiv/2608.22389.json
+industry: banking
 expected:
   candidates:
     - finding: "European payment service providers must settle euro credit transfers in under ten seconds, which removes the overnight batch window for anti-money-laundering analytics and forces detection, explanation, and decision into a single-digit-second envelope."

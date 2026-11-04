@@ -1,5 +1,6 @@
 id: gs-extraction-023
 publicationFixture: fixtures/arxiv/2605.15165.json
+industry: public-sector
 expected:
   candidates:
     - finding: "Congested SNAP call centers in Missouri caused nearly half of application denials to be procedural, because applicants could not complete required interviews, and standard Erlang-A staffing guidance understaffs by ignoring redials and abandonment."

@@ -1,0 +1,11 @@
+id: gs-problem-discovery-028
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2604.26150.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-031.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-028.yaml
+expected:
+  requiredFacts:
+    - "utilities de-energize parts of the grid to prevent wildfire ignitions and the shutoffs impose costs on communities"
+    - "current mixed integer programming methods need restrictive assumptions about line-failure probability models"
+  customerIndustry: energy-utilities
+  painLevelRange: [4, 5]
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

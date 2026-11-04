@@ -1,5 +1,6 @@
 id: gs-extraction-003
 publicationFixture: fixtures/arxiv/2610.40071.json
+industry: other
 expected:
   candidates:
     - finding: "AI coding agents leave no durable record of what they did, which model and tools they used, or who was accountable, so audit and compliance controls built for human commits fail; signed attestations of agent sessions could close the gap."

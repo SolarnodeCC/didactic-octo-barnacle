@@ -2,7 +2,7 @@
 title: Golden sets and reviewers
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-01
+last_reviewed: 2026-11-03
 related: [REQ-TEST-004, REQ-TEST-005, REQ-SCORE-006, REQ-AGENT-001]
 ---
 
@@ -81,6 +81,7 @@ An extraction item lists the expected candidates, or an empty list with the reas
 ```yaml
 id: gs-extraction-001
 publicationFixture: fixtures/openalex/work-001.json
+industry: public-sector       # the customer's industry (ADR 0037), or other
 expected:
   candidates:
     - finding: "One sentence that states the problem."
@@ -89,6 +90,8 @@ expected:
       customerQuote: "Verbatim from the abstract."
 notes: "Reviewer R7, 2026-.."
 ```
+
+`industry` is one of the eight target industries or `other`. It is the industry of the customer in the first candidate (or of the publication, for an entry without a candidate), and it lets a check count the entries per industry (REQ-TEST-005, criterion 1).
 
 An entry for a publication that passes triage but yields no candidate has `candidates: []` and a `reason` string under `expected`:
 

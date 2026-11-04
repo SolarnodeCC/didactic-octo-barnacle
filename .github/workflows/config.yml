@@ -39,6 +39,9 @@ jobs:
       - name: Check KT documents
         run: python3 scripts/check-kt.py
 
+      - name: Check golden sets
+        run: python3 scripts/check-golden-sets.py
+
       - name: Check repository hardening
         run: python3 scripts/check-hardening.py
 

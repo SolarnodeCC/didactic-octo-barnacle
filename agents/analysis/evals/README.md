@@ -11,28 +11,30 @@ fixtures/neighbors/<arXiv id>.json               the nearest publications that s
 
 Publications are read from `agents/extraction/evals/fixtures/arxiv/`. Candidates are read from the expected candidates of the extraction golden set, through `candidateRef`.
 
-## State after the Relevance round
+## State after round 3
 
 | Agent | Entries | Minimum (REQ-TEST-005) |
 |---|---|---|
-| Research Analyst | 20 | 20 |
-| Problem Discovery | 20 | 20 |
-| Relevance | 20 | 20 |
+| Research Analyst | 35 | 20 |
+| Problem Discovery | 35 | 20 |
+| Relevance | 35 | 20 |
 
-- The 20 candidates are the 19 publications of the extraction set that yield a candidate, plus a second candidate of `2610.40071` (`gs-extraction-003`, index 1). The two entries of that publication share its fixtures.
-- Industries use the eight target industries of ADR 0037 plus `other`. Entries per value after the relabel of 2026-11-03:
+- The 35 candidates are the 34 publications of the extraction set that yield a candidate (`gs-extraction-001` to `-038`, without the four that yield none), plus a second candidate of `2610.40071` (`gs-extraction-003`, index 1). The two entries of that publication share its fixtures. Entries 001 to 020 are the pilot and Relevance rounds; entries 021 to 035 are round 3 (draft labels, confirmed when the pull request is merged).
+- Industries use the eight target industries of ADR 0037 plus `other`. Entries per value:
 
 | Value | Research Analyst (industries that must appear) | Problem Discovery (customer industry) | Relevance (best industry) |
 |---|---|---|---|
+| `automotive` | 2 | 2 | 2 |
+| `aerospace-defense` | 5 | 3 | 3 |
+| `consumer-retail` | 3 | 3 | 3 |
+| `energy-utilities` | 3 | 3 | 3 |
 | `banking` | 6 | 4 | 7 |
-| `insurance` | 4 | 0 | 1 |
+| `insurance` | 6 | 2 | 3 |
 | `public-sector` | 5 | 5 | 5 |
-| `life-sciences` | 3 | 1 | 7 |
-| `aerospace-defense` | 2 | 0 | 0 |
+| `life-sciences` | 5 | 3 | 9 |
 | `other` | 7 | 10 | not allowed |
-| `automotive`, `consumer-retail`, `energy-utilities` | 0 | 0 | 0 |
 
-- Care providers (nurses, emergency departments, psychiatric intake, telephone triage) and cross-industry software are `other` for Research Analyst and Problem Discovery; Relevance scores them against `life-sciences` or `banking` with lower strategic relevance ranges. `automotive`, `consumer-retail` and `energy-utilities` have no entries yet, and `aerospace-defense` only appears as a required industry of the two entries of `2610.40071`. New rounds are needed before these sets can cover all eight industries (REQ-TEST-005).
+- Every one of the eight industries now has entries in all three sets. Care providers (nurses, emergency departments, psychiatric intake, telephone triage) and cross-industry software stay `other` for Research Analyst and Problem Discovery; Relevance scores them against `life-sciences` or `banking` with lower strategic relevance ranges.
 - Relevance reads the frozen `handoff` blocks and the Problem Discovery facts of the same entries. Its ranges are at most 30 points wide.
 - The other three agents (Market Analysis, Competition, Startup Generator) have no entries yet. Market Analysis and Competition need recorded search results first (REQ-AGENT-013).
 
@@ -42,4 +44,4 @@ The platform's corpus does not exist yet, so the ten nearest publications were t
 
 ## How the labels were made
 
-Remco Oostelaar reviewed the pilot round and the Relevance round on 2026-11-02. Claude drafted the ranges and the required facts and is not a candidate model in the benchmark. Ranges are the allowed margin: a model output inside the range passes. A Novelty range is at most 30 points wide and a PainLevel range at most 2 wide. `handoff` holds the Novelty at the middle of the range plus the Maturity, industries, and technologies of the expected entry.
+Remco Oostelaar reviewed the pilot round and the Relevance round on 2026-11-02; round 3 is drafted for his review in the pull request. Claude drafted the ranges and the required facts and is not a candidate model in the benchmark. Ranges are the allowed margin: a model output inside the range passes. A Novelty range is at most 30 points wide and a PainLevel range at most 2 wide. `handoff` holds the Novelty at the middle of the range plus the Maturity, industries, and technologies of the expected entry.

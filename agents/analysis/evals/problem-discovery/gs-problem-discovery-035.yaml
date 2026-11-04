@@ -1,0 +1,11 @@
+id: gs-problem-discovery-035
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.33279.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-038.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-035.yaml
+expected:
+  requiredFacts:
+    - "rising volumes of individual case safety reports challenge expert-led causality assessment in pharmacovigilance"
+    - "agreement with experts is 79.4% on the final classification and lower on alternative causes"
+  customerIndustry: life-sciences
+  painLevelRange: [3, 4]
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

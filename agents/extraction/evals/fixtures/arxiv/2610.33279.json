@@ -1,0 +1,10 @@
+{
+  "id": "http://arxiv.org/abs/2610.33279v1",
+  "title": "Multi-Agent Retrieval-Augmented Causality Assessment (MARCA) of Individual Case Safety Reports in Pharmacovigilance",
+  "summary": "Introduction: Increasing volumes of individual case safety reports (ICSRs) challenge expert-led causality assessment in pharmacovigilance. We developed MARCA (Multi-Agent Retrieval-Augmented Causality Assessment), a four-agent framework for Naranjo-based assessment, and evaluated agreement with human experts and exploratory differences between non-RAG and RAG-labelled scores. Methods: MARCA combined scientific literature retrieval, drug-label assessment, objective-evidence classification, and clinical causality reasoning using Gemini 2.5 Pro and DeepSeek-V3.2. Agent-generated rationales informed human-assisted scoring. A consensus expert reference standard covered 215 ICSRs and 1,562 drug-event combinations (DECs) from FAERS (Q1-Q2 2025). Agreement was measured using percentage agreement and Cohen's kappa. Results: Question-level agreement was 96.8% for Naranjo Q2 (kappa = 0.491; 95% CI 0.265-0.663), 85.4% for Q5 (kappa = 0.269; 95% CI 0.180-0.340), and 96.8% for Q10 (kappa = 0.922; 95% CI 0.885-0.951). Final causality classification agreement was 79.4% (95% CI 71.8-85.3; kappa = 0.587, 95% CI 0.450-0.690). In a retrospective subset of 60 DECs, agreement was higher for RAG-labelled than non-RAG scores for Q5 (83.3% vs 65.0%) and Q10 (100.0% vs 18.3%). Discussion: MARCA-assisted assessment showed substantial variation in agreement across Naranjo questions, with lower concordance for alternative causes. Retrospective RAG comparisons are exploratory and do not establish prospective effectiveness.",
+  "published": "2026-10-23T20:43:29Z",
+  "categories": ["cs.CL"],
+  "primaryCategory": "cs.CL",
+  "pdfUrl": "https://arxiv.org/pdf/2610.33279v1",
+  "withdrawn": false
+}

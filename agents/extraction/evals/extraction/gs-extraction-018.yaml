@@ -1,5 +1,6 @@
 id: gs-extraction-018
 publicationFixture: fixtures/arxiv/2606.17555.json
+industry: banking
 expected:
   candidates:
     - finding: "Banks face fraud and money-laundering behavior that is engineered to resemble legitimate activity, and static rule engines remain blind to payment redirection, session hijacking, and laundering layering."

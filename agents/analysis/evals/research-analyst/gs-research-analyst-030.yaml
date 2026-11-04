@@ -1,0 +1,19 @@
+id: gs-research-analyst-030
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2608.22569.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-033.yaml#0
+neighborsFixture: fixtures/neighbors/2608.22569.json
+expected:
+  noveltyRange: [40, 70]
+  maturity: lab-result
+  industriesInclude:
+    - aerospace-defense
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 55
+  maturity: lab-result
+  industry:
+    - aerospace-defense
+  technology:
+    - "stochastic mixed-integer optimisation"
+    - "remaining useful life"
+    - "neural surrogate"
+notes: "Evaluated on scenarios derived from airline data, so lab-result. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

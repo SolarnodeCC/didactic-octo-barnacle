@@ -1,0 +1,11 @@
+id: gs-problem-discovery-030
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2608.22569.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-033.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-030.yaml
+expected:
+  requiredFacts:
+    - "airlines optimize tail assignment and maintenance scheduling separately or in sequence"
+    - "ignoring remaining-useful-life uncertainty raises downstream disruption costs and flight cancellations"
+  customerIndustry: aerospace-defense
+  painLevelRange: [3, 4]
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

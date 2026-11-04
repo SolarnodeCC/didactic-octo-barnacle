@@ -1,5 +1,6 @@
 id: gs-extraction-021
 publicationFixture: fixtures/arxiv/2605.06703.json
+industry: other
 expected:
   candidates:
     - finding: "Enterprise modernization programs fail at a documented and costly rate because organizations lack structured, repeatable routines to plan, execute, validate, and hand off technology change."

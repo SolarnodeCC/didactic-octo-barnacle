@@ -2,7 +2,7 @@
 title: CI gates
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-10-31
+last_reviewed: 2026-11-03
 related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-NFR-021]
 ---
 
@@ -36,8 +36,11 @@ Dependency review is covered by `pnpm audit:ci` and Dependabot (ADR 0033); GitHu
 ```bash
 python3 scripts/check-config.py
 python3 scripts/check-kt.py
+python3 scripts/check-golden-sets.py
 python3 scripts/check-hardening.py
 ```
+
+`check-golden-sets.py` checks the golden sets under `agents/*/evals` (REQ-TEST-005): references, verbatim extraction quotes, the triage rule, range widths, enums, and at least one extraction entry per industry. It reads files and calls no model.
 
 It also runs the `install` command from `.cursor/environment.json` twice to prove it is idempotent.
 

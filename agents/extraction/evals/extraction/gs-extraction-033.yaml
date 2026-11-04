@@ -1,5 +1,6 @@
 id: gs-extraction-033
 publicationFixture: fixtures/arxiv/2608.22569.json
+industry: aerospace-defense
 expected:
   candidates:
     - finding: "Airlines optimize tail assignment and maintenance scheduling separately or in sequence, so predictive health information goes unused, which raises downstream disruption costs and flight cancellations."

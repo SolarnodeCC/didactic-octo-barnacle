@@ -1,0 +1,11 @@
+id: gs-relevance-032
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2609.37454.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-035.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-032.yaml
+problemDiscoveryRef: problem-discovery/gs-problem-discovery-032.yaml
+expected:
+  bestIndustry: insurance
+  strategicRelevanceRange: [65, 95]
+  technicalFeasibilityRange: [50, 80]
+  implementationEffort: L
+notes: "Underwriting is a clear focus area; data residency and integrations make effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

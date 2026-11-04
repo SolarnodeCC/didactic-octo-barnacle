@@ -1,0 +1,11 @@
+id: gs-problem-discovery-032
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2609.37454.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-035.yaml#0
+researchAnalystRef: research-analyst/gs-research-analyst-032.yaml
+expected:
+  requiredFacts:
+    - "commercial P&C underwriters spend 30 to 40% of their time on administrative work and a submission takes about 40 minutes by hand"
+    - "sensitive submission data must not leave the perimeter"
+  customerIndustry: insurance
+  painLevelRange: [3, 4]
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

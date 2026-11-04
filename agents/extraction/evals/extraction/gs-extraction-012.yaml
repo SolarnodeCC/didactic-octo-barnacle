@@ -1,5 +1,6 @@
 id: gs-extraction-012
 publicationFixture: fixtures/arxiv/2610.18679.json
+industry: other
 expected:
   candidates:
     - finding: "Healthcare professionals who use AI forecasts for nurse scheduling frequently misinterpret the communicated uncertainty, which reduces their decision confidence."

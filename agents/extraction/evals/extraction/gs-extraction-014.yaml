@@ -1,5 +1,6 @@
 id: gs-extraction-014
 publicationFixture: fixtures/arxiv/2609.21149.json
+industry: other
 expected:
   candidates:
     - finding: "Health systems that deploy AI-assisted psychiatric intake need a practical way to evaluate it against their clinical standards without burdening clinicians."

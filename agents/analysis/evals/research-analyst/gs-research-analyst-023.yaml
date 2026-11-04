@@ -1,0 +1,19 @@
+id: gs-research-analyst-023
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2604.05987.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-026.yaml#0
+neighborsFixture: fixtures/neighbors/2604.05987.json
+expected:
+  noveltyRange: [30, 60]
+  maturity: prototype
+  industriesInclude:
+    - consumer-retail
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 45
+  maturity: prototype
+  industry:
+    - consumer-retail
+  technology:
+    - "agentic AI"
+    - "fine-tuned domain LLMs"
+    - "Model Context Protocol"
+notes: "Validated with a large supermarket chain; the abstract gives no production use, so prototype. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

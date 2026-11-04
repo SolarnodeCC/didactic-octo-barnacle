@@ -1,5 +1,6 @@
 id: gs-extraction-024
 publicationFixture: fixtures/arxiv/2607.06170.json
+industry: automotive
 expected:
   candidates:
     - finding: "Indian EV makers carry a new and fast growing burden of compliance evidence (type approval reports, battery safety records, supplier quality packages) with manual bottlenecks and retention horizons that reach a decade past end of production, and no information system maps it."

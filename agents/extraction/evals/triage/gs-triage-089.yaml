@@ -1,0 +1,18 @@
+id: gs-triage-089
+publicationFixture: fixtures/arxiv/2610.33279.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: true
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "expert-led causality assessment in pharmacovigilance"
+  statedHarm: "Increasing volumes of individual case safety reports (ICSRs) challenge expert-led causality assessment in pharmacovigilance"
+  trigger: "Increasing volumes of individual case safety reports (ICSRs)"
+  existingAlternative: "expert-led causality assessment"
+  adoptable: "MARCA (Multi-Agent Retrieval-Augmented Causality Assessment), a four-agent framework"
+notes: "Boundary case: the party is the pharmacovigilance expert, named through the role rather than a noun of its own. All five signals true (score 1.0). Industry: life-sciences. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

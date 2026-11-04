@@ -1,0 +1,19 @@
+id: gs-research-analyst-028
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2604.26150.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-031.yaml#0
+neighborsFixture: fixtures/neighbors/2604.26150.json
+expected:
+  noveltyRange: [40, 70]
+  maturity: lab-result
+  industriesInclude:
+    - energy-utilities
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 55
+  maturity: lab-result
+  industry:
+    - energy-utilities
+  technology:
+    - "reinforcement learning"
+    - "Public Safety Power Shutoffs"
+    - "wildfire ignition risk models"
+notes: "Tested on 54-bus and 138-bus simulations, so lab-result. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

@@ -1,0 +1,19 @@
+id: gs-research-analyst-025
+publicationFixture: ../../extraction/evals/fixtures/arxiv/2606.13741.json
+candidateRef: ../../extraction/evals/extraction/gs-extraction-028.yaml#0
+neighborsFixture: fixtures/neighbors/2606.13741.json
+expected:
+  noveltyRange: [20, 50]
+  maturity: field-tested
+  industriesInclude:
+    - consumer-retail
+handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
+  novelty: 35
+  maturity: field-tested
+  industry:
+    - consumer-retail
+  technology:
+    - "forecast-then-optimize pricing"
+    - "gradient-boosted trees"
+    - "multi-objective optimization"
+notes: "Deployed in production after 23 A/B tests, so field-tested. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."

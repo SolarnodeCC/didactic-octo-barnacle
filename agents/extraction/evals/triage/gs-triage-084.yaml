@@ -1,0 +1,18 @@
+id: gs-triage-084
+publicationFixture: fixtures/arxiv/2609.37454.json
+expected:
+  signals:
+    namedParty: true
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: true
+  reason: accepted
+basis:
+  namedParty: "Underwriters in commercial Property and Casualty (P&C) insurance"
+  statedHarm: "spend 30 to 40% of their time on administrative work rather than risk judgment"
+  trigger: "none"
+  existingAlternative: "a single submission takes about 40 minutes by hand"
+  adoptable: "Governing the Edge, a multi-agent framework"
+notes: "Commercial P&C underwriting. Industry: insurance. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."

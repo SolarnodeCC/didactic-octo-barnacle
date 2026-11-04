@@ -1,5 +1,6 @@
 id: gs-extraction-002
 publicationFixture: fixtures/arxiv/2610.40164.json
+industry: public-sector
 expected:
   candidates:
     - finding: "National regulators lack consistent data to compare media ownership concentration across countries, and AI search systems may concentrate attention on news outlets further; a harmonised ownership dataset with concentration indices would let them monitor it."

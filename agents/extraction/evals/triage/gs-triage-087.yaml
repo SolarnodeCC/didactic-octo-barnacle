@@ -1,0 +1,18 @@
+id: gs-triage-087
+publicationFixture: fixtures/arxiv/2609.30765.json
+expected:
+  signals:
+    namedParty: false
+    statedHarm: true
+    trigger: false
+    existingAlternative: true
+    adoptable: true
+  accepted: false
+  reason: low-score
+basis:
+  namedParty: "none: an actuarial task, with no party named"
+  statedHarm: "repeated reserve calculations become computationally expensive"
+  trigger: "none"
+  existingAlternative: "Classical reserve methods based on Thiele's differential equation"
+  adoptable: "an Insurance Reserve Intelligence Platform"
+notes: "Boundary case: harm, alternative, and adoptable are true, but no party is named, so NamedParty is false. Industry: insurance. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."
