@@ -27,7 +27,7 @@ Options 2 and 3 combined in this way: the bootstrap script no longer lists Durab
 
 ## Consequences
 
-- `desiredResources` in `infrastructure/cloudflare/src/bootstrap.ts` has six resources per environment.
+- `desiredResources` in `infrastructure/cloudflare/src/bootstrap.ts` has seven resources per environment: the second R2 bucket, `roi-search-fixtures-<env>`, was added with [ADR 0039](0039-private-search-fixtures-from-tavily.md).
 - The Durable Object class and its `wrangler.toml` migration are added with the first feature that needs it.
 - A changed embedding model means a new index name or a delete and recreate, and a re-embedding of all stored vectors (REQ-PROC-001).
 - ADR 0020 is unchanged in its other parts.

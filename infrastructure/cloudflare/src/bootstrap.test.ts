@@ -26,6 +26,7 @@ describe("REQ-NFR-020: environment bootstrap is idempotent", () => {
     expect(resources.map((resource) => resource.Name)).toEqual([
       "roi-preview",
       "roi-documents-preview",
+      "roi-search-fixtures-preview",
       "roi-publications-preview",
       "roi-publications-dlq-preview",
       "roi-publications-preview",
