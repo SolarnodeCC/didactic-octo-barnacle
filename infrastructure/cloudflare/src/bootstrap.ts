@@ -32,6 +32,8 @@ export function desiredResources(environment: EnvironmentName): DesiredResource[
   return [
     { Kind: "d1", Name: `roi-${suffix}` },
     { Kind: "r2", Name: `roi-documents-${suffix}` },
+    // Private store for recorded search results (ADR 0039, REQ-AGENT-013).
+    { Kind: "r2", Name: `roi-search-fixtures-${suffix}` },
     { Kind: "queue", Name: `roi-publications-${suffix}` },
     { Kind: "queue-dlq", Name: `roi-publications-dlq-${suffix}` },
     { Kind: "vectorize", Name: `roi-publications-${suffix}` },
