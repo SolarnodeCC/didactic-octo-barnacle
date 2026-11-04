@@ -23,6 +23,12 @@ migrations_dir = "migrations"
 binding = "DOCUMENTS"
 bucket_name = "roi-documents-local"
 
+# Private store for recorded search results in every environment (ADR 0039, REQ-AGENT-013).
+# Never public; git holds only manifests.
+[[r2_buckets]]
+binding = "SEARCH_FIXTURES"
+bucket_name = "roi-search-fixtures-local"
+
 [[queues.producers]]
 binding = "PUBLICATION_QUEUE"
 queue = "roi-publications-local"
@@ -53,6 +59,10 @@ migrations_dir = "migrations"
 [[env.preview.r2_buckets]]
 binding = "DOCUMENTS"
 bucket_name = "roi-documents-preview"
+
+[[env.preview.r2_buckets]]
+binding = "SEARCH_FIXTURES"
+bucket_name = "roi-search-fixtures-preview"
 
 [[env.preview.queues.producers]]
 binding = "PUBLICATION_QUEUE"
@@ -93,7 +103,6 @@ migrations_dir = "migrations"
 binding = "DOCUMENTS"
 bucket_name = "roi-documents-staging"
 
-# Private store for recorded search results (ADR 0039, REQ-AGENT-013). Never public; git holds only manifests.
 [[env.staging.r2_buckets]]
 binding = "SEARCH_FIXTURES"
 bucket_name = "roi-search-fixtures-staging"
@@ -135,6 +144,10 @@ migrations_dir = "migrations"
 [[env.production.r2_buckets]]
 binding = "DOCUMENTS"
 bucket_name = "roi-documents-production"
+
+[[env.production.r2_buckets]]
+binding = "SEARCH_FIXTURES"
+bucket_name = "roi-search-fixtures-production"
 
 [[env.production.queues.producers]]
 binding = "PUBLICATION_QUEUE"
