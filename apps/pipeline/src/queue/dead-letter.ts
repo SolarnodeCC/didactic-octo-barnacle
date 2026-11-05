@@ -11,6 +11,8 @@ import {
   getRun,
 } from "../store/run-repo.js";
 
+const MAX_ERROR_LENGTH = 500;
+
 export type DeadLetterOutcome = "recorded" | "already-recorded" | "unreadable";
 
 /**
@@ -37,19 +39,23 @@ export async function handleDeadLetter(
   const now = deps.Now();
 
   const existing = await deps.Db.prepare(
-    "SELECT status FROM queue_message_log WHERE message_id = ?",
+    "SELECT status, last_error FROM queue_message_log WHERE message_id = ?",
   )
     .bind(envelope.MessageId)
-    .first<{ status: string }>();
+    .first<{ status: string; last_error: string | null }>();
   if (existing?.status === "dead-lettered") {
     return "already-recorded";
   }
+
+  // The consumer stored the error of the last failed attempt (`markFailed`); keep it, so
+  // the cause of a dead letter is not replaced by a generic reason.
+  const detail = existing?.last_error ? `${reason}; last error: ${existing.last_error}` : reason;
 
   const statements = [
     existing
       ? deps.Db.prepare(
           "UPDATE queue_message_log SET status = 'dead-lettered', dead_letter = 1, last_error = ?, updated_at = ? WHERE message_id = ?",
-        ).bind(reason, now, envelope.MessageId)
+        ).bind(detail.slice(0, MAX_ERROR_LENGTH), now, envelope.MessageId)
       : deps.Db.prepare(
           "INSERT INTO queue_message_log (id, message_id, type, schema_version, status, attempts, dead_letter, last_error, updated_at, created_at, payload_json) VALUES (?, ?, ?, ?, 'dead-lettered', 0, 1, ?, ?, ?, ?)",
         ).bind(
@@ -57,7 +63,7 @@ export async function handleDeadLetter(
           envelope.MessageId,
           envelope.Type,
           envelope.SchemaVersion,
-          reason,
+          detail.slice(0, MAX_ERROR_LENGTH),
           now,
           now,
           JSON.stringify(envelope),
@@ -70,7 +76,7 @@ export async function handleDeadLetter(
   if (run && closesRun) {
     const counts = addCounts(run.Counts, { ...emptyCounts(), DeadLettered: 1 });
     const failures = appendFailures(run.Failures, [
-      { SourceId: null, Reason: `message ${envelope.MessageId} dead-lettered: ${reason}` },
+      { SourceId: null, Reason: `message ${envelope.MessageId} dead-lettered: ${detail}` },
     ]);
     statements.push(
       deps.Db.prepare(
@@ -86,14 +92,14 @@ export async function handleDeadLetter(
   }
 
   await deps.Db.batch(statements);
-  deps.Log?.("dead_letter.recorded", { messageId: envelope.MessageId, runId });
+  deps.Log?.("dead_letter.recorded", { messageId: envelope.MessageId, runId, reason: detail });
   const report = runId ? await reportForAlert(deps, runId, now) : null;
   await notify(deps, {
     Type: "dead-letter",
     Source: envelope.Ids.Source ?? envelope.Type,
     ...(runId ? { RunId: runId } : {}),
     MessageId: envelope.MessageId,
-    Summary: `A ${envelope.Type} message was dead-lettered after its retries${closesRun ? "; its run was closed as failed" : ""}.`,
+    Summary: `A ${envelope.Type} message was dead-lettered after its retries${closesRun ? "; its run was closed as failed" : ""}. Cause: ${detail}`,
     ...(report ? { Report: report } : {}),
   });
   return "recorded";
