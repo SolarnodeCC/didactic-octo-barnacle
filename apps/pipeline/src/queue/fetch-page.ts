@@ -7,6 +7,7 @@ import {
   ingestOpenAlexWorks,
   type IngestResult,
 } from "../ingest/ingest-page.js";
+import { SCOPE_ARXIV_CATEGORIES } from "../normalize/scope.js";
 import { earliestWindowStart } from "../schedule/window.js";
 import { pendingDocumentIds } from "../store/document-repo.js";
 import { finishRunStatement, getRun, recordPageStatement, type RunRow } from "../store/run-repo.js";
@@ -63,12 +64,19 @@ async function fetchAndIngest(deps: PipelineDeps, run: RunRow): Promise<FetchedP
   if (!Number.isInteger(start) || start < 0) {
     throw new Error("the saved arXiv page offset is not a number");
   }
-  const fetched = await deps.Sources.FetchArxivPage({ Start: start, MaxResults: pageSize });
+  // Only preprints whose first version is within the limit; a new version of a recent one
+  // still comes back, because the feed is sorted by the last update.
+  const fetched = await deps.Sources.FetchArxivPage({
+    Start: start,
+    MaxResults: pageSize,
+    SubmittedFrom: limit,
+    SubmittedTo: runDay,
+  });
   // The feed is newest first: an entry updated before the window ends the run.
   const inWindow = fetched.Entries.filter((entry) => entry.updated.slice(0, 10) >= from);
   const reachedOlder = inWindow.length < fetched.Entries.length;
   return {
-    Result: await ingestArxivEntries(ingestDeps, inWindow),
+    Result: await ingestArxivEntries(ingestDeps, inWindow, SCOPE_ARXIV_CATEGORIES, limit),
     HasMore: fetched.Returned >= pageSize && !reachedOlder,
     NextCursor: String(start + pageSize),
   };

@@ -7,6 +7,14 @@ export type ArxivPageRequest = {
   Start?: number;
   MaxResults?: number;
   Categories?: readonly string[];
+  /**
+   * First day (YYYY-MM-DD) on which the first version of a preprint may have been
+   * submitted. Sent as a `submittedDate` range, so older preprints are never returned, also
+   * when they have a new version (REQ-DATA-009 AC3 and AC6). Omit for no limit.
+   */
+  SubmittedFrom?: string;
+  /** Last day (YYYY-MM-DD) of that range; the day of the run. Defaults to a far future day. */
+  SubmittedTo?: string;
 };
 
 export type ArxivPage = {
@@ -20,9 +28,17 @@ export type ArxivPage = {
 
 const ARXIV_API_URL = "https://export.arxiv.org/api/query";
 
+/** `2026-08-07` becomes `202608070000` (or `202608072359` for the end of the day), in GMT. */
+function arxivDateTime(day: string, endOfDay: boolean): string {
+  return `${day.replaceAll("-", "")}${endOfDay ? "2359" : "0000"}`;
+}
+
 export function buildArxivUrl(request: ArxivPageRequest): string {
   const categories = request.Categories ?? SCOPE_ARXIV_CATEGORIES;
-  const query = categories.map((category) => `cat:${category}`).join(" OR ");
+  const categoryQuery = categories.map((category) => `cat:${category}`).join(" OR ");
+  const query = request.SubmittedFrom
+    ? `(${categoryQuery}) AND submittedDate:[${arxivDateTime(request.SubmittedFrom, false)} TO ${arxivDateTime(request.SubmittedTo ?? "2999-12-31", true)}]`
+    : categoryQuery;
   const params = new URLSearchParams({
     search_query: query,
     start: String(request.Start ?? 0),

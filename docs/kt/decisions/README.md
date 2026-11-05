@@ -52,6 +52,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0039](0039-private-search-fixtures-from-tavily.md) | Record search results as private fixtures, from Tavily | Accepted |
 | [0040](0040-evidence-levels-and-readiness-label.md) | Evidence levels and a readiness label next to the score | Accepted |
 | [0041](0041-short-backfill-and-primary-topic-scope.md) | 14-day backfill, 90-day storage limit, and primary-topic scope | Accepted |
+| [0042](0042-arxiv-limit-on-first-submission-date.md) | arXiv 90-day limit on the date of the first version | Accepted |
 
 ## When an ADR is needed
 
