@@ -34,6 +34,9 @@
       "esbuild",
       "better-sqlite3",
       "workerd"
-    ]
+    ],
+    "overrides": {
+      "minimatch": "^11.0.1"
+    }
   }
 }
