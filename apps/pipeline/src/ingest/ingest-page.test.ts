@@ -51,6 +51,34 @@ describe("REQ-DATA-001: OpenAlex page ingestion", () => {
     expect(rows("publication")).toBe(0);
   });
 
+  it("REQ-DATA-001: only the primary topic decides the scope, not a secondary topic", async () => {
+    const { deps, rows } = setup();
+    const inScope = work("work-complete.json").topics?.[0];
+    const outside = {
+      display_name: "Marine biology",
+      field: { display_name: "Agricultural and biological sciences" },
+      subfield: { display_name: "Aquatic science" },
+    };
+    const secondaryOnly = {
+      ...work("work-complete.json"),
+      primary_topic: outside,
+      topics: [outside, ...(inScope ? [inScope] : [])],
+    };
+    const primary = {
+      ...work("work-no-abstract.json"),
+      primary_topic: inScope ?? null,
+    };
+    const result = await ingestOpenAlexWorks(
+      deps,
+      [secondaryOnly, primary],
+      SCOPE_OPENALEX_TOPIC_NAMES,
+    );
+
+    expect(inScope).toBeDefined();
+    expect(result.Counts).toMatchObject({ Fetched: 2, Created: 1, Skipped: 1, Failed: 0 });
+    expect(rows("publication")).toBe(1);
+  });
+
   it("REQ-DATA-001: one failing item is recorded and does not stop the page", async () => {
     const { deps, rows } = setup();
     const broken = {

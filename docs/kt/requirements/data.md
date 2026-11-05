@@ -2,7 +2,7 @@
 title: Data requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-11-05
 ---
 
 # Data requirements
@@ -20,7 +20,7 @@ The research collector fetches works from OpenAlex, with their authors, institut
 - Status: in-progress
 - Source: README roadmap phase 1 and Data Sources section
 - Acceptance criteria:
-  1. Works that match the configured ingestion scope (see [OpenAlex](../data-sources/openalex.md)) are fetched with their authors, institutions, topics, and citation counts. The request filters on language and on the configured subfield IDs, and a returned work whose topics match none of the topic-map names is skipped, counted, and not stored.
+  1. Works that match the configured ingestion scope (see [OpenAlex](../data-sources/openalex.md)) are fetched with their authors, institutions, topics, and citation counts. The request filters on language and on the configured subfield IDs of the work's primary topic, and a returned work whose primary topic matches none of the topic-map names is skipped, counted, and not stored (ADR 0041).
   2. A repeated run does not create duplicate publications.
   3. A failed or rate-limited request is retried with exponential backoff up to the configured number of attempts; an item that still fails is recorded for the next run and does not stop the whole run. Each request has a timeout and a long `Retry-After` is capped (REQ-NFR-021).
   4. The abstract is reconstructed from `abstract_inverted_index` when OpenAlex provides one.
@@ -81,8 +81,8 @@ Ingestion runs on a schedule and fetches only what is new or changed since the l
 - Acceptance criteria:
   1. Each source has a configured schedule and a stored cursor or date of its last successful run. Only a run that finished without failed items moves the cursor, so the next run covers the items that failed.
   2. A run fetches records published or updated after that cursor, with a configured overlap window.
-  3. A first run backfills a configured window, by default the last 90 days. No run stores a publication dated more than that many days before the day of the run, also not a run that continues an earlier one.
-  4. A run that stops at the page cap without a failed item is continued by the next run of that source from the saved cursor, so the whole window is covered over several runs without fetching the same first pages again. Only the run that finishes the window moves the cursor of AC1, to the day the window began being fetched.
+  3. A first run backfills a configured window, by default the last 14 days. No window reaches back further, and no run stores a publication dated more, than a configured maximum age before the day of the run, by default 90 days, also not a run that continues an earlier one (ADR 0041).
+  4. A run that stops at the page cap without a failed item is continued by the next run of that source from the saved cursor, so the whole window is covered over several runs without fetching the same first pages again. A run whose window begins before the maximum age of AC3 is not continued; a fresh window replaces it. Only the run that finishes the window moves the cursor of AC1, to the day the window began being fetched.
   5. Every run stores its start, end, record counts, and failures.
   6. The 90-day limit of AC3 applies to every source that fetches external publications, now and in future. A source states the date it measures in its data source document: OpenAlex measures the publication date (a work without one is kept and marked incomplete under REQ-DATA-005); arXiv measures the date of the last update, so a new version of an older preprint within the limit still updates its record (REQ-DATA-002 AC3). Enrichment of stored publications (REQ-DATA-003) and PDF fetching follow the stored publications and need no window of their own.
 - Verification: integration test that runs ingestion twice over fixtures

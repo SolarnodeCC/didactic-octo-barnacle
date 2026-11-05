@@ -2,7 +2,7 @@
 title: Pipeline orchestration
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-11-05
 related: [REQ-AGENT-007, REQ-AGENT-009, REQ-AGENT-011, REQ-AGENT-012, REQ-AGENT-013, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-SCORE-007, REQ-ADM-002]
 ---
 
@@ -67,7 +67,7 @@ Cron (OpenAlex / arXiv)
 
 ## Scheduled ingestion
 
-- A cron trigger starts one run per source (`0 6 * * *` OpenAlex, `30 7 * * *` arXiv, UTC). The run row stores its window start, which is the end of the last `succeeded` run minus `ingestion.overlap_days`, or `ingestion.backfill_days` back for a first run, and never further back than `ingestion.backfill_days`. A run also stores no publication dated more than `ingestion.backfill_days` before its own day.
+- A cron trigger starts one run per source (`0 6 * * *` OpenAlex, `30 7 * * *` arXiv, UTC). The run row stores its window start, which is the end of the last `succeeded` run minus `ingestion.overlap_days`, or `ingestion.backfill_days` back for a first run, and never further back than `ingestion.max_age_days`. A run also stores no publication dated more than `ingestion.max_age_days` before its own day (ADR 0041).
 - Each page is one `source.fetch_page` message. The consumer claims the message in `queue_message_log`, fetches the page, stores it, and writes the counts, the next page cursor, and the message state in one batch. A repeated delivery finds the message `completed` and does nothing.
 - The next page is queued before that batch is written. If the Worker stops in between, the same page is stored again, which changes nothing, and the next page is the same message.
 - The last page closes the run: `succeeded`, or `partial` when an item failed or the page cap was reached. A run that ends `partial` or `failed` stores no window end, so the next run covers the same days again. A run that stopped at the page cap with no failed item keeps the cursor of the page it did not fetch (OpenAlex cursor, arXiv offset); the next run of that source continues there with the same window, and the run that finishes the window stores the window end of the first run of the chain (ADR 0035). Stored publications are not duplicated (REQ-DATA-001, REQ-DATA-002).
