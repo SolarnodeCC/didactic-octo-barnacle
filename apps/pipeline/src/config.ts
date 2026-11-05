@@ -7,8 +7,13 @@ import { SCOPE_OPENALEX_SUBFIELD_IDS, SCOPE_OPENALEX_TOPIC_NAMES } from "./norma
 export type IngestConfig = {
   /** Days re-fetched before the last successful window end (REQ-DATA-009 AC2). */
   OverlapDays: number;
-  /** Days fetched by a first run, and the longest window a run may cover (AC3). */
+  /** Days fetched by a first run (REQ-DATA-009 AC3, ADR 0041). */
   BackfillDays: number;
+  /**
+   * The longest a window may reach back, and the limit of what a run stores: nothing dated
+   * more than this many days before the day of the run (REQ-DATA-009 AC3 and AC6, ADR 0041).
+   */
+  MaxAgeDays: number;
   /** Pages one run may fetch, so an unfiltered window cannot flood the database. */
   MaxPagesPerRun: number;
   PageSize: number;
@@ -39,7 +44,8 @@ export type IngestConfig = {
 
 export const DEFAULT_INGEST_CONFIG: IngestConfig = {
   OverlapDays: 2,
-  BackfillDays: 90,
+  BackfillDays: 14,
+  MaxAgeDays: 90,
   MaxPagesPerRun: 50,
   PageSize: 100,
   RunTimeoutHours: 6,

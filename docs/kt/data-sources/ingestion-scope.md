@@ -2,7 +2,7 @@
 title: Ingestion scope
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-03
+last_reviewed: 2026-11-05
 related: [REQ-DATA-001, REQ-DATA-002, REQ-DATA-009, REQ-PROC-005, REQ-PROC-006]
 ---
 
@@ -15,15 +15,15 @@ The locked pilot scope for phase 1. It is deliberately narrow: measure volume an
 | Setting | Pilot value | Locked? |
 |---|---|---|
 | arXiv categories | `cs.AI`, `cs.SE`, `cs.HC`, `cs.CY` (primary or cross-listed) | locked for phase 1 |
-| OpenAlex window | works published in the last 90 days at the first run (REQ-DATA-009, ADR 0035), then incremental; never older than 90 days before the day of a run | locked for phase 1 |
-| OpenAlex topics | topics whose field or subfield appears in the topic map below | locked names; subfield IDs still to be filled (see below) |
+| OpenAlex window | works published in the last 14 days at the first run (REQ-DATA-009, ADR 0041), then incremental; never older than 90 days before the day of a run | locked for phase 1 |
+| OpenAlex topics | works whose primary topic has a field or subfield in the topic map below (ADR 0041) | locked names; subfield IDs still to be filled (see below) |
 | Languages | English only (also the language of the interface, agent outputs, and briefs) | locked |
 | Daily limit to extraction | 100 publications | provisional until phase 1 volume is measured |
 | Day boundary | UTC | locked |
 
 The manual workflow `OpenAlex scope lookup` (`.github/workflows/openalex-scope-lookup.yml`, `pnpm --filter @roi/pipeline scope-lookup`) reads the OpenAlex taxonomy with the staging key and prints, for each topic-map name, the matching fields and subfields with their IDs, which names have no exact match, and the number of works per subfield in a window. It stores nothing and downloads no works.
 
-The OpenAlex request filters on subfield IDs. `OpenAlexScope.SubfieldIds` in `apps/pipeline/src/config.ts` holds the IDs of every subfield name in the map (`OPENALEX_SUBFIELD_IDS` in `apps/pipeline/src/normalize/scope.ts`, looked up in the OpenAlex taxonomy on 2026-11-03), so the collector no longer downloads works outside the map. The name check in the ingest step stays as a second guard. A change to the map changes both the names and the IDs, and a test fails when a name has no ID. Compare the `Skipped` share of `Staging measure` before and after the first staging runs with the IDs; a name that never matches silently drops its works.
+The OpenAlex request filters on the subfield ID of the primary topic (ADR 0041). `OpenAlexScope.SubfieldIds` in `apps/pipeline/src/config.ts` holds the IDs of every subfield name in the map (`OPENALEX_SUBFIELD_IDS` in `apps/pipeline/src/normalize/scope.ts`, looked up in the OpenAlex taxonomy on 2026-11-03), so the collector no longer downloads works outside the map. The name check in the ingest step stays as a second guard. A change to the map changes both the names and the IDs, and a test fails when a name has no ID. Compare the `Skipped` share of `Staging measure` before and after the first staging runs with the IDs; a name that never matches silently drops its works.
 
 The limit and the map are configuration, not code. Changing them is a reviewed pull request that records the reason.
 

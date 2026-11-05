@@ -46,8 +46,8 @@ describe("REQ-DATA-009: scheduled ingestion through the queue", () => {
 
     expect(h.Count("publication")).toBe(3);
     expect(h.OpenAlexRequests).toEqual([
-      { FromDate: "2026-08-01", SubfieldIds: SCOPE_OPENALEX_SUBFIELD_IDS },
-      { FromDate: "2026-08-01", SubfieldIds: SCOPE_OPENALEX_SUBFIELD_IDS, Cursor: "cursor-2" },
+      { FromDate: "2026-10-16", SubfieldIds: SCOPE_OPENALEX_SUBFIELD_IDS },
+      { FromDate: "2026-10-16", SubfieldIds: SCOPE_OPENALEX_SUBFIELD_IDS, Cursor: "cursor-2" },
     ]);
     const run = h.Run();
     expect(run["status"]).toBe("succeeded");
@@ -59,13 +59,13 @@ describe("REQ-DATA-009: scheduled ingestion through the queue", () => {
     });
   });
 
-  it("REQ-DATA-009: a first run backfills 90 days and stores its start, end, counts, and failures", async () => {
+  it("REQ-DATA-009: a first run backfills 14 days and stores its start, end, counts, and failures", async () => {
     scriptTwoPages();
     await runScheduled(h.Deps, OPENALEX_CRON);
     await h.Drain();
 
     const run = h.Run();
-    expect(run["window_from"]).toBe("2026-08-01");
+    expect(run["window_from"]).toBe("2026-10-16");
     expect(run["started_at"]).toBe("2026-10-30T06:00:00.000Z");
     expect(run["ended_at"]).not.toBeNull();
     expect(run["cursor"]).toBe("2026-10-30");
@@ -355,9 +355,9 @@ describe("REQ-DATA-009: a run that stops at the page cap is continued by the nex
     await c.Drain();
 
     expect(c.OpenAlexRequests.map((request) => [request.FromDate, request.Cursor])).toEqual([
-      ["2026-08-01", undefined],
-      ["2026-08-01", "c2"],
-      ["2026-08-01", "c3"],
+      ["2026-10-16", undefined],
+      ["2026-10-16", "c2"],
+      ["2026-10-16", "c3"],
     ]);
     const second = c.Run();
     expect(second["status"]).toBe("succeeded");
@@ -373,30 +373,44 @@ describe("REQ-DATA-009: a run that stops at the page cap is continued by the nex
     expect(c.Count("publication")).toBe(3);
   });
 
-  it("REQ-DATA-009: a continued run stores nothing older than 90 days before its own day", async () => {
-    const c = capped();
-    c.SetOpenAlexPages([
-      openAlexPage([makeWork(1)], "c2"),
-      openAlexPage([makeWork(2)], "c3"),
+  it("REQ-DATA-009: a chain whose window begins before the 90-day limit is not continued; a fresh window replaces it", async () => {
+    // A chain started under the old 90-day backfill, like the one on staging (ADR 0041).
+    const c = createHarness({ MaxPagesPerRun: 2, BackfillDays: 90 });
+    c.SetOpenAlexPages([openAlexPage([makeWork(1)], "c2"), openAlexPage([makeWork(2)], "c3")]);
+    await runScheduled(c.Deps, OPENALEX_CRON);
+    await c.Drain();
+    expect(c.Run()["window_from"]).toBe("2026-08-01");
+    expect(c.Run()["page_cursor"]).toBe("c3");
+
+    // 2026-08-07 is 90 days before 2026-11-05: the chain's window began before it.
+    c.Clock.Now = "2026-11-05T06:00:00.000Z";
+    c.SetOpenAlexPages([openAlexPage([makeWork(3)], null)]);
+    await runScheduled(c.Deps, OPENALEX_CRON);
+    await c.Drain();
+
+    expect(c.OpenAlexRequests[2]).toEqual({
+      FromDate: "2026-08-07",
+      SubfieldIds: SCOPE_OPENALEX_SUBFIELD_IDS,
+    });
+    expect(c.Run()["status"]).toBe("succeeded");
+  });
+
+  it("REQ-DATA-009: no run stores a work dated more than 90 days before its own day", async () => {
+    h.SetOpenAlexPages([
       openAlexPage(
         [
-          { ...makeWork(3), publication_date: "2026-08-05" },
-          { ...makeWork(4), publication_date: "2026-08-10" },
+          { ...makeWork(1), publication_date: "2026-07-31" },
+          { ...makeWork(2), publication_date: "2026-08-01" },
         ],
         null,
       ),
     ]);
-    await runScheduled(c.Deps, OPENALEX_CRON);
-    await c.Drain();
+    await runScheduled(h.Deps, OPENALEX_CRON);
+    await h.Drain();
 
-    // 2026-08-07 is 90 days before 2026-11-05. The window of the first run began 2026-08-01.
-    c.Clock.Now = "2026-11-05T06:00:00.000Z";
-    await runScheduled(c.Deps, OPENALEX_CRON);
-    await c.Drain();
-
-    expect(c.OpenAlexRequests[2]).toMatchObject({ FromDate: "2026-08-01", Cursor: "c3" });
-    expect(c.Count("publication")).toBe(3);
-    expect(JSON.parse(c.Run()["counts_json"] as string)).toMatchObject({ Created: 1, Skipped: 1 });
+    // 2026-08-01 is 90 days before 2026-10-30.
+    expect(h.Count("publication")).toBe(1);
+    expect(JSON.parse(h.Run()["counts_json"] as string)).toMatchObject({ Created: 1, Skipped: 1 });
   });
 
   it("REQ-DATA-009: a capped run with a failed item is not continued, so the item is covered again", async () => {
@@ -415,7 +429,7 @@ describe("REQ-DATA-009: a run that stops at the page cap is continued by the nex
     await c.Drain();
 
     expect(c.OpenAlexRequests[2]?.Cursor).toBeUndefined();
-    expect(c.Run()["window_from"]).toBe("2026-08-02");
+    expect(c.Run()["window_from"]).toBe("2026-10-17");
   });
 
   it("REQ-DATA-002: an arXiv run continues at the saved offset without storing an entry twice", async () => {
@@ -437,21 +451,25 @@ describe("REQ-DATA-009: a run that stops at the page cap is continued by the nex
     expect(a.Count("publication")).toBe(3);
   });
 
-  it("REQ-DATA-009: a continued arXiv run stores nothing last updated more than 90 days before its own day", async () => {
-    const a = createHarness({ PageSize: 2, MaxPagesPerRun: 1 });
+  it("REQ-DATA-009: an arXiv chain whose window begins before the 90-day limit restarts at offset 0", async () => {
+    const a = createHarness({ PageSize: 2, MaxPagesPerRun: 1, BackfillDays: 90 });
     a.SetArxivPages([
       arxivPage([makeEntry(1, "2026-10-29T10:00:00Z"), makeEntry(2, "2026-10-29T09:00:00Z")]),
-      arxivPage([makeEntry(3, "2026-08-10T09:00:00Z"), makeEntry(4, "2026-08-05T09:00:00Z")]),
+      arxivPage([makeEntry(3, "2026-11-04T09:00:00Z"), makeEntry(4, "2026-08-05T09:00:00Z")]),
     ]);
     await runScheduled(a.Deps, ARXIV_CRON);
     await a.Drain();
+    expect(a.Run()["page_cursor"]).toBe("2");
 
     // 2026-08-07 is 90 days before 2026-11-05; the first window began 2026-08-01.
     a.Clock.Now = "2026-11-05T07:30:00.000Z";
     await runScheduled(a.Deps, ARXIV_CRON);
     await a.Drain();
 
+    expect(a.ArxivRequests.map((request) => request.Start)).toEqual([0, 0]);
+    // The fresh window starts at the 90-day limit: the entry from 2026-08-05 is not stored.
     expect(a.Count("publication")).toBe(3);
+    expect(a.Run()["window_from"]).toBe("2026-08-07");
     expect(a.Run()["status"]).toBe("succeeded");
   });
 });

@@ -33,9 +33,9 @@ async function fetchAndIngest(deps: PipelineDeps, run: RunRow): Promise<FetchedP
   };
   const runDay = run.StartedAt.slice(0, 10);
   // A run that continues an earlier one keeps that run's window so its saved cursor stays
-  // valid, but it never stores anything older than `BackfillDays` before its own day.
+  // valid, but it never stores anything older than `MaxAgeDays` before its own day.
   const requestFrom = run.WindowFrom ?? runDay;
-  const limit = earliestWindowStart(runDay, deps.Config.BackfillDays);
+  const limit = earliestWindowStart(runDay, deps.Config.MaxAgeDays);
   const from = max(requestFrom, limit);
 
   if (run.Source === "openalex") {

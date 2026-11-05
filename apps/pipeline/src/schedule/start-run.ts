@@ -9,7 +9,7 @@ import {
   lastSuccessfulWindowEnd,
   type RunRow,
 } from "../store/run-repo.js";
-import { windowStart } from "./window.js";
+import { earliestWindowStart, windowStart } from "./window.js";
 
 export type StartRunResult =
   | { Outcome: "started"; RunId: string; WindowFrom: string }
@@ -33,14 +33,19 @@ export class StartRunError extends Error {
  * page cap saved the cursor of the page it did not fetch; continuing there reaches the
  * rest of its window instead of fetching the same first pages again. Not continued: a run
  * with failed items: the fresh window covers them again. The continued run still stores
- * nothing older than `BackfillDays` before its own day (see `fetch-page.ts`).
+ * nothing older than `MaxAgeDays` before its own day (see `fetch-page.ts`).
+ *
+ * Also not continued: a run whose window already begins before `earliest` (today minus
+ * `MaxAgeDays`). Its oldest days can no longer be stored, and it may carry a cursor from an
+ * older request format; a fresh window replaces it (ADR 0041).
  */
-function continuableRun(previous: RunRow | null) {
+function continuableRun(previous: RunRow | null, earliest: string) {
   if (
     previous?.Status !== "partial" ||
     !previous.PageCursor ||
     !previous.WindowFrom ||
     !previous.WindowEnd ||
+    previous.WindowFrom < earliest ||
     previous.Counts.Failed > 0 ||
     previous.Counts.DeadLettered > 0
   ) {
@@ -89,7 +94,10 @@ export async function startRun(deps: PipelineDeps, source: RunSource): Promise<S
   }
 
   const today = now.slice(0, 10);
-  const continued = continuableRun(await lastFinishedRun(deps.Db, source));
+  const continued = continuableRun(
+    await lastFinishedRun(deps.Db, source),
+    earliestWindowStart(today, deps.Config.MaxAgeDays),
+  );
   const from =
     continued?.WindowFrom ??
     windowStart({
@@ -97,6 +105,7 @@ export async function startRun(deps: PipelineDeps, source: RunSource): Promise<S
       Today: today,
       OverlapDays: deps.Config.OverlapDays,
       BackfillDays: deps.Config.BackfillDays,
+      MaxAgeDays: deps.Config.MaxAgeDays,
     });
   const runId = `run_${source}_${now.replace(/\D/g, "").slice(0, 14)}_${deps.NewId().slice(0, 8)}`;
   await createRun(deps.Db, {

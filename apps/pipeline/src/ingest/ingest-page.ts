@@ -71,19 +71,24 @@ async function ingestItem(
   }
 }
 
+/**
+ * Names of the work's primary topic, its field, and its subfield (ADR 0041). OpenAlex lists
+ * the primary topic first in `topics`, so that is the fallback when `primary_topic` is absent.
+ */
 function openAlexTopicNames(work: OpenAlexWork): string[] {
-  return (work.topics ?? [])
-    .flatMap((topic) => [
-      topic.display_name,
-      topic.field?.display_name,
-      topic.subfield?.display_name,
-    ])
-    .filter((value): value is string => Boolean(value));
+  const topic = work.primary_topic ?? work.topics?.[0];
+  if (!topic) {
+    return [];
+  }
+  return [topic.display_name, topic.field?.display_name, topic.subfield?.display_name].filter(
+    (value): value is string => Boolean(value),
+  );
 }
 
 /**
- * Store a page of OpenAlex works (REQ-DATA-001). A work whose topics, fields, and subfields
- * match none of `topicNames` is skipped and never stored, whatever the server-side filter did.
+ * Store a page of OpenAlex works (REQ-DATA-001). A work whose primary topic, field, and
+ * subfield match none of `topicNames` is skipped and never stored, whatever the server-side
+ * filter did.
  */
 export async function ingestOpenAlexWorks(
   deps: IngestDeps,

@@ -8,8 +8,9 @@ export type OpenAlexPageRequest = {
   Cursor?: string;
   PerPage?: number;
   /**
-   * OpenAlex subfield IDs of the topic map (REQ-DATA-001 AC1). Empty or omitted sends no
-   * topic filter. English is always required: the pilot is English only.
+   * OpenAlex subfield IDs of the topic map (REQ-DATA-001 AC1), matched against the work's
+   * primary topic (ADR 0041). Empty or omitted sends no topic filter. English is always
+   * required: the pilot is English only.
    */
   SubfieldIds?: readonly string[];
   /**
@@ -37,10 +38,14 @@ export function buildOpenAlexUrl(request: OpenAlexPageRequest): string {
   const filters = [`from_publication_date:${request.FromDate}`, "language:en"];
   const subfields = (request.SubfieldIds ?? []).map((id) => id.trim()).filter(Boolean);
   if (subfields.length > 0) {
-    // One filter with OR values; OpenAlex allows at most 100 of them.
-    filters.push(`topics.subfield.id:${subfields.join("|")}`);
+    // One filter with OR values; OpenAlex allows at most 100 of them. Only the primary
+    // topic counts: any of up to three topics matched about six times as many works (ADR 0041).
+    filters.push(`primary_topic.subfield.id:${subfields.join("|")}`);
   }
   params.set("filter", filters.join(","));
+  // An explicit sort keeps the cursor order stable between runs, so a continued run reaches
+  // new works instead of re-reading ones whose internal ranking moved (ADR 0041).
+  params.set("sort", "publication_date:desc");
   params.set("per-page", String(request.PerPage ?? 100));
   params.set("cursor", request.Cursor ?? "*");
   return `${OPENALEX_WORKS_URL}?${params.toString()}`;

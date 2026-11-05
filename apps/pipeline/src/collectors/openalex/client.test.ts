@@ -29,8 +29,13 @@ describe("REQ-DATA-001: OpenAlex client", () => {
       buildOpenAlexUrl({ FromDate: "2026-09-29", SubfieldIds: ["1710", " 1709 ", ""] }),
     );
     expect(url.searchParams.get("filter")).toBe(
-      "from_publication_date:2026-09-29,language:en,topics.subfield.id:1710|1709",
+      "from_publication_date:2026-09-29,language:en,primary_topic.subfield.id:1710|1709",
     );
+  });
+
+  it("REQ-DATA-009: sorts by publication date so a saved cursor stays stable between runs", () => {
+    const url = new URL(buildOpenAlexUrl({ FromDate: "2026-09-29" }));
+    expect(url.searchParams.get("sort")).toBe("publication_date:desc");
   });
 
   it("REQ-DATA-001: sends the API key as a bearer token, not in the URL", async () => {

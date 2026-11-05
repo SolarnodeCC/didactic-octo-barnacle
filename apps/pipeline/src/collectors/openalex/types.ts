@@ -10,6 +10,12 @@ export type OpenAlexAuthorship = {
   institutions?: Array<{ display_name?: string }>;
 };
 
+export type OpenAlexTopic = {
+  display_name?: string;
+  field?: { display_name?: string };
+  subfield?: { display_name?: string };
+};
+
 export type OpenAlexWork = {
   id: string;
   title?: string | null;
@@ -24,11 +30,8 @@ export type OpenAlexWork = {
   };
   abstract_inverted_index?: AbstractInvertedIndex | null;
   authorships?: OpenAlexAuthorship[];
-  topics?: Array<{
-    display_name?: string;
-    field?: { display_name?: string };
-    subfield?: { display_name?: string };
-  }>;
+  topics?: OpenAlexTopic[];
+  primary_topic?: OpenAlexTopic | null;
   cited_by_count?: number;
   language?: string | null;
   is_retracted?: boolean;
