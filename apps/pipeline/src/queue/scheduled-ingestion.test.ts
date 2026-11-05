@@ -256,6 +256,8 @@ describe("REQ-DATA-011: dead-lettered messages are counted and can be replayed",
     ).get() as Record<string, unknown>;
     expect(log["status"]).toBe("dead-lettered");
     expect(log["dead_letter"]).toBe(1);
+    // The cause of the last attempt is kept next to the generic reason.
+    expect(log["last_error"]).toMatch(/^retries exhausted; last error: .*OpenAlex down/);
     const run = h.Run();
     expect(run["status"]).toBe("failed");
     expect(run["cursor"]).toBeNull();
