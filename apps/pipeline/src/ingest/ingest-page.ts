@@ -114,16 +114,25 @@ export async function ingestOpenAlexWorks(
   return result;
 }
 
-/** Store a page of arXiv entries; out-of-scope categories are skipped (REQ-DATA-002 AC1). */
+/**
+ * Store a page of arXiv entries; out-of-scope categories are skipped (REQ-DATA-002 AC1).
+ * An entry whose first version was published before `earliestDate` (YYYY-MM-DD) is skipped
+ * too, also when it has a new version (REQ-DATA-009 AC6).
+ */
 export async function ingestArxivEntries(
   deps: IngestDeps,
   entries: ArxivEntry[],
   categories: readonly string[] = SCOPE_ARXIV_CATEGORIES,
+  earliestDate?: string,
 ): Promise<IngestResult> {
   const result = emptyResult();
   const fetchedAt = deps.Now();
   for (const entry of entries) {
-    if (!isArxivCategoryInScope([entry.primaryCategory, ...entry.categories], categories)) {
+    const published = entry.published.slice(0, 10);
+    if (
+      !isArxivCategoryInScope([entry.primaryCategory, ...entry.categories], categories) ||
+      (earliestDate !== undefined && published !== "" && published < earliestDate)
+    ) {
       result.Counts.Fetched += 1;
       result.Counts.Skipped += 1;
       continue;

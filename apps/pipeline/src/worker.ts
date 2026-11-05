@@ -102,7 +102,12 @@ function buildDeps(env: Env): PipelineDeps {
         ),
       FetchArxivPage: (request) =>
         fetchArxivPage(
-          { Start: request.Start, MaxResults: request.MaxResults },
+          {
+            Start: request.Start,
+            MaxResults: request.MaxResults,
+            ...(request.SubmittedFrom ? { SubmittedFrom: request.SubmittedFrom } : {}),
+            ...(request.SubmittedTo ? { SubmittedTo: request.SubmittedTo } : {}),
+          },
           {
             Fetch: workerFetch,
             Backoff: backoff,

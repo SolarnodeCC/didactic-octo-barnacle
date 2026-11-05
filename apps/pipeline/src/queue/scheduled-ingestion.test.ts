@@ -310,8 +310,8 @@ describe("REQ-DATA-002: arXiv runs page by date and respect the delay", () => {
     await paged.Drain();
 
     expect(paged.ArxivRequests).toEqual([
-      { Start: 0, MaxResults: 2 },
-      { Start: 2, MaxResults: 2 },
+      { Start: 0, MaxResults: 2, SubmittedFrom: "2026-08-01", SubmittedTo: "2026-10-30" },
+      { Start: 2, MaxResults: 2, SubmittedFrom: "2026-08-01", SubmittedTo: "2026-10-30" },
     ]);
     expect(paged.Queue.sent.map((s) => s.delaySeconds)).toEqual([0, 3]);
     expect(paged.Count("publication")).toBe(3);
@@ -471,6 +471,43 @@ describe("REQ-DATA-009: a run that stops at the page cap is continued by the nex
     expect(a.Count("publication")).toBe(3);
     expect(a.Run()["window_from"]).toBe("2026-08-07");
     expect(a.Run()["status"]).toBe("succeeded");
+  });
+});
+
+describe("REQ-DATA-009: arXiv measures the date of the first version", () => {
+  it("REQ-DATA-009: an old preprint with a recent new version is not stored, a recent one is updated", async () => {
+    const a = createHarness();
+    // Preprint 1 was submitted in 2025 and updated yesterday; 2 is recent.
+    a.SetArxivPages([
+      arxivPage([
+        makeEntry(1, "2026-10-29T10:00:00Z", "2025-03-01T10:00:00Z"),
+        makeEntry(2, "2026-10-29T09:00:00Z", "2026-10-20T09:00:00Z"),
+      ]),
+    ]);
+    await runScheduled(a.Deps, ARXIV_CRON);
+    await a.Drain();
+
+    expect(a.Count("publication")).toBe(1);
+    expect(JSON.parse(a.Run()["counts_json"] as string)).toMatchObject({
+      Fetched: 2,
+      Created: 1,
+      Skipped: 1,
+    });
+
+    // The recent preprint gets a second version the next day: its record is updated.
+    a.Clock.Now = "2026-10-31T07:30:00.000Z";
+    a.SetArxivPages([
+      arxivPage([
+        {
+          ...makeEntry(2, "2026-10-30T09:00:00Z", "2026-10-20T09:00:00Z"),
+          id: "http://arxiv.org/abs/2410.00002v2",
+        },
+      ]),
+    ]);
+    await runScheduled(a.Deps, ARXIV_CRON);
+    await a.Drain();
+    expect(a.Count("publication")).toBe(1);
+    expect(JSON.parse(a.Run()["counts_json"] as string)).toMatchObject({ Created: 0, Updated: 1 });
   });
 });
 

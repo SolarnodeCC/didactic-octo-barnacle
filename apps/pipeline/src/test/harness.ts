@@ -49,12 +49,13 @@ export function makeBrokenWork(): OpenAlexWork {
   return { title: "No id at all", topics: baseWork.topics } as unknown as OpenAlexWork;
 }
 
-export function makeEntry(n: number, updated: string): ArxivEntry {
+/** `published` is the date of the first version; it defaults to the date of the last update. */
+export function makeEntry(n: number, updated: string, published: string = updated): ArxivEntry {
   return {
     id: `http://arxiv.org/abs/2410.${String(n).padStart(5, "0")}v1`,
     title: `Preprint number ${n}`,
     summary: `Abstract of preprint ${n}.`,
-    published: updated,
+    published,
     updated,
     categories: ["cs.AI"],
     primaryCategory: "cs.AI",
@@ -73,7 +74,12 @@ export type Harness = {
   Erasure: ErasureDeps;
   Clock: { Now: string };
   OpenAlexRequests: Array<{ FromDate: string; Cursor?: string }>;
-  ArxivRequests: Array<{ Start: number; MaxResults: number }>;
+  ArxivRequests: Array<{
+    Start: number;
+    MaxResults: number;
+    SubmittedFrom?: string;
+    SubmittedTo?: string;
+  }>;
   /** Replace the scripted OpenAlex pages; each call to the client takes the next one. */
   SetOpenAlexPages(pages: Array<OpenAlexPage | Error>): void;
   SetArxivPages(pages: Array<ArxivPage | Error>): void;

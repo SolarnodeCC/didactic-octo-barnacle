@@ -30,7 +30,12 @@ export type PipelineDeps = {
       Cursor?: string;
       SubfieldIds?: readonly string[];
     }) => Promise<OpenAlexPage>;
-    FetchArxivPage: (request: { Start: number; MaxResults: number }) => Promise<ArxivPage>;
+    FetchArxivPage: (request: {
+      Start: number;
+      MaxResults: number;
+      SubmittedFrom?: string;
+      SubmittedTo?: string;
+    }) => Promise<ArxivPage>;
   };
   /** Structured log line; the worker writes JSON, tests can leave it out (REQ-NFR-008 AC1). */
   Log?: (event: string, fields: Record<string, unknown>) => void;

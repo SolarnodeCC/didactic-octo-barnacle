@@ -126,6 +126,19 @@ describe("REQ-DATA-002: arXiv page ingestion", () => {
     expect(rows("publication")).toBe(2);
   });
 
+  it("REQ-DATA-009: a preprint first published before the limit is skipped, also with a recent update", async () => {
+    const { deps, rows } = setup();
+    const entries = parseArxivFeed(feed).map((entry) => ({
+      ...entry,
+      published: "2025-01-01T00:00:00Z",
+      updated: "2026-10-28T00:00:00Z",
+    }));
+    const result = await ingestArxivEntries(deps, entries, undefined, "2026-08-01");
+
+    expect(result.Counts).toMatchObject({ Fetched: 3, Created: 0, Skipped: 3 });
+    expect(rows("publication")).toBe(0);
+  });
+
   it("REQ-DATA-002: a repeated run does not create duplicate preprints", async () => {
     const { deps, rows } = setup();
     const entries = parseArxivFeed(feed);

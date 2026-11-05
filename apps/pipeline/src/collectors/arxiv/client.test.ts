@@ -34,6 +34,21 @@ describe("REQ-DATA-002: arXiv client", () => {
     expect(query).toContain("cat:q-fin.RM");
   });
 
+  it("REQ-DATA-009: limits the query to preprints first submitted in the window, newest update first", () => {
+    const url = new URL(
+      buildArxivUrl({
+        Categories: ["cs.AI", "cs.SE"],
+        SubmittedFrom: "2026-08-07",
+        SubmittedTo: "2026-11-05",
+      }),
+    );
+    expect(url.searchParams.get("search_query")).toBe(
+      "(cat:cs.AI OR cat:cs.SE) AND submittedDate:[202608070000 TO 202611052359]",
+    );
+    expect(url.searchParams.get("sortBy")).toBe("lastUpdatedDate");
+    expect(url.searchParams.get("sortOrder")).toBe("descending");
+  });
+
   it("REQ-DATA-002: keeps primary and cross-listed in-scope entries and drops the rest", async () => {
     const fetchFn: FetchFn = () => Promise.resolve(new Response(feed));
     const page = await fetchArxivPage(
