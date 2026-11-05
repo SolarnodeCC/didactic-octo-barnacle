@@ -50,7 +50,7 @@ The bootstrap script creates D1, R2, a Queue and its dead-letter queue, a Vector
 
 ## Deployment
 
-Staging is deployed by `.github/workflows/staging-deploy.yml`, run from `main` only. `.github/workflows/staging-pipeline.yml` starts it automatically when `CI` and `Configuration` are green for the newest commit of `main`, after a drift check that fails on missing resources; the `staging` environment approval still applies (ADR 0043). You can also run it by hand. It builds, applies pending database migrations (unless switched off), and uploads the Worker together with its secrets in one version (`wrangler deploy --secrets-file`), so the Worker never runs without its erasure key. The workflow then lists the live deployment. Production gets the same workflow after the launch checklist passes on staging. Database migrations are plain SQL files that `wrangler d1 migrations` applies before the Worker that needs them (ADR 0020, REQ-NFR-020). A rollback redeploys the previous Worker version via Wrangler rollback or re-deploy of the prior git tag; migrations are written expand/contract so the previous version still works with the new schema. Vectorize index rebuilds are a separate runbook step after a restore.
+Staging is deployed by `.github/workflows/staging-deploy.yml`, run from `main` only. `.github/workflows/staging-pipeline.yml` starts it automatically when `CI` and `Configuration` are green for the newest commit of `main`, after a drift check that fails on missing resources; the pull request approval is the gate (ADR 0043). You can also run it by hand. It builds, applies pending database migrations (unless switched off), and uploads the Worker together with its secrets in one version (`wrangler deploy --secrets-file`), so the Worker never runs without its erasure key. The workflow then lists the live deployment. Production is released weekly by `.github/workflows/production-release.yml`: a planner picks the newest commit of `main` whose changes ran on staging for the soak time (`RELEASE_SOAK_HOURS`, default 48), have no open `Depends on #N`, no `hold` label, and no drop or rename migration without `contract-ok`, and `production-deploy.yml` deploys that commit and tags it `release-<date>-<sha>` (ADR 0044). A run by hand is a dry run unless `dry_run` is off, and nothing deploys until the variable `PRODUCTION_AUTO_RELEASE` is `true` after the launch checklist. A failed release opens an `alert` issue, which pauses releases until it is closed. Database migrations are plain SQL files that `wrangler d1 migrations` applies before the Worker that needs them (ADR 0020, REQ-NFR-020). A rollback redeploys the previous Worker version via Wrangler rollback or re-deploy of the prior git tag; migrations are written expand/contract so the previous version still works with the new schema. Vectorize index rebuilds are a separate runbook step after a restore.
 
 Do not use Cloudflare Workers Builds to deploy `roi-pipeline-staging` (including Preview builds with `npx wrangler preview`). That path skips migrations and the secrets-file upload. Keep Workers Builds **Preview Builds** off for that Worker; staging stays on the GitHub Actions workflow above. The Wrangler `[env.preview]` environment in `infrastructure/cloudflare/wrangler.toml` is separate and remains for on-request preview deploys when that environment exists.
 
@@ -58,8 +58,9 @@ Settings outside the repository cannot be checked by `scripts/check-hardening.py
 
 | Setting | Expected |
 |---|---|
-| GitHub environment `staging` | Required reviewers; deployment limited to the `main` branch |
-| Branch protection on `main` | Pull request required; status checks `parse` and `toolchain` required; no force pushes |
+| GitHub environment `staging` | No required reviewers (the pull request approval is the gate, ADR 0043); deployment limited to the `main` branch |
+| GitHub environment `production` | Own protection rules (for example a required reviewer or wait timer); deployment limited to the `main` branch |
+| Branch protection on `main` | Pull request required with at least one approval and code owner review; status checks `parse` and `toolchain` required; no force pushes |
 | Secret scanning and push protection | On (REQ-NFR-001) |
 | Dependency graph and Dependabot alerts | On, so Dependabot security updates and GitHub's dependency review action work |
 | Cloudflare API token | Least permissions for the environment (see the secrets table) |
@@ -74,7 +75,8 @@ Set these in the GitHub environment `staging` before the first run:
 | Secret | `OPENALEX_API_KEY` | yes for full OpenAlex runs; cursor paging past the first page needs a free key (ADR 0034) |
 | Secret | `ALERT_GITHUB_TOKEN`, `RESEND_API_KEY` | for alerts; without them that channel is off |
 | Variable | `ALERT_EMAIL_TO` | for alert emails |
-| Environment `staging-readonly` | no required reviewers, branch limit `main`; secrets `CLOUDFLARE_API_TOKEN` (read-only), `CLOUDFLARE_ACCOUNT_ID`, `OPENALEX_API_KEY`, `SCOPE_PR_TOKEN` | for the weekly `Staging scheduled checks` and the monthly `OpenAlex scope sync` (ADR 0043) |
+| Secret | `SCOPE_PR_TOKEN` | for the monthly `OpenAlex scope sync` (ADR 0043) |
+| Variable | `PRODUCTION_AUTO_RELEASE` (repository), `RELEASE_SOAK_HOURS` (optional, default 48) | `true` switches on the weekly production deploy (ADR 0044) |
 
 Also create the GitHub label `alert` once. The first scheduled runs start at the next 06:00 UTC (OpenAlex) and 07:30 UTC (arXiv); a run cannot be started by hand before phase 4. The manual workflow `.github/workflows/openalex-scope-lookup.yml` looks up the OpenAlex subfield IDs of the topic map and the volume per subfield with the staging `OPENALEX_API_KEY` (read-only; see [ingestion scope](data-sources/ingestion-scope.md)). After a few runs, `Staging measure` reports the volume, the data quality, and the cost estimate (ADR 0032).
 
@@ -90,6 +92,7 @@ Cron expressions (UTC) are in [defaults](architecture/defaults.md).
 | Retention job | daily 03:00 | REQ-NFR-015 |
 | Nightly evals | daily 02:00 | REQ-TEST-004 |
 | Staging scheduled checks (drift, measure) | weekly Monday 05:17 | REQ-NFR-020 |
+| Production release (prefix of `main`) | weekly Tuesday 07:23 | REQ-NFR-020 |
 | OpenAlex scope sync (draft PR on changed IDs) | monthly, day 1 at 05:43 | REQ-DATA-001 |
 
 ## Monitoring
@@ -127,7 +130,7 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 | `RESEND_API_KEY` | Sends invitation and sign-in emails (REQ-ACC-007) and alert emails (REQ-NFR-019) | Cloudflare Worker secret; GitHub Actions secret for deployment | preview, staging, production |
 | `RESEND_WEBHOOK_SECRET` | Verifies Resend bounce and complaint webhooks (REQ-ACC-007) | Worker secret | preview, staging, production |
 | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | Deploy with Wrangler and run the bootstrap script; the token has the least permissions each environment needs | GitHub Actions secret | preview, staging, production |
-| `SCOPE_PR_TOKEN` | Opens the draft pull request of `OpenAlex scope sync`; fine-grained token for this repository with Contents and Pull requests write, so the CI checks run on that pull request (ADR 0043) | GitHub environment secret | staging-readonly |
+| `SCOPE_PR_TOKEN` | Opens the draft pull request of `OpenAlex scope sync`; fine-grained token for this repository with Contents and Pull requests write, so the CI checks run on that pull request (ADR 0043) | GitHub environment secret | staging |
 | `OPENALEX_API_KEY` | OpenAlex requests by the collector (REQ-DATA-001); free key required for cursor paging (ADR 0034) | Worker secret, uploaded by `Staging deploy` from the GitHub environment secret; also Cursor environment secret for local agent work | preview, staging, production |
 | `AI_GATEWAY_ACCOUNT_ID`, `AI_GATEWAY_API_TOKEN` | Route model calls through AI Gateway (REQ-NFR-003) | Worker secret | preview, staging, production |
 | `OPENAI_API_KEY` | Model provider behind AI Gateway (when OpenAI is configured) | AI Gateway / Worker secret | preview, staging, production |

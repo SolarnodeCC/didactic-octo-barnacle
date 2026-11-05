@@ -6,7 +6,7 @@ name: OpenAlex scope sync
 # already in the map changed. It never adds or removes a name and ignores volumes; scope choices
 # stay reviewed decisions (ADR 0038, ADR 0041). A pull request made with GITHUB_TOKEN would not
 # start CI, so the PR uses the secret SCOPE_PR_TOKEN (fine-grained token for this repository:
-# Contents and Pull requests write). The OpenAlex key is OPENALEX_API_KEY of `staging-readonly`.
+# Contents and Pull requests write). The OpenAlex key is OPENALEX_API_KEY of `staging`.
 
 on:
   schedule:
@@ -24,7 +24,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    environment: staging-readonly
+    environment: staging
     permissions:
       contents: read
     steps:
@@ -66,7 +66,7 @@ jobs:
             exit 0
           fi
           if [ -z "$SCOPE_PR_TOKEN" ]; then
-            echo "::error::SCOPE_PR_TOKEN is not set in the environment staging-readonly"
+            echo "::error::SCOPE_PR_TOKEN is not set in the environment staging"
             exit 1
           fi
           export GH_TOKEN="$SCOPE_PR_TOKEN"

@@ -54,6 +54,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0041](0041-short-backfill-and-primary-topic-scope.md) | 14-day backfill, 90-day storage limit, and primary-topic scope | Accepted |
 | [0042](0042-arxiv-limit-on-first-submission-date.md) | arXiv 90-day limit on the date of the first version | Accepted |
 | [0043](0043-automated-staging-pipeline.md) | Automated staging pipeline and scope sync | Accepted |
+| [0044](0044-weekly-production-release.md) | Weekly production release | Accepted |
 
 ## When an ADR is needed
 

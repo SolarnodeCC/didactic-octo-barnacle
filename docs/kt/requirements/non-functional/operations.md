@@ -86,4 +86,5 @@ Database changes and environment resources are created by versioned, repeatable 
   3. A migration keeps the previous Worker version working (add first, remove in a later migration after the old version is gone).
   4. A test applies all migrations to an empty local database and checks that the tables and columns the contracts in `packages/models` need exist.
   5. Each environment's token and account ID are secrets listed in [operations](../../operations.md), with the least permissions the environment needs.
-- Verification: integration test of the migrations and the bootstrap against local bindings
+  6. Production gets a prefix of `main` once a week: only commits that ran on staging for the soak time, with no unmet `Depends on #N`, no `hold` label, and no unreviewed drop or rename in a migration (ADR 0044).
+- Verification: integration test of the migrations and the bootstrap against local bindings; unit tests of the release plan

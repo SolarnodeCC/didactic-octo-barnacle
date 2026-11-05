@@ -13,18 +13,11 @@ on:
         description: "Apply pending migrations (otherwise only list them)"
         type: boolean
         default: false
-      environment:
-        description: "GitHub environment that holds the secrets"
-        type: string
-        default: "staging"
   workflow_call:
     inputs:
       apply:
         type: boolean
         default: false
-      environment:
-        type: string
-        default: "staging"
 
 permissions:
   contents: read
@@ -37,7 +30,7 @@ jobs:
   migrations:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment: ${{ inputs.environment || 'staging' }}
+    environment: staging
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

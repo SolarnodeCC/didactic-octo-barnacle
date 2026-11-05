@@ -5,7 +5,8 @@
   "type": "module",
   "bin": {
     "roi-bootstrap": "./dist/bootstrap-cli.js",
-    "roi-measure": "./dist/measure-cli.js"
+    "roi-measure": "./dist/measure-cli.js",
+    "roi-release-plan": "./dist/release/plan-cli.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -14,7 +15,8 @@
     "test:unit": "vitest run",
     "bootstrap": "node ./dist/bootstrap-cli.js",
     "migrations:list": "node ./dist/list-migrations.js",
-    "measure": "node ./dist/measure-cli.js"
+    "measure": "node ./dist/measure-cli.js",
+    "release-plan": "node ./dist/release/plan-cli.js"
   },
   "dependencies": {
     "@roi/models": "workspace:*"
