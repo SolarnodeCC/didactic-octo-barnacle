@@ -8,7 +8,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:unit": "vitest run",
-    "scope-lookup": "node ./dist/scope/lookup-cli.js"
+    "scope-lookup": "node ./dist/scope/lookup-cli.js",
+    "scope-sync": "node ./dist/scope/sync-cli.js"
   },
   "dependencies": {
     "@roi/models": "workspace:*",
@@ -22,6 +23,7 @@
     "vitest": "^4.1.12"
   },
   "bin": {
-    "roi-scope-lookup": "./dist/scope/lookup-cli.js"
+    "roi-scope-lookup": "./dist/scope/lookup-cli.js",
+    "roi-scope-sync": "./dist/scope/sync-cli.js"
   }
 }

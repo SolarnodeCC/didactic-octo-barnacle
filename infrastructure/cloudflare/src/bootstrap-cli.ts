@@ -9,7 +9,9 @@ import { createCloudflareClient } from "./cloudflare-client.js";
 const ENVIRONMENTS = new Set<EnvironmentName>(["local", "preview", "staging", "production"]);
 
 function usage(): never {
-  console.error("Usage: roi-bootstrap --env <local|preview|staging|production> [--apply]");
+  console.error(
+    "Usage: roi-bootstrap --env <local|preview|staging|production> [--apply] [--fail-on-drift]",
+  );
   process.exit(2);
 }
 
@@ -17,6 +19,7 @@ async function main(): Promise<void> {
   const args = process.argv.slice(2);
   let environment: EnvironmentName | undefined;
   let apply = false;
+  let failOnDrift = false;
 
   for (let i = 0; i < args.length; i += 1) {
     const arg = args[i];
@@ -29,6 +32,8 @@ async function main(): Promise<void> {
       environment = value as EnvironmentName;
     } else if (arg === "--apply") {
       apply = true;
+    } else if (arg === "--fail-on-drift") {
+      failOnDrift = true;
     } else {
       usage();
     }
@@ -61,6 +66,14 @@ async function main(): Promise<void> {
   });
 
   console.log(JSON.stringify(result, null, 2));
+
+  // The automated staging pipeline stops before the deploy when resources are missing (REQ-NFR-020).
+  if (failOnDrift && result.Drift.Missing.length > 0) {
+    console.error(
+      `Missing resources: ${result.Drift.Missing.length}. Run Staging bootstrap with apply.`,
+    );
+    process.exit(3);
+  }
 }
 
 main().catch((error: unknown) => {

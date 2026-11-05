@@ -7,6 +7,16 @@ name: Staging measure
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: "GitHub environment that holds the secrets"
+        type: string
+        default: "staging"
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        default: "staging"
 
 permissions:
   contents: read
@@ -19,7 +29,7 @@ jobs:
   measure:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment: staging
+    environment: ${{ inputs.environment || 'staging' }}
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

@@ -13,6 +13,25 @@ on:
         description: "Create the missing resources (otherwise only report drift)"
         type: boolean
         default: false
+      fail_on_drift:
+        description: "Fail when resources are missing (used by the automated pipeline)"
+        type: boolean
+        default: false
+      environment:
+        description: "GitHub environment that holds the secrets"
+        type: string
+        default: "staging"
+  workflow_call:
+    inputs:
+      apply:
+        type: boolean
+        default: false
+      fail_on_drift:
+        type: boolean
+        default: false
+      environment:
+        type: string
+        default: "staging"
 
 permissions:
   contents: read
@@ -25,7 +44,7 @@ jobs:
   bootstrap:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment: staging
+    environment: ${{ inputs.environment || 'staging' }}
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -50,7 +69,12 @@ jobs:
         run: pnpm build
 
       - name: Report drift
-        run: node infrastructure/cloudflare/dist/bootstrap-cli.js --env staging
+        env:
+          FAIL_ON_DRIFT: ${{ inputs.fail_on_drift }}
+        run: |
+          flag=""
+          if [ "$FAIL_ON_DRIFT" = "true" ]; then flag="--fail-on-drift"; fi
+          node infrastructure/cloudflare/dist/bootstrap-cli.js --env staging $flag
 
       - name: Create missing resources
         if: ${{ inputs.apply }}

@@ -8,7 +8,7 @@ related: [REQ-NFR-001, REQ-NFR-005, REQ-NFR-008, REQ-NFR-015, REQ-NFR-017, REQ-A
 
 # Operations
 
-The repository holds the KT documents, the phase 1 foundation toolchain (`packages/models`, pnpm workspace, lint, and CI), and Cloudflare infrastructure scaffolding (`infrastructure/cloudflare`: Wrangler config, D1 migrations, bootstrap planner). `apps/pipeline` also holds the source clients (retry with backoff, arXiv rate limiting), the D1 repository with deduplication, and a Worker entry that answers a health check. It also holds the cron handler that starts a run, the queue consumer for pages and dead letters, and the replay function for dead-lettered messages (REQ-DATA-009, REQ-DATA-011). It also stores license-gated PDFs in R2 through a safe fetcher (REQ-DATA-004, REQ-DATA-010). It also builds run reports, structured logs, and alerts by GitHub issue and email (REQ-NFR-008, REQ-NFR-019), and erases authors on request (REQ-NFR-016). The manual workflows `Staging deploy` and `Staging measure` deploy the Worker to staging and report the phase 1 measurements. Until they have been run, nothing of the Worker is deployed. The route to erase an author and the public author notice come with the admin API in phase 4; sections marked *planned* describe how they will work once those packages exist (ADR 0004 (Accepted), ADR 0020).
+The repository holds the KT documents, the phase 1 foundation toolchain (`packages/models`, pnpm workspace, lint, and CI), and Cloudflare infrastructure scaffolding (`infrastructure/cloudflare`: Wrangler config, D1 migrations, bootstrap planner). `apps/pipeline` also holds the source clients (retry with backoff, arXiv rate limiting), the D1 repository with deduplication, and a Worker entry that answers a health check. It also holds the cron handler that starts a run, the queue consumer for pages and dead letters, and the replay function for dead-lettered messages (REQ-DATA-009, REQ-DATA-011). It also stores license-gated PDFs in R2 through a safe fetcher (REQ-DATA-004, REQ-DATA-010). It also builds run reports, structured logs, and alerts by GitHub issue and email (REQ-NFR-008, REQ-NFR-019), and erases authors on request (REQ-NFR-016). The workflows `Staging pipeline` (after a green `main`), `Staging deploy`, and `Staging measure` deploy the Worker to staging and report the phase 1 measurements (ADR 0043). Until they have been run, nothing of the Worker is deployed. The route to erase an author and the public author notice come with the admin API in phase 4; sections marked *planned* describe how they will work once those packages exist (ADR 0004 (Accepted), ADR 0020).
 
 ## Checks
 
@@ -50,7 +50,7 @@ The bootstrap script creates D1, R2, a Queue and its dead-letter queue, a Vector
 
 ## Deployment
 
-Staging is deployed by the manual workflow `.github/workflows/staging-deploy.yml`, run from `main` only. It builds, applies pending database migrations (unless switched off), and uploads the Worker together with its secrets in one version (`wrangler deploy --secrets-file`), so the Worker never runs without its erasure key. The workflow then lists the live deployment. Production gets the same workflow after the launch checklist passes on staging. Database migrations are plain SQL files that `wrangler d1 migrations` applies before the Worker that needs them (ADR 0020, REQ-NFR-020). A rollback redeploys the previous Worker version via Wrangler rollback or re-deploy of the prior git tag; migrations are written expand/contract so the previous version still works with the new schema. Vectorize index rebuilds are a separate runbook step after a restore.
+Staging is deployed by `.github/workflows/staging-deploy.yml`, run from `main` only. `.github/workflows/staging-pipeline.yml` starts it automatically when `CI` and `Configuration` are green for the newest commit of `main`, after a drift check that fails on missing resources; the `staging` environment approval still applies (ADR 0043). You can also run it by hand. It builds, applies pending database migrations (unless switched off), and uploads the Worker together with its secrets in one version (`wrangler deploy --secrets-file`), so the Worker never runs without its erasure key. The workflow then lists the live deployment. Production gets the same workflow after the launch checklist passes on staging. Database migrations are plain SQL files that `wrangler d1 migrations` applies before the Worker that needs them (ADR 0020, REQ-NFR-020). A rollback redeploys the previous Worker version via Wrangler rollback or re-deploy of the prior git tag; migrations are written expand/contract so the previous version still works with the new schema. Vectorize index rebuilds are a separate runbook step after a restore.
 
 Do not use Cloudflare Workers Builds to deploy `roi-pipeline-staging` (including Preview builds with `npx wrangler preview`). That path skips migrations and the secrets-file upload. Keep Workers Builds **Preview Builds** off for that Worker; staging stays on the GitHub Actions workflow above. The Wrangler `[env.preview]` environment in `infrastructure/cloudflare/wrangler.toml` is separate and remains for on-request preview deploys when that environment exists.
 
@@ -74,6 +74,7 @@ Set these in the GitHub environment `staging` before the first run:
 | Secret | `OPENALEX_API_KEY` | yes for full OpenAlex runs; cursor paging past the first page needs a free key (ADR 0034) |
 | Secret | `ALERT_GITHUB_TOKEN`, `RESEND_API_KEY` | for alerts; without them that channel is off |
 | Variable | `ALERT_EMAIL_TO` | for alert emails |
+| Environment `staging-readonly` | no required reviewers, branch limit `main`; secrets `CLOUDFLARE_API_TOKEN` (read-only), `CLOUDFLARE_ACCOUNT_ID`, `OPENALEX_API_KEY`, `SCOPE_PR_TOKEN` | for the weekly `Staging scheduled checks` and the monthly `OpenAlex scope sync` (ADR 0043) |
 
 Also create the GitHub label `alert` once. The first scheduled runs start at the next 06:00 UTC (OpenAlex) and 07:30 UTC (arXiv); a run cannot be started by hand before phase 4. The manual workflow `.github/workflows/openalex-scope-lookup.yml` looks up the OpenAlex subfield IDs of the topic map and the volume per subfield with the staging `OPENALEX_API_KEY` (read-only; see [ingestion scope](data-sources/ingestion-scope.md)). After a few runs, `Staging measure` reports the volume, the data quality, and the cost estimate (ADR 0032).
 
@@ -88,6 +89,8 @@ Cron expressions (UTC) are in [defaults](architecture/defaults.md).
 | Retraction check | weekly Monday 08:00 | REQ-DATA-008 |
 | Retention job | daily 03:00 | REQ-NFR-015 |
 | Nightly evals | daily 02:00 | REQ-TEST-004 |
+| Staging scheduled checks (drift, measure) | weekly Monday 05:17 | REQ-NFR-020 |
+| OpenAlex scope sync (draft PR on changed IDs) | monthly, day 1 at 05:43 | REQ-DATA-001 |
 
 ## Monitoring
 
@@ -124,6 +127,7 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 | `RESEND_API_KEY` | Sends invitation and sign-in emails (REQ-ACC-007) and alert emails (REQ-NFR-019) | Cloudflare Worker secret; GitHub Actions secret for deployment | preview, staging, production |
 | `RESEND_WEBHOOK_SECRET` | Verifies Resend bounce and complaint webhooks (REQ-ACC-007) | Worker secret | preview, staging, production |
 | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | Deploy with Wrangler and run the bootstrap script; the token has the least permissions each environment needs | GitHub Actions secret | preview, staging, production |
+| `SCOPE_PR_TOKEN` | Opens the draft pull request of `OpenAlex scope sync`; fine-grained token for this repository with Contents and Pull requests write, so the CI checks run on that pull request (ADR 0043) | GitHub environment secret | staging-readonly |
 | `OPENALEX_API_KEY` | OpenAlex requests by the collector (REQ-DATA-001); free key required for cursor paging (ADR 0034) | Worker secret, uploaded by `Staging deploy` from the GitHub environment secret; also Cursor environment secret for local agent work | preview, staging, production |
 | `AI_GATEWAY_ACCOUNT_ID`, `AI_GATEWAY_API_TOKEN` | Route model calls through AI Gateway (REQ-NFR-003) | Worker secret | preview, staging, production |
 | `OPENAI_API_KEY` | Model provider behind AI Gateway (when OpenAI is configured) | AI Gateway / Worker secret | preview, staging, production |

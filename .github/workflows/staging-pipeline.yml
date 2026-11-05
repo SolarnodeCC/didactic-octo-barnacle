@@ -1,0 +1,74 @@
+name: Staging pipeline
+
+# Automatic staging rollout after a green main (REQ-NFR-002, REQ-NFR-020, REQ-NFR-021, ADR 0043).
+# It starts when `CI` or `Configuration` finishes on a push to main. A gate job lets only the
+# run that finds both checks green for the newest commit of main continue; the other run ends
+# without deploying. Then it reports drift (and stops when resources are missing), and calls
+# `Staging deploy`, which applies the migrations and uploads the Worker. Both called jobs use
+# the GitHub environment `staging`, so its required reviewers still approve every rollout.
+# `Staging deploy` also keeps its own check-run gate.
+
+on:
+  workflow_run:
+    workflows: ["CI", "Configuration"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-pipeline
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    if: github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      checks: read
+      contents: read
+    outputs:
+      proceed: ${{ steps.check.outputs.proceed }}
+    steps:
+      - name: Check both gates for the newest commit of main
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          echo "proceed=false" >> "$GITHUB_OUTPUT"
+          # Only the newest commit of main is rolled out; a newer push starts its own run.
+          if [ "$HEAD_SHA" != "$GITHUB_SHA" ]; then
+            echo "A newer commit is on main ($GITHUB_SHA). Nothing to do for $HEAD_SHA."
+            exit 0
+          fi
+          for check in parse toolchain; do
+            conclusion=$(gh api "repos/$GITHUB_REPOSITORY/commits/$HEAD_SHA/check-runs?check_name=$check&filter=latest" --jq '.check_runs | sort_by(.completed_at) | last | .conclusion')
+            if [ "$conclusion" != "success" ]; then
+              echo "The check '$check' is not green yet for $HEAD_SHA (found: ${conclusion:-none}). The other workflow run will continue."
+              exit 0
+            fi
+          done
+          echo "proceed=true" >> "$GITHUB_OUTPUT"
+
+  bootstrap:
+    needs: gate
+    if: needs.gate.outputs.proceed == 'true'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/staging-bootstrap.yml
+    with:
+      apply: false
+      fail_on_drift: true
+
+  deploy:
+    needs: [gate, bootstrap]
+    if: needs.gate.outputs.proceed == 'true'
+    permissions:
+      contents: read
+      checks: read
+    uses: ./.github/workflows/staging-deploy.yml
+    with:
+      migrate: true
