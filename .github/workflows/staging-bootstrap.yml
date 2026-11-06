@@ -14,7 +14,7 @@ on:
         type: boolean
         default: false
       fail_on_drift:
-        description: "Fail when resources are missing (used by the automated pipeline)"
+        description: "Fail when resources are missing (used by the automated pipeline). With apply, the run fails only if resources are still missing after apply"
         type: boolean
         default: false
   workflow_call:
@@ -61,14 +61,21 @@ jobs:
       - name: Build
         run: pnpm build
 
+      # With apply the plan only reports: the next step creates what is missing, and the
+      # last step fails the job if anything is still missing afterwards.
       - name: Report drift
         env:
           FAIL_ON_DRIFT: ${{ inputs.fail_on_drift }}
+          APPLY: ${{ inputs.apply }}
         run: |
           flag=""
-          if [ "$FAIL_ON_DRIFT" = "true" ]; then flag="--fail-on-drift"; fi
+          if [ "$FAIL_ON_DRIFT" = "true" ] && [ "$APPLY" != "true" ]; then flag="--fail-on-drift"; fi
           node infrastructure/cloudflare/dist/bootstrap-cli.js --env staging $flag
 
       - name: Create missing resources
         if: ${{ inputs.apply }}
         run: node infrastructure/cloudflare/dist/bootstrap-cli.js --env staging --apply
+
+      - name: Verify no drift remains
+        if: ${{ inputs.apply }}
+        run: node infrastructure/cloudflare/dist/bootstrap-cli.js --env staging --fail-on-drift
