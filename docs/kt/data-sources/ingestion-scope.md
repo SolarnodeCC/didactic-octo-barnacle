@@ -60,4 +60,38 @@ Phase 2 does not start until the phase 1 measurements give a complete estimate o
 
 ## Results
 
-Not measured yet. After the first scheduled runs on staging, the report of `Staging measure` is recorded here, with its date, the page cap status, and the assumptions used.
+### 6 November 2026
+
+`Staging scheduled checks` run 14, at 14:58 UTC. The data covers the runs from 31 October to the morning of 6 November, before the deploy of 6 November 12:39 UTC that brought delayed retries (ADR 0045), the D1 query cuts, and the PDF queue (ADR 0047). Read it as the baseline for those changes.
+
+**Page cap:** 18 of 22 runs stopped at the page cap, so every volume below is a lower bound.
+
+| Measure | arXiv | OpenAlex |
+|---|---|---|
+| Publications stored | 13,372 | 14,028 |
+| Publication days | 744 (preprints from before ADR 0042) | 242 |
+| Mean per day | 18.0 | 58.0 |
+| Largest day | 544 | 4,090 |
+| With abstract and complete | 100.0 % | 79.4 % |
+| Storable PDF | 0.1 % | 18.7 % |
+
+- **Runs:** 22 in total; 0 succeeded, 18 partial, and 4 failed. 15 messages were dead-lettered, and 122 duplicates were flagged for review.
+- **PDFs:** 1,515 stored. Of the PDF messages, 990 ended on an HTTP error status, 73 were not a PDF, 20 were blocked URLs, 9 had too many redirects, and 11 were dead-lettered.
+
+**Cost per publication (ESTIMATE, ADR 0032).** The mean abstract is 373 tokens. The prices are those of the dearer benchmark candidate per step, because no model is configured yet (OQ-036):
+
+- triage on `glm-4.7-flash` at USD 0.06 / 0.40;
+- extraction on `deepseek-v4.1-flash-1017` at USD 0.30 / 1.20.
+
+The prices are per million input / output tokens, read on 6 November 2026 and converted at the ECB rate of 1.1165 USD per EUR. Prompt and output tokens are the placeholders in `cost-assumptions.json`.
+
+| Figure | EUR |
+|---|---|
+| Triage, per publication | 0.00008 |
+| Extraction, per publication | 0.00136 |
+| **Per publication (triage plus extraction)** | **0.0014** |
+| Per day at the mean of 31 publications | 0.045 |
+| Per day at the largest day so far (4,634 publications, at most 100 extracted) | 0.52 |
+| Provisional phase 2 budget (OQ-013: 100 × cost × 1.5) | 0.22 per day |
+
+All figures are upper bounds for the cost. Replace them when OQ-036 picks the models and the first model calls of phase 2 give a measured cost (REQ-NFR-005).

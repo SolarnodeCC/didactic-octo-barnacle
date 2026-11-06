@@ -152,9 +152,23 @@ function seed(db: Database.Database): void {
   ).run("a".repeat(64), NOW);
 }
 
-const noPrices: CostAssumptions = parseCostAssumptions(
+const committedAssumptions: CostAssumptions = parseCostAssumptions(
   JSON.parse(readFileSync(assumptionsFile, "utf8")),
 );
+/** The committed token counts with every price taken out, to test the incomplete report. */
+const noPrices: CostAssumptions = {
+  ...committedAssumptions,
+  triage: {
+    ...committedAssumptions.triage,
+    inputEurPerMillionTokens: null,
+    outputEurPerMillionTokens: null,
+  },
+  extraction: {
+    ...committedAssumptions.extraction,
+    inputEurPerMillionTokens: null,
+    outputEurPerMillionTokens: null,
+  },
+};
 const prices: CostAssumptions = {
   ...noPrices,
   triage: { ...noPrices.triage, inputEurPerMillionTokens: 1, outputEurPerMillionTokens: 2 },
@@ -328,10 +342,31 @@ describe("REQ-NFR-005: cost per publication is an estimate with stated assumptio
     expect(markdown).toContain("- [ ] The cost per publication estimate is complete");
   });
 
-  it("REQ-NFR-005: the committed assumptions parse and carry no invented prices", () => {
-    expect(noPrices.triage.inputEurPerMillionTokens).toBeNull();
-    expect(noPrices.extraction.outputEurPerMillionTokens).toBeNull();
-    expect(noPrices.dailyExtractionLimit).toBe(100);
+  it("REQ-NFR-005: the committed prices name their model, source, date, and exchange rate", () => {
+    const raw = JSON.parse(readFileSync(assumptionsFile, "utf8")) as {
+      priceSource: {
+        url: string;
+        readOn: string;
+        exchangeRate: { usdPerEur: number; date: string };
+      };
+      triage: Record<string, unknown>;
+      extraction: Record<string, unknown>;
+    };
+    const committed = parseCostAssumptions(raw);
+    expect(committed.dailyExtractionLimit).toBe(100);
+    expect(raw.priceSource.url).toMatch(/^https:\/\//);
+    expect(raw.priceSource.readOn).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    const rate = raw.priceSource.exchangeRate.usdPerEur;
+    expect(rate).toBeGreaterThan(0);
+    for (const name of ["triage", "extraction"] as const) {
+      const step = raw[name];
+      expect(step["model"]).toMatch(/^@cf\//);
+      // Each euro price is the listed dollar price at the recorded rate, rounded to 4 places.
+      for (const side of ["input", "output"] as const) {
+        const usd = step[`${side}UsdPerMillionTokens`] as number;
+        expect(committed[name][`${side}EurPerMillionTokens`]).toBeCloseTo(usd / rate, 4);
+      }
+    }
   });
 
   it("REQ-NFR-005: assumptions that are not numbers or have negative values are refused", () => {

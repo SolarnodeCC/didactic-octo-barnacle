@@ -1,17 +1,33 @@
 {
-  "note": "Assumptions for the phase 1 ESTIMATE of the cost per publication (ADR 0032). The token counts are placeholders until the phase 2 prompts exist. The prices are null on purpose: fill in the current price of the model configured for each step, from the provider's price list, in a reviewed pull request. Without prices the report shows token volumes only.",
+  "note": "Assumptions for the phase 1 ESTIMATE of the cost per publication (ADR 0032). The token counts are placeholders until the phase 2 prompts exist. No model is configured yet (OQ-036), so each step uses the price of the dearer of its two benchmark candidates (docs/kt/test/model-benchmark-plan.md), which makes the cost an upper bound. Prices are the Workers AI list prices in US dollars converted at the ECB reference rate below. Replace them in a reviewed pull request when OQ-036 picks the models, and read the price list again then.",
   "charsPerToken": 4,
   "dailyExtractionLimit": 100,
+  "priceSource": {
+    "url": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+    "listUpdated": "2026-10-20",
+    "readOn": "2026-11-06",
+    "exchangeRate": {
+      "usdPerEur": 1.1165,
+      "date": "2026-11-06",
+      "url": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
+    }
+  },
   "triage": {
     "promptTokens": 500,
     "outputTokens": 100,
-    "inputEurPerMillionTokens": null,
-    "outputEurPerMillionTokens": null
+    "model": "@cf/zai-org/glm-4.7-flash",
+    "inputUsdPerMillionTokens": 0.06,
+    "outputUsdPerMillionTokens": 0.4,
+    "inputEurPerMillionTokens": 0.0537,
+    "outputEurPerMillionTokens": 0.3583
   },
   "extraction": {
     "promptTokens": 1500,
     "outputTokens": 800,
-    "inputEurPerMillionTokens": null,
-    "outputEurPerMillionTokens": null
+    "model": "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
+    "inputUsdPerMillionTokens": 0.3,
+    "outputUsdPerMillionTokens": 1.2,
+    "inputEurPerMillionTokens": 0.2687,
+    "outputEurPerMillionTokens": 1.0748
   }
 }
