@@ -10,7 +10,7 @@ import {
   SCOPE_ARXIV_CATEGORIES,
 } from "../normalize/scope.js";
 import { ErasureConfigError } from "../privacy/author-key.js";
-import { upsertMappedRecord, type MappedRecord } from "../store/publication-repo.js";
+import { authorId, upsertMappedRecord, type MappedRecord } from "../store/publication-repo.js";
 import { type SqlDatabase } from "../store/sql.js";
 
 export type IngestDeps = {
@@ -36,38 +36,78 @@ function emptyResult(): IngestResult {
   };
 }
 
-async function ingestItem(
+/** An item of a page after mapping: the record, or the error that mapping it raised. */
+type PreparedItem = { SourceId: string | null | undefined; Map: () => MappedRecord };
+type MappedItem =
+  | { SourceId: string | null | undefined; Mapped: MappedRecord }
+  | { SourceId: string | null | undefined; Error: unknown };
+
+function recordFailure(result: IngestResult, sourceId: string | null | undefined, error: unknown) {
+  // One bad item never stops the page (REQ-DATA-001 AC3).
+  result.Counts.Failed += 1;
+  result.Failures.push({
+    // A malformed item can lack an ID; JSON would drop `undefined`, so keep it as null.
+    SourceId: sourceId ?? null,
+    Reason: error instanceof Error ? error.message : String(error),
+  });
+}
+
+/**
+ * The erasure list is checked once for every author on the page instead of once per
+ * record (REQ-NFR-016, REQ-NFR-010); each record then reads its answer from that set.
+ * A missing erasure key still stops the page (`ErasureConfigError`).
+ */
+async function withPageErasures(deps: IngestDeps, items: MappedItem[]): Promise<IngestDeps> {
+  if (!deps.SuppressedAuthors) {
+    return deps;
+  }
+  const ids = items.flatMap((item) => ("Mapped" in item ? item.Mapped.Authors.map(authorId) : []));
+  const erased = ids.length > 0 ? await deps.SuppressedAuthors(ids) : new Set<string>();
+  return {
+    ...deps,
+    SuppressedAuthors: (asked) => Promise.resolve(new Set(asked.filter((id) => erased.has(id)))),
+  };
+}
+
+async function ingestItems(
   deps: IngestDeps,
   result: IngestResult,
-  sourceId: string | null | undefined,
-  map: () => MappedRecord,
+  prepared: PreparedItem[],
 ): Promise<void> {
-  result.Counts.Fetched += 1;
-  try {
-    const mapped = map();
-    const outcome = await upsertMappedRecord(deps.Db, mapped, deps);
-    if (mapped.Publication.HasStorablePdf) {
-      result.PdfCandidates.push(outcome.PublicationId);
+  const items: MappedItem[] = prepared.map((item) => {
+    try {
+      return { SourceId: item.SourceId, Mapped: item.Map() };
+    } catch (error) {
+      return { SourceId: item.SourceId, Error: error };
     }
-    if (outcome.Outcome === "created") {
-      result.Counts.Created += 1;
-    } else if (outcome.Outcome === "updated") {
-      result.Counts.Updated += 1;
-    } else {
-      result.Counts.Skipped += 1;
+  });
+  const pageDeps = await withPageErasures(deps, items);
+  for (const item of items) {
+    result.Counts.Fetched += 1;
+    if ("Error" in item) {
+      recordFailure(result, item.SourceId, item.Error);
+      continue;
     }
-  } catch (error) {
-    // Without the erasure key an erased author could be stored again: stop the page.
-    if (error instanceof ErasureConfigError) {
-      throw error;
+    try {
+      const mapped = item.Mapped;
+      const outcome = await upsertMappedRecord(pageDeps.Db, mapped, pageDeps);
+      if (mapped.Publication.HasStorablePdf) {
+        result.PdfCandidates.push(outcome.PublicationId);
+      }
+      if (outcome.Outcome === "created") {
+        result.Counts.Created += 1;
+      } else if (outcome.Outcome === "updated") {
+        result.Counts.Updated += 1;
+      } else {
+        result.Counts.Skipped += 1;
+      }
+    } catch (error) {
+      // Without the erasure key an erased author could be stored again: stop the page.
+      if (error instanceof ErasureConfigError) {
+        throw error;
+      }
+      recordFailure(result, item.SourceId, error);
     }
-    // One bad item never stops the page (REQ-DATA-001 AC3).
-    result.Counts.Failed += 1;
-    result.Failures.push({
-      // A malformed item can lack an ID; JSON would drop `undefined`, so keep it as null.
-      SourceId: sourceId ?? null,
-      Reason: error instanceof Error ? error.message : String(error),
-    });
   }
 }
 
@@ -99,6 +139,7 @@ export async function ingestOpenAlexWorks(
 ): Promise<IngestResult> {
   const result = emptyResult();
   const fetchedAt = deps.Now();
+  const prepared: PreparedItem[] = [];
   for (const work of works) {
     const published = work.publication_date ?? null;
     if (
@@ -109,8 +150,9 @@ export async function ingestOpenAlexWorks(
       result.Counts.Skipped += 1;
       continue;
     }
-    await ingestItem(deps, result, work.id, () => mapOpenAlexWork(work, fetchedAt));
+    prepared.push({ SourceId: work.id, Map: () => mapOpenAlexWork(work, fetchedAt) });
   }
+  await ingestItems(deps, result, prepared);
   return result;
 }
 
@@ -127,6 +169,7 @@ export async function ingestArxivEntries(
 ): Promise<IngestResult> {
   const result = emptyResult();
   const fetchedAt = deps.Now();
+  const prepared: PreparedItem[] = [];
   for (const entry of entries) {
     const published = entry.published.slice(0, 10);
     if (
@@ -137,7 +180,8 @@ export async function ingestArxivEntries(
       result.Counts.Skipped += 1;
       continue;
     }
-    await ingestItem(deps, result, entry.id, () => mapArxivEntry(entry, fetchedAt));
+    prepared.push({ SourceId: entry.id, Map: () => mapArxivEntry(entry, fetchedAt) });
   }
+  await ingestItems(deps, result, prepared);
   return result;
 }

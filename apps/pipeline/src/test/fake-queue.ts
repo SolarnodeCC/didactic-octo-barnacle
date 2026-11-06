@@ -1,4 +1,9 @@
-import { type QueueBatchLike, type QueueMessageLike, type QueueSender } from "../queue/types.js";
+import {
+  SEND_BATCH_LIMIT,
+  type QueueBatchLike,
+  type QueueMessageLike,
+  type QueueSender,
+} from "../queue/types.js";
 
 type Pending = { id: string; body: unknown; attempts: number; delaySeconds: number };
 
@@ -28,6 +33,20 @@ export class FakeQueue implements QueueSender {
     this.sent.push({ body, delaySeconds });
     this.pending.push({ id: `q${(this.nextId += 1)}`, body, attempts: 0, delaySeconds });
     return Promise.resolve();
+  }
+
+  /** Each `sendBatch` call, by the number of messages it held. */
+  readonly batchSizes: number[] = [];
+
+  async sendBatch(messages: Iterable<{ body: unknown; delaySeconds?: number }>): Promise<void> {
+    const list = [...messages];
+    if (list.length > SEND_BATCH_LIMIT) {
+      throw new Error(`sendBatch holds at most ${SEND_BATCH_LIMIT} messages`);
+    }
+    this.batchSizes.push(list.length);
+    for (const message of list) {
+      await this.send(message.body, { delaySeconds: message.delaySeconds ?? 0 });
+    }
   }
 
   get size(): number {

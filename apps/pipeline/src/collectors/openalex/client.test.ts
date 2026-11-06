@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { buildOpenAlexUrl, fetchOpenAlexPage } from "./client.js";
+import { buildOpenAlexUrl, fetchOpenAlexPage, OPENALEX_WORK_FIELDS } from "./client.js";
+import { type OpenAlexWork } from "./types.js";
 import { type FetchFn } from "../../http/retry.js";
 
 const backoff = { MaxAttempts: 3, BaseMs: 1, Sleep: () => Promise.resolve() };
@@ -22,6 +23,31 @@ describe("REQ-DATA-001: OpenAlex client", () => {
     expect(url.searchParams.get("cursor")).toBe("*");
     expect(url.searchParams.get("per-page")).toBe("100");
     expect(url.searchParams.get("api_key")).toBeNull();
+  });
+
+  it("REQ-NFR-010: asks only for the fields the mapper reads", () => {
+    // Every field of the work type, checked by the compiler: a new field must be listed.
+    const fields: Record<keyof OpenAlexWork, true> = {
+      id: true,
+      title: true,
+      display_name: true,
+      publication_date: true,
+      doi: true,
+      ids: true,
+      abstract_inverted_index: true,
+      authorships: true,
+      topics: true,
+      primary_topic: true,
+      cited_by_count: true,
+      language: true,
+      is_retracted: true,
+      open_access: true,
+      primary_location: true,
+    };
+    const url = new URL(buildOpenAlexUrl({ FromDate: "2026-09-29" }));
+    const selected = (url.searchParams.get("select") ?? "").split(/,/u);
+    expect(selected.sort()).toEqual(Object.keys(fields).sort());
+    expect([...OPENALEX_WORK_FIELDS].sort()).toEqual(Object.keys(fields).sort());
   });
 
   it("REQ-DATA-001: filters on the configured subfield IDs when there are any", () => {

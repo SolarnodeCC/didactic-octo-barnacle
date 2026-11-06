@@ -68,7 +68,7 @@ function bareOrcid(orcid: string): string {
 }
 
 /** Author IDs come from the ORCID when there is one, so the same person is one row. */
-function authorId(author: { SourceAuthorId: string; Orcid: string | null }): string {
+export function authorId(author: { SourceAuthorId: string; Orcid: string | null }): string {
   return author.Orcid ? `orcid:${bareOrcid(author.Orcid)}` : `src:${author.SourceAuthorId}`;
 }
 
@@ -102,45 +102,58 @@ async function loadPublication(db: SqlDatabase, id: string): Promise<Publication
     .first<PublicationRow>();
 }
 
-async function findIds(db: SqlDatabase, sql: string, values: SqlValue[]): Promise<string[]> {
-  const { results } = await db
-    .prepare(sql)
-    .bind(...values)
-    .all<{ id: string }>();
-  return results.map((row) => row.id);
-}
+type Matches = {
+  /** The publication that already holds this exact source record, if any. */
+  Own: string | null;
+  /** Candidate publications in the REQ-DATA-007 order: DOI, arXiv ID, OpenAlex IDs, title key. */
+  Candidates: string[];
+};
 
-/** Candidate publications in the REQ-DATA-007 order: DOI, arXiv ID, OpenAlex IDs, title key. */
-async function findCandidateIds(
+/**
+ * The own source record and every candidate in one round trip (REQ-NFR-010). Each branch
+ * of the `UNION ALL` carries its rank, so the order of REQ-DATA-007 is kept.
+ */
+async function findMatches(
   db: SqlDatabase,
   mapped: MappedRecord,
   titleKey: string | null,
-): Promise<string[]> {
-  const ids: string[] = [];
+): Promise<Matches> {
+  const { Source, SourceId } = mapped.SourceRecord;
+  const parts = [
+    "SELECT 0 AS rank, publication_id AS id FROM source_record WHERE source = ? AND source_work_id = ?",
+  ];
+  const values: SqlValue[] = [Source, sourceWorkId(Source, SourceId)];
   const { Doi, ArxivId } = mapped.Publication;
   if (Doi) {
-    ids.push(...(await findIds(db, "SELECT id FROM publication WHERE doi = ?", [Doi])));
+    parts.push("SELECT 1 AS rank, id FROM publication WHERE doi = ?");
+    values.push(Doi);
   }
   if (ArxivId) {
-    ids.push(...(await findIds(db, "SELECT id FROM publication WHERE arxiv_id = ?", [ArxivId])));
+    parts.push("SELECT 2 AS rank, id FROM publication WHERE arxiv_id = ?");
+    values.push(ArxivId);
   }
   const openAlexIds = (mapped.OpenAlexIds ?? []).map((id) => id.toLowerCase());
   if (openAlexIds.length > 0) {
+    // `lower(source_work_id)` is served by `source_record_openalex_lower_idx` (migration 0002).
     const marks = openAlexIds.map(() => "?").join(", ");
-    ids.push(
-      ...(await findIds(
-        db,
-        `SELECT DISTINCT publication_id AS id FROM source_record WHERE source = 'openalex' AND lower(source_work_id) IN (${marks})`,
-        openAlexIds,
-      )),
+    parts.push(
+      `SELECT 3 AS rank, publication_id AS id FROM source_record WHERE source = 'openalex' AND lower(source_work_id) IN (${marks})`,
     );
+    values.push(...openAlexIds);
   }
   if (titleKey) {
-    ids.push(
-      ...(await findIds(db, "SELECT id FROM publication WHERE title_author_key = ?", [titleKey])),
-    );
+    parts.push("SELECT 4 AS rank, id FROM publication WHERE title_author_key = ?");
+    values.push(titleKey);
   }
-  return [...new Set(ids)];
+  const { results } = await db
+    .prepare(`${parts.join(" UNION ALL ")} ORDER BY rank`)
+    .bind(...values)
+    .all<{ rank: number; id: string }>();
+  const own = results.find((row) => row.rank === 0)?.id ?? null;
+  return {
+    Own: own,
+    Candidates: [...new Set(results.filter((row) => row.rank > 0).map((row) => row.id))],
+  };
 }
 
 async function firstAuthorName(db: SqlDatabase, publicationId: string): Promise<string> {
@@ -164,9 +177,13 @@ async function sourcesOf(
   return results;
 }
 
+type SourceRow = { source: string; source_work_id: string };
+
 type Target =
   | { Kind: "create"; ReviewAgainst: string | null }
-  | { Kind: "refresh" | "merge"; PublicationId: string };
+  | { Kind: "refresh"; PublicationId: string }
+  /** A merge carries the rows it was decided on, so they are not read twice. */
+  | { Kind: "merge"; PublicationId: string; Row: PublicationRow; Sources: SourceRow[] };
 
 /**
  * Decide where an incoming record goes: its own source record (a refresh), an
@@ -178,19 +195,13 @@ async function chooseTarget(
   titleKey: string | null,
   firstAuthor: string,
 ): Promise<Target> {
-  const { Source, SourceId } = mapped.SourceRecord;
-  const own = await db
-    .prepare(
-      "SELECT publication_id AS id FROM source_record WHERE source = ? AND source_work_id = ?",
-    )
-    .bind(Source, sourceWorkId(Source, SourceId))
-    .first<{ id: string }>();
-  if (own) {
-    return { Kind: "refresh", PublicationId: own.id };
+  const matches = await findMatches(db, mapped, titleKey);
+  if (matches.Own) {
+    return { Kind: "refresh", PublicationId: matches.Own };
   }
 
   let reviewAgainst: string | null = null;
-  for (const candidateId of await findCandidateIds(db, mapped, titleKey)) {
+  for (const candidateId of matches.Candidates) {
     const candidate = await loadPublication(db, candidateId);
     if (!candidate) {
       continue;
@@ -213,7 +224,7 @@ async function chooseTarget(
       ExistingFirstAuthor: await firstAuthorName(db, candidateId),
     });
     if (decision.Action === "merge") {
-      return { Kind: "merge", PublicationId: candidateId };
+      return { Kind: "merge", PublicationId: candidateId, Row: candidate, Sources: sources };
     }
     if (decision.Action === "review" && reviewAgainst === null) {
       reviewAgainst = candidateId;
@@ -290,7 +301,11 @@ export async function upsertMappedRecord(
 
   const target = await chooseTarget(db, mapped, incomingKey, incomingFirstAuthor);
   const existing =
-    target.Kind === "create" ? null : await loadPublication(db, target.PublicationId);
+    target.Kind === "merge"
+      ? target.Row
+      : target.Kind === "refresh"
+        ? await loadPublication(db, target.PublicationId)
+        : null;
   const refresh = target.Kind === "refresh";
 
   const title = mergedTitle(existing?.title ?? null, incoming.Title, refresh);
@@ -403,9 +418,14 @@ export async function upsertMappedRecord(
   );
 
   // Author metadata: OpenAlex is richer, so an arXiv record never overwrites it.
-  const otherSources = existing ? await sourcesOf(db, publicationId) : [];
-  const keepOpenAlexAuthors =
-    source.Source === "arxiv" && otherSources.some((s) => s.source === "openalex");
+  // Only an arXiv record needs the other sources: an OpenAlex record always writes authors.
+  const otherSources =
+    source.Source !== "arxiv" || !existing
+      ? []
+      : target.Kind === "merge"
+        ? target.Sources
+        : await sourcesOf(db, publicationId);
+  const keepOpenAlexAuthors = otherSources.some((s) => s.source === "openalex");
   let authorshipsChanged = false;
   if (!keepOpenAlexAuthors) {
     const desired = desiredAuthorships(mapped);

@@ -29,6 +29,7 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
       "0005_alert_state.sql",
       "0006_author_erasure.sql",
       "0007_ingestion_run_window_end.sql",
+      "0008_source_record_openalex_lower_idx.sql",
     ]);
   });
 
@@ -45,6 +46,7 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
       "0005_alert_state.sql",
       "0006_author_erasure.sql",
       "0007_ingestion_run_window_end.sql",
+      "0008_source_record_openalex_lower_idx.sql",
     ]);
 
     for (const table of EXPECTED_PHASE1_TABLES) {
@@ -169,5 +171,22 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
         UpdatedAt: now,
       }).DeadLetter,
     ).toBe(false);
+  });
+});
+
+describe("REQ-NFR-010: deduplication lookups use an index", () => {
+  it("REQ-NFR-010: the case-insensitive OpenAlex ID lookup does not scan source_record", () => {
+    const db = new Database(":memory:");
+    applyMigrations((sql) => {
+      db.exec(sql);
+    });
+    const plan = db
+      .prepare(
+        "EXPLAIN QUERY PLAN SELECT publication_id FROM source_record WHERE source = 'openalex' AND lower(source_work_id) IN (?, ?)",
+      )
+      .all("w1", "w2") as Array<{ detail: string }>;
+    const details = plan.map((row) => row.detail).join("\n");
+    expect(details).toContain("source_record_openalex_lower_idx");
+    expect(details).not.toMatch(/SCAN source_record/);
   });
 });

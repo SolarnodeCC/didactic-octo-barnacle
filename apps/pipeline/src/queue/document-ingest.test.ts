@@ -285,3 +285,18 @@ describe("REQ-TEST-003: document tests never reach the network", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 });
+
+describe("REQ-NFR-010: document messages are sent in batches", () => {
+  it("REQ-NFR-010: a page with many PDFs sends its document messages in batches of at most 100", async () => {
+    const works = Array.from({ length: 150 }, (_, i) =>
+      makeWork(i + 1, { Pdf: { Url: `https://repo.example.org/${i + 1}.pdf`, License: "cc-by" } }),
+    );
+    h.SetOpenAlexPages([openAlexPage(works, null)]);
+    await runScheduled(h.Deps, OPENALEX_CRON);
+    // No PDF is scripted, so each document message fails once and is dead-lettered.
+    await h.Drain({ MaxRetries: 0 });
+
+    expect(h.Queue.batchSizes).toEqual([100, 50]);
+    expect(documentMessages(h)).toHaveLength(150);
+  });
+});
