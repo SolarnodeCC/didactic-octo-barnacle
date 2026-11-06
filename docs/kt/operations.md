@@ -2,7 +2,7 @@
 title: Operations
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-31
+last_reviewed: 2026-11-06
 related: [REQ-NFR-001, REQ-NFR-005, REQ-NFR-008, REQ-NFR-015, REQ-NFR-017, REQ-ADM-001, REQ-ADM-002]
 ---
 
@@ -136,8 +136,6 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 | `SCOPE_PR_TOKEN` | Opens the draft pull request of `OpenAlex scope sync`; fine-grained token for this repository with Contents and Pull requests write, so the CI checks run on that pull request (ADR 0046) | GitHub environment secret | staging |
 | `OPENALEX_API_KEY` | OpenAlex requests by the collector (REQ-DATA-001); free key required for cursor paging (ADR 0034) | Worker secret, uploaded by `Staging deploy` from the GitHub environment secret; also Cursor environment secret for local agent work | preview, staging, production |
 | `AI_GATEWAY_ACCOUNT_ID`, `AI_GATEWAY_API_TOKEN` | Route model calls through AI Gateway (REQ-NFR-003) | Worker secret | preview, staging, production |
-| `OPENAI_API_KEY` | Model provider behind AI Gateway (when OpenAI is configured) | AI Gateway / Worker secret | preview, staging, production |
-| `ANTHROPIC_API_KEY` | Model provider behind AI Gateway (when Anthropic is configured) | AI Gateway / Worker secret | preview, staging, production |
 | `SEARCH_PROVIDER_API_KEY` | Primary web search provider for Market Analysis and Competition (ADR 0022) | Worker secret | preview, staging, production |
 | `SEARCH_PROVIDER_FALLBACK_API_KEY` | Second search provider for benchmark and failover (ADR 0022) | Worker secret | preview, staging, production |
 | `ALERT_GITHUB_TOKEN` | Opens and comments on alert issues; a fine-grained token for this repository only, with the permission Issues: read and write and no other (REQ-NFR-019 AC5) | Cloudflare Worker secret | preview, staging, production |
@@ -145,7 +143,7 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 | `ALERT_EMAIL_TO` | Ops address that receives alert emails (REQ-NFR-019); kept out of the repository | Worker variable | preview, staging, production |
 | `ALERT_EMAIL_FROM` | Sender of alert emails: `onboarding@resend.dev` in staging (delivers only to the Resend account owner); an address on the verified domain in production (ADR 0030) | Worker variable (`wrangler.toml`) | staging, production |
 | `ALERT_GITHUB_REPO` | `owner/repo` that receives alert issues | Worker variable (`wrangler.toml`) | staging, production |
-| `EVAL_OPENAI_API_KEY`, `EVAL_ANTHROPIC_API_KEY`, `EVAL_AI_GATEWAY_TOKEN` | Live evals (REQ-TEST-004, ADR 0006); judge uses a different provider than the agent | GitHub environment `evals`, with required reviewer approval | evals |
+| `EVAL_ANTHROPIC_API_KEY`, `EVAL_AI_GATEWAY_TOKEN` | Live evals (REQ-TEST-004, ADR 0006); the judge is Anthropic, a different provider than the Workers AI agents (ADR 0049) | GitHub environment `evals`, with required reviewer approval | evals |
 
 ## Launch checklist (planned)
 

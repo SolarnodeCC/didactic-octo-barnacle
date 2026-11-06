@@ -13,21 +13,14 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
-| OQ-014 | May we widen full-text use (transient processing, quotes from non-redistributable papers), and do the source and model provider terms allow commercial use? | Legal contact named by `@SolarnodeCC` answers the [review brief](legal/review-brief.md). Phase 1 stays abstract-first (ADR 0014). Phase 2 does not start until phase-2 gate questions are signed | before phase 2 starts |
+| OQ-014 | May we widen full-text use (transient processing, quotes from non-redistributable papers), and do the source and model provider terms allow commercial use? | The phase-2 gate questions 1 to 5 of the [review brief](legal/review-brief.md) were approved on 2026-11-06. Still open: launch questions 6 to 12, among them transient processing of non-redistributable full text (item 9) and the processor agreements (item 8). Abstract-first stays (ADR 0014) until item 9 is answered | before launch |
 | OQ-015 | Who are the named golden-set and calibration reviewers? | Fill the ten slots (eight industries plus two shared) in [golden sets](test/golden-sets.md); structure and sizes are fixed | before phase 3 |
 
 ## Models
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
-| OQ-036 | Which model runs each model-backed step? | Cloudflare-hosted models only. Run the [model benchmark plan](test/model-benchmark-plan.md) on the golden sets, pick the cheapest model that meets each step's threshold, and record the result in an ADR | triage and extraction before phase 2 starts; the six analysis agents before phase 3 |
-| OQ-040 | Which providers may the pipeline call: Cloudflare-hosted models only, or also OpenAI and Anthropic through AI Gateway? | The documents disagree. `README.md`, [agents](agents/README.md), and [technology stack](architecture/technology-stack.md) say OpenAI or Anthropic through AI Gateway; OQ-036 and the [model benchmark plan](test/model-benchmark-plan.md) say Cloudflare-hosted only; OQ-020 needs a judge from another provider. Proposal: Cloudflare-hosted models for the pipeline steps, one external provider for the eval judge only, and the stack documents updated to match. Contracts and the eval runner in `packages/models` and `agents/extraction` are provider-agnostic, so either answer keeps them | with OQ-036, before phase 2 starts |
-
-## Selection and validation
-
-| ID | Question | Proposal | Decide before |
-|---|---|---|---|
-| OQ-038 | Is a burden at population or sector level, with no party that can act on it, a candidate in extraction? | Add to REQ-PROC-009: no candidate when the stated burden belongs to a population or sector and no named customer can act on it. Entries `gs-extraction-015` (2602.11223) and `gs-extraction-020` (2609.10350) show the case. Decide after the first extraction eval run, with data | before phase 2 starts |
+| OQ-036 | Which model runs each model-backed step? | Workers AI models only (ADR 0049). Round one of the [model benchmark plan](test/model-benchmark-plan.md) runs now on triage and extraction only, two candidates each, three runs per item; pick the cheapest model that meets each step's threshold and record the result in an ADR | triage and extraction before phase 2 starts; the six analysis agents before phase 3 |
 
 ## Ownership
 
@@ -72,3 +65,5 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-021 | Daily budget = expected daily complete opportunities × measured cost × 1.25, locked before phase 4 scoring | ADR 0023 |
 | OQ-037 | Option B of ADR 0036: one analyst sets E3, `validated` needs all four elements at E3, the Startup Generator writes the brief, the label shows on the detail page only | ADR 0040, [evidence levels](evidence-and-readiness.md) |
 | OQ-017 | Organization profiles and organization-wide feedback come after the MVP | REQ-DASH-005 |
+| OQ-040 | Workers AI models for every pipeline step; Anthropic only as the eval judge; OpenAI not used | ADR 0049 |
+| OQ-038 | A burden of a population or sector with no named customer that can act yields no candidate | ADR 0050, REQ-PROC-009 |

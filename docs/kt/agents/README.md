@@ -2,12 +2,12 @@
 title: Agents index
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-06
 ---
 
 # Multi-agent framework
 
-The multi-agent engine runs agents as plain TypeScript steps inside Cloudflare Workflows with OpenAI or Anthropic models (ADR 0003). Each agent has one responsibility, receives fixed inputs, and returns a typed output contract. How the agents are chained is described in [orchestration](../architecture/orchestration.md).
+The multi-agent engine runs agents as plain TypeScript steps inside Cloudflare Workflows with Workers AI models called through AI Gateway (ADR 0003, ADR 0049). Each agent has one responsibility, receives fixed inputs, and returns a typed output contract. How the agents are chained is described in [orchestration](../architecture/orchestration.md).
 
 - [Contract conventions](contract-conventions.md): type notation, the envelope every output carries, evidence, and failure rules that apply to all agents.
 

@@ -2,7 +2,7 @@
 title: Decisions index
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-04
+last_reviewed: 2026-11-06
 ---
 
 # Architecture decision records
@@ -59,6 +59,9 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0046](0046-automated-staging-pipeline.md) | Automated staging pipeline and scope sync | Accepted |
 | [0047](0047-separate-document-queue.md) | A separate queue for PDF downloads | Accepted |
 | [0048](0048-openalex-publication-types-with-abstract.md) | OpenAlex publication types with an abstract | Accepted |
+| [0049](0049-workers-ai-for-pipeline-anthropic-for-judge.md) | Workers AI for the pipeline steps, Anthropic for the eval judge | Accepted |
+| [0050](0050-no-candidate-without-an-actionable-party.md) | No extraction candidate without a party that can act | Accepted |
+| [0051](0051-phase-1-exits-on-sufficient-data.md) | Phase 1 exits on sufficient data, not on a succeeded run | Accepted |
 
 ## When an ADR is needed
 

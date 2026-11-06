@@ -3,5 +3,5 @@ publicationFixture: fixtures/arxiv/2609.10350.json
 industry: banking
 expected:
   candidates: []
-  reason: "Triage passes on the stated systemic risk, but the study models contagion for supervisors and offers no product a named customer would adopt. No candidate under REQ-PROC-009; owner resolved the doubt this way. The general rule for burdens without an actionable party is OQ-038."
+  reason: "Triage passes on the stated systemic risk, but the study models contagion for supervisors and offers no product a named customer would adopt. No candidate under REQ-PROC-009; owner resolved the doubt this way. REQ-PROC-009 AC6 states the general rule for burdens without an actionable party (ADR 0050)."
 notes: "Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."

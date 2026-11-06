@@ -12,11 +12,13 @@ Plan for choosing the model of each model-backed step by measurement. It follows
 
 ## Decisions taken
 
-The owner decided the following on 2026-11-01.
+The owner decided the following on 2026-11-01, and the rows marked 2026-11-06 on that date.
 
 | Topic | Decision |
 |---|---|
-| Hosting | Cloudflare only. Every candidate is hosted on Workers AI. No third-party provider is benchmarked in this round. |
+| Hosting | Cloudflare only. Every candidate is hosted on Workers AI. No third-party provider is benchmarked in this round. The pipeline runs on Workers AI only (ADR 0049). |
+| Judge (2026-11-06) | Anthropic, through AI Gateway, for the free-text checks of OQ-020 (ADR 0049). It is never a candidate. |
+| Round one scope (2026-11-06) | Triage and opportunity extraction only, with the two candidates each listed below, three runs per item, on the current golden sets. The six analysis agents follow before phase 3. |
 | Labels | The owner labels the golden sets, and an agent prepares the draft labels (see [Labeling](#labeling)). |
 | Critic step | Out of scope. The pipeline stays as in [orchestration](../architecture/orchestration.md). A model judge for Startup Generator stays in the evals. |
 | Pass rule | The eval thresholds of REQ-TEST-005, written before the first run (see [Thresholds](#thresholds)). |
@@ -193,7 +195,7 @@ Stop and ask the owner before the total model cost passes the budget of 50 euro.
 6. Round two: finalists, one reasoning variant, optional prompt tuning.
 7. Write the ADR, update the model configuration, and close OQ-036.
 
-If the chosen models differ from OpenAI or Anthropic, the ADR also updates the [technology stack](../architecture/technology-stack.md), [privacy](../architecture/privacy.md), [operations](../operations.md), and `README.md` and `AGENTS.md`, which name only those two providers.
+ADR 0049 already updated the [technology stack](../architecture/technology-stack.md), [privacy](../architecture/privacy.md), [operations](../operations.md), `README.md`, and `AGENTS.md` to Workers AI for the pipeline. The ADR that closes OQ-036 names the model per step and updates the model configuration.
 
 ## Questions and answers
 
@@ -201,9 +203,9 @@ Status: **confirmed** (KT documents or Cloudflare documentation), **assumption**
 
 **Why does the project need a model provider?** The agents are plain TypeScript Workflow steps that each make one structured model call (ADR 0003). Confirmed.
 
-**Is Anthropic required?** No. The documents name OpenAI or Anthropic, and `ANTHROPIC_API_KEY` is only needed when Anthropic is configured (operations). Confirmed.
+**Is Anthropic required?** Only as the eval judge (ADR 0049). The pipeline calls Workers AI only. Confirmed.
 
-**Can open models on Cloudflare be used?** Yes in principle: all calls go through AI Gateway and the model is configuration. The documents plan Workers AI only for embeddings, so text generation needs an ADR. Confirmed.
+**Can open models on Cloudflare be used?** Yes in principle: all calls go through AI Gateway and the model is configuration. ADR 0049 puts every pipeline step on Workers AI. Confirmed.
 
 **Does a large context window matter?** Probably less than assumed. The standard input is a title and abstract (ADR 0014) plus earlier agent outputs. Assumption.
 

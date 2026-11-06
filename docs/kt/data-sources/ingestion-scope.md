@@ -96,3 +96,5 @@ The prices are per million input / output tokens, read on 6 November 2026 and co
 | Provisional phase 2 budget (OQ-013: 100 × cost × 1.5) | 0.22 per day |
 
 All figures are upper bounds for the cost. Replace them when OQ-036 picks the models and the first model calls of phase 2 give a measured cost (REQ-NFR-005).
+
+**Phase 1 exit data check (ADR 0051).** The exit needs at least 1,000 publications with a title and an abstract per source, over at least 7 publication days. This report meets it: arXiv 13,372 stored, all with abstract, over 744 publication days; OpenAlex about 11,100 of 14,028 with abstract, over 242 publication days. The daily volume above is a lower bound for the pipeline; the OpenAlex API count of ADR 0048 is about 3,400 works a day under the current filter.
