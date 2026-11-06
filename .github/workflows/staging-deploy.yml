@@ -1,6 +1,6 @@
 name: Staging deploy
 
-# Deploy of the collector Worker to staging, by hand or called by `Staging pipeline` (ADR 0046) (REQ-NFR-002, REQ-NFR-020, ADR 0020).
+# Deploy of the collector Worker to staging, by hand or started by `Staging pipeline` (ADR 0046) (REQ-NFR-002, REQ-NFR-020, ADR 0020).
 # It applies the database migrations first (they are expand-only, so the running Worker
 # keeps working), then uploads the Worker together with its secrets in one version.
 # The GitHub environment `staging` supplies:
@@ -14,11 +14,6 @@ on:
     inputs:
       migrate:
         description: "Apply pending database migrations before the deploy"
-        type: boolean
-        default: true
-  workflow_call:
-    inputs:
-      migrate:
         type: boolean
         default: true
 
@@ -72,6 +67,10 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Stop on missing resources
+        # A binding to a queue or bucket that does not exist fails the deploy; say why first.
+        run: node infrastructure/cloudflare/dist/bootstrap-cli.js --env staging --fail-on-drift
 
       - name: Check the erasure key
         env:

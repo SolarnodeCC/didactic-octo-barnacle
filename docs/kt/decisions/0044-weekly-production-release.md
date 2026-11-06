@@ -33,7 +33,7 @@ Option 3. `Production release` runs weekly (Tuesday 07:23 UTC) and by hand. A pl
 
 The first change that fails a rule ends the release; it and everything after it wait for the next week. No open issue labeled `alert` may exist. The planner prints what ships and what waits, and why.
 
-`Production deploy` deploys that exact commit to the environment `production`, which keeps its own protection rules. Nothing deploys until the repository variable `PRODUCTION_AUTO_RELEASE` is `true`, which the owner sets after the launch checklist. After a successful deploy the commit is tagged `release-<date>-<sha>`; the tag is the base of the next release and the rollback target.
+`Production release` starts `Production deploy` as a run of its own (`gh workflow run`), so the deploy job gets the secrets of the environment `production` (ADR 0046). It deploys that exact commit, which must be on `main` with green checks, to the environment `production`, which keeps its own protection rules. Nothing deploys until the repository variable `PRODUCTION_AUTO_RELEASE` is `true`, which the owner sets after the launch checklist. After a successful deploy, `Production deploy` tags the commit `release-<date>-<sha>` and opens an alert issue if the deploy fails; the tag is the base of the next release and the rollback target.
 
 ## Consequences
 

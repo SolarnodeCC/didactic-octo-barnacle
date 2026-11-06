@@ -2,7 +2,7 @@
 title: "0046: Automated staging pipeline and scope sync"
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-05
+last_reviewed: 2026-11-06
 related: [REQ-NFR-002, REQ-NFR-020, REQ-NFR-021, REQ-DATA-001]
 ---
 
@@ -26,11 +26,11 @@ The workflows `Staging bootstrap`, `Staging database`, `Staging deploy`, `Stagin
 
 Option 3. The gate for staging is the pull request: branch protection on `main` requires an approval and a code owner review (`CODEOWNERS`), and the checks `parse` and `toolchain` must pass. The environment `staging` only limits deployment to the branch `main`. Production keeps its own protection and is released weekly (ADR 0044).
 
-- `Staging pipeline` starts when `CI` or `Configuration` finishes on a push to `main`. A gate job lets one run continue when `parse` and `toolchain` are green for the newest commit of `main`. The pipeline reports drift, fails on missing resources (`--fail-on-drift`), then calls `Staging deploy`, which applies migrations and uploads the Worker. Bootstrap `apply` stays manual.
-- The existing workflows can be called (`workflow_call`) and keep `workflow_dispatch`.
+- `Staging pipeline` starts when `CI` or `Configuration` finishes on a push to `main`. A gate job lets one run continue when `parse` and `toolchain` are green for the newest commit of `main`. The pipeline then starts `Staging deploy` as a run of its own (`gh workflow run`). That run stops on missing resources (`--fail-on-drift`), applies migrations, and uploads the Worker. Bootstrap `apply` stays manual.
+- No workflow that needs secrets is called with `uses:`. The secrets are secrets of the GitHub environment, and they do not reach a job of a called workflow, even when that job names the environment. The first version of this pipeline called `Staging bootstrap` and `Staging deploy`, and its bootstrap ran with empty Cloudflare credentials (runs 12 and 14 of 6 November 2026), so nothing was deployed. `Staging scheduled checks` therefore runs its drift and measure jobs itself, and `Production release` starts `Production deploy` the same way (ADR 0044).
 - `Staging scheduled checks` run weekly and are read-only (drift, measure). A failure opens or updates a GitHub issue labeled `alert`.
 - `OpenAlex scope sync` runs monthly. When the ID of a name already in the topic map changed, it opens a **draft** pull request that only changes that ID. It never adds or removes a name and ignores volumes (ADR 0038, ADR 0041). A pull request made with `GITHUB_TOKEN` does not start CI, so the workflow uses the secret `SCOPE_PR_TOKEN`, a fine-grained token for this repository with Contents and Pull requests write.
-- `scripts/check-hardening.py` requires `branches: [main]` on `workflow_run` and forbids `secrets: inherit`.
+- `scripts/check-hardening.py` requires `branches: [main]` on `workflow_run`, forbids `secrets: inherit`, and fails when a job calls a local workflow whose jobs use an environment.
 
 ## Consequences
 
