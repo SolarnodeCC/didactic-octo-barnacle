@@ -16,15 +16,15 @@ Tables, configuration keys, and bindings are in [schema](schema.md). Behavior th
 |---|---|
 | `packages/models` | `MoneySchema`; schemas for the model-call record, processing run, triage decision row, extraction result, and candidate row; the new queue message types and `CandidateId` in the message IDs; the `callModel` helper (ADR 0003) and its Workers AI and budget interfaces |
 | `packages/prompts` (new) | One versioned prompt per step (`triage@1`, `extraction@1`), the sampling settings that go with it, and the delimiters that mark publication text as data |
-| `packages/vector-store` (new) | `embedTexts`, `upsertPublicationVectors`, `deletePublicationVectors`, `searchPublications`, the index registry, and the recall-at-10 corpus and evaluator (ADR 0056, ADR 0057, both Proposed) |
+| `packages/vector-store` (new) | `embedTexts`, `upsertPublicationVectors`, `deletePublicationVectors`, `searchPublications`, the index registry, and the recall-at-10 corpus and evaluator (ADR 0056, ADR 0057) |
 | `agents/extraction` | `runTriageStep` and `runExtractionStep`: pure functions from input to validated output through `callModel`; an eval command that runs the existing eval runner on `callModel` for the benchmark |
 | `apps/pipeline` | Consumers for embedding, triage, extraction, and text extraction; the admission cron; the retraction check; budget handling; the thin-slice Workflow with stub steps; run-report fields for processing |
-| `apps/api` (new, minimal) | One read-only route for the thin slice (ADR 0058, Proposed) |
+| `apps/api` (new, minimal) | One read-only route for the thin slice (ADR 0058) |
 | `infrastructure/cloudflare` | Migrations 0009 and 0010; Workers AI, Vectorize, Workflow, and queue bindings; new crons; bootstrap entries for the new queues and the Vectorize metadata indexes; the price table |
 
 ## Queues and message types
 
-The queue layout is ADR 0053 (Proposed). Messages carry IDs only, as today.
+The queue layout is ADR 0053. Messages carry IDs only, as today.
 
 | Type | Message ID | Producer | Queue | Consumer |
 |---|---|---|---|---|
@@ -41,7 +41,7 @@ Every consumer uses the existing claim in `queue_message_log`, the growing retry
 `callModel` is the only way to call a model (REQ-NFR-003 AC1). It takes the step, the agent when one applies, the run, the model configuration, the prompt, the contract schema, and the text the output must quote from. For each call it:
 
 1. Checks the daily budget at the first attempt of a step, never on a retry, so a step that has started finishes (REQ-NFR-005 AC2).
-2. Calls the Workers AI binding with the environment's AI Gateway and request metadata: run ID, step, and agent (REQ-NFR-003 AC2, ADR 0054, Proposed).
+2. Calls the Workers AI binding with the environment's AI Gateway and request metadata: run ID, step, and agent (REQ-NFR-003 AC2, ADR 0054).
 3. Applies the two code repairs (`repairModelOutput`), validates the contract, and checks every quote against the input text. A failure is retried with the validation errors, up to `model.max_attempts`. A 429 or 5xx is retried with backoff and `Retry-After` and counts toward the same limit.
 4. Writes one `model_call` row per attempt: tokens, latency, cost as `Money`, `price_table_version`, `estimated`, and the outcome (`ok`, `invalid-output`, `provider-error`). The row never holds prompt or publication text (REQ-NFR-011).
 5. Adds the cost to `budget_day` in the same batch.
@@ -54,14 +54,14 @@ In phase 2 the model queue's concurrency (8, equal to `model.semaphore_max`) is 
 - The vector ID is the publication ID, so a repeated message overwrites the same vector. Metadata: `source` (string) and `published_day` (number, `YYYYMMDD`). Vectorize applies a metadata index only to vectors written after the index exists, so bootstrap creates both indexes before the first write (REQ-PROC-002 AC1).
 - The embedding consumer embeds a whole batch in one call, writes the vectors, then the `embedding` rows and message states in one D1 batch.
 - `searchPublications(query, { source?, from?, to?, topK })` embeds the query with the current index's model, queries the current index with the filters, and returns publication IDs with scores, best first (REQ-PROC-003 AC1, AC2). Agents in phase 3 and the opportunity search in phase 4 call this function.
-- **Model change** (REQ-PROC-001 AC2, ADR 0056, Proposed): a new index and its binding are added, the backfill command queues `publication.embed` for every publication against the new index, and search keeps reading the current index. When every publication has a vector in the new index, a reviewed configuration change marks it current. The old binding is removed in the next release.
+- **Model change** (REQ-PROC-001 AC2, ADR 0056): a new index and its binding are added, the backfill command queues `publication.embed` for every publication against the new index, and search keeps reading the current index. When every publication has a vector in the new index, a reviewed configuration change marks it current. The old binding is removed in the next release.
 
 ## Triage
 
 1. **Rules, no model** (REQ-PROC-006 AC1): `incomplete` from `publication.completeness`, `retracted` from `publication.retracted`, `out-of-scope` when `industriesForTopics` (OpenAlex) or the arXiv category map finds no target industry. The decision row is written with that reason.
 2. **Model**: `runTriageStep` reads the title and abstract inside delimiters and returns the five signals and notes (REQ-PROC-008 AC1).
 3. **Code**: `decideTriage` sets the score. A publication that fails the signal rule is stored as `low-score`. One that passes is stored as `awaiting-admission` (REQ-PROC-008 AC2, AC3).
-4. **Admission cron** (ADR 0055, Proposed), daily after ingestion:
+4. **Admission cron** (ADR 0055), daily after ingestion:
    - It takes the decisions still `awaiting-admission` from the last `triage.admission_pool_days`.
    - It ranks them with `admitWithinDailyLimit`, using the limit minus the publications already admitted that UTC day (REQ-PROC-008 AC4).
    - It sets the admitted to `accepted` and queues `publication.extract`.
@@ -89,7 +89,7 @@ In phase 2 the model queue's concurrency (8, equal to `model.semaphore_max`) is 
 
 ## Budget
 
-- `budget.daily_eur` per environment. Before calibration it is the daily limit × the cost per publication × `budget.phase2_multiplier` (REQ-NFR-005 AC1, OQ-013). OQ-043 asks whether that formula covers triage of every ingested publication and embeddings.
+- `budget.daily_eur` per environment. Before calibration it is the sum of the expected daily triage calls × the triage cost, the daily extraction limit × the extraction cost, and the expected daily embeddings × the embedding cost, times `budget.phase2_multiplier` (REQ-NFR-005 AC1, ADR 0059). `budget.expected_daily_triaged` and `budget.expected_daily_embeddings` come from the measured daily volume.
 - When `budget_day.spent` reaches the limit, `callModel` refuses new steps:
   - The triage and embedding consumers complete those messages as `budget-deferred`, and the admission cron queues them again the next day.
   - The admission cron admits nothing.
@@ -100,7 +100,7 @@ In phase 2 the model queue's concurrency (8, equal to `model.semaphore_max`) is 
 ## Retractions
 
 - Ingestion already sets `publication.retracted` and never clears it.
-- The weekly retraction check (`0 8 * * 1`) asks OpenAlex for retracted works, and arXiv for withdrawals, among the stored publications of the last `retraction.lookback_days` (OQ-042), and sets the flag (REQ-DATA-008 AC1).
+- The weekly retraction check (`0 8 * * 1`) asks OpenAlex for retracted works, and arXiv for withdrawals, among the stored publications of the last `retraction.lookback_days` (30 days, ADR 0061), and sets the flag (REQ-DATA-008 AC1).
 - The daily admission cron starts with a sweep of flagged publications not yet handled. It deletes their vectors from every index, hides their candidates and, from migration 0010, their opportunities with `hidden_reason = retracted`, and stamps `retraction_handled_at` (REQ-DATA-008 AC2, AC3; REQ-PROC-002 AC2).
 
 ## Thin slice

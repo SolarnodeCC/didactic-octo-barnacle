@@ -1,14 +1,14 @@
 ---
 title: "0056: Embedding index versioning and backfill"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-06
 related: [REQ-PROC-001, REQ-PROC-002, REQ-PROC-003, REQ-NFR-020]
 ---
 
 # 0056: Embedding index versioning and backfill
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-11-06
 
 ## Context

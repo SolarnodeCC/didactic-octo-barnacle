@@ -56,10 +56,10 @@ Model spending stays within a configured budget.
 - Phase: 2
 - Priority: must
 - Status: planned
-- Source: KT review of cost and volume
+- Source: KT review of cost and volume, ADR 0059
 - Depends on: REQ-NFR-003
 - Acceptance criteria:
-  1. A daily budget for model calls is configured per environment. Before calibration it is the daily limit times the cost per publication times 1.5. At the start of phase 2 the cost per publication is the estimate from phase 1 data (ADR 0032); the first measured cost from phase 2 model calls replaces it. Phase 2 does not start without the estimate.
+  1. A daily budget for model calls is configured per environment. Before calibration it is the sum of the expected daily triage calls times the triage cost, the daily extraction limit times the extraction cost, and the expected daily embeddings times the embedding cost, times 1.5, with the size of the full-text input priced in (ADR 0059). At the start of phase 2 the cost per call is the estimate from phase 1 data (ADR 0032); the first measured cost from phase 2 model calls replaces it. Phase 2 does not start without the estimate.
   2. When the budget is reached, no new pipeline runs start that day; running steps finish.
   3. Cost per publication and per opportunity is reported for each run.
 - Verification: integration test with a stubbed gateway and a low budget

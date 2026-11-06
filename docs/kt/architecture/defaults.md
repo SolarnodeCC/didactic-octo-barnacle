@@ -2,7 +2,7 @@
 title: Runtime defaults
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-05
+last_reviewed: 2026-11-06
 related: [REQ-PROC-005, REQ-PROC-006, REQ-AGENT-007, REQ-AGENT-012, REQ-AGENT-013, REQ-DATA-011, REQ-NFR-005]
 ---
 
@@ -81,7 +81,7 @@ Payload of every message: `{ schemaVersion, type, ids: { runId?, source?, page?,
 
 | Key | Default | Notes |
 |---|---|---|
-| `budget.phase2_multiplier` | `1.5` | daily_limit × cost_per_publication × multiplier |
+| `budget.phase2_multiplier` | `1.5` | Margin on the phase 2 budget: (expected daily triage calls × triage cost + daily limit × extraction cost + expected daily embeddings × embedding cost) × multiplier (ADR 0059) |
 | `budget.cost_per_opportunity_ceiling_eur` | `2.0` | Until ADR 0023 lock |
 | `budget.daily_eur` | unset | Set by ADR 0023 formula before phase 4 scoring |
 

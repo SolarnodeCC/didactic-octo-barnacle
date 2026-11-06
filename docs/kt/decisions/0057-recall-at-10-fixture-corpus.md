@@ -1,14 +1,14 @@
 ---
 title: "0057: Fixture corpus for recall at 10"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-06
 related: [REQ-PROC-003, REQ-TEST-003, REQ-DATA-010]
 ---
 
 # 0057: Fixture corpus for recall at 10
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-11-06
 
 ## Context

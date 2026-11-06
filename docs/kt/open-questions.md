@@ -21,14 +21,6 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
 | OQ-036 | Which model runs each model-backed step? | Workers AI models only (ADR 0049). Round one of the [model benchmark plan](test/model-benchmark-plan.md) runs now on triage and extraction only, two candidates each, three runs per item; pick the cheapest model that meets each step's threshold and record the result in an ADR | triage and extraction before phase 2 starts; the six analysis agents before phase 3 |
-| OQ-043 | Does the provisional phase 2 budget cover triage of every ingested publication, embeddings, and full-text extraction input? | REQ-NFR-005 AC1 multiplies the daily limit (100) by a cost per publication that ADR 0032 defines as one triage and one extraction call on the abstract. Triage runs on every in-scope publication (about EUR 0.37 on the largest measured day alone, against a EUR 0.22 budget), embeddings run on all of them, and full text makes extraction input larger. Proposal: budget = (expected daily triaged publications × triage cost + daily limit × extraction cost + daily embeddings × embedding cost) × 1.5, with `extraction.full_text_max_chars` priced in, and REQ-NFR-005 AC1 changed to match ([phase 2 dependencies](phase-2/dependencies.md#cost-and-quotas)) | before phase 2 starts |
-
-## Selection and validation
-
-| ID | Question | Proposal | Decide before |
-|---|---|---|---|
-| OQ-041 | REQ-TEST-005 (golden sets and thresholds) is phase 3, but the phase 2 exit, REQ-PROC-006 AC3, and REQ-PROC-009 AC5 depend on the triage and extraction golden sets. Should REQ-TEST-005 move to phase 2 for those two steps? | Split it: the triage and extraction part becomes a phase 2 requirement, and the six analysis agents stay in phase 3. The golden sets and `scripts/check-golden-sets.py` already exist | before phase 2 starts |
-| OQ-042 | How far back does the weekly retraction check look? | Ingestion re-reads only `ingestion.overlap_days` (2), so later retractions are found only by the weekly check of REQ-DATA-008. Proposal: `retraction.lookback_days` = `ingestion.max_age_days` (90), since nothing older is stored; widen it if opportunities live longer than that | before WP8 of the [phase 2 build plan](phase-2/build-plan.md) |
 
 ## Ownership
 
@@ -49,7 +41,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-009 | Dashboard on Workers with the OpenNext adapter | ADR 0012 |
 | OQ-012 | Narrow pilot scope with a topic map; daily volume is measured in phase 1 | [Ingestion scope](data-sources/ingestion-scope.md) |
 | OQ-023 | Global model-call limit in a Durable Object semaphore | ADR 0017 |
-| OQ-013 | Provisional phase 2 budget = daily limit × cost per publication × 1.5, where phase 1 estimates the cost per publication from real data (ADR 0032) and the first model calls of phase 2 replace the estimate; phase 2 does not start without the estimate | REQ-NFR-005 |
+| OQ-013 | Provisional phase 2 budget = daily limit × cost per publication × 1.5 (formula replaced by OQ-043), where phase 1 estimates the cost per publication from real data (ADR 0032) and the first model calls of phase 2 replace the estimate; phase 2 does not start without the estimate | REQ-NFR-005 |
 | OQ-016 | Thin end-to-end slice first: one publication through every layer with stubbed agents by the end of phase 2 | REQ-PROC-007, [roadmap](roadmap.md) |
 | OQ-019 | Single owner `@SolarnodeCC` for the MVP; splitting by role is OQ-034 | [KT README](README.md#ownership) |
 | OQ-020 | Benchmark two or three models per agent on the golden set in phase 3; the eval judge uses a different provider than the agent it grades | [AI evals](test/ai-evals.md) |
@@ -75,3 +67,6 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-017 | Organization profiles and organization-wide feedback come after the MVP | REQ-DASH-005 |
 | OQ-040 | Workers AI models for every pipeline step; Anthropic only as the eval judge; OpenAI not used | ADR 0049 |
 | OQ-038 | A burden of a population or sector with no named customer that can act yields no candidate | ADR 0050, REQ-PROC-009 |
+| OQ-041 | REQ-TEST-005 is split: triage and extraction golden sets are a phase 2 requirement, the six analysis agents stay in phase 3 | ADR 0060, REQ-TEST-006 |
+| OQ-042 | The weekly retraction check looks back 30 days | ADR 0061 |
+| OQ-043 | Phase 2 budget is built per cost component: triage, extraction, and embeddings, times 1.5, with the full-text input priced in | ADR 0059, REQ-NFR-005 |

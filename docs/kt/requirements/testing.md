@@ -64,17 +64,32 @@ A change to prompts or to the model configuration runs the evals.
   3. A pull request from a fork does not run live evals; a maintainer runs them from a branch in this repository before merging.
 - Verification: CI job
 
-### REQ-TEST-005: Golden set per agent
+### REQ-TEST-005: Golden set per analysis agent
 
-Each agent and model-backed step has a reviewed golden set.
+Each of the six analysis agents has a reviewed golden set. The golden sets of triage and extraction are REQ-TEST-006 (ADR 0060).
 
 - Phase: 3
 - Priority: must
 - Status: planned
-- Source: test strategy
+- Source: test strategy, ADR 0060
 - Acceptance criteria:
-  1. The golden set holds at least 20 entries per agent, covers all eight target industries (at least one entry per industry), and, for triage and extraction, holds at least three entries that should yield no candidate.
+  1. The golden set holds at least 20 entries per agent and covers all eight target industries (at least one entry per industry).
   2. Each entry names its reviewer; entries for an industry are reviewed by someone with knowledge of that industry.
   3. Changes to the golden set go through a pull request with a named reviewer.
   4. The pass threshold of each golden set is written down with a tolerance before the first eval run, and changes only through a reviewed pull request.
 - Verification: code review
+
+### REQ-TEST-006: Golden sets for triage and extraction
+
+Triage and opportunity extraction have reviewed golden sets with written thresholds before phase 2 ends (ADR 0060).
+
+- Phase: 2
+- Priority: must
+- Status: in-progress
+- Source: test strategy, OQ-041, ADR 0060
+- Acceptance criteria:
+  1. Each golden set holds at least 20 entries and covers all eight target industries (at least one entry per industry). The extraction set holds at least three entries that should yield no candidate.
+  2. Each entry names its reviewer; entries for an industry are reviewed by someone with knowledge of that industry.
+  3. Changes to a golden set go through a pull request with a named reviewer.
+  4. The pass threshold of each golden set is written down with a tolerance before the first eval run, and changes only through a reviewed pull request.
+- Verification: `scripts/check-golden-sets.py` in CI and code review

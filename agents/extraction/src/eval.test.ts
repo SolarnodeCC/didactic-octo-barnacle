@@ -57,8 +57,8 @@ function extractionOracle(entries: readonly ExtractionEntry[]): ModelFn {
   };
 }
 
-describe("REQ-TEST-005: the golden sets load for the eval runner", () => {
-  it("REQ-TEST-005: triage and extraction each hold at least 20 entries with their fixtures", () => {
+describe("REQ-TEST-006: the golden sets load for the eval runner", () => {
+  it("REQ-TEST-006: triage and extraction each hold at least 20 entries with their fixtures", () => {
     expect(triageSet.length).toBeGreaterThanOrEqual(20);
     expect(extractionSet.length).toBeGreaterThanOrEqual(20);
     expect(triageSet.every((entry) => entry.Publication.Abstract.length > 0)).toBe(true);
