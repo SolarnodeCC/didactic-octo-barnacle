@@ -1,6 +1,6 @@
 name: Staging deploy
 
-# Deploy of the collector Worker to staging, by hand or called by `Staging pipeline` (ADR 0043) (REQ-NFR-002, REQ-NFR-020, ADR 0020).
+# Deploy of the collector Worker to staging, by hand or called by `Staging pipeline` (ADR 0046) (REQ-NFR-002, REQ-NFR-020, ADR 0020).
 # It applies the database migrations first (they are expand-only, so the running Worker
 # keeps working), then uploads the Worker together with its secrets in one version.
 # The GitHub environment `staging` supplies:

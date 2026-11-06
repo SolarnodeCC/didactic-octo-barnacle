@@ -1,6 +1,6 @@
 name: OpenAlex scope sync
 
-# Monthly check of the OpenAlex subfield IDs of the topic map (REQ-DATA-001, ADR 0043). It runs
+# Monthly check of the OpenAlex subfield IDs of the topic map (REQ-DATA-001, ADR 0046). It runs
 # the read-only lookup of `OpenAlex scope lookup`, compares the IDs with
 # apps/pipeline/src/normalize/scope.ts, and opens a DRAFT pull request when the ID of a name
 # already in the map changed. It never adds or removes a name and ignores volumes; scope choices

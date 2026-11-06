@@ -52,7 +52,14 @@ jobs:
       - name: Unit tests
         run: pnpm test:unit
 
+      - name: Integration tests
+        run: pnpm test:integration
+
+      - name: Coverage report (reported, not gated)
+        run: pnpm test:coverage
+
       - name: Traceability
         run: |
           python3 -m pip install --disable-pip-version-check -q -r scripts/requirements.txt
+          pnpm check:scripts
           pnpm check:traceability

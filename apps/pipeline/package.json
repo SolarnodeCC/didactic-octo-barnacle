@@ -7,7 +7,9 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "test:unit": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "test:coverage": "vitest run --coverage",
     "scope-lookup": "node ./dist/scope/lookup-cli.js",
     "scope-sync": "node ./dist/scope/sync-cli.js"
   },

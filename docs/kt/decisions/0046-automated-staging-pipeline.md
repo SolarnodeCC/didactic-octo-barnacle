@@ -1,12 +1,12 @@
 ---
-title: "0043: Automated staging pipeline and scope sync"
+title: "0046: Automated staging pipeline and scope sync"
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-11-05
 related: [REQ-NFR-002, REQ-NFR-020, REQ-NFR-021, REQ-DATA-001]
 ---
 
-# 0043: Automated staging pipeline and scope sync
+# 0046: Automated staging pipeline and scope sync
 
 - Decision status: Accepted
 - Date: 2026-11-05

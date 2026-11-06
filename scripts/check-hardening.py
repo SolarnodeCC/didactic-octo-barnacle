@@ -16,7 +16,7 @@ here, in CI, on every pull request. Rules (see docs/kt/decisions/0033-repository
 8. `wrangler.toml` turns off workers.dev and preview URLs and never turns them on.
 9. CI audits the dependencies (`audit:ci` in package.json and in ci.yml).
 10. A workflow that runs on `workflow_run` limits it to `branches: [main]`, and no job passes
-    `secrets: inherit` to a called workflow (ADR 0043).
+    `secrets: inherit` to a called workflow (ADR 0046).
 """
 
 from __future__ import annotations

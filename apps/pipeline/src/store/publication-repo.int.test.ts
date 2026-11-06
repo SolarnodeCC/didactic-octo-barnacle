@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { upsertMappedRecord, type MappedRecord } from "./publication-repo.js";
 import { mapArxivEntry } from "../collectors/arxiv/map-entry.js";
+import { parseArxivFeed } from "../collectors/arxiv/parse-feed.js";
 import { type ArxivEntry } from "../collectors/arxiv/types.js";
 import { mapOpenAlexWork } from "../collectors/openalex/map-work.js";
 import { type OpenAlexWork } from "../collectors/openalex/types.js";
@@ -24,6 +25,15 @@ function arxiv(patch: Partial<ArxivEntry> = {}): MappedRecord {
     readFileSync(join(fixtures, "arxiv", "entry-cs-ai.json"), "utf8"),
   ) as ArxivEntry;
   return mapArxivEntry({ ...entry, ...patch }, NOW);
+}
+
+/** The single entry of a recorded one-entry arXiv feed. */
+function recordedArxiv(name: string): MappedRecord {
+  const [entry] = parseArxivFeed(readFileSync(join(fixtures, "arxiv", name), "utf8"));
+  if (!entry) {
+    throw new Error(`${name} has no entry`);
+  }
+  return mapArxivEntry(entry, NOW);
 }
 
 function count(database: TestDatabase, table: string): number {
@@ -216,5 +226,91 @@ describe("REQ-DATA-005: incomplete publications are stored and marked", () => {
     await upsertMappedRecord(database.Db, arxiv({ id: "http://arxiv.org/abs/2409.11111v3" }), deps);
     const row = database.Raw.prepare("SELECT completeness FROM publication").get();
     expect(row).toEqual({ completeness: "complete" });
+  });
+});
+
+describe("REQ-DATA-002: recorded versions of one preprint", () => {
+  it("REQ-DATA-002: the recorded v1 and v2 of 2609.30137 give one row at version 2", async () => {
+    const database = createTestDatabase();
+    const deps = { Now: () => NOW, NewId: counter() };
+
+    const v1 = await upsertMappedRecord(
+      database.Db,
+      recordedArxiv("feed-two-versions-v1.xml"),
+      deps,
+    );
+    const v2 = await upsertMappedRecord(
+      database.Db,
+      recordedArxiv("feed-two-versions-v2.xml"),
+      deps,
+    );
+
+    expect(v2.PublicationId).toBe(v1.PublicationId);
+    expect(count(database, "publication")).toBe(1);
+    expect(count(database, "source_record")).toBe(1);
+    const row = database.Raw.prepare("SELECT arxiv_id, arxiv_version FROM publication").get();
+    expect(row).toEqual({ arxiv_id: "2609.30137", arxiv_version: 2 });
+  });
+
+  it("REQ-DATA-002: an older version delivered after a newer one does not lower the version", async () => {
+    const database = createTestDatabase();
+    const deps = { Now: () => NOW, NewId: counter() };
+
+    await upsertMappedRecord(database.Db, recordedArxiv("feed-two-versions-v2.xml"), deps);
+    await upsertMappedRecord(database.Db, recordedArxiv("feed-two-versions-v1.xml"), deps);
+
+    const row = database.Raw.prepare("SELECT arxiv_version FROM publication").get();
+    expect(row).toEqual({ arxiv_version: 2 });
+  });
+});
+
+describe("REQ-DATA-008: retracted publications are flagged", () => {
+  it("REQ-DATA-008: a work that OpenAlex marks as retracted is stored with the flag", async () => {
+    const database = createTestDatabase();
+
+    await upsertMappedRecord(database.Db, openAlex("work-retracted.json"), {
+      Now: () => NOW,
+      NewId: counter(),
+    });
+
+    const row = database.Raw.prepare("SELECT retracted FROM publication").get();
+    expect(row).toEqual({ retracted: 1 });
+  });
+
+  it("REQ-DATA-008: a stored work is flagged on the next run once OpenAlex marks it as retracted", async () => {
+    const database = createTestDatabase();
+    const deps = { Now: () => NOW, NewId: counter() };
+
+    await upsertMappedRecord(
+      database.Db,
+      openAlex("work-retracted.json", { is_retracted: false }),
+      deps,
+    );
+    expect(database.Raw.prepare("SELECT retracted FROM publication").get()).toEqual({
+      retracted: 0,
+    });
+
+    await upsertMappedRecord(database.Db, openAlex("work-retracted.json"), deps);
+
+    expect(count(database, "publication")).toBe(1);
+    expect(database.Raw.prepare("SELECT retracted FROM publication").get()).toEqual({
+      retracted: 1,
+    });
+  });
+
+  it("REQ-DATA-008: a later record without the flag does not clear a retraction", async () => {
+    const database = createTestDatabase();
+    const deps = { Now: () => NOW, NewId: counter() };
+
+    await upsertMappedRecord(database.Db, openAlex("work-retracted.json"), deps);
+    await upsertMappedRecord(
+      database.Db,
+      openAlex("work-retracted.json", { is_retracted: false }),
+      deps,
+    );
+
+    expect(database.Raw.prepare("SELECT retracted FROM publication").get()).toEqual({
+      retracted: 1,
+    });
   });
 });

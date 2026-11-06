@@ -7,11 +7,37 @@ import { buildReport, collectMeasurements, formatMarkdown, type Row } from "./me
 
 const ENVIRONMENTS = new Set(["preview", "staging", "production"]);
 
-function usage(): never {
-  console.error(
-    "Usage: roi-measure --env <preview|staging|production> [--assumptions <file>] [--json-out <file>]",
-  );
-  process.exit(2);
+export const MEASURE_USAGE =
+  "Usage: roi-measure --env <preview|staging|production> [--assumptions <file>] [--json-out <file>]";
+
+export type MeasureArgs = { Environment: string; AssumptionsPath: string; JsonOut?: string };
+
+/** The parsed arguments, or null when they do not match the usage line. */
+export function parseMeasureArgs(args: readonly string[]): MeasureArgs | null {
+  let environment: string | undefined;
+  let assumptionsPath = "measure/cost-assumptions.json";
+  let jsonOut: string | undefined;
+  for (let i = 0; i < args.length; i += 1) {
+    const value = args[i + 1];
+    if (args[i] === "--env" && value && ENVIRONMENTS.has(value)) {
+      environment = value;
+    } else if (args[i] === "--assumptions" && value) {
+      assumptionsPath = value;
+    } else if (args[i] === "--json-out" && value) {
+      jsonOut = value;
+    } else {
+      return null;
+    }
+    i += 1;
+  }
+  if (!environment) {
+    return null;
+  }
+  return {
+    Environment: environment,
+    AssumptionsPath: assumptionsPath,
+    ...(jsonOut ? { JsonOut: jsonOut } : {}),
+  };
 }
 
 /**
@@ -71,40 +97,48 @@ function wranglerExecute(environment: string): (sql: string) => Promise<Row[]> {
   };
 }
 
-async function main(): Promise<void> {
-  const args = process.argv.slice(2);
-  let environment: string | undefined;
-  let assumptionsPath = "measure/cost-assumptions.json";
-  let jsonOut: string | undefined;
-  for (let i = 0; i < args.length; i += 1) {
-    const value = args[i + 1];
-    if (args[i] === "--env" && value && ENVIRONMENTS.has(value)) {
-      environment = value;
-    } else if (args[i] === "--assumptions" && value) {
-      assumptionsPath = value;
-    } else if (args[i] === "--json-out" && value) {
-      jsonOut = value;
-    } else {
-      usage();
-    }
-    i += 1;
-  }
-  if (!environment) {
-    usage();
-  }
+export type MeasureCliDeps = {
+  /** Runs one read-only SQL statement against the environment's D1 database. */
+  Execute?: (environment: string) => (sql: string) => Promise<Row[]>;
+  ReadFile?: (path: string) => string;
+  WriteFile?: (path: string, text: string) => void;
+  Now?: () => string;
+  Log: (line: string) => void;
+  Error: (line: string) => void;
+};
 
-  const assumptions = parseCostAssumptions(JSON.parse(readFileSync(assumptionsPath, "utf8")));
-  const data = await collectMeasurements(wranglerExecute(environment));
-  const report = buildReport(data, assumptions, new Date().toISOString());
-  if (jsonOut) {
-    writeFileSync(jsonOut, JSON.stringify(report, null, 2));
+/** Runs the CLI and returns its exit code: 0 on success, 1 on failure, 2 on bad usage. */
+export async function runMeasureCli(
+  args: readonly string[],
+  deps: MeasureCliDeps,
+): Promise<number> {
+  const parsed = parseMeasureArgs(args);
+  if (!parsed) {
+    deps.Error(MEASURE_USAGE);
+    return 2;
   }
-  console.log(formatMarkdown(report));
+  try {
+    const read = deps.ReadFile ?? ((path: string) => readFileSync(path, "utf8"));
+    const assumptions = parseCostAssumptions(JSON.parse(read(parsed.AssumptionsPath)));
+    const execute = (deps.Execute ?? wranglerExecute)(parsed.Environment);
+    const data = await collectMeasurements(execute);
+    const report = buildReport(data, assumptions, deps.Now?.() ?? new Date().toISOString());
+    if (parsed.JsonOut) {
+      (deps.WriteFile ?? writeFileSync)(parsed.JsonOut, JSON.stringify(report, null, 2));
+    }
+    deps.Log(formatMarkdown(report));
+    return 0;
+  } catch (error) {
+    deps.Error(error instanceof Error ? error.message : String(error));
+    return 1;
+  }
 }
 
 if (process.argv[1]?.endsWith("measure-cli.js")) {
-  main().catch((error: unknown) => {
-    console.error(error instanceof Error ? error.message : error);
-    process.exit(1);
+  void runMeasureCli(process.argv.slice(2), {
+    Log: (line) => console.log(line),
+    Error: (line) => console.error(line),
+  }).then((code) => {
+    process.exitCode = code;
   });
 }

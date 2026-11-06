@@ -2,7 +2,7 @@
 title: Test data
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-11-03
+last_reviewed: 2026-11-06
 related: [REQ-TEST-003, REQ-TEST-005, REQ-DATA-010, REQ-AGENT-013]
 ---
 
@@ -11,9 +11,23 @@ related: [REQ-TEST-003, REQ-TEST-005, REQ-DATA-010, REQ-AGENT-013]
 ## Fixtures for academic sources
 
 - Responses from OpenAlex, arXiv, and Semantic Scholar are recorded once and stored as fixture files next to the tests that use them, as `fixtures/<source>/<case>.json` (or `.xml` for arXiv).
-- Tests serve fixtures through the fetch mocking of the Workers test plugin. Unit, integration, and contract tests never call these APIs (REQ-TEST-003). A test that tries to reach the network fails.
-- Refresh fixtures deliberately, in a separate pull request, and note why. Keep each fixture to the fields the test needs. A small recording script under `scripts/` is added with the first collector.
-- Include error cases: rate limiting, timeouts, empty results, malformed records, a work without an abstract, a retracted work, and a preprint with two versions.
+- Tests serve fixtures through a `fetch` function that they inject or stub with `vi.stubGlobal`. Unit, integration, and contract tests never call these APIs (REQ-TEST-003). The shared setup file `test-support/no-network.ts` replaces the global `fetch` and refuses outbound TCP connections, so a test that tries to reach the network fails (ADR 0043).
+- Refresh fixtures deliberately, in a separate pull request, and note why. Keep each fixture to the fields the test needs. The fixtures of `apps/pipeline` are in `apps/pipeline/src/fixtures/<source>/`. Record a new one with `scripts/record-fixture.py`, by hand and never in CI:
+
+  ```bash
+  python3 scripts/record-fixture.py openalex W4400000000 --case work-retracted
+  python3 scripts/record-fixture.py arxiv 2410.00001v2 --case feed-two-versions-v2
+  python3 scripts/record-fixture.py openalex-empty --case page-empty
+  python3 scripts/record-fixture.py arxiv-empty --case feed-empty
+  ```
+
+  It keeps only the fields the collector reads, writes an arXiv entry as a one-entry Atom feed, and replaces author names with placeholders unless `--keep-author-names` is passed. Author IDs, ORCIDs, and affiliations are always replaced. It reads `OPENALEX_API_KEY` from the environment and never writes request headers. It refuses to overwrite a fixture without `--force`.
+- Include error cases. Recorded from the live APIs on 2026-11-06:
+  - a retracted work, `openalex/work-retracted.json` (W4380078608, CC BY; REQ-DATA-008);
+  - a preprint with two versions, `arxiv/feed-two-versions-v1.xml` and `-v2.xml` (2609.30137; REQ-DATA-002 AC3);
+  - empty results, `openalex/page-empty.json` and `arxiv/feed-empty.xml`.
+
+  Written by hand: a work without an abstract (`openalex/work-no-abstract.json`) and malformed records (`makeBrokenWork` in `apps/pipeline/src/test/harness.ts`). Rate limiting, `Retry-After`, timeouts, and server errors are HTTP behaviour, not a response body to record; they are tested with stubbed responses in `apps/pipeline/src/http/retry.test.ts`.
 
 ## Search results
 

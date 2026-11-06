@@ -53,8 +53,9 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0040](0040-evidence-levels-and-readiness-label.md) | Evidence levels and a readiness label next to the score | Accepted |
 | [0041](0041-short-backfill-and-primary-topic-scope.md) | 14-day backfill, 90-day storage limit, and primary-topic scope | Accepted |
 | [0042](0042-arxiv-limit-on-first-submission-date.md) | arXiv 90-day limit on the date of the first version | Accepted |
-| [0043](0043-automated-staging-pipeline.md) | Automated staging pipeline and scope sync | Accepted |
+| [0043](0043-node-integration-tests-and-network-guard.md) | Node integration tests with a network guard | Accepted |
 | [0044](0044-weekly-production-release.md) | Weekly production release | Accepted |
+| [0046](0046-automated-staging-pipeline.md) | Automated staging pipeline and scope sync | Accepted |
 
 ## When an ADR is needed
 

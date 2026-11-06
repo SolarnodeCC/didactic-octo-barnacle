@@ -1,8 +1,8 @@
 name: Staging scheduled checks
 
-# Weekly read-only checks of staging (REQ-NFR-020, ADR 0032, ADR 0043): infrastructure drift
+# Weekly read-only checks of staging (REQ-NFR-020, ADR 0032, ADR 0046): infrastructure drift
 # and the phase 1 measurements. They use the GitHub environment `staging`, which has no
-# required reviewers (the pull request approval is the gate, ADR 0043).
+# required reviewers (the pull request approval is the gate, ADR 0046).
 # A failure opens a GitHub issue labeled `alert`, or comments on the one that is open.
 
 on:

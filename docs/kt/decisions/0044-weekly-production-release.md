@@ -13,7 +13,7 @@ related: [REQ-NFR-002, REQ-NFR-020, REQ-NFR-021]
 
 ## Context
 
-Staging follows `main` automatically (ADR 0043). Production should get changes once a week, and a change that depends on another pull request must not reach production without it.
+Staging follows `main` automatically (ADR 0046). Production should get changes once a week, and a change that depends on another pull request must not reach production without it.
 
 ## Options considered
 

@@ -1,6 +1,6 @@
 name: Staging pipeline
 
-# Automatic staging rollout after a green main (REQ-NFR-002, REQ-NFR-020, REQ-NFR-021, ADR 0043).
+# Automatic staging rollout after a green main (REQ-NFR-002, REQ-NFR-020, REQ-NFR-021, ADR 0046).
 # It starts when `CI` or `Configuration` finishes on a push to main. A gate job lets only the
 # run that finds both checks green for the newest commit of main continue; the other run ends
 # without deploying. Then it reports drift (and stops when resources are missing), and calls
