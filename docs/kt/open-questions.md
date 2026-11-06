@@ -2,7 +2,7 @@
 title: Open questions
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-04
+last_reviewed: 2026-11-06
 ---
 
 # Open questions
@@ -21,6 +21,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
 | OQ-036 | Which model runs each model-backed step? | Cloudflare-hosted models only. Run the [model benchmark plan](test/model-benchmark-plan.md) on the golden sets, pick the cheapest model that meets each step's threshold, and record the result in an ADR | triage and extraction before phase 2 starts; the six analysis agents before phase 3 |
+| OQ-040 | Which providers may the pipeline call: Cloudflare-hosted models only, or also OpenAI and Anthropic through AI Gateway? | The documents disagree. `README.md`, [agents](agents/README.md), and [technology stack](architecture/technology-stack.md) say OpenAI or Anthropic through AI Gateway; OQ-036 and the [model benchmark plan](test/model-benchmark-plan.md) say Cloudflare-hosted only; OQ-020 needs a judge from another provider. Proposal: Cloudflare-hosted models for the pipeline steps, one external provider for the eval judge only, and the stack documents updated to match. Contracts and the eval runner in `packages/models` and `agents/extraction` are provider-agnostic, so either answer keeps them | with OQ-036, before phase 2 starts |
 
 ## Selection and validation
 

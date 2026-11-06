@@ -1,0 +1,21 @@
+{
+  "name": "@roi/agent-extraction",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run"
+  },
+  "dependencies": {
+    "@roi/models": "workspace:*",
+    "yaml": "^2.4.2",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.12"
+  }
+}
