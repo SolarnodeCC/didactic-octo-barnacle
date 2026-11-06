@@ -2,7 +2,7 @@
 title: Model benchmark plan
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-11-01
+last_reviewed: 2026-11-06
 related: [REQ-AGENT-010, REQ-AGENT-012, REQ-AGENT-014, REQ-NFR-003, REQ-NFR-005, REQ-NFR-011, REQ-TEST-004, REQ-TEST-005]
 ---
 
@@ -110,6 +110,26 @@ For each pair of step and model:
 5. Keep the default reasoning setting in round one. Test one alternative setting only for finalists in round two.
 6. Grade free text with a model judge that is a different model than the candidate (OQ-020), checked against human labels as described in [AI evals](ai-evals.md).
 7. Keep the raw response of every call in R2 under a benchmark prefix of a staging bucket, next to the usage record. Grading and metrics can then be recomputed without new model calls. The benchmark items are public abstracts (CC0), and the usage records hold no publication text (REQ-NFR-011).
+
+### Eval runner
+
+The deterministic checks already run without a model. `agents/extraction/src/eval.ts` loads the triage and extraction golden sets with their fixtures, and scores any `ModelFn` (publication in, raw output out) against them:
+
+- **Triage:** the schema, agreement per signal, and the decision that `decideTriage` derives (REQ-PROC-008). It reports precision and recall of the accept decision.
+- **Extraction:** the schema, verbatim quotes (REQ-AGENT-008), and the number of candidates (REQ-PROC-009).
+- **Both:** the two repairs of REQ-AGENT-011, and the pass rate against the stored threshold.
+
+The contracts it uses are in `packages/models` (`triage.ts`, `extraction.ts`, `agent-contract.ts`). Unit tests run it with stubs:
+
+- A stub that answers with the labels passes every entry, which proves the golden sets fit the contracts.
+- Stubs that answer wrongly fail.
+
+Still to add for the benchmark:
+
+- The model-call helper through AI Gateway (ADR 0003).
+- The three-run stability check.
+- The model judge for `Finding` and `Customer` (OQ-020).
+- Usage records (REQ-NFR-011).
 
 ### Metrics
 

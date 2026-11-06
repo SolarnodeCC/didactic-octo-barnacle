@@ -1,11 +1,11 @@
 # Research Opportunity Intelligence Platform
 
-This repository specifies a platform that turns scientific publications into scored software opportunities. The knowledge transfer (KT) documents in `docs/kt/` are the product source of truth; `README.md` is a summary that links to them (see `docs/kt/decisions/0002-kt-documents-are-source-of-truth.md`). The checked-in tree is that specification, the MIT `LICENSE`, the phase 1 foundation (`packages/models` and the pnpm workspace), Cloudflare infrastructure scaffolding (`infrastructure/cloudflare`), and the pipeline collector mappers (`apps/pipeline`). The dashboard, API, agents, and remaining packages described in the KT documents are not implemented yet.
+This repository specifies a platform that turns scientific publications into scored software opportunities. The knowledge transfer (KT) documents in `docs/kt/` are the product source of truth; `README.md` is a summary that links to them (see `docs/kt/decisions/0002-kt-documents-are-source-of-truth.md`). The checked-in tree is that specification, the MIT `LICENSE`, the phase 1 foundation (`packages/models` and the pnpm workspace), Cloudflare infrastructure scaffolding (`infrastructure/cloudflare`), the pipeline collector mappers (`apps/pipeline`), and the triage and extraction eval runner (`agents/extraction`, model-free). The dashboard, API, agent runtime, and remaining packages described in the KT documents are not implemented yet.
 
 Planned layout:
 
 - `apps/dashboard`, `apps/api`, and `apps/pipeline` (present; fixture mappers)
-- `agents/extraction`, `agents/analysis`, `agents/market`, and `agents/startup`
+- `agents/extraction` (present; eval runner), `agents/analysis`, `agents/market`, and `agents/startup`
 - `packages/vector-store`, `packages/prompts`, `packages/scoring`, and `packages/models` (present)
 - `infrastructure/cloudflare` (present)
 

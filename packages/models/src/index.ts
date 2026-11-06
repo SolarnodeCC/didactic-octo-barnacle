@@ -71,3 +71,41 @@ export {
   type ErasureReason,
   type ErasureRecord,
 } from "./erasure.js";
+
+export {
+  EvidenceKindSchema,
+  EvidenceSchema,
+  IndustrySchema,
+  OutputModeSchema,
+  RepairKindSchema,
+  agentEnvelopeSchema,
+  missingQuotes,
+  repairModelOutput,
+  type Evidence,
+  type Industry,
+  type RepairKind,
+  type RepairResult,
+} from "./agent-contract.js";
+
+export {
+  DEFAULT_ACCEPT_SCORE_CUT,
+  TriageModelOutputSchema,
+  TriageReasonSchema,
+  TriageSignalsSchema,
+  admitWithinDailyLimit,
+  decideTriage,
+  type RankedTriage,
+  type TriageDecision,
+  type TriageModelOutput,
+  type TriageReason,
+  type TriageSignals,
+} from "./triage.js";
+
+export {
+  DEFAULT_MAX_CANDIDATES,
+  ExtractionCandidateSchema,
+  extractionMissingQuotes,
+  extractionOutputSchema,
+  type ExtractionCandidate,
+  type ExtractionOutput,
+} from "./extraction.js";
