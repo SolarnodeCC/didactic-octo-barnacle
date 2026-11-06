@@ -196,3 +196,54 @@ describe("REQ-DATA-010: PDF fetcher", () => {
     expect(fetchFn).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("REQ-DATA-010: the PDF body is read into one buffer when its size is declared", () => {
+  /** A body delivered in several chunks, as a real download would arrive. */
+  function chunked(...parts: Uint8Array[]): ReadableStream<Uint8Array> {
+    let index = 0;
+    return new ReadableStream<Uint8Array>({
+      pull(controller) {
+        const part = parts[index];
+        index += 1;
+        if (part) {
+          controller.enqueue(part);
+        } else {
+          controller.close();
+        }
+      },
+    });
+  }
+  const head = PDF.subarray(0, 8);
+  const tail = PDF.subarray(8);
+
+  it("REQ-DATA-010: a body of exactly the declared size comes back whole", async () => {
+    const { fetchPdf } = fetcherFor(
+      pdfResponse(chunked(head, tail), { "content-length": String(PDF.byteLength) }),
+    );
+    const result = await fetchPdf("https://repo.example.org/a.pdf");
+    expect(result.Bytes).toEqual(PDF);
+    expect(result.Bytes.buffer.byteLength).toBe(PDF.byteLength);
+  });
+
+  it("REQ-DATA-010: a body longer than declared is still read whole", async () => {
+    const { fetchPdf } = fetcherFor(pdfResponse(chunked(head, tail), { "content-length": "4" }));
+    expect((await fetchPdf("https://repo.example.org/a.pdf")).Bytes).toEqual(PDF);
+  });
+
+  it("REQ-DATA-010: a body shorter than declared returns only the bytes that arrived", async () => {
+    const { fetchPdf } = fetcherFor(
+      pdfResponse(chunked(head, tail), { "content-length": String(PDF.byteLength + 50) }),
+    );
+    const result = await fetchPdf("https://repo.example.org/a.pdf");
+    expect(result.Bytes).toEqual(PDF);
+    expect(result.Bytes.byteLength).toBe(PDF.byteLength);
+  });
+
+  it("REQ-DATA-010: a body that outgrows a small declared size still stops at the limit", async () => {
+    const big = new Uint8Array(600).fill(0x20);
+    const { fetchPdf } = fetcherFor(
+      pdfResponse(chunked(PDF, big, big), { "content-length": String(PDF.byteLength) }),
+    );
+    expect((await failure(fetchPdf("https://repo.example.org/a.pdf"))).Code).toBe("too-large");
+  });
+});

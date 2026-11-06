@@ -36,6 +36,9 @@ export function desiredResources(environment: EnvironmentName): DesiredResource[
     { Kind: "r2", Name: `roi-search-fixtures-${suffix}` },
     { Kind: "queue", Name: `roi-publications-${suffix}` },
     { Kind: "queue-dlq", Name: `roi-publications-dlq-${suffix}` },
+    // PDF downloads, consumed apart from the pages (ADR 0047).
+    { Kind: "queue", Name: `roi-documents-${suffix}` },
+    { Kind: "queue-dlq", Name: `roi-documents-dlq-${suffix}` },
     { Kind: "vectorize", Name: `roi-publications-${suffix}` },
     { Kind: "ai-gateway", Name: `roi-${suffix}` },
   ];

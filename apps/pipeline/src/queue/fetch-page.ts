@@ -2,7 +2,12 @@ import { QueueMessageEnvelopeSchema, type IngestionRunFailure } from "@roi/model
 
 import { claimMessage, completeStatement, markFailed } from "./log.js";
 import { SEND_BATCH_LIMIT } from "./types.js";
-import { documentIngestEnvelope, fetchPageEnvelope, type PipelineDeps } from "./deps.js";
+import {
+  documentIngestEnvelope,
+  documentQueue,
+  fetchPageEnvelope,
+  type PipelineDeps,
+} from "./deps.js";
 import {
   ingestArxivEntries,
   ingestOpenAlexWorks,
@@ -125,7 +130,7 @@ async function processPage(
   // Sent in batches of up to 100, one request each, instead of one request per message.
   const documents = await pendingDocumentIds(deps.Db, fetched.Result.PdfCandidates);
   for (let start = 0; start < documents.length; start += SEND_BATCH_LIMIT) {
-    await deps.Queue.sendBatch(
+    await documentQueue(deps).sendBatch(
       documents
         .slice(start, start + SEND_BATCH_LIMIT)
         .map((publicationId) => ({ body: documentIngestEnvelope(publicationId) })),

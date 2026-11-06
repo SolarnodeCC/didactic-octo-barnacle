@@ -20,6 +20,8 @@ export type Env = {
   DB: SqlDatabase;
   DOCUMENTS: ObjectStore;
   PUBLICATION_QUEUE: QueueSender;
+  /** PDF downloads, consumed apart from the pages (ADR 0047). */
+  DOCUMENT_QUEUE: QueueSender;
   /** Worker secret; the name is listed in docs/kt/operations.md. */
   OPENALEX_API_KEY?: string;
   /**
@@ -60,6 +62,7 @@ function buildDeps(env: Env): PipelineDeps {
   return {
     Db: env.DB,
     Queue: env.PUBLICATION_QUEUE,
+    DocumentQueue: env.DOCUMENT_QUEUE,
     Now: () => new Date().toISOString(),
     NewId: () => crypto.randomUUID(),
     Config: config,

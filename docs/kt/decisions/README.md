@@ -57,6 +57,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0044](0044-weekly-production-release.md) | Weekly production release | Accepted |
 | [0045](0045-delayed-queue-retries-and-ordered-pages.md) | Delayed queue retries and pages stored in order | Accepted |
 | [0046](0046-automated-staging-pipeline.md) | Automated staging pipeline and scope sync | Accepted |
+| [0047](0047-separate-document-queue.md) | A separate queue for PDF downloads | Accepted |
 
 ## When an ADR is needed
 

@@ -12,7 +12,13 @@ import { type QueueSender } from "./types.js";
 
 export type PipelineDeps = {
   Db: SqlDatabase;
+  /** Page messages (`source.fetch_page`); one at a time, in order (REQ-DATA-009). */
   Queue: QueueSender;
+  /**
+   * PDF messages (`document.ingest`), on their own queue so a slow download never holds up
+   * the pages (ADR 0047). Without it, they share `Queue`.
+   */
+  DocumentQueue?: QueueSender;
   Now: () => string;
   NewId: () => string;
   Config: IngestConfig;
@@ -40,6 +46,11 @@ export type PipelineDeps = {
   /** Structured log line; the worker writes JSON, tests can leave it out (REQ-NFR-008 AC1). */
   Log?: (event: string, fields: Record<string, unknown>) => void;
 };
+
+/** The queue that carries `document.ingest` messages. */
+export function documentQueue(deps: Pick<PipelineDeps, "Queue" | "DocumentQueue">): QueueSender {
+  return deps.DocumentQueue ?? deps.Queue;
+}
 
 export type RunSource = Extract<SourceName, "openalex" | "arxiv">;
 
