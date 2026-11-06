@@ -3,7 +3,9 @@
 Run from the repository root, by hand, never in CI:
 
     python3 scripts/record-fixture.py openalex W4400000000 --case work-retracted
-    python3 scripts/record-fixture.py arxiv 2410.00001 --case feed-two-versions
+    python3 scripts/record-fixture.py arxiv 2410.00001v2 --case feed-two-versions-v2
+    python3 scripts/record-fixture.py openalex-empty --case page-empty
+    python3 scripts/record-fixture.py arxiv-empty --case feed-empty
 
 It writes apps/pipeline/src/fixtures/openalex/<case>.json or
 apps/pipeline/src/fixtures/arxiv/<case>.xml. Tests read fixtures, so recording is
@@ -14,6 +16,9 @@ What it keeps and what it scrubs:
 - An OpenAlex work keeps only the fields the collector reads (the keys of
   `OpenAlexWork` in apps/pipeline/src/collectors/openalex/types.ts).
 - An arXiv entry is written as a one-entry Atom feed, the format the collector parses.
+- `openalex-empty` and `arxiv-empty` run a query that matches nothing and keep the
+  fields the collector reads from an empty page: OpenAlex `meta.count` and
+  `meta.next_cursor`, arXiv `opensearch:totalResults`.
 - Authors are pseudonymised by default: names become "Author 1", "Author 2", ...,
   OpenAlex author IDs become synthetic IDs, and ORCIDs and affiliations become
   placeholders (REQ-NFR-009, REQ-NFR-016). Pass --keep-author-names only when a test
@@ -40,6 +45,10 @@ from typing import Any, Callable
 FIXTURES = pathlib.Path("apps/pipeline/src/fixtures")
 OPENALEX_WORK_URL = "https://api.openalex.org/works/{id}"
 ARXIV_QUERY_URL = "https://export.arxiv.org/api/query?{query}"
+OPENALEX_EMPTY_URL = (
+    "https://api.openalex.org/works?filter=from_publication_date:2099-01-01&per-page=1&cursor=*"
+)
+ARXIV_EMPTY_QUERY = "cat:cs.AI AND submittedDate:[199001010000 TO 199001020000]"
 USER_AGENT = "roi-fixture-recorder"
 TIMEOUT_SECONDS = 30
 
@@ -67,6 +76,7 @@ TOPIC_KEYS = ("id", "display_name", "subfield", "field", "domain")
 
 ATOM = "http://www.w3.org/2005/Atom"
 ARXIV = "http://arxiv.org/schemas/atom"
+OPENSEARCH = "http://a9.com/-/spec/opensearch/1.1/"
 OPENALEX_ID = re.compile(r"^W\d+$")
 ARXIV_ID = re.compile(r"^(\d{4}\.\d{4,5}|[a-z-]+(\.[A-Z]{2})?/\d{7})(v\d+)?$")
 CASE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
@@ -140,8 +150,7 @@ def trim_openalex_work(work: dict[str, Any], keep_names: bool = False) -> dict[s
 
 def scrub_arxiv_feed(xml_text: bytes, keep_names: bool = False) -> str:
     """The first entry of an arXiv Atom response, as a one-entry feed."""
-    ET.register_namespace("", ATOM)
-    ET.register_namespace("arxiv", ARXIV)
+    _register_namespaces()
     root = ET.fromstring(xml_text)
     entry = root.find(f"{{{ATOM}}}entry")
     if entry is None or entry.find(f"{{{ATOM}}}title") is None:
@@ -156,18 +165,69 @@ def scrub_arxiv_feed(xml_text: bytes, keep_names: bool = False) -> str:
     title = ET.SubElement(feed, f"{{{ATOM}}}title")
     title.text = "ArXiv Query"
     feed.append(entry)
+    return _write_feed(feed)
+
+
+def _register_namespaces() -> None:
+    ET.register_namespace("", ATOM)
+    ET.register_namespace("arxiv", ARXIV)
+    ET.register_namespace("opensearch", OPENSEARCH)
+
+
+def _write_feed(feed: ET.Element) -> str:
     ET.indent(feed, space="  ")
     return '<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(feed, encoding="unicode") + "\n"
+
+
+def trim_empty_arxiv_feed(xml_text: bytes) -> str:
+    """A real arXiv response with no entries, keeping the result count."""
+    _register_namespaces()
+    root = ET.fromstring(xml_text)
+    if root.find(f"{{{ATOM}}}entry") is not None:
+        raise ValueError("the arXiv response is not empty")
+    total = root.find(f"{{{OPENSEARCH}}}totalResults")
+    feed = ET.Element(f"{{{ATOM}}}feed")
+    ET.SubElement(feed, f"{{{ATOM}}}title").text = "ArXiv Query"
+    ET.SubElement(feed, f"{{{OPENSEARCH}}}totalResults").text = (
+        total.text if total is not None else "0"
+    )
+    return _write_feed(feed)
+
+
+def trim_empty_openalex_page(page: dict[str, Any]) -> dict[str, Any]:
+    """A real OpenAlex page with no works, keeping what the collector reads."""
+    if page.get("results"):
+        raise ValueError("the OpenAlex response is not empty")
+    meta = page.get("meta") or {}
+    return {
+        "meta": {"count": meta.get("count", 0), "next_cursor": meta.get("next_cursor")},
+        "results": [],
+    }
+
+
+def _openalex_headers() -> dict[str, str]:
+    headers = {"accept": "application/json", "user-agent": USER_AGENT}
+    api_key = os.environ.get("OPENALEX_API_KEY")
+    if api_key:
+        headers["authorization"] = f"Bearer {api_key}"
+    return headers
+
+
+def record_openalex_empty(fetch: Fetch) -> str:
+    page = json.loads(fetch(OPENALEX_EMPTY_URL, _openalex_headers()))
+    return json.dumps(trim_empty_openalex_page(page), indent=2) + "\n"
+
+
+def record_arxiv_empty(fetch: Fetch) -> str:
+    query = urllib.parse.urlencode({"search_query": ARXIV_EMPTY_QUERY, "max_results": "1"})
+    body = fetch(ARXIV_QUERY_URL.format(query=query), {"user-agent": USER_AGENT})
+    return trim_empty_arxiv_feed(body)
 
 
 def record_openalex(work_id: str, keep_names: bool, fetch: Fetch) -> str:
     if not OPENALEX_ID.match(work_id):
         raise ValueError(f"not an OpenAlex work ID: {work_id!r} (expected W followed by digits)")
-    headers = {"accept": "application/json", "user-agent": USER_AGENT}
-    api_key = os.environ.get("OPENALEX_API_KEY")
-    if api_key:
-        headers["authorization"] = f"Bearer {api_key}"
-    body = fetch(OPENALEX_WORK_URL.format(id=work_id), headers)
+    body = fetch(OPENALEX_WORK_URL.format(id=work_id), _openalex_headers())
     work = json.loads(body)
     return json.dumps(trim_openalex_work(work, keep_names), indent=2, ensure_ascii=False) + "\n"
 
@@ -182,8 +242,10 @@ def record_arxiv(arxiv_id: str, keep_names: bool, fetch: Fetch) -> str:
 
 def main(argv: list[str] | None = None, fetch: Fetch = http_fetch, root: pathlib.Path = pathlib.Path(".")) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    parser.add_argument("source", choices=("openalex", "arxiv"))
-    parser.add_argument("id", help="an OpenAlex work ID (W...) or an arXiv ID (2410.00001)")
+    parser.add_argument("source", choices=("openalex", "arxiv", "openalex-empty", "arxiv-empty"))
+    parser.add_argument(
+        "id", nargs="?", help="an OpenAlex work ID (W...) or an arXiv ID (2410.00001); not for *-empty"
+    )
     parser.add_argument("--case", required=True, help="fixture name in kebab-case, without extension")
     parser.add_argument("--keep-author-names", action="store_true", help="keep real public author names")
     parser.add_argument("--force", action="store_true", help="overwrite an existing fixture")
@@ -191,15 +253,22 @@ def main(argv: list[str] | None = None, fetch: Fetch = http_fetch, root: pathlib
 
     if not CASE.match(args.case):
         parser.error(f"--case must be kebab-case: {args.case!r}")
-    extension = "json" if args.source == "openalex" else "xml"
-    target = root / FIXTURES / args.source / f"{args.case}.{extension}"
+    empty = args.source.endswith("-empty")
+    if empty == (args.id is not None):
+        parser.error("give an ID for openalex and arxiv, and none for openalex-empty and arxiv-empty")
+    source = args.source.removesuffix("-empty")
+    extension = "json" if source == "openalex" else "xml"
+    target = root / FIXTURES / source / f"{args.case}.{extension}"
     if target.exists() and not args.force:
         print(f"error: {target} exists; pass --force to refresh it", file=sys.stderr)
         return 1
 
     try:
-        record = record_openalex if args.source == "openalex" else record_arxiv
-        text = record(args.id, args.keep_author_names, fetch)
+        if empty:
+            text = (record_openalex_empty if source == "openalex" else record_arxiv_empty)(fetch)
+        else:
+            record = record_openalex if source == "openalex" else record_arxiv
+            text = record(args.id, args.keep_author_names, fetch)
     except ValueError as error:
         print(f"error: {error}", file=sys.stderr)
         return 1

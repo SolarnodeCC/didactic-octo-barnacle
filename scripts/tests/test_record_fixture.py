@@ -175,6 +175,42 @@ class MainTest(unittest.TestCase):
         self.assertEqual(self.run_main(["arxiv", "2410.1 OR all:x", "--case", "x"], fetch), 1)
         self.assertEqual(fetch.calls, [])
 
+    def test_req_test_003_records_an_empty_openalex_page_with_only_meta_and_results(self) -> None:
+        page = {"meta": {"count": 0, "next_cursor": None, "db_response_time_ms": 2, "x_query": {}}, "results": []}
+        fetch = FakeFetch(json.dumps(page).encode())
+
+        self.assertEqual(self.run_main(["openalex-empty", "--case", "page-empty"], fetch), 0)
+        self.assertIn("from_publication_date:2099-01-01", fetch.calls[0][0])
+        self.assertIn("cursor=*", fetch.calls[0][0])
+        recorded = json.loads((self.root / "apps/pipeline/src/fixtures/openalex/page-empty.json").read_text())
+        self.assertEqual(recorded, {"meta": {"count": 0, "next_cursor": None}, "results": []})
+
+    def test_req_test_003_records_an_empty_arxiv_feed_with_its_result_count(self) -> None:
+        empty = (
+            b'<feed xmlns="http://www.w3.org/2005/Atom" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">'
+            b"<id>https://arxiv.org/api/x</id><title>q</title>"
+            b"<opensearch:totalResults>0</opensearch:totalResults></feed>"
+        )
+        fetch = FakeFetch(empty)
+
+        self.assertEqual(self.run_main(["arxiv-empty", "--case", "feed-empty"], fetch), 0)
+        self.assertIn("submittedDate", fetch.calls[0][0])
+        text = (self.root / "apps/pipeline/src/fixtures/arxiv/feed-empty.xml").read_text()
+        self.assertIn("<opensearch:totalResults>0</opensearch:totalResults>", text)
+        self.assertNotIn("<entry", text)
+        self.assertNotIn("arxiv.org/api/x", text)
+
+    def test_req_test_003_empty_modes_refuse_a_response_that_has_results(self) -> None:
+        self.assertEqual(self.run_main(["openalex-empty", "--case", "x"], FakeFetch(json.dumps({"results": [WORK]}).encode())), 1)
+        self.assertEqual(self.run_main(["arxiv-empty", "--case", "x"], FakeFetch(FEED)), 1)
+        self.assertFalse((self.root / "apps/pipeline/src/fixtures").exists())
+
+    def test_req_test_003_an_id_is_required_for_a_record_and_refused_for_an_empty_page(self) -> None:
+        with self.assertRaises(SystemExit):
+            self.run_main(["openalex", "--case", "x"], FakeFetch(b""))
+        with self.assertRaises(SystemExit):
+            self.run_main(["arxiv-empty", "2410.00001", "--case", "x"], FakeFetch(b""))
+
     def test_req_test_003_rejects_a_case_name_that_is_not_kebab_case(self) -> None:
         with self.assertRaises(SystemExit):
             self.run_main(["openalex", "W123", "--case", "../escape"], FakeFetch(b""))

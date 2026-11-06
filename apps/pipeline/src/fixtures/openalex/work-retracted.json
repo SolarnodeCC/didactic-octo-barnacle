@@ -1,0 +1,319 @@
+{
+  "id": "https://openalex.org/W4380078608",
+  "title": "RETRACTED ARTICLE: Impact of artificial intelligence on human loss in decision making, laziness and safety in education",
+  "display_name": "RETRACTED ARTICLE: Impact of artificial intelligence on human loss in decision making, laziness and safety in education",
+  "publication_date": "2023-06-09",
+  "doi": "https://doi.org/10.1057/s41599-023-01787-8",
+  "ids": {
+    "openalex": "https://openalex.org/W4380078608",
+    "doi": "https://doi.org/10.1057/s41599-023-01787-8"
+  },
+  "abstract_inverted_index": {
+    "This": [0, 67],
+    "study": [1, 68, 185],
+    "examines": [2],
+    "the": [3, 54, 58, 77, 102, 105, 116, 150, 157, 176, 203, 211, 228],
+    "impact": [4, 158],
+    "of": [5, 61, 118, 136, 152, 159],
+    "artificial": [6, 160],
+    "intelligence": [7, 161],
+    "(AI)": [8],
+    "on": [9, 71, 214],
+    "loss": [10, 117, 151],
+    "in": [11, 20, 90, 138, 141, 149, 162, 197],
+    "decision-making,": [12],
+    "laziness,": [13],
+    "and": [14, 22, 51, 92, 121, 129, 144, 147, 164, 217, 219],
+    "privacy": [15, 143],
+    "concerns": [16, 206],
+    "among": [17],
+    "university": [18],
+    "students": [19, 86],
+    "Pakistan": [21, 91],
+    "China.": [23, 93],
+    "Like": [24],
+    "other": [25],
+    "sectors,": [26],
+    "education": [27, 223],
+    "also": [28, 126],
+    "adopts": [29],
+    "AI": [30, 36, 62, 113, 195, 200, 221],
+    "technologies": [31],
+    "to": [32, 40, 46, 100, 156, 181, 226],
+    "address": [33, 227],
+    "modern-day": [34],
+    "challenges.": [35],
+    "investment": [37],
+    "will": [38],
+    "grow": [39],
+    "USD": [41],
+    "253.82": [42],
+    "million": [43],
+    "from": [44, 84, 87, 104],
+    "2021": [45],
+    "2025.": [47],
+    "However,": [48, 183],
+    "worryingly,": [49],
+    "researchers": [50],
+    "institutions": [52],
+    "across": [53],
+    "globe": [55],
+    "are": [56, 154, 191],
+    "praising": [57],
+    "positive": [59],
+    "role": [60],
+    "but": [63],
+    "ignoring": [64],
+    "its": [65],
+    "concerns.": [66],
+    "is": [69, 175, 224],
+    "based": [70],
+    "qualitative": [72],
+    "methodology": [73],
+    "using": [74, 220],
+    "PLS-Smart": [75],
+    "for": [76, 222],
+    "data": [78, 81, 108],
+    "analysis.": [79],
+    "Primary": [80],
+    "was": [82, 98, 170],
+    "collected": [83],
+    "285": [85],
+    "different": [88],
+    "universities": [89],
+    "The": [94, 107, 131],
+    "purposive": [95],
+    "Sampling": [96],
+    "technique": [97],
+    "used": [99],
+    "draw": [101],
+    "sample": [103],
+    "population.": [106],
+    "analysis": [109],
+    "findings": [110, 132],
+    "show": [111, 133],
+    "that": [112, 134, 172, 187],
+    "significantly": [114],
+    "impacts": [115, 127],
+    "human": [119, 173, 205],
+    "decision-making": [120, 153],
+    "makes": [122],
+    "humans": [123],
+    "lazy.": [124],
+    "It": [125],
+    "security": [128, 145],
+    "privacy.": [130],
+    "68.9%": [135],
+    "laziness": [137, 174],
+    "humans,": [139],
+    "68.6%": [140],
+    "personal": [142],
+    "issues,": [146],
+    "27.7%": [148],
+    "due": [155, 180],
+    "Pakistani": [163],
+    "Chinese": [165],
+    "society.": [166],
+    "From": [167],
+    "this,": [168],
+    "it": [169],
+    "observed": [171],
+    "most": [177],
+    "affected": [178],
+    "area": [179],
+    "AI.": [182],
+    "this": [184],
+    "argues": [186],
+    "significant": [188],
+    "preventive": [189],
+    "measures": [190],
+    "necessary": [192],
+    "before": [193],
+    "implementing": [194],
+    "technology": [196],
+    "education.": [198],
+    "Accepting": [199],
+    "without": [201],
+    "addressing": [202],
+    "major": [204],
+    "would": [207],
+    "be": [208],
+    "like": [209],
+    "summoning": [210],
+    "devils.": [212],
+    "Concentrating": [213],
+    "justified": [215],
+    "designing": [216],
+    "deploying": [218],
+    "recommended": [225],
+    "issue.": [229]
+  },
+  "authorships": [
+    {
+      "author_position": "first",
+      "author": {
+        "id": "https://openalex.org/A900000001",
+        "display_name": "Author 1",
+        "orcid": null
+      },
+      "institutions": [
+        {
+          "display_name": "Institution 1.1"
+        }
+      ]
+    },
+    {
+      "author_position": "middle",
+      "author": {
+        "id": "https://openalex.org/A900000002",
+        "display_name": "Author 2",
+        "orcid": null
+      },
+      "institutions": [
+        {
+          "display_name": "Institution 2.1"
+        }
+      ]
+    },
+    {
+      "author_position": "middle",
+      "author": {
+        "id": "https://openalex.org/A900000003",
+        "display_name": "Author 3",
+        "orcid": null
+      },
+      "institutions": [
+        {
+          "display_name": "Institution 3.1"
+        }
+      ]
+    },
+    {
+      "author_position": "middle",
+      "author": {
+        "id": "https://openalex.org/A900000004",
+        "display_name": "Author 4",
+        "orcid": null
+      },
+      "institutions": [
+        {
+          "display_name": "Institution 4.1"
+        }
+      ]
+    },
+    {
+      "author_position": "middle",
+      "author": {
+        "id": "https://openalex.org/A900000005",
+        "display_name": "Author 5",
+        "orcid": null
+      },
+      "institutions": []
+    },
+    {
+      "author_position": "middle",
+      "author": {
+        "id": "https://openalex.org/A900000006",
+        "display_name": "Author 6",
+        "orcid": null
+      },
+      "institutions": [
+        {
+          "display_name": "Institution 6.1"
+        }
+      ]
+    },
+    {
+      "author_position": "last",
+      "author": {
+        "id": "https://openalex.org/A900000007",
+        "display_name": "Author 7",
+        "orcid": null
+      },
+      "institutions": [
+        {
+          "display_name": "Institution 7.1"
+        }
+      ]
+    }
+  ],
+  "topics": [
+    {
+      "id": "https://openalex.org/T14414",
+      "display_name": "Artificial Intelligence in Education",
+      "subfield": {
+        "id": "https://openalex.org/subfields/1710",
+        "display_name": "Information Systems"
+      },
+      "field": {
+        "id": "https://openalex.org/fields/17",
+        "display_name": "Computer Science"
+      },
+      "domain": {
+        "id": "https://openalex.org/domains/3",
+        "display_name": "Physical Sciences"
+      }
+    },
+    {
+      "id": "https://openalex.org/T10883",
+      "display_name": "Ethics and Social Impacts of AI",
+      "subfield": {
+        "id": "https://openalex.org/subfields/3311",
+        "display_name": "Safety Research"
+      },
+      "field": {
+        "id": "https://openalex.org/fields/33",
+        "display_name": "Social Sciences"
+      },
+      "domain": {
+        "id": "https://openalex.org/domains/2",
+        "display_name": "Social Sciences"
+      }
+    },
+    {
+      "id": "https://openalex.org/T11636",
+      "display_name": "Artificial Intelligence in Healthcare and Education",
+      "subfield": {
+        "id": "https://openalex.org/subfields/2718",
+        "display_name": "Health Informatics"
+      },
+      "field": {
+        "id": "https://openalex.org/fields/27",
+        "display_name": "Medicine"
+      },
+      "domain": {
+        "id": "https://openalex.org/domains/4",
+        "display_name": "Health Sciences"
+      }
+    }
+  ],
+  "primary_topic": {
+    "id": "https://openalex.org/T14414",
+    "display_name": "Artificial Intelligence in Education",
+    "subfield": {
+      "id": "https://openalex.org/subfields/1710",
+      "display_name": "Information Systems"
+    },
+    "field": {
+      "id": "https://openalex.org/fields/17",
+      "display_name": "Computer Science"
+    },
+    "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+    }
+  },
+  "cited_by_count": 458,
+  "language": "en",
+  "is_retracted": true,
+  "open_access": {
+    "is_oa": true,
+    "oa_url": "https://www.nature.com/articles/s41599-023-01787-8.pdf",
+    "any_repository_has_fulltext": true
+  },
+  "primary_location": {
+    "license": "cc-by",
+    "pdf_url": "https://www.nature.com/articles/s41599-023-01787-8.pdf",
+    "landing_page_url": "https://doi.org/10.1057/s41599-023-01787-8"
+  }
+}
