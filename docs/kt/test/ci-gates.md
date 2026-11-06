@@ -2,7 +2,7 @@
 title: CI gates
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-11-03
+last_reviewed: 2026-11-06
 related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-NFR-021]
 ---
 
@@ -25,7 +25,7 @@ When a gate is added, record the name of its status check here and add it to the
 | Status check | Gate |
 |---|---|
 | `parse` | Configuration check, KT check, hardening check (REQ-NFR-021), workspace install |
-| `toolchain` | Dependency audit (REQ-NFR-021), lint, format check, typecheck, build, unit tests, traceability (REQ-TEST-001) |
+| `toolchain` | Dependency audit (REQ-NFR-021), lint, format check, typecheck, build, unit tests, integration tests, tests of the check scripts, traceability (REQ-TEST-001); also prints a coverage report that does not gate |
 
 Dependency review is covered by `pnpm audit:ci` and Dependabot (ADR 0033); GitHub's dependency review action is added when the repository's dependency graph is on.
 
@@ -53,12 +53,17 @@ pnpm format:check
 pnpm build
 pnpm typecheck
 pnpm test:unit
+pnpm test:integration
+pnpm test:coverage
+pnpm check:scripts
 pnpm check:traceability
 ```
 
-`pnpm typecheck` builds `@roi/models` first so workspace packages can resolve its declaration files.
+`pnpm typecheck` builds `@roi/models` first so workspace packages can resolve its declaration files, and also typechecks `test-support/`.
 
-The collector integration tests in `apps/pipeline` run in `pnpm test:unit`. They apply the real migrations from `infrastructure/cloudflare/migrations` to an in-memory SQLite database that stands in for D1, and use recorded fixtures and stubbed `fetch` functions (REQ-TEST-003). The queue tests add an in-memory queue with at-least-once delivery, retries, and a dead-letter queue (`apps/pipeline/src/test/fake-queue.ts`); they deliver every message twice and replay a dead-lettered message (REQ-DATA-011). PDF tests use an in-memory R2 bucket and a stubbed fetch; the fetcher's URL rules, redirects, limits, and timeout are unit-tested (REQ-DATA-010). Alert tests use an in-memory GitHub and Resend; they check the issue, the email, the 24-hour comment, channel failures, and that no content or credential leaves the pipeline (REQ-NFR-019). The erasure tests search every table and the bucket for the erased name, ORCID, and affiliation, restore the database to an earlier state, and fail when a new person-related column appears (REQ-NFR-016, REQ-NFR-009). The measurement queries are tested against a database with the real migrations and hand-calculated expectations, and each must be a single read-only SELECT (REQ-NFR-005).
+`pnpm test:unit` runs the `*.test.ts` files and `pnpm test:integration` runs the `*.int.test.ts` files (ADR 0043). Every Vitest project loads `test-support/no-network.ts`, which makes any unstubbed `fetch` or outbound TCP connection fail with a REQ-TEST-003 error. `pnpm test:coverage` runs both levels with V8 coverage; coverage is reported, not gated. `pnpm check:scripts` runs the `unittest` tests in `scripts/tests/`. They cover every check script and `scripts/record-fixture.py`; each check script runs on a copy of the real inputs with one rule broken, and the recorder runs with a stubbed fetch. `pnpm check:traceability` fails on an uncovered `done` requirement or an undefined REQ-ID, and warns about uncovered `in-progress` requirements.
+
+The collector integration tests in `apps/pipeline` run in `pnpm test:integration`. They apply the real migrations from `infrastructure/cloudflare/migrations` to an in-memory SQLite database that stands in for D1, and use recorded fixtures and stubbed `fetch` functions (REQ-TEST-003). The queue tests add an in-memory queue with at-least-once delivery, retries, and a dead-letter queue (`apps/pipeline/src/test/fake-queue.ts`); they deliver every message twice and replay a dead-lettered message (REQ-DATA-011). PDF tests use an in-memory R2 bucket and a stubbed fetch; the fetcher's URL rules, redirects, limits, and timeout are unit-tested (REQ-DATA-010). Alert tests use an in-memory GitHub and Resend; they check the issue, the email, the 24-hour comment, channel failures, and that no content or credential leaves the pipeline (REQ-NFR-019). The erasure tests search every table and the bucket for the erased name, ORCID, and affiliation, restore the database to an earlier state, and fail when a new person-related column appears (REQ-NFR-016, REQ-NFR-009). The measurement queries are tested against a database with the real migrations and hand-calculated expectations, and each must be a single read-only SELECT (REQ-NFR-005).
 
 ## Rules
 

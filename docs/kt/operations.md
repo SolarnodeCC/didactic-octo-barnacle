@@ -22,6 +22,9 @@ The repository holds the KT documents, the phase 1 foundation toolchain (`packag
 | Typecheck | `pnpm typecheck` | yes (`CI` / `toolchain`) |
 | Build | `pnpm build` | yes (`CI` / `toolchain`) |
 | Unit tests | `pnpm test:unit` | yes (`CI` / `toolchain`) |
+| Integration tests | `pnpm test:integration` | yes (`CI` / `toolchain`) |
+| Coverage report | `pnpm test:coverage` | no, reported only (`CI` / `toolchain`) |
+| Check-script tests | `pnpm check:scripts` | yes (`CI` / `toolchain`) |
 | Traceability | `pnpm check:traceability` | yes (`CI` / `toolchain`) |
 
 Install the Python dependency first, then the Node workspace (Node 24, ADR 0008):

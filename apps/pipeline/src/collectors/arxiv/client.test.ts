@@ -82,3 +82,20 @@ describe("REQ-DATA-002: arXiv client", () => {
     expect(waits).toBe(2);
   });
 });
+
+describe("REQ-DATA-002: arXiv client on a recorded empty feed", () => {
+  it("REQ-DATA-002: a real response with no entries returns an empty last page", async () => {
+    const empty = readFileSync(
+      join(dirname(fileURLToPath(import.meta.url)), "../../fixtures/arxiv/feed-empty.xml"),
+      "utf8",
+    );
+    const fetchFn: FetchFn = () => Promise.resolve(new Response(empty));
+
+    const page = await fetchArxivPage(
+      {},
+      { Fetch: fetchFn, Backoff: backoff, WaitForSlot: () => Promise.resolve() },
+    );
+
+    expect(page).toEqual({ Entries: [], OutOfScope: 0, Returned: 0 });
+  });
+});
