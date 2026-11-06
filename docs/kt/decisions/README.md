@@ -63,6 +63,12 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0050](0050-no-candidate-without-an-actionable-party.md) | No extraction candidate without a party that can act | Accepted |
 | [0051](0051-phase-1-exits-on-sufficient-data.md) | Phase 1 exits on sufficient data, not on a succeeded run | Accepted |
 | [0052](0052-phase-1-requirement-status-sweep.md) | Phase 1 requirement status sweep and the dashboard split of REQ-NFR-002 | Accepted |
+| [0053](0053-phase-2-queue-topology.md) | Phase 2 queue topology | Proposed |
+| [0054](0054-processing-runs-and-model-call-records.md) | Processing runs and model-call records | Proposed |
+| [0055](0055-daily-admission-and-budget-stop.md) | Daily admission to extraction and the budget stop | Proposed |
+| [0056](0056-embedding-index-versioning.md) | Embedding index versioning and backfill | Proposed |
+| [0057](0057-recall-at-10-fixture-corpus.md) | Fixture corpus for recall at 10 | Proposed |
+| [0058](0058-thin-slice-read-route.md) | A read route for the thin slice | Proposed |
 
 ## When an ADR is needed
 
