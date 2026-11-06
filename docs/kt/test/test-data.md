@@ -2,7 +2,7 @@
 title: Test data
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-11-03
+last_reviewed: 2026-11-06
 related: [REQ-TEST-003, REQ-TEST-005, REQ-DATA-010, REQ-AGENT-013]
 ---
 
@@ -11,8 +11,8 @@ related: [REQ-TEST-003, REQ-TEST-005, REQ-DATA-010, REQ-AGENT-013]
 ## Fixtures for academic sources
 
 - Responses from OpenAlex, arXiv, and Semantic Scholar are recorded once and stored as fixture files next to the tests that use them, as `fixtures/<source>/<case>.json` (or `.xml` for arXiv).
-- Tests serve fixtures through the fetch mocking of the Workers test plugin. Unit, integration, and contract tests never call these APIs (REQ-TEST-003). A test that tries to reach the network fails.
-- Refresh fixtures deliberately, in a separate pull request, and note why. Keep each fixture to the fields the test needs. A small recording script under `scripts/` is added with the first collector.
+- Tests serve fixtures through a `fetch` function that they inject or stub with `vi.stubGlobal`. Unit, integration, and contract tests never call these APIs (REQ-TEST-003). The shared setup file `test-support/no-network.ts` replaces the global `fetch` and refuses outbound TCP connections, so a test that tries to reach the network fails (ADR 0043).
+- Refresh fixtures deliberately, in a separate pull request, and note why. Keep each fixture to the fields the test needs. The fixtures of `apps/pipeline` are in `apps/pipeline/src/fixtures/<source>/`. They were recorded by hand; a recording script under `scripts/` is still to be added.
 - Include error cases: rate limiting, timeouts, empty results, malformed records, a work without an abstract, a retracted work, and a preprint with two versions.
 
 ## Search results
