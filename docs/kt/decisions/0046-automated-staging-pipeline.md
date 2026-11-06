@@ -34,5 +34,6 @@ Option 3. The gate for staging is the pull request: branch protection on `main` 
 
 ## Consequences
 
+- A drift stop is cleared by running `Staging bootstrap` with `apply`. That run reports, creates, and then checks again, so `fail_on_drift` never keeps `apply` from running.
 - Scheduled jobs use the same Cloudflare token as the deploy; there is no read-only token. Workflow files run from `main` only and sit under `CODEOWNERS`, so a change to them is reviewed.
 - The owner turns off required reviewers on the environment `staging`, keeps the branch limit `main`, adds `SCOPE_PR_TOKEN`, and checks that branch protection on `main` requires an approval. Names only are documented in [operations](../operations.md).
