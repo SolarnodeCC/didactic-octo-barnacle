@@ -12,7 +12,14 @@ related: [REQ-TEST-003, REQ-TEST-005, REQ-DATA-010, REQ-AGENT-013]
 
 - Responses from OpenAlex, arXiv, and Semantic Scholar are recorded once and stored as fixture files next to the tests that use them, as `fixtures/<source>/<case>.json` (or `.xml` for arXiv).
 - Tests serve fixtures through a `fetch` function that they inject or stub with `vi.stubGlobal`. Unit, integration, and contract tests never call these APIs (REQ-TEST-003). The shared setup file `test-support/no-network.ts` replaces the global `fetch` and refuses outbound TCP connections, so a test that tries to reach the network fails (ADR 0043).
-- Refresh fixtures deliberately, in a separate pull request, and note why. Keep each fixture to the fields the test needs. The fixtures of `apps/pipeline` are in `apps/pipeline/src/fixtures/<source>/`. They were recorded by hand; a recording script under `scripts/` is still to be added.
+- Refresh fixtures deliberately, in a separate pull request, and note why. Keep each fixture to the fields the test needs. The fixtures of `apps/pipeline` are in `apps/pipeline/src/fixtures/<source>/`. Record a new one with `scripts/record-fixture.py`, by hand and never in CI:
+
+  ```bash
+  python3 scripts/record-fixture.py openalex W4400000000 --case work-retracted
+  python3 scripts/record-fixture.py arxiv 2410.00001 --case feed-two-versions
+  ```
+
+  It keeps only the fields the collector reads, writes an arXiv entry as a one-entry Atom feed, and replaces author names with placeholders unless `--keep-author-names` is passed. Author IDs, ORCIDs, and affiliations are always replaced. It reads `OPENALEX_API_KEY` from the environment and never writes request headers. It refuses to overwrite a fixture without `--force`.
 - Include error cases: rate limiting, timeouts, empty results, malformed records, a work without an abstract, a retracted work, and a preprint with two versions.
 
 ## Search results
