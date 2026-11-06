@@ -10,7 +10,7 @@ extraction/gs-extraction-NNN.yaml the expected candidates with quotes (REQ-PROC-
 
 ## State after round 3
 
-| Set | Entries | Minimum (REQ-TEST-005) |
+| Set | Entries | Minimum (REQ-TEST-006) |
 |---|---|---|
 | Triage | 91 | 20 |
 | Extraction | 38 | 20 |

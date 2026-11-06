@@ -92,7 +92,7 @@ Triage has a documented scope rule, a typed decision, and a golden set.
 - Acceptance criteria:
   1. A publication is in scope when its OpenAlex topics or arXiv categories map to a target industry in the topic map stored in configuration ([ingestion scope](../data-sources/ingestion-scope.md)).
   2. A triage decision is stored as `Accepted` (boolean), `TriageScore` (number 0..1), and `Reason` (enum: `accepted`, `incomplete`, `retracted`, `out-of-scope`, `low-score`, `daily-limit`), plus `Model` and `PromptVersion` when a model was used.
-  3. The model part of triage follows the [contract conventions](../agents/contract-conventions.md) and has a contract test and a golden set of at least 20 entries (REQ-TEST-005).
+  3. The model part of triage follows the [contract conventions](../agents/contract-conventions.md) and has a contract test and a golden set of at least 20 entries (REQ-TEST-006).
   4. The daily limit and the time zone for the day boundary (UTC) are configuration.
 - Verification: unit tests on scope rules, contract test, and eval on the golden set
 
@@ -127,7 +127,7 @@ The triage model reports five yes/no signals read from the title and abstract, a
   3. A publication that fails the signal rule gets `Reason: low-score`. The other reasons keep their meaning from REQ-PROC-006.
   4. Publications above the daily limit are ranked by `TriageScore`, ties break by publication date (newest first) and then by publication ID, and a run with the same input gives the same order.
   5. A generic or implied party does not make `NamedParty` true, and a quality gain on a benchmark does not make `StatedHarm` true.
-  6. Each golden-set entry holds the expected value of every signal. The eval reports agreement per signal and the precision and recall of the accept decision (REQ-TEST-005).
+  6. Each golden-set entry holds the expected value of every signal. The eval reports agreement per signal and the precision and recall of the accept decision (REQ-TEST-006).
 - Verification: unit tests of the decision rule with stubbed signals, contract test, and eval on the golden set
 
 ### REQ-PROC-009: Extraction requires a quotable problem and customer
@@ -144,6 +144,6 @@ Every candidate opportunity names the customer who has the problem, and the prob
   2. `WhyNow` and `CurrentAlternative` are optional. When set, each has a quote (`WhyNowQuote`, `AlternativeQuote`). Otherwise they are empty, and the step never infers them.
   3. The pipeline rejects an output when any quote does not occur in the publication text the step received (REQ-AGENT-008).
   4. A generic or implied party ("users", "people") does not count as `Customer`.
-  5. A publication that passes triage and has no quotable problem and customer yields an empty list with a Notes reason. The golden set holds at least three such entries (REQ-TEST-005).
+  5. A publication that passes triage and has no quotable problem and customer yields an empty list with a Notes reason. The golden set holds at least three such entries (REQ-TEST-006).
   6. A publication whose stated burden belongs to a population or a sector as a whole, with no named customer (a role or organization type) that could adopt a product against it, yields an empty list, and `Notes` says so (ADR 0050).
 - Verification: contract test with stubbed responses that omit a customer or quote text that is not in the publication, and eval on the golden set

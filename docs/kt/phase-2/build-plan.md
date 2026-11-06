@@ -29,7 +29,7 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 
 - Re-review and approve `requirements/processing.md` and `requirements/non-functional/platform.md`. REQ-PROC-008 and REQ-PROC-009 were added after their last review.
 - Move `agents/triage.md`, `agents/opportunity-extraction.md`, and `agents/contract-conventions.md` from `draft` to `approved`.
-- Accept or change ADRs 0053 to 0058, and answer OQ-041, OQ-042, and OQ-043.
+- ADRs 0053 to 0061 are accepted, and OQ-041, OQ-042, and OQ-043 are answered (ADR 0059, 0060, 0061).
 - **Exit:** every phase 2 document is `approved`.
 
 ## WP1: Foundations
@@ -46,7 +46,7 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 ## WP2: Model-call helper
 
 - **`callModel`** in `packages/models`: budget check at the first attempt, the Workers AI call with gateway options and metadata, repair, validation, quote check, retries with errors and backoff, and one `model_call` row per attempt.
-- **Cost:** a price table with a version. Whether the binding returns the gateway cost is checked on the first `evals` call. If it does not, the record is marked estimated (ADR 0054, Proposed).
+- **Cost:** a price table with a version. Whether the binding returns the gateway cost is checked on the first `evals` call. If it does not, the record is marked estimated (ADR 0054).
 - **A fake Workers AI binding** that returns recorded responses, rate-limit errors, and malformed output.
 - **Tests:**
   - no direct provider URL in the code (REQ-NFR-003 AC1);
@@ -75,8 +75,8 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 
 - **`packages/vector-store`:** a fake Vectorize with exact cosine ranking, and the registry seeded with the existing index.
 - **Pipeline:** the embedding queue and consumer, and the producer in the page consumer.
-- **Search and backfill:** `searchPublications`, and the backfill command and cut-over of ADR 0056 (Proposed).
-- **Recall corpus:** the corpus and its labelled neighbours (ADR 0057, Proposed).
+- **Search and backfill:** `searchPublications`, and the backfill command and cut-over of ADR 0056.
+- **Recall corpus:** the corpus and its labelled neighbours (ADR 0057).
 - **Tests:**
   - one current embedding with model name and version per publication, through `callModel` (REQ-PROC-001 AC1, AC3);
   - search stays on the old index until the backfill is complete (REQ-PROC-001 AC2);
@@ -124,7 +124,7 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 
 ## WP10: Thin slice
 
-- Migration 0010, `CandidateWorkflow` with stub steps from the examples, the placeholder score model, the read route of ADR 0058 (Proposed), and the `slice` command and run report.
+- Migration 0010, `CandidateWorkflow` with stub steps from the examples, the placeholder score model, the read route of ADR 0058, and the `slice` command and run report.
 - Add `Customer` and `CustomerQuote` to the example candidate. Add a test that validates the examples against the `packages/models` schemas.
 - **Tests:** the slice integration test with local bindings covers AC1 to AC3 (REQ-PROC-007). A test replaces one stub step with another implementation and the pipeline is unchanged (AC4).
 - **Exit:** `pnpm --filter @roi/pipeline slice` runs locally and the read route returns the opportunity.

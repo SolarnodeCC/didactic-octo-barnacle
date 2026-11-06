@@ -1,14 +1,14 @@
 ---
 title: "0055: Daily admission to extraction and the budget stop"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-06
 related: [REQ-PROC-005, REQ-PROC-008, REQ-NFR-005, REQ-NFR-010, REQ-NFR-019]
 ---
 
 # 0055: Daily admission to extraction and the budget stop
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-11-06
 
 ## Context

@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
 import { z } from "zod";
 
-/** `agents/extraction/evals`, the golden sets of triage and extraction (REQ-TEST-005). */
+/** `agents/extraction/evals`, the golden sets of triage and extraction (REQ-TEST-006). */
 export const EVALS_DIR = join(dirname(fileURLToPath(import.meta.url)), "../evals");
 
 /** The input a triage or extraction step receives in phase 2: title and abstract. */

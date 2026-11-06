@@ -1,14 +1,14 @@
 ---
 title: "0054: Processing runs and model-call records"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-06
 related: [REQ-NFR-003, REQ-NFR-005, REQ-NFR-011, REQ-NFR-008]
 ---
 
 # 0054: Processing runs and model-call records
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-11-06
 
 ## Context

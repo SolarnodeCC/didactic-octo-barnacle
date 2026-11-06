@@ -19,8 +19,8 @@ Phase 2 starts only when every gate below is closed ([Definition of Ready](../ro
 | OQ-036: models for triage and extraction | Open; round one covers triage and extraction only, two candidates each (benchmark plan) | AI engineering lead | Benchmark ADR on the golden sets ([benchmark plan](../test/model-benchmark-plan.md)); needs WP1 to WP3 |
 | OQ-040: providers | Answered by ADR 0049: Workers AI for the pipeline, Anthropic as the eval judge only | `@SolarnodeCC` | ADR 0049 |
 | OQ-038: population-level burden | Answered by ADR 0050 (REQ-PROC-009 AC6) | Product owner | ADR 0050; the first extraction eval run reviews the rule |
-| OQ-005 benchmark run (ADR 0010) | Reference model fixed; benchmark not run | AI engineering lead | Recall report on the corpus of ADR 0057 (Proposed) and an ADR if the model changes from `bge-base-en-v1.5` |
-| Cost per publication (REQ-NFR-005) | Estimate recorded (EUR 0.0014) with placeholder token counts | Lead engineer | Estimate refreshed after the phase 1 exit run; OQ-043 answered |
+| OQ-005 benchmark run (ADR 0010) | Reference model fixed; benchmark not run | AI engineering lead | Recall report on the corpus of ADR 0057 and an ADR if the model changes from `bge-base-en-v1.5` |
+| Cost per publication (REQ-NFR-005) | Estimate recorded (EUR 0.0014) with placeholder token counts | Lead engineer | Estimate refreshed after the phase 1 exit run; budget formula of ADR 0059 |
 | Requirement and agent documents approved | Requirement files `approved` but reviewed before ADR 0036; agent documents `draft` | Product owner, AI engineering lead | WP0 |
 
 ## Order of the work packages
@@ -76,7 +76,7 @@ Every new dependency is SHA-pinned or version-locked as REQ-NFR-021 requires, an
 
 ## Cost and quotas
 
-- Provisional phase 2 budget: EUR 0.22 per day in staging (100 × EUR 0.0014 × 1.5), from the estimate in [ingestion scope](../data-sources/ingestion-scope.md). The first measured cost replaces it (REQ-NFR-005 AC1).
-- That estimate covers one triage and one extraction call per extracted publication. It does not cover triage of every ingested publication, embeddings, or full-text input. On the largest measured day, triage alone at the estimated price is about EUR 0.37. OQ-043 asks whether the formula should count them.
+- Provisional phase 2 budget (ADR 0059, REQ-NFR-005 AC1): the expected daily triage calls × the triage cost, plus the daily extraction limit × the extraction cost, plus the expected daily embeddings × the embedding cost, times 1.5, with the full-text input priced in. With the prices of 6 November 2026 and without embeddings and full text, that is about EUR 0.76 a day on the largest measured day and about EUR 0.21 at the mean volume. The first measured costs replace the estimate.
+- The older figure of EUR 0.22 a day (100 × EUR 0.0014 × 1.5, OQ-013) counted one triage and one extraction call per extracted publication only. Triage of every ingested publication alone is about EUR 0.37 on the largest measured day.
 - Benchmark budget: at most EUR 50 ([benchmark plan](../test/model-benchmark-plan.md)).
 - Paid Workers AI models allow about 20 requests per minute each. The model queue's concurrency and the retry on 429 keep within it. WP2 measures it on the first calls.

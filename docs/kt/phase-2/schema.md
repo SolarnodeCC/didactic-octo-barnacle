@@ -47,15 +47,16 @@ It adds no organization-scoped table. Those arrive with phase 4 (ADR 0019).
 
 New keys for [defaults](../architecture/defaults.md). They are added there in the pull request that first reads them.
 
-| Key | Proposed default | Notes |
+| Key | Default | Notes |
 |---|---|---|
 | `processing.enabled` | `false` | Turns the phase 2 consumers on per environment |
-| `triage.admission_pool_days` | `7` | How long a passing publication waits for admission (ADR 0055, Proposed) |
+| `triage.admission_pool_days` | `7` | How long a passing publication waits for admission (ADR 0055) |
 | `extraction.full_text_max_chars` | `24000` | Cut before the call; the quote check uses the cut text |
 | `text.max_pdf_bytes` | set in WP4 | From measured peak memory (ADR 0009) |
 | `text.max_pages` | set in WP4 | From measured peak memory and CPU (ADR 0009) |
 | `embedding.batch_size` | `50` | Messages per embedding call |
-| `retraction.lookback_days` | `90` | Equal to `ingestion.max_age_days` until OQ-042 is answered |
+| `budget.expected_daily_triaged`, `budget.expected_daily_embeddings` | from the measured daily volume | Largest measured day until a steady state is known (ADR 0059) |
+| `retraction.lookback_days` | `30` | How far back the weekly retraction check looks (ADR 0061) |
 | `model.price_table_version` | `2026-11-06` | Versioned price table in `infrastructure/cloudflare`, used when the gateway gives no cost (REQ-NFR-011 AC2) |
 | `model.triage`, `model.extraction`, `model.embedding` | from the OQ-036 ADR | Model name, version, and sampling settings |
 

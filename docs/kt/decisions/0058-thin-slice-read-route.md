@@ -1,14 +1,14 @@
 ---
 title: "0058: A read route for the thin slice"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-06
 related: [REQ-PROC-007, REQ-API-001, REQ-ACC-001]
 ---
 
 # 0058: A read route for the thin slice
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-11-06
 
 ## Context

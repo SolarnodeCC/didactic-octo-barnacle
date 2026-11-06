@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check the golden sets under agents/*/evals (REQ-TEST-005).
+"""Check the golden sets under agents/*/evals (REQ-TEST-005, REQ-TEST-006).
 
 Paths in analysis entries are relative to agents/analysis/evals; paths in triage and extraction entries are relative to agents/extraction/evals.
 

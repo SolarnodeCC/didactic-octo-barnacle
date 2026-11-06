@@ -31,7 +31,7 @@ Phase 2 is done when the [exit criteria](../roadmap.md#exit-criteria) hold: reca
 ## Out of scope
 
 - The six analysis agents, the search tool, and the per-candidate Workflow with real agents: phase 3. The thin slice uses stub steps in their place.
-- The scoring engine, data API, auth and admin API, and dashboard: phase 4. The thin slice gets one read-only route, local and preview only (ADR 0058, Proposed).
+- The scoring engine, data API, auth and admin API, and dashboard: phase 4. The thin slice gets one read-only route, local and preview only (ADR 0058).
 - User-facing opportunity search (REQ-API-006, REQ-DASH-015): phase 4. Phase 2 builds the search function it will call.
 - Semantic Scholar (REQ-DATA-003) and wider full-text use: wait for the legal answer to OQ-014 ([review brief](../legal/review-brief.md)).
 - External model providers for pipeline steps: Workers AI only (ADR 0049).

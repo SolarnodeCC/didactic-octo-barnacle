@@ -8,7 +8,7 @@ related: [REQ-PROC-007]
 
 # Phase 2 delivery plan: research understanding
 
-How phase 2 of the [roadmap](../roadmap.md) is delivered: what it builds, how it is built, the design, the build order, and what it waits for. The requirements stay the source of truth; this plan refers to them by ID and does not restate them. Decisions this plan needs are ADRs 0053 to 0058 (and ADR 0049, which settles the provider) in [decisions](../decisions/README.md); the ones marked Proposed are proposals until a code owner accepts them.
+How phase 2 of the [roadmap](../roadmap.md) is delivered: what it builds, how it is built, the design, the build order, and what it waits for. The requirements stay the source of truth; this plan refers to them by ID and does not restate them. Decisions this plan needs are ADRs 0053 to 0061 (and ADR 0049, which settles the provider) in [decisions](../decisions/README.md); all are accepted.
 
 | File | Summary |
 |---|---|

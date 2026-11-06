@@ -48,7 +48,7 @@ Every other work package waits until the gates are closed. No phase 2 code makes
 
 | Exit criterion | Evidence |
 |---|---|
-| Recall at 10 of at least 0.8 on the fixture corpus | The recall report of the corpus (ADR 0057, Proposed) on the chosen embedding model, attached to the closing pull request |
+| Recall at 10 of at least 0.8 on the fixture corpus | The recall report of the corpus (ADR 0057) on the chosen embedding model, attached to the closing pull request |
 | Triage and extraction meet their golden-set thresholds | Eval reports from the benchmark ADR that closes OQ-036 and a rerun on the configured models and prompts |
 | Candidates within the daily budget | Seven staging days with no budget stop, or a stop that worked as REQ-NFR-005 AC2 says; cost per publication and per opportunity in each run report |
 | Thin slice end to end | The slice integration test in CI and one run of the slice command in the development environment, with its run report |

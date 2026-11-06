@@ -3,7 +3,7 @@ title: Model benchmark plan
 owner: "@SolarnodeCC"
 status: draft
 last_reviewed: 2026-11-06
-related: [REQ-AGENT-010, REQ-AGENT-012, REQ-AGENT-014, REQ-NFR-003, REQ-NFR-005, REQ-NFR-011, REQ-TEST-004, REQ-TEST-005]
+related: [REQ-AGENT-010, REQ-AGENT-012, REQ-AGENT-014, REQ-NFR-003, REQ-NFR-005, REQ-NFR-011, REQ-TEST-004, REQ-TEST-005, REQ-TEST-006]
 ---
 
 # Model benchmark plan
@@ -21,7 +21,7 @@ The owner decided the following on 2026-11-01, and the rows marked 2026-11-06 on
 | Round one scope (2026-11-06) | Triage and opportunity extraction only, with the two candidates each listed below, three runs per item, on the current golden sets. The six analysis agents follow before phase 3. |
 | Labels | The owner labels the golden sets, and an agent prepares the draft labels (see [Labeling](#labeling)). |
 | Critic step | Out of scope. The pipeline stays as in [orchestration](../architecture/orchestration.md). A model judge for Startup Generator stays in the evals. |
-| Pass rule | The eval thresholds of REQ-TEST-005, written before the first run (see [Thresholds](#thresholds)). |
+| Pass rule | The eval thresholds of REQ-TEST-006 (triage and extraction) and REQ-TEST-005 (the analysis agents), written before the first run (see [Thresholds](#thresholds)). |
 | Benchmark budget | Model cost of at most 50 euro in total. |
 | Account plan | The account has an active Workers Paid subscription, so no upgrade is needed (see [Account plan](#account-plan)). |
 
@@ -86,7 +86,7 @@ Notes:
 
 ## Test data
 
-- Reuse the golden sets of [AI evals](ai-evals.md) and [golden sets](golden-sets.md): at least 20 entries per step (REQ-TEST-005).
+- Reuse the golden sets of [AI evals](ai-evals.md) and [golden sets](golden-sets.md): at least 20 entries per step (REQ-TEST-006, REQ-TEST-005).
 - Proposal: one shared set of about 50 publications from OpenAlex and arXiv, stratified by source, field, and abstract length, so one set feeds all steps. The number is a proposal; the minimum is 20.
 - Include publications that must yield no opportunity (at least three), abstracts with injected instructions (REQ-NFR-006), and a few with licensed full text (`InputMode: full-text`).
 - Search results for Market Analysis and Competition are recorded fixtures. The benchmark makes no live search calls (REQ-AGENT-013, REQ-TEST-003).

@@ -1,14 +1,14 @@
 ---
 title: "0053: Phase 2 queue topology"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-06
 related: [REQ-DATA-006, REQ-PROC-001, REQ-PROC-004, REQ-PROC-005, REQ-NFR-010, REQ-DATA-011]
 ---
 
 # 0053: Phase 2 queue topology
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-11-06
 
 ## Context
