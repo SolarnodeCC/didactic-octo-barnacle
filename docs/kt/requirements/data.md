@@ -17,7 +17,7 @@ The research collector fetches works from OpenAlex, with their authors, institut
 
 - Phase: 1
 - Priority: must
-- Status: in-progress
+- Status: done
 - Source: README roadmap phase 1 and Data Sources section
 - Acceptance criteria:
   1. Works that match the configured ingestion scope (see [OpenAlex](../data-sources/openalex.md)) are fetched with their authors, institutions, topics, and citation counts. The request filters on language, on the configured subfield IDs of the work's primary topic, on the configured work types, and on having an abstract. A returned work whose primary topic matches none of the topic-map names, whose type is not configured, or that has no abstract is skipped, counted, and not stored (ADR 0041, ADR 0048).
@@ -32,7 +32,7 @@ The research collector fetches preprints from arXiv in the configured categories
 
 - Phase: 1
 - Priority: must
-- Status: in-progress
+- Status: done
 - Source: README roadmap phase 1 and Data Sources section
 - Acceptance criteria:
   1. Only preprints whose primary or cross-listed category is in the configured category list are fetched.
@@ -60,7 +60,7 @@ A publication found in more than one source has one publication record.
 
 - Phase: 1
 - Priority: must
-- Status: in-progress
+- Status: done
 - Source: KT review of data sources
 - Depends on: REQ-DATA-001, REQ-DATA-002
 - Acceptance criteria:
@@ -167,7 +167,7 @@ Every Queue consumer and Workflow step tolerates repeated delivery.
 
 - Phase: 1
 - Priority: must
-- Status: planned
+- Status: done
 - Source: Readiness assessment; ADR 0004
 - Depends on: REQ-DATA-009
 - Acceptance criteria:

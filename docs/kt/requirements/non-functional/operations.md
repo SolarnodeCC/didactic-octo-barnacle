@@ -2,7 +2,7 @@
 title: Operations requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-11-06
 ---
 
 # Operations requirements
@@ -77,7 +77,7 @@ Database changes and environment resources are created by versioned, repeatable 
 
 - Phase: 1
 - Priority: must
-- Status: in-progress
+- Status: done
 - Source: Readiness assessment; ADR 0020
 - Depends on: REQ-NFR-002
 - Acceptance criteria:

@@ -2,7 +2,7 @@
 title: Security requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-11-06
 ---
 
 # Security requirements
@@ -15,7 +15,7 @@ Credentials are never committed.
 
 - Phase: 1
 - Priority: must
-- Status: in-progress
+- Status: done
 - Source: AGENTS.md repository conventions
 - Acceptance criteria:
   1. API keys and Cloudflare tokens are stored in Cursor environment secrets or GitHub Actions secrets.

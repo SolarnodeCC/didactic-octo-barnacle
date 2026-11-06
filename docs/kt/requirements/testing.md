@@ -2,7 +2,7 @@
 title: Test requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-11-06
 ---
 
 # Test requirements
@@ -15,7 +15,7 @@ Every test names the requirement it verifies.
 
 - Phase: 1
 - Priority: must
-- Status: in-progress
+- Status: done
 - Source: test strategy
 - Acceptance criteria:
   1. Each test name or description contains a REQ-ID; tests of shared helpers that implement no requirement are allowed and reported as untraced.
@@ -42,7 +42,7 @@ Unit, integration, and contract tests do not call academic APIs or model provide
 
 - Phase: 1
 - Priority: must
-- Status: in-progress
+- Status: done
 - Source: test strategy and ADR 0006
 - Acceptance criteria:
   1. Academic API tests use recorded fixtures, and a test that tries to reach the network fails.

@@ -2,7 +2,7 @@
 title: Processing requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-11-06
 ---
 
 # Processing requirements
@@ -137,7 +137,7 @@ Every candidate opportunity names the customer who has the problem, and the prob
 - Phase: 2
 - Priority: must
 - Status: planned
-- Source: ADR 0036
+- Source: ADR 0036, ADR 0050
 - Depends on: REQ-PROC-004, REQ-PROC-008
 - Acceptance criteria:
   1. Each candidate holds `Finding`, `EvidenceQuote`, `Customer`, and `CustomerQuote`. A candidate for which the model cannot quote both a problem and a customer is not returned.
@@ -145,4 +145,5 @@ Every candidate opportunity names the customer who has the problem, and the prob
   3. The pipeline rejects an output when any quote does not occur in the publication text the step received (REQ-AGENT-008).
   4. A generic or implied party ("users", "people") does not count as `Customer`.
   5. A publication that passes triage and has no quotable problem and customer yields an empty list with a Notes reason. The golden set holds at least three such entries (REQ-TEST-005).
+  6. A publication whose stated burden belongs to a population or a sector as a whole, with no named customer (a role or organization type) that could adopt a product against it, yields an empty list, and `Notes` says so (ADR 0050).
 - Verification: contract test with stubbed responses that omit a customer or quote text that is not in the publication, and eval on the golden set

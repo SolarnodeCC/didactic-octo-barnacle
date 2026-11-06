@@ -2,22 +2,21 @@
 title: Legal review brief (OQ-014)
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-03
+last_reviewed: 2026-11-06
 related: [REQ-DATA-010, REQ-ACC-011, REQ-NFR-016]
 ---
 
 # Legal review brief (OQ-014)
 
-Written answers from a named legal contact close OQ-014. Until then, phase 1 stays abstract-first and stores only license-permitted PDFs (ADR 0014). Phase 2 does not start without the answers marked **phase-2 gate** below.
+Written answers from a named legal contact close OQ-014. Phase 2 does not start without the answers marked **phase-2 gate** below; they were approved on 2026-11-06 (see [Answers](#answers)). Until the launch questions are answered, the platform stays abstract-first and stores only license-permitted PDFs (ADR 0014).
 
 ## Named contact
 
 | Field | Value |
 |---|---|
-| Legal contact name | _to be named by `@SolarnodeCC`_ |
-| Contact email | _to be named_ |
+| Legal contact | through the project address `info@solarnode.cc`; the owner chose not to record a person's name (2026-11-06) |
 | Date requested | 2026-10-29 |
-| Date answered | _pending_ |
+| Date answered | 2026-11-06 for the phase-2 gate questions 1 to 5, as reported by `@SolarnodeCC`; launch questions 6 to 12 pending |
 
 ## Phase-2 gate questions
 
@@ -39,7 +38,16 @@ Answer yes/no with conditions for each:
 11. Ask Tavily for written confirmation that storing API Output as private evaluation fixtures, used only to test our own agents, is allowed. The Platform Terms (2026-05-04) and Acceptable Use Policy (2026-10-21) do not address storage, evaluation, or publication of Output (ADR 0039).
 12. Ask Brave Search in writing for the right to store and evaluate results. Its terms (section 3(b)) forbid both by default.
 
-## Engineering constraints until signed
+## Answers
+
+| Questions | Answer | Conditions |
+|---|---|---|
+| 1 to 5 (phase-2 gate) | Approved, reported by `@SolarnodeCC` on 2026-11-06 | None recorded |
+| 6 to 12 (launch) | _pending_ | |
+
+Under ADR 0049 the pipeline sends abstracts to Workers AI, not to OpenAI or Anthropic. Question 4 covers the Anthropic eval judge; model processing by Cloudflare falls under the Cloudflare agreement of question 8.
+
+## Engineering constraints until the launch questions are signed
 
 - No full-text widening beyond ADR 0014.
 - No Semantic Scholar ingestion.
