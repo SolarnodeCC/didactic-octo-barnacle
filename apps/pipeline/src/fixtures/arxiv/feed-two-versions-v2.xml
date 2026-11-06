@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:arxiv="http://arxiv.org/schemas/atom">
+  <title>ArXiv Query</title>
+  <entry>
+    <id>http://arxiv.org/abs/2609.30137v2</id>
+    <title>Screen Before You Serve: Simulation for Production Customer Experience AI Agents at 140M Scale</title>
+    <updated>2026-11-05T18:38:42Z</updated>
+    <link href="https://arxiv.org/abs/2609.30137v2" rel="alternate" type="text/html" />
+    <link href="https://arxiv.org/pdf/2609.30137v2" rel="related" type="application/pdf" title="pdf" />
+    <summary>Customer experience (CX) agents use tools and large language models to address customer requests and guide conversational interactions with an organization's products. Improving these agents, especially in regulated industries, is difficult: they must detect intent, follow complex operational policies and use tools reliably. Manual end-to-end testing offers limited coverage, while live experiments expose customers to failures that can erode trust.
+  We present a hypothesis-driven simulation workflow for screening candidate CX agents before deployment. Synthetic customers react to agent responses and simulated tool outputs enable multi-step agentic workflows without invoking production backends. We use the Snowglobe simulator on Nubank's Card Delivery agent and its expanded successor, Card Management - Nubank's highest-volume chat-support agent in Brazil. Across 4 deployed versions, simulated and production version-level binary evaluator scores show high correlation. Simulation-guided iteration increased transactional net promoter score (tNPS) by 36.69 points in a live A/B test. We also screened open-weight configurations in over 16,000 simulated conversations. In a subsequent live A/B test, the selected model increased self-service rate (SSR) by 8.82 percentage points to the highest level observed at Nubank, with no statistically significant change in tNPS. Simulation made broad exploration of models, reasoning settings, and prompts feasible without customer exposure, enabling production improvements that would have been impractical to pursue through live experimentation alone.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom" />
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom" />
+    <published>2026-09-24T17:07:38Z</published>
+    <arxiv:comment>17 pages, 11 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI" />
+    <author>
+      <name>Author 1</name>
+    </author>
+    <author>
+      <name>Author 2</name>
+    </author>
+    <author>
+      <name>Author 3</name>
+    </author>
+    <author>
+      <name>Author 4</name>
+    </author>
+    <author>
+      <name>Author 5</name>
+    </author>
+    <author>
+      <name>Author 6</name>
+    </author>
+    <author>
+      <name>Author 7</name>
+    </author>
+    <author>
+      <name>Author 8</name>
+    </author>
+    <author>
+      <name>Author 9</name>
+    </author>
+    <author>
+      <name>Author 10</name>
+    </author>
+    <author>
+      <name>Author 11</name>
+    </author>
+    <author>
+      <name>Author 12</name>
+    </author>
+    <author>
+      <name>Author 13</name>
+    </author>
+    <author>
+      <name>Author 14</name>
+    </author>
+    <author>
+      <name>Author 15</name>
+    </author>
+    <author>
+      <name>Author 16</name>
+    </author>
+  </entry>
+</feed>
