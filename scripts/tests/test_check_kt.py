@@ -56,7 +56,7 @@ class KtTest(ScriptTestCase):
         self.assert_fails_with("REQ-TEST-001 is missing '- Source:'")
 
     def test_req_nfr_004_fails_on_an_unknown_requirement_status(self) -> None:
-        self.replace(TESTING, "- Status: in-progress", "- Status: started")
+        self.replace(TESTING, "- Status: done", "- Status: started")
         self.assert_fails_with("REQ-TEST-001 Status must be one of")
 
     def test_req_nfr_004_fails_on_a_malformed_requirement_heading(self) -> None:
