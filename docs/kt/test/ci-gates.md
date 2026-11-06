@@ -51,12 +51,16 @@ pnpm audit:ci
 pnpm lint
 pnpm format:check
 pnpm build
-pnpm typecheck
-pnpm test:unit
+pnpm -r run typecheck
+pnpm -r run test:unit
 pnpm check:traceability
 ```
 
-`pnpm typecheck` builds `@roi/models` first so workspace packages can resolve its declaration files.
+Locally, `pnpm typecheck` and `pnpm test:unit` build `@roi/models` first so workspace packages can resolve its declaration files. CI builds every package once with `pnpm build` and then runs the per-package scripts, so `@roi/models` is not built three times.
+
+Both workflows cache the pnpm store through `actions/setup-node` (`cache: pnpm`, keyed on `pnpm-lock.yaml`). The cache holds downloaded packages only, no build output and no secrets, and `pnpm install --frozen-lockfile` still checks every package against the lockfile. Corepack is enabled before `setup-node` so the cache step finds pnpm, and again after it so pnpm runs on Node 24.
+
+`pnpm check:traceability` fails when a `done` requirement has no test or named review. It also prints, without failing, the `in-progress` requirements that no test names yet, so work in flight shows its gaps early (REQ-TEST-001).
 
 The collector integration tests in `apps/pipeline` run in `pnpm test:unit`. They apply the real migrations from `infrastructure/cloudflare/migrations` to an in-memory SQLite database that stands in for D1, and use recorded fixtures and stubbed `fetch` functions (REQ-TEST-003). The queue tests add an in-memory queue with at-least-once delivery, retries, and a dead-letter queue (`apps/pipeline/src/test/fake-queue.ts`); they deliver every message twice and replay a dead-lettered message (REQ-DATA-011). PDF tests use an in-memory R2 bucket and a stubbed fetch; the fetcher's URL rules, redirects, limits, and timeout are unit-tested (REQ-DATA-010). Alert tests use an in-memory GitHub and Resend; they check the issue, the email, the 24-hour comment, channel failures, and that no content or credential leaves the pipeline (REQ-NFR-019). The erasure tests search every table and the bucket for the erased name, ORCID, and affiliation, restore the database to an earlier state, and fail when a new person-related column appears (REQ-NFR-016, REQ-NFR-009). The measurement queries are tested against a database with the real migrations and hand-calculated expectations, and each must be a single read-only SELECT (REQ-NFR-005).
 

@@ -22,14 +22,24 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: ".nvmrc"
-
+      # Corepack runs first so setup-node finds pnpm for the store cache.
       - name: Enable Corepack and pnpm
         run: |
           corepack enable
           corepack prepare pnpm@10.18.2 --activate
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: ".nvmrc"
+          # The pnpm store, keyed on pnpm-lock.yaml; no secrets or build output.
+          cache: pnpm
+
+      # Again on Node 24, so the pnpm shim belongs to the Node that runs the build.
+      - name: Bind pnpm to Node 24
+        run: |
+          corepack enable
+          node --version
+          pnpm --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -43,14 +53,16 @@ jobs:
       - name: Format check
         run: pnpm format:check
 
+      # One build: the root `typecheck` and `test:unit` scripts rebuild @roi/models for
+      # local use, which CI does not need after this step.
       - name: Build
         run: pnpm build
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: pnpm -r run typecheck
 
       - name: Unit tests
-        run: pnpm test:unit
+        run: pnpm -r run test:unit
 
       - name: Traceability
         run: |

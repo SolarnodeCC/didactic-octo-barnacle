@@ -22,14 +22,24 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: ".nvmrc"
-
+      # Corepack runs first so setup-node finds pnpm for the store cache.
       - name: Enable Corepack and pnpm
         run: |
           corepack enable
           corepack prepare pnpm@10.18.2 --activate
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: ".nvmrc"
+          # The pnpm store, keyed on pnpm-lock.yaml; no secrets or build output.
+          cache: pnpm
+
+      # Again on Node 24, so the pnpm shim belongs to the Node that runs the build.
+      - name: Bind pnpm to Node 24
+        run: |
+          corepack enable
+          node --version
+          pnpm --version
 
       - name: Parse JSON, YAML, and rule frontmatter
         run: |
