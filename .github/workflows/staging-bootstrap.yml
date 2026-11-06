@@ -13,6 +13,18 @@ on:
         description: "Create the missing resources (otherwise only report drift)"
         type: boolean
         default: false
+      fail_on_drift:
+        description: "Fail when resources are missing (used by the automated pipeline)"
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      apply:
+        type: boolean
+        default: false
+      fail_on_drift:
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -50,7 +62,12 @@ jobs:
         run: pnpm build
 
       - name: Report drift
-        run: node infrastructure/cloudflare/dist/bootstrap-cli.js --env staging
+        env:
+          FAIL_ON_DRIFT: ${{ inputs.fail_on_drift }}
+        run: |
+          flag=""
+          if [ "$FAIL_ON_DRIFT" = "true" ]; then flag="--fail-on-drift"; fi
+          node infrastructure/cloudflare/dist/bootstrap-cli.js --env staging $flag
 
       - name: Create missing resources
         if: ${{ inputs.apply }}

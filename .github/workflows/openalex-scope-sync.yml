@@ -1,0 +1,90 @@
+name: OpenAlex scope sync
+
+# Monthly check of the OpenAlex subfield IDs of the topic map (REQ-DATA-001, ADR 0046). It runs
+# the read-only lookup of `OpenAlex scope lookup`, compares the IDs with
+# apps/pipeline/src/normalize/scope.ts, and opens a DRAFT pull request when the ID of a name
+# already in the map changed. It never adds or removes a name and ignores volumes; scope choices
+# stay reviewed decisions (ADR 0038, ADR 0041). A pull request made with GITHUB_TOKEN would not
+# start CI, so the PR uses the secret SCOPE_PR_TOKEN (fine-grained token for this repository:
+# Contents and Pull requests write). The OpenAlex key is OPENALEX_API_KEY of `staging`.
+
+on:
+  schedule:
+    - cron: "43 5 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: openalex-scope-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: staging
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Enable Corepack and pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.18.2 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Look up the scope
+        working-directory: apps/pipeline
+        env:
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+        run: node dist/scope/lookup-cli.js --days 90 --json-out "$RUNNER_TEMP/scope.json" > "$RUNNER_TEMP/lookup.md"
+
+      - name: Compare with the checked-in IDs
+        working-directory: apps/pipeline
+        run: node dist/scope/sync-cli.js --report "$RUNNER_TEMP/scope.json" --source src/normalize/scope.ts | tee "$RUNNER_TEMP/sync.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open a draft pull request when an ID changed
+        env:
+          SCOPE_PR_TOKEN: ${{ secrets.SCOPE_PR_TOKEN }}
+        run: |
+          if git diff --quiet -- apps/pipeline/src/normalize/scope.ts; then
+            echo "No change, no pull request."
+            exit 0
+          fi
+          if [ -z "$SCOPE_PR_TOKEN" ]; then
+            echo "::error::SCOPE_PR_TOKEN is not set in the environment staging"
+            exit 1
+          fi
+          export GH_TOKEN="$SCOPE_PR_TOKEN"
+          branch="automation/openalex-subfield-ids"
+          if [ -n "$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$branch" --state open --json number --jq '.[0].number // empty')" ]; then
+            echo "A pull request for $branch is already open."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git commit -am "Update OpenAlex subfield IDs (REQ-DATA-001)"
+          git push "https://x-access-token:${SCOPE_PR_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$branch"
+          {
+            echo "Automatic monthly check of the OpenAlex subfield IDs (REQ-DATA-001)."
+            echo
+            cat "$RUNNER_TEMP/sync.md"
+            echo "Review the IDs against the OpenAlex taxonomy before merging."
+          } > "$RUNNER_TEMP/body.md"
+          gh pr create --repo "$GITHUB_REPOSITORY" --draft --base main --head "$branch" \
+            --title "Update OpenAlex subfield IDs" --body-file "$RUNNER_TEMP/body.md"

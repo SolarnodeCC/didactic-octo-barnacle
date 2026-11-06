@@ -1,0 +1,125 @@
+name: Production deploy
+
+# Deploy of the collector Worker to production at an exact commit (REQ-NFR-002, REQ-NFR-020,
+# ADR 0044). Only `Production release` calls it, with the commit its plan picked. It does not
+# run by itself and stays off until the variable PRODUCTION_AUTO_RELEASE is "true" (see
+# docs/kt/operations.md, launch checklist). The GitHub environment `production` supplies the
+# same secrets as `staging` and its own protection rules.
+
+on:
+  workflow_call:
+    inputs:
+      sha:
+        description: "Commit of main to deploy"
+        type: string
+        required: true
+      migrate:
+        description: "Apply pending database migrations before the deploy"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  checks: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Require a commit of main
+        env:
+          SHA: ${{ inputs.sha }}
+        run: |
+          # Only reviewed code on main goes to production (REQ-NFR-021).
+          git fetch --quiet origin main
+          if ! git merge-base --is-ancestor "$SHA" origin/main; then
+            echo "::error::$SHA is not a commit of main"
+            exit 1
+          fi
+
+      - name: Require green checks for this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ inputs.sha }}
+        run: |
+          # Production only gets a commit whose pull request checks passed (REQ-NFR-021).
+          for check in parse toolchain; do
+            conclusion=$(gh api "repos/$GITHUB_REPOSITORY/commits/$SHA/check-runs?check_name=$check&filter=latest" --jq '.check_runs | sort_by(.completed_at) | last | .conclusion')
+            if [ "$conclusion" != "success" ]; then
+              echo "::error::The check '$check' has no successful run for $SHA (found: ${conclusion:-none})"
+              exit 1
+            fi
+          done
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Enable Corepack and pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.18.2 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Check the erasure key
+        env:
+          ERASURE_HASH_KEY: ${{ secrets.ERASURE_HASH_KEY }}
+        run: |
+          # Without this key the Worker stops ingesting (REQ-NFR-016). Only the length is checked.
+          if [ "${#ERASURE_HASH_KEY}" -lt 32 ]; then
+            echo "::error::ERASURE_HASH_KEY is missing or shorter than 32 characters in the secrets of the environment production"
+            exit 1
+          fi
+
+      - name: Apply migrations
+        if: ${{ inputs.migrate }}
+        working-directory: infrastructure/cloudflare
+        run: pnpm exec wrangler d1 migrations apply DB --env production --remote
+
+      - name: Deploy the Worker with its secrets
+        working-directory: infrastructure/cloudflare
+        env:
+          ERASURE_HASH_KEY: ${{ secrets.ERASURE_HASH_KEY }}
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          ALERT_GITHUB_TOKEN: ${{ secrets.ALERT_GITHUB_TOKEN }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ALERT_EMAIL_TO: ${{ vars.ALERT_EMAIL_TO }}
+          SHA: ${{ inputs.sha }}
+        run: |
+          umask 077
+          secrets_file="$RUNNER_TEMP/worker-secrets.json"
+          # The file is built from the environment by node, so no value passes through the shell.
+          node -e 'const out = {}; for (const key of ["ERASURE_HASH_KEY", "OPENALEX_API_KEY", "ALERT_GITHUB_TOKEN", "RESEND_API_KEY"]) { if (process.env[key]) out[key] = process.env[key]; } process.stdout.write(JSON.stringify(out));' > "$secrets_file"
+          args=(--env production --secrets-file "$secrets_file" --message "Deploy ${SHA::7} from GitHub Actions")
+          if [ -n "$ALERT_EMAIL_TO" ]; then
+            args+=(--var "ALERT_EMAIL_TO:$ALERT_EMAIL_TO")
+          fi
+          pnpm exec wrangler deploy "${args[@]}"
+
+      - name: Remove the secrets file
+        if: ${{ always() }}
+        run: rm -f "$RUNNER_TEMP/worker-secrets.json"
+
+      - name: Show the live deployment
+        working-directory: infrastructure/cloudflare
+        run: pnpm exec wrangler deployments list --env production
