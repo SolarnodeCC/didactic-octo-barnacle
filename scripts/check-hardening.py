@@ -17,6 +17,9 @@ here, in CI, on every pull request. Rules (see docs/kt/decisions/0033-repository
 9. CI audits the dependencies (`audit:ci` in package.json and in ci.yml).
 10. A workflow that runs on `workflow_run` limits it to `branches: [main]`, and no job passes
     `secrets: inherit` to a called workflow (ADR 0046).
+11. No job calls (`uses:`) a local workflow whose jobs use an `environment`. Environment
+    secrets do not reach a job of a called workflow, so it would run with empty credentials;
+    start such a workflow as its own run with `gh workflow run` instead (ADR 0046).
 """
 
 from __future__ import annotations
@@ -73,6 +76,15 @@ def check_workflows() -> None:
         for job_name, job in (workflow.get("jobs") or {}).items():
             if job.get("secrets") == "inherit":
                 fail(f"{name}: job {job_name} must not pass `secrets: inherit`")
+            called = job.get("uses")
+            if isinstance(called, str) and called.startswith("./.github/workflows/"):
+                target = ROOT / called[2:].split("@")[0]
+                target_jobs = (yaml.safe_load(target.read_text()) or {}).get("jobs") or {} if target.is_file() else {}
+                if any("environment" in (called_job or {}) for called_job in target_jobs.values()):
+                    fail(
+                        f"{name}: job {job_name} calls {target.name}, which uses an environment; "
+                        "its secrets would be empty, so start it with `gh workflow run`"
+                    )
             for index, step in enumerate(job.get("steps") or []):
                 where = f"{name}: job {job_name}, step {index + 1}"
                 uses = step.get("uses")

@@ -17,14 +17,6 @@ on:
         description: "Fail when resources are missing (used by the automated pipeline). With apply, the run fails only if resources are still missing after apply"
         type: boolean
         default: false
-  workflow_call:
-    inputs:
-      apply:
-        type: boolean
-        default: false
-      fail_on_drift:
-        type: boolean
-        default: false
 
 permissions:
   contents: read

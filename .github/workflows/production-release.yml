@@ -7,7 +7,8 @@ name: Production release
 # not labeled `hold`, and has no unreviewed drop or rename in a migration (`contract-ok`).
 # A run by hand is a dry run unless `dry_run` is switched off. Nothing is deployed until the
 # repository variable PRODUCTION_AUTO_RELEASE is "true", which the owner sets after the launch
-# checklist in docs/kt/operations.md. After a deploy the commit gets the tag `release-<date>-<sha>`.
+# checklist in docs/kt/operations.md. The deploy runs as its own `Production deploy` run, which
+# tags the commit `release-<date>-<sha>` after it and opens an alert if it fails (ADR 0046).
 
 on:
   schedule:
@@ -69,36 +70,26 @@ jobs:
           set -o pipefail
           node infrastructure/cloudflare/dist/release/plan-cli.js --soak-hours "$SOAK_HOURS" --output-file "$GITHUB_OUTPUT" | tee -a "$GITHUB_STEP_SUMMARY"
 
-  deploy:
+  dispatch:
     needs: plan
     if: ${{ needs.plan.outputs.sha != '' && vars.PRODUCTION_AUTO_RELEASE == 'true' && (github.event_name == 'schedule' || inputs.dry_run == false) }}
-    permissions:
-      contents: read
-      checks: read
-    uses: ./.github/workflows/production-deploy.yml
-    with:
-      sha: ${{ needs.plan.outputs.sha }}
-      migrate: true
-
-  tag:
-    needs: [plan, deploy]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
-      contents: write
+      actions: write
+      contents: read
     steps:
-      - name: Tag the released commit
+      - name: Start Production deploy
         env:
           GH_TOKEN: ${{ github.token }}
           SHA: ${{ needs.plan.outputs.sha }}
         run: |
-          tag="release-$(date -u +%Y-%m-%d)-${SHA::7}"
-          gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$tag" -f "sha=$SHA"
-          echo "Tagged $SHA as $tag" >> "$GITHUB_STEP_SUMMARY"
+          gh workflow run production-deploy.yml --repo "$GITHUB_REPOSITORY" --ref main -f "sha=$SHA" -f migrate=true
+          echo "Started Production deploy for $SHA: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/workflows/production-deploy.yml" >> "$GITHUB_STEP_SUMMARY"
 
   alert:
-    needs: [plan, deploy, tag]
-    if: ${{ always() && (needs.plan.result == 'failure' || needs.deploy.result == 'failure' || needs.tag.result == 'failure') }}
+    needs: [plan, dispatch]
+    if: ${{ always() && (needs.plan.result == 'failure' || needs.dispatch.result == 'failure') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

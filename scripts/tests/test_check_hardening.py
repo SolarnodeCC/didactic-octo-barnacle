@@ -44,6 +44,16 @@ class HardeningTest(ScriptTestCase):
         self.replace(CI, "run: pnpm lint", 'run: echo "${{ github.event.pull_request.title }}"')
         self.assert_fails_with("pass event data or inputs through `env`, not into `run`")
 
+    def test_req_nfr_021_fails_on_a_call_to_a_workflow_that_uses_an_environment(self) -> None:
+        self.write(
+            ".github/workflows/caller.yml",
+            "name: Caller\non:\n  workflow_dispatch:\npermissions:\n  contents: read\n"
+            "jobs:\n  deploy:\n    uses: ./.github/workflows/staging-deploy.yml\n",
+        )
+        self.assert_fails_with(
+            "caller.yml: job deploy calls staging-deploy.yml, which uses an environment"
+        )
+
     def test_req_nfr_021_fails_when_dependabot_drops_an_ecosystem(self) -> None:
         self.replace(".github/dependabot.yml", "package-ecosystem: npm", "package-ecosystem: cargo")
         self.assert_fails_with("dependabot.yml: add the `npm` ecosystem")
