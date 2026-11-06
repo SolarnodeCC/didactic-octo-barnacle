@@ -1,6 +1,8 @@
 import { SCOPE_OPENALEX_SUBFIELD_IDS } from "../normalize/scope.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { fetchPageEnvelope } from "./deps.js";
+import { handleFetchPage } from "./fetch-page.js";
 import { replayDeadLetter } from "./replay.js";
 import { runScheduled } from "../schedule/run-scheduled.js";
 import { startRun } from "../schedule/start-run.js";
@@ -517,5 +519,56 @@ describe("REQ-TEST-003: scheduled ingestion tests never reach the network", () =
     await runScheduled(h.Deps, OPENALEX_CRON);
     await h.Drain();
     expect(fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe("REQ-DATA-009: pages of a run are stored in order", () => {
+  it("REQ-DATA-009: a page that arrives before the page before it is stored waits and fetches nothing", async () => {
+    scriptTwoPages();
+    const started = await runScheduled(h.Deps, OPENALEX_CRON);
+    const runId = (started as { RunId: string }).RunId;
+    const early = fetchPageEnvelope(runId, "openalex", 1);
+
+    await expect(handleFetchPage(h.Deps, early)).rejects.toThrow(/before page 0/);
+    expect(h.OpenAlexRequests).toHaveLength(0);
+    expect(h.Run()["pages_done"]).toBe(0);
+
+    // Once page 0 is stored, page 1 is claimed again and continues from its cursor.
+    await h.Drain();
+    expect(h.OpenAlexRequests[1]).toMatchObject({ Cursor: "cursor-2" });
+    expect(h.Run()["status"]).toBe("succeeded");
+    expect(h.Run()["pages_done"]).toBe(2);
+    expect(h.Count("publication")).toBe(3);
+  });
+
+  it("REQ-DATA-011: a page that is already counted is completed without fetching or counting it again", async () => {
+    h.SetOpenAlexPages([
+      openAlexPage([makeWork(1)], "cursor-2"),
+      openAlexPage([makeWork(2)], "cursor-3"),
+      openAlexPage([makeWork(3)], null),
+    ]);
+    await runScheduled(h.Deps, OPENALEX_CRON);
+    const runId = h.Run()["id"] as string;
+    // Deliver page 0 and page 1 only, then replay page 0 under a fresh log row.
+    await handleFetchPage(h.Deps, fetchPageEnvelope(runId, "openalex", 0));
+    await handleFetchPage(h.Deps, fetchPageEnvelope(runId, "openalex", 1));
+    h.Database.Raw.prepare("DELETE FROM queue_message_log WHERE message_id = ?").run(
+      `fetch:${runId}:0`,
+    );
+    const requests = h.OpenAlexRequests.length;
+
+    expect(await handleFetchPage(h.Deps, fetchPageEnvelope(runId, "openalex", 0))).toBe("skipped");
+    expect(h.OpenAlexRequests).toHaveLength(requests);
+    expect(h.Run()["pages_done"]).toBe(2);
+  });
+
+  it("REQ-DATA-011: a failed page is retried with a delay, not at once", async () => {
+    h.SetOpenAlexPages([new Error("upstream 503"), openAlexPage([makeWork(1)], null)]);
+    await runScheduled(h.Deps, OPENALEX_CRON);
+    await h.Drain();
+
+    expect(h.Queue.retries).toHaveLength(1);
+    expect(h.Queue.retries[0]?.delaySeconds).toBeGreaterThanOrEqual(24);
+    expect(h.Run()["status"]).toBe("succeeded");
   });
 });

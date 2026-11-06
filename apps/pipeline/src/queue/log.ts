@@ -12,36 +12,21 @@ const MAX_ERROR_LENGTH = 500;
  * Consumers claim a message before they work (REQ-DATA-011 AC1). A message that is
  * already `completed` is a repeated delivery and is skipped, so processing the same
  * message twice gives the same stored result.
+ *
+ * The claim is one statement: it inserts the log row or, for a message seen before that
+ * is neither completed nor dead-lettered, counts another attempt. Two deliveries of a new
+ * message can then never both try to insert it, and the common case is one round trip.
  */
 export async function claimMessage(
   db: SqlDatabase,
   envelope: QueueMessageEnvelope,
   now: string,
 ): Promise<ClaimResult> {
-  const row = await db
-    .prepare("SELECT status FROM queue_message_log WHERE message_id = ?")
-    .bind(envelope.MessageId)
-    .first<LogRow>();
-
-  if (row?.status === "completed") {
-    return "duplicate";
-  }
-  if (row?.status === "dead-lettered") {
-    return "dead-lettered";
-  }
-  if (row) {
-    await db
-      .prepare(
-        "UPDATE queue_message_log SET status = 'processing', attempts = attempts + 1, updated_at = ? WHERE message_id = ?",
-      )
-      .bind(now, envelope.MessageId)
-      .run();
-    return "claimed";
-  }
-
-  await db
+  const claimed = await db
     .prepare(
-      "INSERT INTO queue_message_log (id, message_id, type, schema_version, status, attempts, dead_letter, updated_at, created_at, payload_json) VALUES (?, ?, ?, ?, 'processing', 1, 0, ?, ?, ?)",
+      "INSERT INTO queue_message_log (id, message_id, type, schema_version, status, attempts, dead_letter, updated_at, created_at, payload_json) VALUES (?, ?, ?, ?, 'processing', 1, 0, ?, ?, ?) " +
+        "ON CONFLICT (message_id) DO UPDATE SET status = 'processing', attempts = queue_message_log.attempts + 1, updated_at = excluded.updated_at " +
+        "WHERE queue_message_log.status NOT IN ('completed', 'dead-lettered') RETURNING status",
     )
     .bind(
       `qml_${envelope.MessageId}`,
@@ -52,8 +37,17 @@ export async function claimMessage(
       now,
       JSON.stringify(envelope),
     )
-    .run();
-  return "claimed";
+    .first<LogRow>();
+  if (claimed) {
+    return "claimed";
+  }
+
+  // Nothing was written: the row exists and is completed or dead-lettered.
+  const row = await db
+    .prepare("SELECT status FROM queue_message_log WHERE message_id = ?")
+    .bind(envelope.MessageId)
+    .first<LogRow>();
+  return row?.status === "dead-lettered" ? "dead-lettered" : "duplicate";
 }
 
 /**

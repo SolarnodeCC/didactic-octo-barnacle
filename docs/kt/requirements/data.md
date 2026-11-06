@@ -172,6 +172,7 @@ Every Queue consumer and Workflow step tolerates repeated delivery.
 - Acceptance criteria:
   1. A consumer checks stored state before it works, so processing the same message twice gives the same stored result.
   2. Queue messages are typed records with a schema version and carry IDs only, never large payloads.
-  3. A message that fails its retries goes to a dead-letter queue, and the run report counts dead-lettered messages (REQ-NFR-008).
+  3. A failed message is retried after a delay that doubles from 30 seconds, with jitter and at most 15 minutes (ADR 0045). A message that fails its retries goes to a dead-letter queue, and the run report counts dead-lettered messages (REQ-NFR-008).
   4. A dead-lettered message can be replayed without creating duplicates. In phase 1 this is the replay function; the admin route `POST /admin/queue/replay` arrives with the admin API in phase 4 (REQ-ADM-004).
+  5. The pages of a run are stored in order: a page whose predecessor is not stored yet waits for it, and a page that is already counted is not counted again (ADR 0045).
 - Verification: integration test that delivers each message twice and replays a dead-lettered message

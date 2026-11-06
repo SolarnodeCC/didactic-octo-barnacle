@@ -40,6 +40,13 @@ export type Env = {
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 // Not `fetch` itself: calling it detached from the global scope fails in Workers.
 const workerFetch: typeof fetch = (input, init) => fetch(input, init);
+// One limiter per isolate, not per page: a retried page in the same isolate still waits
+// for the arXiv request interval after the request before it (REQ-DATA-002).
+const arxivSlot = createRateLimiter({
+  MinIntervalMs: ARXIV_MIN_REQUEST_INTERVAL_MS,
+  Now: () => Date.now(),
+  Sleep: sleep,
+});
 
 function buildDeps(env: Env): PipelineDeps {
   const config = DEFAULT_INGEST_CONFIG;
@@ -111,11 +118,7 @@ function buildDeps(env: Env): PipelineDeps {
           {
             Fetch: workerFetch,
             Backoff: backoff,
-            WaitForSlot: createRateLimiter({
-              MinIntervalMs: ARXIV_MIN_REQUEST_INTERVAL_MS,
-              Now: () => Date.now(),
-              Sleep: sleep,
-            }),
+            WaitForSlot: arxivSlot,
           },
         ),
     },

@@ -55,6 +55,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0042](0042-arxiv-limit-on-first-submission-date.md) | arXiv 90-day limit on the date of the first version | Accepted |
 | [0043](0043-node-integration-tests-and-network-guard.md) | Node integration tests with a network guard | Accepted |
 | [0044](0044-weekly-production-release.md) | Weekly production release | Accepted |
+| [0045](0045-delayed-queue-retries-and-ordered-pages.md) | Delayed queue retries and pages stored in order | Accepted |
 | [0046](0046-automated-staging-pipeline.md) | Automated staging pipeline and scope sync | Accepted |
 
 ## When an ADR is needed
