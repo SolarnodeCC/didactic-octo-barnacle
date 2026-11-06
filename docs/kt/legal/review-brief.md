@@ -14,8 +14,7 @@ Written answers from a named legal contact close OQ-014. Phase 2 does not start 
 
 | Field | Value |
 |---|---|
-| Legal contact name | _to be named by `@SolarnodeCC`_ |
-| Contact email | _to be named_ |
+| Legal contact | through the project address `info@solarnode.cc`; the owner chose not to record a person's name (2026-11-06) |
 | Date requested | 2026-10-29 |
 | Date answered | 2026-11-06 for the phase-2 gate questions 1 to 5, as reported by `@SolarnodeCC`; launch questions 6 to 12 pending |
 
@@ -43,7 +42,7 @@ Answer yes/no with conditions for each:
 
 | Questions | Answer | Conditions |
 |---|---|---|
-| 1 to 5 (phase-2 gate) | Approved, reported by `@SolarnodeCC` on 2026-11-06 | _none recorded yet; add any condition the legal contact attached_ |
+| 1 to 5 (phase-2 gate) | Approved, reported by `@SolarnodeCC` on 2026-11-06 | None recorded |
 | 6 to 12 (launch) | _pending_ | |
 
 Under ADR 0049 the pipeline sends abstracts to Workers AI, not to OpenAI or Anthropic. Question 4 covers the Anthropic eval judge; model processing by Cloudflare falls under the Cloudflare agreement of question 8.
