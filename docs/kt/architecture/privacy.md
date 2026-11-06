@@ -25,8 +25,8 @@ Model providers receive publication text and prompts, never user data (security)
 
 | Processor | Purpose | Data | Needed before launch |
 |---|---|---|---|
-| Cloudflare | Hosting, storage, AI Gateway | all platform data | data processing agreement, location of storage |
-| OpenAI / Anthropic (per configured model) | Model calls | publication text, prompts | data processing agreement, retention terms, no training on inputs |
+| Cloudflare | Hosting, storage, AI Gateway, Workers AI model calls (ADR 0049) | all platform data | data processing agreement, location of storage |
+| OpenAI or Anthropic (eval judge only, ADR 0049) | Live evals in the `evals` environment | golden-set publication text, prompts | data processing agreement, retention terms, no training on inputs |
 | Resend | Email delivery | email address | data processing agreement |
 | Web search provider (OQ-033) | Search for two agents | search queries built from publication topics | data processing agreement |
 

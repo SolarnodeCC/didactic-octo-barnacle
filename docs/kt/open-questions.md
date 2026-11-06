@@ -21,13 +21,15 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
 | OQ-036 | Which model runs each model-backed step? | Cloudflare-hosted models only. Run the [model benchmark plan](test/model-benchmark-plan.md) on the golden sets, pick the cheapest model that meets each step's threshold, and record the result in an ADR | triage and extraction before phase 2 starts; the six analysis agents before phase 3 |
-| OQ-040 | Which providers may the pipeline call: Cloudflare-hosted models only, or also OpenAI and Anthropic through AI Gateway? | The documents disagree. `README.md`, [agents](agents/README.md), and [technology stack](architecture/technology-stack.md) say OpenAI or Anthropic through AI Gateway; OQ-036 and the [model benchmark plan](test/model-benchmark-plan.md) say Cloudflare-hosted only; OQ-020 needs a judge from another provider. Proposal: Cloudflare-hosted models for the pipeline steps, one external provider for the eval judge only, and the stack documents updated to match. Contracts and the eval runner in `packages/models` and `agents/extraction` are provider-agnostic, so either answer keeps them | with OQ-036, before phase 2 starts |
+| OQ-043 | Does the provisional phase 2 budget cover triage of every ingested publication, embeddings, and full-text extraction input? | REQ-NFR-005 AC1 multiplies the daily limit (100) by a cost per publication that ADR 0032 defines as one triage and one extraction call on the abstract. Triage runs on every in-scope publication (about EUR 0.37 on the largest measured day alone, against a EUR 0.22 budget), embeddings run on all of them, and full text makes extraction input larger. Proposal: budget = (expected daily triaged publications × triage cost + daily limit × extraction cost + daily embeddings × embedding cost) × 1.5, with `extraction.full_text_max_chars` priced in, and REQ-NFR-005 AC1 changed to match ([phase 2 dependencies](phase-2/dependencies.md#cost-and-quotas)) | before phase 2 starts |
 
 ## Selection and validation
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
 | OQ-038 | Is a burden at population or sector level, with no party that can act on it, a candidate in extraction? | Add to REQ-PROC-009: no candidate when the stated burden belongs to a population or sector and no named customer can act on it. Entries `gs-extraction-015` (2602.11223) and `gs-extraction-020` (2609.10350) show the case. Decide after the first extraction eval run, with data | before phase 2 starts |
+| OQ-041 | REQ-TEST-005 (golden sets and thresholds) is phase 3, but the phase 2 exit, REQ-PROC-006 AC3, and REQ-PROC-009 AC5 depend on the triage and extraction golden sets. Should REQ-TEST-005 move to phase 2 for those two steps? | Split it: the triage and extraction part becomes a phase 2 requirement, and the six analysis agents stay in phase 3. The golden sets and `scripts/check-golden-sets.py` already exist | before phase 2 starts |
+| OQ-042 | How far back does the weekly retraction check look? | Ingestion re-reads only `ingestion.overlap_days` (2), so later retractions are found only by the weekly check of REQ-DATA-008. Proposal: `retraction.lookback_days` = `ingestion.max_age_days` (90), since nothing older is stored; widen it if opportunities live longer than that | before WP8 of the [phase 2 build plan](phase-2/build-plan.md) |
 
 ## Ownership
 
@@ -72,3 +74,4 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-021 | Daily budget = expected daily complete opportunities × measured cost × 1.25, locked before phase 4 scoring | ADR 0023 |
 | OQ-037 | Option B of ADR 0036: one analyst sets E3, `validated` needs all four elements at E3, the Startup Generator writes the brief, the label shows on the detail page only | ADR 0040, [evidence levels](evidence-and-readiness.md) |
 | OQ-017 | Organization profiles and organization-wide feedback come after the MVP | REQ-DASH-005 |
+| OQ-040 | Cloudflare-hosted models through Workers AI and AI Gateway for pipeline steps; one external provider through AI Gateway only for the eval judge | ADR 0049 |

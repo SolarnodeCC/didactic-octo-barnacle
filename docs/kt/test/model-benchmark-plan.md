@@ -193,7 +193,7 @@ Stop and ask the owner before the total model cost passes the budget of 50 euro.
 6. Round two: finalists, one reasoning variant, optional prompt tuning.
 7. Write the ADR, update the model configuration, and close OQ-036.
 
-If the chosen models differ from OpenAI or Anthropic, the ADR also updates the [technology stack](../architecture/technology-stack.md), [privacy](../architecture/privacy.md), [operations](../operations.md), and `README.md` and `AGENTS.md`, which name only those two providers.
+ADR 0049 already updated the [technology stack](../architecture/technology-stack.md), [privacy](../architecture/privacy.md), [operations](../operations.md), `README.md`, and `AGENTS.md` for Cloudflare-hosted pipeline models. The benchmark ADR names the models and needs no further change to them unless it picks an external provider.
 
 ## Questions and answers
 

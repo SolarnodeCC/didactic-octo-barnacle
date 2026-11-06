@@ -59,6 +59,13 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0046](0046-automated-staging-pipeline.md) | Automated staging pipeline and scope sync | Accepted |
 | [0047](0047-separate-document-queue.md) | A separate queue for PDF downloads | Accepted |
 | [0048](0048-openalex-publication-types-with-abstract.md) | OpenAlex publication types with an abstract | Accepted |
+| [0049](0049-workers-ai-for-pipeline-steps.md) | Workers AI for pipeline steps, one external provider for the eval judge | Accepted |
+| [0050](0050-phase-2-queue-topology.md) | Phase 2 queue topology | Proposed |
+| [0051](0051-processing-runs-and-model-call-records.md) | Processing runs and model-call records | Proposed |
+| [0052](0052-daily-admission-and-budget-stop.md) | Daily admission to extraction and the budget stop | Proposed |
+| [0053](0053-embedding-index-versioning.md) | Embedding index versioning and backfill | Proposed |
+| [0054](0054-recall-at-10-fixture-corpus.md) | Fixture corpus for recall at 10 | Proposed |
+| [0055](0055-thin-slice-read-route.md) | A read route for the thin slice | Proposed |
 
 ## When an ADR is needed
 

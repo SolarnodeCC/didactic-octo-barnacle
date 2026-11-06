@@ -12,7 +12,7 @@ related: [REQ-NFR-002, REQ-NFR-003, REQ-AGENT-013]
 |---|---|
 | Development | Cursor, Claude Code, GitHub, GitHub Actions |
 | Cloud platform | Cloudflare Workers, Workflows, Queues, D1, R2, Vectorize, AI Gateway, Durable Objects (ADR 0017) |
-| AI and agents | Plain TypeScript agents in Workflow steps (ADR 0003); OpenAI and Anthropic through AI Gateway; a web search provider for two agents (ADR 0013, OQ-033) |
+| AI and agents | Plain TypeScript agents in Workflow steps (ADR 0003); Cloudflare-hosted models through the Workers AI binding and AI Gateway for every pipeline step, and one external provider (OpenAI or Anthropic) through AI Gateway for the eval judge only (ADR 0049); a web search provider for two agents (ADR 0013, OQ-033) |
 | Frontend | Next.js on Workers through the OpenNext adapter (ADR 0012), Tailwind CSS |
 | Language and runtime | TypeScript (strict, ES modules); Node 24 LTS for tooling (ADR 0008) |
 | Package manager | pnpm workspaces (ADR 0008) |
