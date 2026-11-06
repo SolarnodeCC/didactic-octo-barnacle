@@ -8,7 +8,8 @@ export interface QueueMessageLike {
   readonly body: unknown;
   readonly attempts: number;
   ack(): void;
-  retry(): void;
+  /** `delaySeconds` holds the message back before the next delivery (REQ-DATA-011 AC3). */
+  retry(options?: { delaySeconds?: number }): void;
 }
 
 export interface QueueBatchLike {

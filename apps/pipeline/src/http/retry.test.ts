@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { fetchWithBackoff, HttpRequestError, type FetchFn } from "./retry.js";
+import { fetchWithBackoff, HttpRequestError, retryAfterMs, type FetchFn } from "./retry.js";
 
 function response(status: number, headers: Record<string, string> = {}): Response {
   return new Response("body", { status, headers });
@@ -18,6 +18,8 @@ function setup(...responses: Array<Response | Error>) {
   const options = {
     MaxAttempts: 3,
     BaseMs: 100,
+    // The midpoint of the jitter range, so the expected delays are exact.
+    Random: () => 0.5,
     Sleep: (ms: number) => {
       sleeps.push(ms);
       return Promise.resolve();
@@ -136,6 +138,46 @@ describe("REQ-NFR-021: bounded requests and waits", () => {
         RetryAmbiguous: false,
       }),
     ).rejects.toMatchObject({ Attempts: 1, Status: null });
+  });
+});
+
+describe("REQ-DATA-001: backoff jitter and Retry-After dates", () => {
+  it("REQ-DATA-001: the computed backoff varies by at most 20 % either way", async () => {
+    const low = setup(response(503), response(503), response(200));
+    await fetchWithBackoff(low.fetchFn, "https://example.org", undefined, {
+      ...low.options,
+      Random: () => 0,
+    });
+    expect(low.sleeps).toEqual([80, 160]);
+
+    const high = setup(response(503), response(503), response(200));
+    await fetchWithBackoff(high.fetchFn, "https://example.org", undefined, {
+      ...high.options,
+      Random: () => 1,
+    });
+    expect(high.sleeps).toEqual([120, 240]);
+  });
+
+  it("REQ-DATA-001: a Retry-After HTTP date waits until that time", async () => {
+    const now = Date.parse("2026-11-06T10:00:00Z");
+    const { fetchFn, sleeps, options } = setup(
+      response(503, { "retry-after": "Fri, 06 Nov 2026 10:00:12 GMT" }),
+      response(200),
+    );
+    await fetchWithBackoff(fetchFn, "https://example.org", undefined, {
+      ...options,
+      NowMs: () => now,
+    });
+    expect(sleeps).toEqual([12_000]);
+  });
+
+  it("REQ-DATA-001: a Retry-After date in the past or a malformed value falls back sensibly", () => {
+    const now = () => Date.parse("2026-11-06T10:00:00Z");
+    const past = response(503, { "retry-after": "Fri, 06 Nov 2026 09:00:00 GMT" });
+    expect(retryAfterMs(past, now)).toBe(0);
+    expect(retryAfterMs(response(503, { "retry-after": "soon" }), now)).toBeNull();
+    expect(retryAfterMs(response(503, { "retry-after": "-5" }), now)).toBeNull();
+    expect(retryAfterMs(response(503, { "retry-after": "7" }), now)).toBe(7000);
   });
 });
 
