@@ -16,6 +16,13 @@ export type BackoffOptions = {
    * processed already, and a retry would then duplicate it.
    */
   RetryAmbiguous?: boolean;
+  /**
+   * Source of the ±20 % jitter on the computed backoff (default `Math.random`), so clients
+   * that failed together do not retry in step. A `Retry-After` delay is used as given.
+   */
+  Random?: () => number;
+  /** Clock for an HTTP-date `Retry-After` (default `Date.now`). */
+  NowMs?: () => number;
 };
 
 export const DEFAULT_REQUEST_TIMEOUT_MS = 15_000;
@@ -36,14 +43,18 @@ function isRetryableStatus(status: number, retryAmbiguous: boolean): boolean {
   return status === 429 || (retryAmbiguous && (status === 408 || status >= 500));
 }
 
-/** Delay from a `Retry-After` header in seconds; HTTP dates are ignored. */
-function retryAfterMs(response: Response): number | null {
-  const header = response.headers.get("retry-after");
+/** Delay from a `Retry-After` header: delay-seconds or an HTTP date (RFC 9110). */
+export function retryAfterMs(response: Response, nowMs: () => number = Date.now): number | null {
+  const header = response.headers.get("retry-after")?.trim();
   if (!header) {
     return null;
   }
-  const seconds = Number(header);
-  return Number.isFinite(seconds) && seconds >= 0 ? seconds * 1000 : null;
+  if (/^\d+$/.test(header)) {
+    return Number(header) * 1000;
+  }
+  // An HTTP date always names its weekday and month; a bare number is never a date.
+  const at = /[a-z]/i.test(header) ? Date.parse(header) : Number.NaN;
+  return Number.isFinite(at) ? Math.max(0, at - nowMs()) : null;
 }
 
 /**
@@ -63,9 +74,10 @@ export async function fetchWithBackoff(
   const timeoutMs = options.RequestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS;
   const maxDelayMs = options.MaxDelayMs ?? DEFAULT_MAX_DELAY_MS;
   const retryAmbiguous = options.RetryAmbiguous ?? true;
+  const random = options.Random ?? Math.random;
 
   for (let attempt = 1; attempt <= options.MaxAttempts; attempt += 1) {
-    let delayMs = options.BaseMs * 2 ** (attempt - 1);
+    let delayMs = Math.round(options.BaseMs * 2 ** (attempt - 1) * (0.8 + 0.4 * random()));
     try {
       const timeout = AbortSignal.timeout(timeoutMs);
       const signal = init?.signal ? AbortSignal.any([init.signal, timeout]) : timeout;
@@ -79,7 +91,7 @@ export async function fetchWithBackoff(
       if (!isRetryableStatus(response.status, retryAmbiguous)) {
         throw new HttpRequestError(lastMessage, attempt, response.status);
       }
-      delayMs = retryAfterMs(response) ?? delayMs;
+      delayMs = retryAfterMs(response, options.NowMs) ?? delayMs;
     } catch (error) {
       if (error instanceof HttpRequestError) {
         throw error;

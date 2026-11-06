@@ -13,6 +13,11 @@ on:
         description: "Apply pending migrations (otherwise only list them)"
         type: boolean
         default: false
+  workflow_call:
+    inputs:
+      apply:
+        type: boolean
+        default: false
 
 permissions:
   contents: read

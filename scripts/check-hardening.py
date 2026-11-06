@@ -15,6 +15,8 @@ here, in CI, on every pull request. Rules (see docs/kt/decisions/0033-repository
 7. CODEOWNERS has a default owner (`*`).
 8. `wrangler.toml` turns off workers.dev and preview URLs and never turns them on.
 9. CI audits the dependencies (`audit:ci` in package.json and in ci.yml).
+10. A workflow that runs on `workflow_run` limits it to `branches: [main]`, and no job passes
+    `secrets: inherit` to a called workflow (ADR 0046).
 """
 
 from __future__ import annotations
@@ -64,7 +66,13 @@ def check_workflows() -> None:
             fail(f"{name}: pull_request_target is not allowed")
         if "pull_request" in events and re.search(r"\bsecrets\.", text):
             fail(f"{name}: a workflow that runs on pull_request must not use secrets")
+        run_trigger = (workflow.get("on", workflow.get(True, {})) or {})
+        if "workflow_run" in events:
+            if not isinstance(run_trigger, dict) or run_trigger["workflow_run"].get("branches") != ["main"]:
+                fail(f"{name}: limit `workflow_run` to `branches: [main]`")
         for job_name, job in (workflow.get("jobs") or {}).items():
+            if job.get("secrets") == "inherit":
+                fail(f"{name}: job {job_name} must not pass `secrets: inherit`")
             for index, step in enumerate(job.get("steps") or []):
                 where = f"{name}: job {job_name}, step {index + 1}"
                 uses = step.get("uses")

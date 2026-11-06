@@ -1,0 +1,120 @@
+name: Production release
+
+# Weekly promotion of main to production (REQ-NFR-020, REQ-NFR-021, ADR 0044). A release is a
+# prefix of main: everything up to one commit ships together. The plan (infrastructure/cloudflare
+# src/release/plan.ts) picks the newest commit for which every change since the last release
+# tag is green, has been on staging for SOAK hours, has no open dependency (`Depends on #N`), is
+# not labeled `hold`, and has no unreviewed drop or rename in a migration (`contract-ok`).
+# A run by hand is a dry run unless `dry_run` is switched off. Nothing is deployed until the
+# repository variable PRODUCTION_AUTO_RELEASE is "true", which the owner sets after the launch
+# checklist in docs/kt/operations.md. After a deploy the commit gets the tag `release-<date>-<sha>`.
+
+on:
+  schedule:
+    - cron: "23 7 * * 2"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Only print the plan; deploy nothing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-release
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+      checks: read
+      issues: read
+      pull-requests: read
+    outputs:
+      sha: ${{ steps.plan.outputs.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Enable Corepack and pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.18.2 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Plan the release
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOAK_HOURS: ${{ vars.RELEASE_SOAK_HOURS || '48' }}
+        run: |
+          set -o pipefail
+          node infrastructure/cloudflare/dist/release/plan-cli.js --soak-hours "$SOAK_HOURS" --output-file "$GITHUB_OUTPUT" | tee -a "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    needs: plan
+    if: ${{ needs.plan.outputs.sha != '' && vars.PRODUCTION_AUTO_RELEASE == 'true' && (github.event_name == 'schedule' || inputs.dry_run == false) }}
+    permissions:
+      contents: read
+      checks: read
+    uses: ./.github/workflows/production-deploy.yml
+    with:
+      sha: ${{ needs.plan.outputs.sha }}
+      migrate: true
+
+  tag:
+    needs: [plan, deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Tag the released commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ needs.plan.outputs.sha }}
+        run: |
+          tag="release-$(date -u +%Y-%m-%d)-${SHA::7}"
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$tag" -f "sha=$SHA"
+          echo "Tagged $SHA as $tag" >> "$GITHUB_STEP_SUMMARY"
+
+  alert:
+    needs: [plan, deploy, tag]
+    if: ${{ always() && (needs.plan.result == 'failure' || needs.deploy.result == 'failure' || needs.tag.result == 'failure') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Open or update the alert issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Production release failed"
+          number=$(gh issue list --repo "$GITHUB_REPOSITORY" --label alert --state open --search "$title in:title" --json number --jq '.[0].number // empty')
+          body="The weekly production release failed: $RUN_URL"
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --repo "$GITHUB_REPOSITORY" --body "$body"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --label alert --title "$title" --body "$body"
+          fi

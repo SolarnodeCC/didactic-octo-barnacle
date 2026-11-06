@@ -7,6 +7,9 @@ import {
 
 type Pending = { id: string; body: unknown; attempts: number; delaySeconds: number };
 
+/** One `retry()` call: the message and the delay the consumer asked for. */
+export type RetryRecord = { id: string; attempts: number; delaySeconds: number };
+
 export type DrainOptions = {
   /** Retries before a message goes to the dead-letter queue (`max_retries`). */
   MaxRetries: number;
@@ -25,6 +28,7 @@ export class FakeQueue implements QueueSender {
 
   readonly sent: Array<{ body: unknown; delaySeconds: number }> = [];
   readonly deadLettered: unknown[] = [];
+  readonly retries: RetryRecord[] = [];
   private pending: Pending[] = [];
   private nextId = 0;
 
@@ -93,8 +97,13 @@ export class FakeQueue implements QueueSender {
       ack: () => {
         acked = true;
       },
-      retry: () => {
+      retry: (options) => {
         acked = false;
+        this.retries.push({
+          id: item.id,
+          attempts: item.attempts + 1,
+          delaySeconds: options?.delaySeconds ?? 0,
+        });
       },
     };
     try {

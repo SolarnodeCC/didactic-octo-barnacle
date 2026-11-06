@@ -96,6 +96,18 @@ async function processPage(
     await deps.Db.batch([completeStatement(deps.Db, messageId, now)]);
     return "skipped";
   }
+  // Pages of a run are stored in order; the cursor for this page is the one the page
+  // before it saved. A page whose predecessor is not stored yet (its commit failed after
+  // it sent this message) waits for it; a page that is already counted is not stored again.
+  if (run.PagesDone < page) {
+    throw new Error(`page ${page} arrived before page ${run.PagesDone} was stored`);
+  }
+  if (run.PagesDone > page) {
+    await deps.Db.batch([
+      completeStatement(deps.Db, messageId, now, `page ${page} was already stored`),
+    ]);
+    return "skipped";
+  }
 
   const fetched = await fetchAndIngest(deps, run);
   const nextPage = page + 1;

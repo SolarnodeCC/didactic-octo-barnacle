@@ -9,16 +9,17 @@ import { createCloudflareClient } from "./cloudflare-client.js";
 const ENVIRONMENTS = new Set<EnvironmentName>(["local", "preview", "staging", "production"]);
 
 export const BOOTSTRAP_USAGE =
-  "Usage: roi-bootstrap --env <local|preview|staging|production> [--apply]";
+  "Usage: roi-bootstrap --env <local|preview|staging|production> [--apply] [--fail-on-drift]";
 export const APPLY_NEEDS_CREDENTIALS =
   "Apply requires CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID (see docs/kt/operations.md).";
 
-export type BootstrapArgs = { Environment: EnvironmentName; Apply: boolean };
+export type BootstrapArgs = { Environment: EnvironmentName; Apply: boolean; FailOnDrift: boolean };
 
 /** The parsed arguments, or null when they do not match the usage line. */
 export function parseBootstrapArgs(args: readonly string[]): BootstrapArgs | null {
   let environment: EnvironmentName | undefined;
   let apply = false;
+  let failOnDrift = false;
   for (let i = 0; i < args.length; i += 1) {
     const arg = args[i];
     if (arg === "--env") {
@@ -30,11 +31,13 @@ export function parseBootstrapArgs(args: readonly string[]): BootstrapArgs | nul
       environment = value as EnvironmentName;
     } else if (arg === "--apply") {
       apply = true;
+    } else if (arg === "--fail-on-drift") {
+      failOnDrift = true;
     } else {
       return null;
     }
   }
-  return environment ? { Environment: environment, Apply: apply } : null;
+  return environment ? { Environment: environment, Apply: apply, FailOnDrift: failOnDrift } : null;
 }
 
 export type BootstrapCliDeps = {
@@ -45,7 +48,10 @@ export type BootstrapCliDeps = {
   CreateClient?: typeof createCloudflareClient;
 };
 
-/** Runs the CLI and returns its exit code: 0 on success, 1 on failure, 2 on bad usage. */
+/**
+ * Runs the CLI and returns its exit code: 0 on success, 1 on failure, 2 on bad usage, and 3
+ * when `--fail-on-drift` is set and resources are missing.
+ */
 export async function runBootstrapCli(
   args: readonly string[],
   deps: BootstrapCliDeps,
@@ -77,6 +83,14 @@ export async function runBootstrapCli(
     ...(client ? { Client: client } : {}),
   });
   deps.Log(JSON.stringify(result, null, 2));
+
+  // The automated staging pipeline stops before the deploy when resources are missing (REQ-NFR-020).
+  if (parsed.FailOnDrift && result.Drift.Missing.length > 0) {
+    deps.Error(
+      `Missing resources: ${result.Drift.Missing.length}. Run Staging bootstrap with apply.`,
+    );
+    return 3;
+  }
   return 0;
 }
 
