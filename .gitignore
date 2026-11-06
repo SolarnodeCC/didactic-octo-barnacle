@@ -10,3 +10,4 @@ coverage/
 .wrangler/
 *.tsbuildinfo
 .DS_Store
+__pycache__/

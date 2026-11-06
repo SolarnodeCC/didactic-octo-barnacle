@@ -43,7 +43,7 @@ python3 -m pip install -r scripts/requirements.txt
 python3 scripts/check-config.py
 python3 scripts/check-kt.py
 pnpm install --frozen-lockfile
-pnpm lint && pnpm format:check && pnpm typecheck && pnpm build && pnpm test:unit && pnpm check:traceability
+pnpm lint && pnpm format:check && pnpm typecheck && pnpm build && pnpm test:unit && pnpm test:integration && pnpm check:scripts && pnpm check:traceability
 ```
 
 ---

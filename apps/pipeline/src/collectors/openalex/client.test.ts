@@ -1,3 +1,7 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { buildOpenAlexUrl, fetchOpenAlexPage, OPENALEX_WORK_FIELDS } from "./client.js";
@@ -121,5 +125,22 @@ describe("REQ-DATA-001: OpenAlex client", () => {
       { Fetch: fetchFn, Backoff: backoff },
     );
     expect(page.Works).toEqual([]);
+  });
+});
+
+describe("REQ-DATA-001: OpenAlex client on a recorded empty page", () => {
+  it("REQ-DATA-001: an empty page has no works and no next cursor, so paging stops", async () => {
+    const body = readFileSync(
+      join(dirname(fileURLToPath(import.meta.url)), "../../fixtures/openalex/page-empty.json"),
+      "utf8",
+    );
+    const fetchFn: FetchFn = () => Promise.resolve(new Response(body));
+
+    const page = await fetchOpenAlexPage(
+      { FromDate: "2026-10-01" },
+      { Fetch: fetchFn, Backoff: backoff },
+    );
+
+    expect(page).toEqual({ Works: [], NextCursor: null });
   });
 });
