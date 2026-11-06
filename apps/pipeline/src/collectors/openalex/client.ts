@@ -33,6 +33,29 @@ type OpenAlexResponse = {
 
 const OPENALEX_WORKS_URL = "https://api.openalex.org/works";
 
+/**
+ * The root fields the mapper and the scope filter read (`types.ts`). Without `select`,
+ * OpenAlex returns every field of a work (referenced works, locations, concepts, ...),
+ * which is several times larger to download and parse (REQ-NFR-010).
+ */
+export const OPENALEX_WORK_FIELDS = [
+  "id",
+  "title",
+  "display_name",
+  "publication_date",
+  "doi",
+  "ids",
+  "abstract_inverted_index",
+  "authorships",
+  "topics",
+  "primary_topic",
+  "cited_by_count",
+  "language",
+  "is_retracted",
+  "open_access",
+  "primary_location",
+] as const;
+
 export function buildOpenAlexUrl(request: OpenAlexPageRequest): string {
   const params = new URLSearchParams();
   const filters = [`from_publication_date:${request.FromDate}`, "language:en"];
@@ -46,6 +69,7 @@ export function buildOpenAlexUrl(request: OpenAlexPageRequest): string {
   // An explicit sort keeps the cursor order stable between runs, so a continued run reaches
   // new works instead of re-reading ones whose internal ranking moved (ADR 0041).
   params.set("sort", "publication_date:desc");
+  params.set("select", OPENALEX_WORK_FIELDS.join(","));
   params.set("per-page", String(request.PerPage ?? 100));
   params.set("cursor", request.Cursor ?? "*");
   return `${OPENALEX_WORKS_URL}?${params.toString()}`;

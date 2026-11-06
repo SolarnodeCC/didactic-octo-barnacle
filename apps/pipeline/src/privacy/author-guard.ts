@@ -17,10 +17,9 @@ export function createAuthorGuard(db: SqlDatabase, hash: AuthorKeyHasher): Autho
       const unique = [...new Set(authorIds)];
       for (let start = 0; start < unique.length; start += CHUNK) {
         const chunk = unique.slice(start, start + CHUNK);
-        const hashes = new Map<string, string>();
-        for (const id of chunk) {
-          hashes.set(await hash(id), id);
-        }
+        // The hashes are independent, so they are computed together.
+        const digests = await Promise.all(chunk.map((id) => hash(id)));
+        const hashes = new Map(digests.map((digest, index) => [digest, chunk[index] as string]));
         const marks = [...hashes.keys()].map(() => "?").join(", ");
         const { results } = await db
           .prepare(`SELECT subject_hash FROM author_erasure WHERE subject_hash IN (${marks})`)

@@ -1,6 +1,7 @@
 import { QueueMessageEnvelopeSchema, type IngestionRunFailure } from "@roi/models";
 
 import { claimMessage, completeStatement, markFailed } from "./log.js";
+import { SEND_BATCH_LIMIT } from "./types.js";
 import { documentIngestEnvelope, fetchPageEnvelope, type PipelineDeps } from "./deps.js";
 import {
   ingestArxivEntries,
@@ -121,8 +122,14 @@ async function processPage(
 
   // Publications with a storable PDF get a document message; the PDF itself is fetched
   // by its own consumer. Sent before the commit, like the next page: a repeat is deduplicated.
-  for (const publicationId of await pendingDocumentIds(deps.Db, fetched.Result.PdfCandidates)) {
-    await deps.Queue.send(documentIngestEnvelope(publicationId));
+  // Sent in batches of up to 100, one request each, instead of one request per message.
+  const documents = await pendingDocumentIds(deps.Db, fetched.Result.PdfCandidates);
+  for (let start = 0; start < documents.length; start += SEND_BATCH_LIMIT) {
+    await deps.Queue.sendBatch(
+      documents
+        .slice(start, start + SEND_BATCH_LIMIT)
+        .map((publicationId) => ({ body: documentIngestEnvelope(publicationId) })),
+    );
   }
 
   const statements = [
