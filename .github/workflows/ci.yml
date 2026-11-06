@@ -53,18 +53,27 @@ jobs:
       - name: Format check
         run: pnpm format:check
 
-      # One build: the root `typecheck` and `test:unit` scripts rebuild @roi/models for
-      # local use, which CI does not need after this step.
+      # One build: the root `typecheck` and `test:*` scripts rebuild @roi/models for local
+      # use, which CI does not need after this step.
       - name: Build
         run: pnpm build
 
       - name: Typecheck
-        run: pnpm -r run typecheck
+        run: |
+          pnpm -r run typecheck
+          pnpm exec tsc -p test-support
 
       - name: Unit tests
         run: pnpm -r run test:unit
 
+      - name: Integration tests
+        run: pnpm -r run test:integration
+
+      - name: Coverage report (reported, not gated)
+        run: pnpm -r run test:coverage
+
       - name: Traceability
         run: |
           python3 -m pip install --disable-pip-version-check -q -r scripts/requirements.txt
+          pnpm check:scripts
           pnpm check:traceability
