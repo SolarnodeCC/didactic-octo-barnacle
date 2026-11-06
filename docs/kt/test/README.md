@@ -2,7 +2,7 @@
 title: Test strategy
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-11-06
 related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-TEST-005]
 ---
 
@@ -58,4 +58,4 @@ related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-TEST-005]
 
 ## Current state
 
-`packages/models` has unit tests for phase 1 ingestion schemas and helpers. CI runs the configuration check, the KT check, and the toolchain gates including the traceability check (see [CI gates](ci-gates.md)). The test tools are decided in ADR 0008.
+`packages/models`, `apps/pipeline`, and `infrastructure/cloudflare` have unit tests (`*.test.ts`). `apps/pipeline` and `infrastructure/cloudflare` also have integration tests (`*.int.test.ts`) that run in Node with in-memory stand-ins. Every Vitest project loads the network guard `test-support/no-network.ts`. `agents/*/evals` holds golden sets and thresholds; there is no eval runner yet. CI runs the configuration, KT, golden-set, and hardening checks; the unit tests, the integration tests, and a coverage report; the tests of the check scripts; and the traceability check (see [CI gates](ci-gates.md)). The test tools are decided in ADR 0008 and ADR 0043.

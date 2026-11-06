@@ -2,7 +2,7 @@
 title: Test levels
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-06
 related: [REQ-TEST-002, REQ-API-003, REQ-AGENT-009]
 ---
 
@@ -11,7 +11,7 @@ related: [REQ-TEST-002, REQ-API-003, REQ-AGENT-009]
 | Level | What it covers | Proposed tool | Runs |
 |---|---|---|---|
 | Unit | Pure functions: scoring, parsing, metadata extraction, deduplication, triage rules, mapping | Vitest | every pull request |
-| Integration | Workers with their bindings: D1, R2, Queues, Vectorize, Workflows, Durable Objects | Vitest with `@cloudflare/vitest-plugin` (local runtime) | every pull request |
+| Integration | Workers with their bindings: D1, R2, Queues, Vectorize, Workflows, Durable Objects | Vitest in Node with in-memory stand-ins (`*.int.test.ts`, ADR 0043); `@cloudflare/vitest-plugin` once a Worker needs Vectorize, Workflows, or Durable Objects | every pull request |
 | Contract | Agent output against its output contract; API request and response shapes (REQ-API-003) | Schema validation (for example Zod or JSON Schema) in Vitest | every pull request |
 | End-to-end | Dashboard user flows against a local API with seeded data | Playwright | every pull request from phase 4 |
 | Eval | Quality of agent output against golden sets | Eval runner (see [AI evals](ai-evals.md)) | on prompt or model changes, and nightly |
@@ -25,7 +25,7 @@ Cover every branch of deterministic logic. Scoring (REQ-SCORE-001, REQ-SCORE-002
 
 ## Integration
 
-Run Workers in the local runtime with real local bindings, not hand-written mocks of D1 or R2. External HTTP calls are served from fixtures (see [test data](test-data.md)). Check idempotency: running an ingestion twice, or delivering a queue message twice, gives the same state (REQ-DATA-011). Check the role matrix of the auth and admin routes (REQ-ADM-004). Check resumption: a pipeline stopped after a step resumes without repeating it (REQ-AGENT-007).
+Integration tests are named `*.int.test.ts` and run with `pnpm test:integration`. Until a Worker needs a binding without a Node stand-in, they run in Node (ADR 0043). D1 is in-memory SQLite with the real migrations applied (`apps/pipeline/src/test/sqlite-d1.ts`). Queues, R2, and the alert channels are in-memory fakes in `apps/pipeline/src/test/`. The Worker entry is driven through its default export (`worker.int.test.ts`). External HTTP calls are served from fixtures through an injected or stubbed `fetch` (see [test data](test-data.md)). Check idempotency: running an ingestion twice, or delivering a queue message twice, gives the same state (REQ-DATA-011). Check the role matrix of the auth and admin routes (REQ-ADM-004). Check resumption: a pipeline stopped after a step resumes without repeating it (REQ-AGENT-007).
 
 ## Contract
 
@@ -42,4 +42,4 @@ Keep end-to-end tests few and focused on the flows named in the dashboard requir
 
 ## Coverage
 
-Coverage is reported, not gated. The gate is traceability: every requirement with status `done` must have a verifying test or named review (REQ-TEST-001).
+Coverage is reported, not gated: `pnpm test:coverage` prints V8 coverage per package in CI. The gate is traceability: every requirement with status `done` must have a verifying test or named review (REQ-TEST-001).
