@@ -24,8 +24,9 @@ SKIP_DIRS = {".git", "node_modules", "dist", "coverage", ".wrangler"}
 REQ_HEADING = re.compile(r"^### (REQ-[A-Z]+-\d{3}):", re.M)
 REQ_STATUS = re.compile(r"^- Status:\s*(\S+)", re.M)
 REQ_ID = re.compile(r"\bREQ-[A-Z]+-\d{3}\b")
+# The word boundary keeps calls such as `split(",")` from counting as a test named ",".
 TEST_NAME = re.compile(
-    r"""(?:it|test|describe)\s*\(\s*(['"`])(.*?)\1""",
+    r"""\b(?:it|test|describe)\s*\(\s*(['"`])(.*?)\1""",
     re.S,
 )
 REVIEW_ROW = re.compile(r"^\|\s*(REQ-[A-Z]+-\d{3})\s*\|", re.M)

@@ -116,6 +116,17 @@ class TraceabilityTest(unittest.TestCase):
         self.assertTrue(any("untraced test" in w for w in result.warnings))
         self.assertFalse(any("REQ-DATA-004" in w for w in result.warnings))
 
+    def test_req_test_001_does_not_count_calls_that_end_in_it_as_tests(self) -> None:
+        self.write(
+            "pkg/src/f.test.ts",
+            'it("REQ-DATA-001: splits", () => { const parts = "a,b".split(","); });\n',
+        )
+
+        result = traceability.check(self.root)
+
+        self.assertEqual(result.stats["tests scanned"], 3)
+        self.assertFalse(any("untraced test" in w for w in result.warnings))
+
     def test_req_test_001_skips_node_modules_and_build_output(self) -> None:
         self.write("node_modules/x/src/d.test.ts", 'it("REQ-DATA-999: vendored", () => {});\n')
         self.write("pkg/dist/e.test.ts", 'it("REQ-DATA-998: built", () => {});\n')
