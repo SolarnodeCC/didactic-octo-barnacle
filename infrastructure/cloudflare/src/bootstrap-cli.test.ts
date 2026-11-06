@@ -34,15 +34,41 @@ function harness(env: NodeJS.ProcessEnv = {}) {
 }
 
 describe("REQ-NFR-020: bootstrap CLI", () => {
-  it("REQ-NFR-020: parses --env and --apply", () => {
+  it("REQ-NFR-020: parses --env, --apply, and --fail-on-drift", () => {
     expect(parseBootstrapArgs(["--env", "staging"])).toEqual({
       Environment: "staging",
       Apply: false,
+      FailOnDrift: false,
     });
     expect(parseBootstrapArgs(["--apply", "--env", "preview"])).toEqual({
       Environment: "preview",
       Apply: true,
+      FailOnDrift: false,
     });
+    expect(parseBootstrapArgs(["--env", "staging", "--fail-on-drift"])).toEqual({
+      Environment: "staging",
+      Apply: false,
+      FailOnDrift: true,
+    });
+  });
+
+  it("REQ-NFR-020: --fail-on-drift exits 3 when resources are missing and 0 when none are", async () => {
+    const withDrift = (missing: number) => {
+      const h = harness();
+      h.deps.Bootstrap = vi.fn(() =>
+        Promise.resolve({
+          Drift: { Missing: Array.from({ length: missing }, () => ({})), Extra: [] },
+        }),
+      ) as unknown as typeof bootstrapEnvironment;
+      return h;
+    };
+    const drifted = withDrift(2);
+    expect(await runBootstrapCli(["--env", "staging", "--fail-on-drift"], drifted.deps)).toBe(3);
+    expect(drifted.errors).toEqual(["Missing resources: 2. Run Staging bootstrap with apply."]);
+
+    const clean = withDrift(0);
+    expect(await runBootstrapCli(["--env", "staging", "--fail-on-drift"], clean.deps)).toBe(0);
+    expect(clean.errors).toEqual([]);
   });
 
   it.each([
