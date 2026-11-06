@@ -2,7 +2,7 @@
 title: Platform and cost requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-11-06
 ---
 
 # Platform and cost requirements
@@ -15,12 +15,26 @@ The platform runs on the Cloudflare services listed in the [technology stack](..
 
 - Phase: 1
 - Priority: must
-- Status: planned
+- Status: done
 - Source: README Technology Stack
 - Acceptance criteria:
-  1. Every runtime component is deployed as a Cloudflare Worker, Workflow, or Durable Object. The dashboard runs on Workers through the OpenNext adapter (ADR 0012).
+  1. Every runtime component is deployed as a Cloudflare Worker, Workflow, or Durable Object. The dashboard part of this criterion moved to REQ-NFR-022 (ADR 0052).
   2. A service outside the listed stack is only added with an ADR.
-- Verification: code review
+- Verification: code review and the collector Worker entry tests
+
+### REQ-NFR-022: Dashboard on Workers
+
+The dashboard is deployed on Cloudflare Workers through the OpenNext adapter (ADR 0012). Split from REQ-NFR-002 AC1 (ADR 0052).
+
+- Phase: 4
+- Priority: must
+- Status: planned
+- Source: REQ-NFR-002, ADR 0012, ADR 0052
+- Depends on: REQ-NFR-002
+- Acceptance criteria:
+  1. The dashboard is built with the OpenNext adapter and deployed as a Cloudflare Worker per environment.
+  2. It is deployed through the same reviewed workflows as the other Workers, with no other hosting service.
+- Verification: code review and a deploy check of the dashboard Worker
 
 ### REQ-NFR-003: Model calls through AI Gateway
 

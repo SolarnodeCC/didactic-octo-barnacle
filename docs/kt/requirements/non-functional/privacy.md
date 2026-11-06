@@ -2,7 +2,7 @@
 title: Privacy requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-11-06
 ---
 
 # Privacy requirements
@@ -15,7 +15,7 @@ The platform processes as little personal data as possible.
 
 - Phase: 1
 - Priority: must
-- Status: in-progress
+- Status: done
 - Source: KT review of data protection
 - Acceptance criteria:
   1. Only public author metadata from the sources is stored: name, source identifiers such as ORCID, and affiliation.
@@ -44,7 +44,7 @@ The platform has a documented lawful basis and an erasure process for the author
 
 - Phase: 1
 - Priority: must
-- Status: in-progress
+- Status: done
 - Source: Readiness assessment (GDPR); REQ-NFR-009
 - Acceptance criteria:
   1. The [privacy](../../architecture/privacy.md) document states the lawful basis for storing author names, ORCIDs, and affiliations, and how the notice to authors is given.

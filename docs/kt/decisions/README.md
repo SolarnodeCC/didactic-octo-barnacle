@@ -62,6 +62,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0049](0049-workers-ai-for-pipeline-anthropic-for-judge.md) | Workers AI for the pipeline steps, Anthropic for the eval judge | Accepted |
 | [0050](0050-no-candidate-without-an-actionable-party.md) | No extraction candidate without a party that can act | Accepted |
 | [0051](0051-phase-1-exits-on-sufficient-data.md) | Phase 1 exits on sufficient data, not on a succeeded run | Accepted |
+| [0052](0052-phase-1-requirement-status-sweep.md) | Phase 1 requirement status sweep and the dashboard split of REQ-NFR-002 | Accepted |
 
 ## When an ADR is needed
 
