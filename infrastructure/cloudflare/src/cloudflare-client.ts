@@ -80,8 +80,9 @@ export const CREATABLE_KINDS: readonly ResourceKind[] = [
   "ai-gateway",
 ];
 
+/** `roi-<queue>-dlq-<env>`: the page and the PDF queues each have one (ADR 0047). */
 function isDeadLetterQueue(name: string): boolean {
-  return name.startsWith("roi-publications-dlq-");
+  return /^roi-[a-z]+-dlq-/u.test(name);
 }
 
 /**

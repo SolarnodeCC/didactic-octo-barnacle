@@ -46,6 +46,25 @@ queue = "roi-publications-dlq-local"
 max_batch_size = 1
 max_retries = 1
 
+# PDF downloads have their own queue, so a slow download never holds up the pages
+# (ADR 0047). Messages are independent, so several run at once; the retry delay is set
+# by the consumer (ADR 0045).
+[[queues.producers]]
+binding = "DOCUMENT_QUEUE"
+queue = "roi-documents-local"
+
+[[queues.consumers]]
+queue = "roi-documents-local"
+max_batch_size = 5
+max_concurrency = 5
+max_retries = 3
+dead_letter_queue = "roi-documents-dlq-local"
+
+[[queues.consumers]]
+queue = "roi-documents-dlq-local"
+max_batch_size = 1
+max_retries = 1
+
 [env.preview]
 name = "roi-pipeline-preview"
 vars = { ENVIRONMENT = "preview" }
@@ -78,6 +97,25 @@ dead_letter_queue = "roi-publications-dlq-preview"
 # The dead-letter queue is consumed by the same Worker (REQ-DATA-011).
 [[env.preview.queues.consumers]]
 queue = "roi-publications-dlq-preview"
+max_batch_size = 1
+max_retries = 1
+
+# PDF downloads have their own queue, so a slow download never holds up the pages
+# (ADR 0047). Messages are independent, so several run at once; the retry delay is set
+# by the consumer (ADR 0045).
+[[env.preview.queues.producers]]
+binding = "DOCUMENT_QUEUE"
+queue = "roi-documents-preview"
+
+[[env.preview.queues.consumers]]
+queue = "roi-documents-preview"
+max_batch_size = 5
+max_concurrency = 5
+max_retries = 3
+dead_letter_queue = "roi-documents-dlq-preview"
+
+[[env.preview.queues.consumers]]
+queue = "roi-documents-dlq-preview"
 max_batch_size = 1
 max_retries = 1
 
@@ -123,6 +161,25 @@ queue = "roi-publications-dlq-staging"
 max_batch_size = 1
 max_retries = 1
 
+# PDF downloads have their own queue, so a slow download never holds up the pages
+# (ADR 0047). Messages are independent, so several run at once; the retry delay is set
+# by the consumer (ADR 0045).
+[[env.staging.queues.producers]]
+binding = "DOCUMENT_QUEUE"
+queue = "roi-documents-staging"
+
+[[env.staging.queues.consumers]]
+queue = "roi-documents-staging"
+max_batch_size = 5
+max_concurrency = 5
+max_retries = 3
+dead_letter_queue = "roi-documents-dlq-staging"
+
+[[env.staging.queues.consumers]]
+queue = "roi-documents-dlq-staging"
+max_batch_size = 1
+max_retries = 1
+
 [env.production]
 name = "roi-pipeline-production"
 vars = { ENVIRONMENT = "production", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo-barnacle" }
@@ -162,5 +219,24 @@ dead_letter_queue = "roi-publications-dlq-production"
 # The dead-letter queue is consumed by the same Worker (REQ-DATA-011).
 [[env.production.queues.consumers]]
 queue = "roi-publications-dlq-production"
+max_batch_size = 1
+max_retries = 1
+
+# PDF downloads have their own queue, so a slow download never holds up the pages
+# (ADR 0047). Messages are independent, so several run at once; the retry delay is set
+# by the consumer (ADR 0045).
+[[env.production.queues.producers]]
+binding = "DOCUMENT_QUEUE"
+queue = "roi-documents-production"
+
+[[env.production.queues.consumers]]
+queue = "roi-documents-production"
+max_batch_size = 5
+max_concurrency = 5
+max_retries = 3
+dead_letter_queue = "roi-documents-dlq-production"
+
+[[env.production.queues.consumers]]
+queue = "roi-documents-dlq-production"
 max_batch_size = 1
 max_retries = 1

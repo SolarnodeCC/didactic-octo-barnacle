@@ -143,6 +143,8 @@ describe("REQ-NFR-020: Cloudflare bootstrap client", () => {
     await bootstrapEnvironment({ Environment: "staging", Mode: "apply", Client: client });
 
     expect(account.store.queues.sort()).toEqual([
+      "roi-documents-dlq-staging",
+      "roi-documents-staging",
       "roi-publications-dlq-staging",
       "roi-publications-staging",
     ]);

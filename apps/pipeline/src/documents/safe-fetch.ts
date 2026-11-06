@@ -41,15 +41,26 @@ function isRetryableStatus(status: number): boolean {
   return status === 408 || status === 429 || status >= 500;
 }
 
+/**
+ * Reads the body up to `maxBytes`. When the server declares a `content-length`, the bytes go
+ * straight into one buffer of that size, so a 25 MB file needs 25 MB instead of the chunks
+ * plus a copy (ADR 0047). A body that turns out longer than declared, for example a
+ * compressed transfer, falls back to collecting chunks; the size limit holds either way.
+ */
 async function readCapped(
   response: Response,
   maxBytes: number,
   signal: AbortSignal,
+  declaredBytes: number | null = null,
 ): Promise<Uint8Array<ArrayBuffer>> {
   const reader = response.body?.getReader();
   if (!reader) {
     throw new PdfFetchError("response has no body", "not-pdf", true);
   }
+  let buffer: Uint8Array<ArrayBuffer> | null =
+    declaredBytes !== null && declaredBytes > 0 && declaredBytes <= maxBytes
+      ? new Uint8Array(declaredBytes)
+      : null;
   const chunks: Uint8Array[] = [];
   let total = 0;
   try {
@@ -61,11 +72,20 @@ async function readCapped(
       if (done) {
         break;
       }
-      total += value.byteLength;
-      if (total > maxBytes) {
+      if (total + value.byteLength > maxBytes) {
         throw new PdfFetchError(`file is larger than ${maxBytes} bytes`, "too-large", true);
       }
-      chunks.push(value);
+      if (buffer && total + value.byteLength > buffer.byteLength) {
+        // More than declared: keep what was read and collect the rest as chunks.
+        chunks.push(buffer.subarray(0, total));
+        buffer = null;
+      }
+      if (buffer) {
+        buffer.set(value, total);
+      } else {
+        chunks.push(value);
+      }
+      total += value.byteLength;
     }
   } catch (error) {
     await reader.cancel().catch(() => undefined);
@@ -77,6 +97,10 @@ async function readCapped(
       signal.aborted ? "timeout" : "network",
       false,
     );
+  }
+  if (buffer) {
+    // Shorter than declared: a view of the bytes that arrived, without a copy.
+    return total === buffer.byteLength ? buffer : buffer.subarray(0, total);
   }
   const bytes = new Uint8Array(total);
   let offset = 0;
@@ -146,8 +170,9 @@ export function createPdfFetcher(options: {
           await response.body?.cancel().catch(() => undefined);
           throw new PdfFetchError(`content type is not application/pdf`, "not-pdf", true);
         }
-        const declared = Number(response.headers.get("content-length"));
-        if (Number.isFinite(declared) && declared > limits.MaxBytes) {
+        const header = response.headers.get("content-length");
+        const declared = header !== null && /^\d+$/u.test(header.trim()) ? Number(header) : null;
+        if (declared !== null && declared > limits.MaxBytes) {
           await response.body?.cancel().catch(() => undefined);
           throw new PdfFetchError(
             `file is larger than ${limits.MaxBytes} bytes`,
@@ -156,7 +181,7 @@ export function createPdfFetcher(options: {
           );
         }
 
-        const bytes = await readCapped(response, limits.MaxBytes, controller.signal);
+        const bytes = await readCapped(response, limits.MaxBytes, controller.signal, declared);
         if (!PDF_MAGIC.every((byte, index) => bytes[index] === byte)) {
           throw new PdfFetchError("file does not start with %PDF-", "not-pdf", true);
         }

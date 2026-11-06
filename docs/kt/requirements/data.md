@@ -101,6 +101,7 @@ The full-text PDF of an ingested publication is stored when it is openly availab
   1. A PDF is openly available when a source gives the URL of a PDF in the location whose license is recorded under REQ-DATA-010 and allows storage (ADR 0014). A separate open access URL does not qualify, because its license may differ. Most arXiv PDFs do not qualify, so those publications stay abstract-only.
   2. The PDF is stored once, keyed by its content hash, and linked to its publication record.
   3. A publication without an available PDF is still ingested and marked as having no PDF.
+  4. PDF downloads run on their own queue, so a slow or failing download never delays the pages of a run (ADR 0047).
 - Verification: integration test with local object storage
 
 ### REQ-DATA-005: Metadata extraction

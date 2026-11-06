@@ -1,6 +1,6 @@
 import { QueueMessageEnvelopeSchema } from "@roi/models";
 
-import { type PipelineDeps } from "./deps.js";
+import { documentQueue, type PipelineDeps } from "./deps.js";
 import { getRun } from "../store/run-repo.js";
 
 export type ReplayOutcome = "replayed" | "not-dead-lettered" | "unknown-message";
@@ -50,7 +50,9 @@ export async function replayDeadLetter(
   await deps.Db.batch(statements);
 
   try {
-    await deps.Queue.send(envelope);
+    // A message goes back to the queue it came from (ADR 0047).
+    const queue = envelope.Type === "document.ingest" ? documentQueue(deps) : deps.Queue;
+    await queue.send(envelope);
   } catch (error) {
     // Put the message back in the dead-letter state so it can be replayed again.
     await deps.Db.prepare(

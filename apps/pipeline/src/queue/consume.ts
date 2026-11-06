@@ -6,7 +6,7 @@ import { handleDocumentIngest } from "./document-ingest.js";
 import { handleFetchPage } from "./fetch-page.js";
 import { type QueueBatchLike } from "./types.js";
 
-/** Cloudflare names the dead-letter queue `roi-publications-dlq-<env>`. */
+/** Dead-letter queues are named `roi-<queue>-dlq-<env>`, for pages and for PDFs (ADR 0047). */
 export function isDeadLetterQueue(queueName: string): boolean {
   return queueName.includes("-dlq-");
 }

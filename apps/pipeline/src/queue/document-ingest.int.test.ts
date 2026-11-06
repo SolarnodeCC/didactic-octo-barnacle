@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { consumeBatch } from "./consume.js";
 import { replayDeadLetter } from "./replay.js";
 import { createPdfFetcher, PdfFetchError } from "../documents/safe-fetch.js";
 import { runScheduled } from "../schedule/run-scheduled.js";
@@ -14,6 +15,7 @@ import {
   arxivPage,
   type Harness,
 } from "../test/harness.js";
+import { FakeQueue } from "../test/fake-queue.js";
 
 const OPENALEX_CRON = "0 6 * * *";
 const ARXIV_CRON = "30 7 * * *";
@@ -298,5 +300,56 @@ describe("REQ-NFR-010: document messages are sent in batches", () => {
 
     expect(h.Queue.batchSizes).toEqual([100, 50]);
     expect(documentMessages(h)).toHaveLength(150);
+  });
+});
+
+describe("REQ-DATA-004: PDFs have their own queue", () => {
+  function withDocumentQueue(harness: Harness) {
+    const documents = new FakeQueue();
+    const deps = { ...harness.Deps, DocumentQueue: documents };
+    const drain = (queue: FakeQueue, maxRetries = 3) =>
+      queue.drain({ MaxRetries: maxRetries, Consume: (batch) => consumeBatch(deps, batch) });
+    return { documents, deps, drain };
+  }
+
+  it("REQ-DATA-004: document messages go to the document queue and never to the page queue", async () => {
+    const { documents, deps, drain } = withDocumentQueue(h);
+    h.SetPdfs({ [URL_A]: pdfBytes("a") });
+    h.SetOpenAlexPages([
+      openAlexPage([makeWork(1, { Pdf: { Url: URL_A, License: "cc-by" } })], null),
+    ]);
+    await runScheduled(deps, OPENALEX_CRON);
+    await drain(h.Queue);
+
+    expect(documentMessages(h)).toEqual([]);
+    expect(documents.sent.map((s) => (s.body as { Type: string }).Type)).toEqual([
+      "document.ingest",
+    ]);
+    expect(h.Run()["status"]).toBe("succeeded");
+    expect(documents.size).toBe(1);
+
+    await drain(documents);
+    expect(documents.size).toBe(0);
+    expect(documents.sent).toHaveLength(1);
+    expect(documents.deadLettered).toEqual([]);
+    expect(h.PdfRequests).toEqual([URL_A]);
+  });
+
+  it("REQ-DATA-011: a dead-lettered document is replayed to the document queue", async () => {
+    const { documents, deps, drain } = withDocumentQueue(h);
+    h.SetPdfs({ [URL_A]: new Error("upstream 503") });
+    h.SetOpenAlexPages([
+      openAlexPage([makeWork(1, { Pdf: { Url: URL_A, License: "cc-by" } })], null),
+    ]);
+    await runScheduled(deps, OPENALEX_CRON);
+    await drain(h.Queue);
+    await drain(documents, 0);
+    expect(documents.deadLettered).toHaveLength(1);
+    const messageId = (documents.deadLettered[0] as { MessageId: string }).MessageId;
+    const pageMessages = h.Queue.sent.length;
+
+    expect(await replayDeadLetter(deps, messageId)).toBe("replayed");
+    expect(h.Queue.sent).toHaveLength(pageMessages);
+    expect(documents.size).toBe(1);
   });
 });

@@ -17,6 +17,7 @@ const ERASURE_TEST_KEY = "test-erasure-key-of-at-least-32-characters";
 
 let database: TestDatabase;
 let queue: FakeQueue;
+let documentQueue: FakeQueue;
 let logs: string[];
 
 function makeEnv(overrides: Partial<Env> = {}): Env {
@@ -25,6 +26,7 @@ function makeEnv(overrides: Partial<Env> = {}): Env {
     DB: database.Db,
     DOCUMENTS: new FakeBucket(),
     PUBLICATION_QUEUE: queue,
+    DOCUMENT_QUEUE: documentQueue,
     OPENALEX_API_KEY: OPENALEX_TEST_KEY,
     ERASURE_HASH_KEY: ERASURE_TEST_KEY,
     ...overrides,
@@ -54,6 +56,7 @@ function stubOpenAlex(works: unknown[]): ReturnType<typeof vi.fn> {
 beforeEach(() => {
   database = createTestDatabase();
   queue = new FakeQueue();
+  documentQueue = new FakeQueue();
   logs = [];
   vi.spyOn(console, "log").mockImplementation((line: unknown) => {
     logs.push(String(line));
