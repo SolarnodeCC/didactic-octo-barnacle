@@ -38,6 +38,18 @@ describe("REQ-AGENT-011: only two repairs are made before validation", () => {
     expect(Contract.safeParse(result.Ok ? result.Value : null).success).toBe(false);
   });
 
+  it("REQ-AGENT-011: a fence without a closing line or with prose in the tag is left alone", () => {
+    expect(repairModelOutput('```json {"Items":[]}```', Contract)).toMatchObject({ Ok: false });
+    expect(repairModelOutput("```this is prose\n{}\n```", Contract)).toMatchObject({ Ok: false });
+  });
+
+  it("REQ-NFR-006: a hostile fenced string is handled in linear time", () => {
+    const hostile = "```\n" + "\n ".repeat(50_000);
+    const started = performance.now();
+    expect(repairModelOutput(hostile, Contract)).toMatchObject({ Ok: false });
+    expect(performance.now() - started).toBeLessThan(500);
+  });
+
   it("REQ-AGENT-011: text that is not JSON is reported, not guessed", () => {
     expect(repairModelOutput("Sure! Here is the answer.", Contract)).toMatchObject({ Ok: false });
   });

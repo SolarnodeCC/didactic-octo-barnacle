@@ -78,7 +78,27 @@ export function agentEnvelopeSchema<T extends z.ZodType>(output: T) {
   });
 }
 
-const CODE_FENCE = /^\s*```[a-zA-Z]*\s*\n([\s\S]*?)\n?```\s*$/u;
+/**
+ * The body of a markdown code fence around the whole text, or null. Plain string
+ * operations, no regular expression: model output is untrusted, and a backtracking
+ * pattern over it can take polynomial time.
+ */
+function fencedBody(text: string): string | null {
+  const trimmed = text.trim();
+  if (!trimmed.startsWith("```") || !trimmed.endsWith("```") || trimmed.length < 6) {
+    return null;
+  }
+  const firstLineEnd = trimmed.indexOf("\n");
+  if (firstLineEnd === -1) {
+    return null;
+  }
+  // The opening line holds only the fence and an optional language tag, such as `json`.
+  const tag = trimmed.slice(3, firstLineEnd).trim();
+  if (!/^[a-zA-Z]*$/u.test(tag)) {
+    return null;
+  }
+  return trimmed.slice(firstLineEnd + 1, trimmed.length - 3).trim();
+}
 
 /** The repaired value and the repairs applied, or the reason it could not be read. */
 export type RepairResult =
@@ -104,9 +124,9 @@ export function repairModelOutput(raw: unknown, contract: z.ZodObject): RepairRe
   const repairs: RepairKind[] = [];
   let value: unknown = raw;
   if (typeof value === "string") {
-    const fenced = CODE_FENCE.exec(value);
-    if (fenced) {
-      value = fenced[1];
+    const fenced = fencedBody(value);
+    if (fenced !== null) {
+      value = fenced;
       repairs.push("stripped-code-fence");
     }
     try {
