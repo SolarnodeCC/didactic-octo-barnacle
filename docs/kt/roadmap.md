@@ -28,6 +28,8 @@ The `Phase` field of each requirement refers to these phases. `later` means afte
 
 The Research Analyst, Problem Discovery, and Relevance agents are in phase 3 because the phase 3 agents need their output and the phase 4 scoring engine needs Scientific Novelty, Technical Feasibility, and Strategic Relevance. Semantic Scholar stays `later`: OpenAlex already provides citation counts, and Semantic Scholar adds citation graphs and recommendations on top.
 
+How phase 2 is delivered (solution, approach, design, build order, and dependencies) is in the [phase 2 delivery plan](phase-2/README.md).
+
 ## Definition of Ready for a phase
 
 A phase starts when:
