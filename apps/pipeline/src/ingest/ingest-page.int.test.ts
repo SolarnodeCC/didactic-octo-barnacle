@@ -51,6 +51,25 @@ describe("REQ-DATA-001: OpenAlex page ingestion", () => {
     expect(rows("publication")).toBe(0);
   });
 
+  it("REQ-DATA-001: a dataset or a work without an abstract is skipped when the rule asks for it", async () => {
+    const { deps, rows } = setup();
+    const dataset = {
+      ...work("work-complete.json"),
+      id: "https://openalex.org/W9",
+      type: "dataset",
+    };
+    const result = await ingestOpenAlexWorks(
+      deps,
+      [work("work-complete.json"), dataset, work("work-no-abstract.json")],
+      SCOPE_OPENALEX_TOPIC_NAMES,
+      undefined,
+      { WorkTypes: ["article", "preprint"], RequireAbstract: true },
+    );
+
+    expect(result.Counts).toMatchObject({ Fetched: 3, Created: 1, Skipped: 2, Failed: 0 });
+    expect(rows("publication")).toBe(1);
+  });
+
   it("REQ-DATA-001: only the primary topic decides the scope, not a secondary topic", async () => {
     const { deps, rows } = setup();
     const inScope = work("work-complete.json").topics?.[0];

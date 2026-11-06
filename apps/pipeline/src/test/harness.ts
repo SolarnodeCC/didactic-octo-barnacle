@@ -46,7 +46,13 @@ export function makeWork(
 
 /** A work the mapper cannot store, to prove one bad item does not stop a page. */
 export function makeBrokenWork(): OpenAlexWork {
-  return { title: "No id at all", topics: baseWork.topics } as unknown as OpenAlexWork;
+  // Passes the type, abstract, and topic checks (ADR 0048) so it reaches the mapper and fails there.
+  return {
+    title: "No id at all",
+    type: baseWork.type,
+    abstract_inverted_index: baseWork.abstract_inverted_index,
+    topics: baseWork.topics,
+  } as unknown as OpenAlexWork;
 }
 
 /** `published` is the date of the first version; it defaults to the date of the last update. */

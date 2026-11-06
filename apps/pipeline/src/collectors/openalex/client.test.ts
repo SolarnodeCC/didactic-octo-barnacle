@@ -35,6 +35,7 @@ describe("REQ-DATA-001: OpenAlex client", () => {
       id: true,
       title: true,
       display_name: true,
+      type: true,
       publication_date: true,
       doi: true,
       ids: true,
@@ -52,6 +53,19 @@ describe("REQ-DATA-001: OpenAlex client", () => {
     const selected = (url.searchParams.get("select") ?? "").split(/,/u);
     expect(selected.sort()).toEqual(Object.keys(fields).sort());
     expect([...OPENALEX_WORK_FIELDS].sort()).toEqual(Object.keys(fields).sort());
+  });
+
+  it("REQ-DATA-001: filters on the configured work types and on having an abstract", () => {
+    const url = new URL(
+      buildOpenAlexUrl({
+        FromDate: "2026-09-29",
+        WorkTypes: ["article", " preprint ", ""],
+        RequireAbstract: true,
+      }),
+    );
+    expect(url.searchParams.get("filter")).toBe(
+      "from_publication_date:2026-09-29,language:en,type:article|preprint,has_abstract:true",
+    );
   });
 
   it("REQ-DATA-001: filters on the configured subfield IDs when there are any", () => {

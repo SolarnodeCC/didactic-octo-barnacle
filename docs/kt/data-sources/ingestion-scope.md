@@ -2,7 +2,7 @@
 title: Ingestion scope
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-05
+last_reviewed: 2026-11-06
 related: [REQ-DATA-001, REQ-DATA-002, REQ-DATA-009, REQ-PROC-005, REQ-PROC-006]
 ---
 
@@ -17,6 +17,7 @@ The locked pilot scope for phase 1. It is deliberately narrow: measure volume an
 | arXiv categories | `cs.AI`, `cs.SE`, `cs.HC`, `cs.CY` (primary or cross-listed) | locked for phase 1 |
 | OpenAlex window | works published in the last 14 days at the first run (REQ-DATA-009, ADR 0041), then incremental; never older than 90 days before the day of a run | locked for phase 1 |
 | OpenAlex topics | works whose primary topic has a field or subfield in the topic map below (ADR 0041) | locked names; subfield IDs still to be filled (see below) |
+| OpenAlex work types | `article`, `preprint`, `review`, `conference-paper`, with an abstract (ADR 0048) | locked for phase 1 |
 | Languages | English only (also the language of the interface, agent outputs, and briefs) | locked |
 | Daily limit to extraction | 100 publications | provisional until phase 1 volume is measured |
 | Day boundary | UTC | locked |

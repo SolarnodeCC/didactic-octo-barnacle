@@ -57,6 +57,10 @@ async function fetchAndIngest(deps: PipelineDeps, run: RunRow): Promise<FetchedP
         fetched.Works,
         deps.Config.OpenAlexScope.TopicNames,
         limit,
+        {
+          WorkTypes: deps.Config.OpenAlexScope.WorkTypes,
+          RequireAbstract: deps.Config.OpenAlexScope.RequireAbstract,
+        },
       ),
       HasMore: fetched.NextCursor !== null && fetched.Works.length > 0,
       NextCursor: fetched.NextCursor,

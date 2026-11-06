@@ -20,6 +20,8 @@ export type OpenAlexWork = {
   id: string;
   title?: string | null;
   display_name?: string | null;
+  /** OpenAlex work type, for example `article` or `dataset` (ADR 0048). */
+  type?: string | null;
   publication_date?: string | null;
   doi?: string | null;
   ids?: {

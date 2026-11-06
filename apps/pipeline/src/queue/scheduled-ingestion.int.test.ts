@@ -39,6 +39,26 @@ function scriptTwoPages(): void {
   ]);
 }
 
+describe("REQ-DATA-001: a scheduled run stores only publication types with an abstract", () => {
+  it("REQ-DATA-001: the default config skips a dataset and a work without an abstract", async () => {
+    h.SetOpenAlexPages([
+      openAlexPage(
+        [
+          makeWork(1),
+          { ...makeWork(2), type: "dataset" },
+          { ...makeWork(3), abstract_inverted_index: null },
+        ],
+        null,
+      ),
+    ]);
+    await runScheduled(h.Deps, OPENALEX_CRON);
+    await h.Drain();
+
+    expect(h.Count("publication")).toBe(1);
+    expect(JSON.parse(h.Run()["counts_json"] as string)).toMatchObject({ Created: 1, Skipped: 2 });
+  });
+});
+
 describe("REQ-DATA-009: scheduled ingestion through the queue", () => {
   it("REQ-DATA-009: a cron run pages through OpenAlex and stores every work once", async () => {
     scriptTwoPages();

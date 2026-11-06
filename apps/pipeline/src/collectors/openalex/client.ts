@@ -13,6 +13,10 @@ export type OpenAlexPageRequest = {
    * required: the pilot is English only.
    */
   SubfieldIds?: readonly string[];
+  /** OpenAlex work types to fetch, sent as `type:A|B` (ADR 0048). Empty or omitted sends none. */
+  WorkTypes?: readonly string[];
+  /** Sends `has_abstract:true` (ADR 0048). */
+  RequireAbstract?: boolean;
   /**
    * From the `OPENALEX_API_KEY` secret (docs/kt/operations.md). Required for cursor
    * paging past the first page (ADR 0034); omit only for a keyless single-page smoke test.
@@ -42,6 +46,7 @@ export const OPENALEX_WORK_FIELDS = [
   "id",
   "title",
   "display_name",
+  "type",
   "publication_date",
   "doi",
   "ids",
@@ -64,6 +69,13 @@ export function buildOpenAlexUrl(request: OpenAlexPageRequest): string {
     // One filter with OR values; OpenAlex allows at most 100 of them. Only the primary
     // topic counts: any of up to three topics matched about six times as many works (ADR 0041).
     filters.push(`primary_topic.subfield.id:${subfields.join("|")}`);
+  }
+  const types = (request.WorkTypes ?? []).map((type) => type.trim()).filter(Boolean);
+  if (types.length > 0) {
+    filters.push(`type:${types.join("|")}`);
+  }
+  if (request.RequireAbstract) {
+    filters.push("has_abstract:true");
   }
   params.set("filter", filters.join(","));
   // An explicit sort keeps the cursor order stable between runs, so a continued run reaches
