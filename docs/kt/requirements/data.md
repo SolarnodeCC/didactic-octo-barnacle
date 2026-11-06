@@ -2,7 +2,7 @@
 title: Data requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-05
+last_reviewed: 2026-11-06
 ---
 
 # Data requirements
@@ -20,7 +20,7 @@ The research collector fetches works from OpenAlex, with their authors, institut
 - Status: in-progress
 - Source: README roadmap phase 1 and Data Sources section
 - Acceptance criteria:
-  1. Works that match the configured ingestion scope (see [OpenAlex](../data-sources/openalex.md)) are fetched with their authors, institutions, topics, and citation counts. The request filters on language and on the configured subfield IDs of the work's primary topic, and a returned work whose primary topic matches none of the topic-map names is skipped, counted, and not stored (ADR 0041).
+  1. Works that match the configured ingestion scope (see [OpenAlex](../data-sources/openalex.md)) are fetched with their authors, institutions, topics, and citation counts. The request filters on language, on the configured subfield IDs of the work's primary topic, on the configured work types, and on having an abstract. A returned work whose primary topic matches none of the topic-map names, whose type is not configured, or that has no abstract is skipped, counted, and not stored (ADR 0041, ADR 0048).
   2. A repeated run does not create duplicate publications.
   3. A failed or rate-limited request is retried with exponential backoff up to the configured number of attempts; an item that still fails is recorded for the next run and does not stop the whole run. Each request has a timeout and a long `Retry-After` is capped (REQ-NFR-021).
   4. The abstract is reconstructed from `abstract_inverted_index` when OpenAlex provides one.
@@ -114,7 +114,7 @@ Structured metadata from the source APIs is normalized into one publication reco
 - Source: README roadmap phase 1
 - Acceptance criteria:
   1. Title, abstract, authors, publication date, source, and source identifier are stored for every publication.
-  2. A publication missing a required field is stored, marked incomplete with the missing field, and not passed to the agents.
+  2. A publication missing a required field is stored, marked incomplete with the missing field, and not passed to the agents. OpenAlex works without an abstract are not fetched at all (REQ-DATA-001 AC1, ADR 0048); this criterion covers every other missing field and arXiv.
 - Verification: unit tests on fixture documents
 
 ### REQ-DATA-006: Full-text extraction

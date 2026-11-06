@@ -105,6 +105,8 @@ function buildDeps(env: Env): PipelineDeps {
             FromDate: request.FromDate,
             PerPage: config.PageSize,
             ...(request.SubfieldIds ? { SubfieldIds: request.SubfieldIds } : {}),
+            WorkTypes: config.OpenAlexScope.WorkTypes,
+            RequireAbstract: config.OpenAlexScope.RequireAbstract,
             ...(request.Cursor ? { Cursor: request.Cursor } : {}),
             ...(env.OPENALEX_API_KEY ? { ApiKey: env.OPENALEX_API_KEY } : {}),
           },

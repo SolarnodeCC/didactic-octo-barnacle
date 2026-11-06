@@ -136,14 +136,23 @@ export async function ingestOpenAlexWorks(
   topicNames: readonly string[],
   /** Oldest publication date to store (YYYY-MM-DD); an older work is skipped. */
   earliestDate?: string,
+  /**
+   * Work types and abstract rule of ADR 0048: a work outside them is skipped, whatever the
+   * server-side filter did. Omitted, no work is skipped for its type or abstract.
+   */
+  kind: { WorkTypes?: readonly string[]; RequireAbstract?: boolean } = {},
 ): Promise<IngestResult> {
   const result = emptyResult();
   const fetchedAt = deps.Now();
   const prepared: PreparedItem[] = [];
+  const types = kind.WorkTypes && kind.WorkTypes.length > 0 ? new Set(kind.WorkTypes) : null;
   for (const work of works) {
     const published = work.publication_date ?? null;
+    const hasAbstract = Object.keys(work.abstract_inverted_index ?? {}).length > 0;
     if (
       !isOpenAlexTopicsInScope(openAlexTopicNames(work), topicNames) ||
+      (types !== null && !types.has(work.type ?? "")) ||
+      (kind.RequireAbstract === true && !hasAbstract) ||
       (earliestDate !== undefined && published !== null && published < earliestDate)
     ) {
       result.Counts.Fetched += 1;

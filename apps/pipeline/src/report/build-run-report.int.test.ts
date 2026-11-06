@@ -55,7 +55,9 @@ describe("REQ-NFR-008: run report", () => {
 
   it("REQ-NFR-008: counts incomplete records, flagged duplicates, and failed PDFs", async () => {
     const h = createHarness();
-    const noAbstract = { ...makeWork(1), abstract_inverted_index: null };
+    // Without a publication date: incomplete but stored. A work without an abstract is no
+    // longer fetched from OpenAlex at all (ADR 0048).
+    const noDate = { ...makeWork(1), publication_date: null };
     const first = makeWork(2);
     const lookalike = { ...makeWork(3), title: first.title };
     const withPdf = makeWork(4, {
@@ -68,7 +70,7 @@ describe("REQ-NFR-008: run report", () => {
         true,
       ),
     });
-    const id = await run(h, [openAlexPage([noAbstract, first, lookalike, withPdf], null)]);
+    const id = await run(h, [openAlexPage([noDate, first, lookalike, withPdf], null)]);
     const report = await buildRunReport(h.Database.Db, id, h.Clock.Now);
 
     expect(report?.DataQuality).toEqual({

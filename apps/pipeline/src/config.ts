@@ -32,6 +32,10 @@ export type IngestConfig = {
      * above keeps works out. Fill from the OpenAlex taxonomy; see ingestion-scope.md.
      */
     SubfieldIds: readonly string[];
+    /** OpenAlex work types that are fetched and stored; a dataset is not a publication (ADR 0048). */
+    WorkTypes: readonly string[];
+    /** Fetch and store only works with an abstract (ADR 0048, REQ-DATA-005 note). */
+    RequireAbstract: boolean;
   };
   Pdf: {
     MaxBytes: number;
@@ -54,6 +58,8 @@ export const DEFAULT_INGEST_CONFIG: IngestConfig = {
   OpenAlexScope: {
     TopicNames: SCOPE_OPENALEX_TOPIC_NAMES,
     SubfieldIds: SCOPE_OPENALEX_SUBFIELD_IDS,
+    WorkTypes: ["article", "preprint", "review", "conference-paper"],
+    RequireAbstract: true,
   },
   Pdf: { MaxBytes: 25 * 1024 * 1024, TimeoutMs: 20_000, MaxRedirects: 3, AllowedHosts: [] },
 };
