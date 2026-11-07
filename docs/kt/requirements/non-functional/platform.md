@@ -70,7 +70,7 @@ Every model call is recorded in the platform's own database with its usage and c
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: KT review of a comparable internal governance platform (token use and cost transparency) and REQ-NFR-005
 - Depends on: REQ-NFR-003
 - Acceptance criteria:

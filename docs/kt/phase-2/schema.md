@@ -2,7 +2,7 @@
 title: Phase 2 schema, configuration, and bindings
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-07
 related: [REQ-NFR-020, REQ-NFR-011, REQ-PROC-001, REQ-PROC-006, REQ-PROC-009, REQ-DATA-006, REQ-DATA-008, REQ-PROC-007]
 ---
 
@@ -24,12 +24,14 @@ It extends the tables planned in schema migration 0001 with the fields that REQ-
 | `triage_decision` | `id`, `publication_id`, `run_id`, `status` (`decided`, `awaiting-admission`), `accepted`, `score`, `reason`, `signal_named_party`, `signal_stated_harm`, `signal_trigger`, `signal_existing_alternative`, `signal_adoptable`, `notes`, `model`, `prompt_version`, `admitted_on`, `created_at`, `updated_at` | UNIQUE `publication_id`; index (`status`, `created_at`) |
 | `extraction_result` | `id`, `publication_id`, `run_id`, `model`, `prompt_version`, `input_mode` (`abstract`, `full-text`), `confidence`, `notes`, `candidate_count`, `created_at` | UNIQUE `publication_id` |
 | `candidate` | `id`, `publication_id`, `extraction_result_id`, `finding`, `evidence_quote`, `customer`, `customer_quote`, `why_now`, `why_now_quote`, `current_alternative`, `alternative_quote`, `hidden_reason`, `created_at` | index `publication_id` |
-| `admission_day` | `day`, `limit`, `admitted`, `deferred`, `ran_at` | PRIMARY `day` |
+| `admission_day` | `day`, `daily_limit`, `admitted`, `deferred`, `ran_at` | PRIMARY `day` |
 
 Added columns:
 
 - `publication.retraction_handled_at` (REQ-DATA-008).
 - `document.failure_reason` (REQ-DATA-006). `document.status` gains the values `text-extracted` and `text-failed`. The column has no check constraint today, so this needs no table rebuild.
+
+Migration 0009 is `infrastructure/cloudflare/migrations/0009_processing.sql`. The daily limit of `admission_day` is named `daily_limit`, because `LIMIT` is an SQL keyword. `triage_decision.reason` is empty only while a passing publication waits for its first admission; the row contracts are in `packages/models/src/processing.ts` and `model-call.ts`.
 
 Signals are nullable: a rule rejection has no signals, no model, and no prompt version (REQ-PROC-006 AC2). The signal columns carry a `signal_` prefix because `trigger` is an SQL keyword. A publication is triaged once; triaging again with a new prompt version is a backfill that replaces the row, and its model calls stay recorded.
 
@@ -45,7 +47,7 @@ It adds no organization-scoped table. Those arrive with phase 4 (ADR 0019).
 
 ## Configuration keys
 
-New keys for [defaults](../architecture/defaults.md). They are added there in the pull request that first reads them.
+New keys for [defaults](../architecture/defaults.md). They are added there in the pull request that first reads them. WP1 added `processing.enabled`, `triage.admission_pool_days`, `extraction.full_text_max_chars`, `embedding.batch_size`, `retraction.lookback_days`, and `model.price_table_version`.
 
 | Key | Default | Notes |
 |---|---|---|

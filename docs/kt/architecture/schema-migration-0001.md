@@ -2,7 +2,7 @@
 title: Migration 0001 schema design
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-30
+last_reviewed: 2026-11-07
 related: [REQ-NFR-020, REQ-DATA-005, REQ-DATA-007, REQ-DATA-011, REQ-NFR-018, REQ-ACC-002, REQ-ACC-004]
 ---
 
@@ -77,4 +77,5 @@ Physical D1 tables for the first SQL migration (`infrastructure/cloudflare/migra
 - `0007_ingestion_run_window_end.sql` adds `ingestion_run.window_end`, the end date of the window a run covers. A run that continues one that stopped at the page cap keeps the value of the first run of the chain, so the `succeeded` run that closes the chain stores that date in `cursor` (REQ-DATA-009, ADR 0035). It is an expand-only change (REQ-NFR-020).
 - `0006_author_erasure.sql` adds `author_erasure` (`id`, `subject_hash` UNIQUE, `reason`, `erased_at`: the erasure list, ADR 0031) and `audit_event` with the columns listed above. `audit_event.organization_id` is empty for platform-level events on the shared research corpus, such as author erasure (ADR 0019); account events from phase 4 carry it. It also adds indexes on `authorship.author_id` and `lower(author.display_name)` (REQ-NFR-016).
 - `0003_publication_title_author_key.sql` adds `publication.title_author_key`, the normalized title and first author (`titleAuthorReviewKey` in `packages/models`), with an index. The collector looks up title-and-first-author matches with it (REQ-DATA-007). It is an expand-only change (REQ-NFR-020).
+- `0009_processing.sql` adds the phase 2 processing tables of the [phase 2 schema](../phase-2/schema.md): `processing_run`, `model_call`, `budget_day`, `embedding_index`, `embedding`, `triage_decision`, `extraction_result`, `candidate`, and `admission_day`, plus `publication.retraction_handled_at` and `document.failure_reason`. It replaces the planned `embedding`, `triage_decision`, `candidate`, and `model_call` rows above: `model_call` keys on (`run_kind`, `run_id`) and stores cost as `cost_amount` and `cost_currency`, and `embedding` is unique per (`publication_id`, `embedding_index_id`). `EXPECTED_PHASE2_TABLES` lists its columns. It is an expand-only change (REQ-NFR-020).
 - `source_record.source_work_id` holds the arXiv ID without its version, so all versions of a preprint share one source record; the version number is kept in `publication.arxiv_version` (REQ-DATA-002).

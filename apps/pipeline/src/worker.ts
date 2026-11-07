@@ -37,6 +37,8 @@ export type Env = {
   RESEND_API_KEY?: string;
   ALERT_EMAIL_TO?: string;
   ALERT_EMAIL_FROM?: string;
+  /** `processing.enabled` (`"true"` or `"false"`); unset means off. See processing-config.ts. */
+  PROCESSING_ENABLED?: string;
 };
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
