@@ -1,7 +1,7 @@
 ---
 title: Phase 2 design
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-07
 related: [REQ-DATA-006, REQ-DATA-008, REQ-PROC-001, REQ-PROC-002, REQ-PROC-003, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-PROC-007, REQ-PROC-008, REQ-PROC-009, REQ-NFR-003, REQ-NFR-005, REQ-NFR-010, REQ-NFR-011]
 ---

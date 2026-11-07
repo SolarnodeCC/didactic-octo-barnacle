@@ -1,8 +1,8 @@
 ---
 title: Phase 2 build plan
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-11-06
+status: approved
+last_reviewed: 2026-11-07
 related: [REQ-DATA-006, REQ-DATA-008, REQ-PROC-001, REQ-PROC-002, REQ-PROC-003, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-PROC-007, REQ-PROC-008, REQ-PROC-009, REQ-NFR-003, REQ-NFR-005, REQ-NFR-010, REQ-NFR-011, REQ-TEST-002]
 ---
 
@@ -32,6 +32,7 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 - ADRs 0053 to 0061 are accepted, and OQ-041, OQ-042, and OQ-043 are answered (ADR 0059, 0060, 0061).
 - ADRs 0063 to 0067 (automatic recovery, quote normalisation, full-text wait, code checks, eval metrics) and ADRs 0070 and 0071 (downstream context, quality monitoring) are accepted. The approved files they change were re-reviewed and approved on 2026-11-07: `requirements/processing.md`, `requirements/agents.md`, `requirements/data.md`, `requirements/admin.md`, `requirements/testing.md`, `requirements/non-functional/operations.md` (also REQ-NFR-023), `test/golden-sets.md`, and `open-questions.md`.
 - **Exit:** every phase 2 document is `approved`.
+- Met on 2026-11-07: the phase 2 plan files (`phase-2/*.md`) and the phase 2 test documents (`test/ai-evals.md`, `test/model-benchmark-plan.md`, `test/model-benchmark-run.md`, `test/benchmark-round-one.md`) are `approved`, as are the documents above.
 
 ## WP1: Foundations
 

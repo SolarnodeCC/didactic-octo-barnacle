@@ -1,8 +1,8 @@
 ---
 title: AI evals
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-10-28
+status: approved
+last_reviewed: 2026-11-07
 related: [REQ-TEST-004, REQ-TEST-005, REQ-NFR-003, REQ-AGENT-008, REQ-SCORE-006]
 ---
 
