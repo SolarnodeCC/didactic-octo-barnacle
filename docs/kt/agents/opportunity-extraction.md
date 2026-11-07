@@ -47,7 +47,7 @@ The pipeline assigns each candidate an Id and links it to the publication before
 
 ## Rules
 
-- Every quote must occur in the publication text the step received. The pipeline rejects the output when one does not.
+- Every quote must occur in the publication text the step received, after the normalisation of the [contract conventions](contract-conventions.md). An attempt with a missing quote is retried with the candidate and field named. On the last attempt the failing candidate is dropped and listed in `Dropped`, and the other candidates are kept (ADR 0064).
 - A candidate needs both a quotable problem and a quotable customer. The model leaves out a candidate for which it cannot quote both.
 - `Customer` is a role or organization type. A generic or implied party ("users", "people") does not count.
 - A burden that belongs to a population or a sector as a whole, with no named customer that could adopt a product against it, yields no candidate (ADR 0050). A named party that can act, such as a hospital or a bank's risk team, still yields one when both quotes exist.

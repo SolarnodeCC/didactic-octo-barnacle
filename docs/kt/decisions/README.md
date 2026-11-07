@@ -74,6 +74,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0061](0061-retraction-check-looks-back-30-days.md) | The weekly retraction check looks back 30 days | Accepted |
 | [0062](0062-replace-deprecated-benchmark-candidates.md) | Replace the benchmark candidates that Workers AI deprecates on 2026-11-20 | Accepted |
 | [0063](0063-automatic-recovery-without-an-admin.md) | Automatic recovery without an admin | Proposed |
+| [0064](0064-quote-check-after-normalisation.md) | Quote check after normalisation, and valid candidates are kept | Proposed |
 
 ## When an ADR is needed
 

@@ -33,7 +33,7 @@ The platform is meant to run end to end without manual steps ([overview](../over
 
 - **Failure classes.** A step that ends without a stored result is classed by its last outcome:
   - *transient*: `provider-error`, `budget-exhausted`, or a message that went to the dead-letter queue;
-  - *content*: `invalid-output`, including a quote that fails the check of ADR 0064.
+  - *content*: `invalid-output`, including a quote that fails the check of [0064](0064-quote-check-after-normalisation.md).
 - **Re-drive.** The daily admission cron ([0055](0055-daily-admission-and-budget-stop.md)) re-drives failed work after the retraction sweep and before it admits new publications. A re-drive starts at the first failed step and reuses the stored output of every completed step, the same mechanism as REQ-ADM-002 AC1.
   - A transient failure is re-driven at most once a day, up to `recovery.max_redrives` (3) times.
   - A content failure is re-driven once, the next day. After that it is re-driven again only when the step's model or prompt version has changed since its last attempt, because the same model on the same prompt is likely to fail the same way.

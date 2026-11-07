@@ -124,7 +124,7 @@ Agent claims can be traced to a source.
 - Source: overview principle Reliability
 - Acceptance criteria:
   1. Every field marked "evidence required" in a contract has at least one evidence item. An item of kind `none-found` records that a search or comparison found nothing; it satisfies the requirement only for the fields whose contract allows it.
-  2. An evidence quote from the publication is checked to occur in the publication text the agent received; an output with a quote that does not occur is rejected.
+  2. An evidence quote from the publication is checked to occur in the publication text the agent received, after both are normalised as in [contract conventions](../agents/contract-conventions.md) (ADR 0064); an output with a quote that does not occur is rejected. The stored quote is the exact span of the source text that matched.
   3. External sources are stored as URLs with the date they were retrieved.
 - Verification: contract test and eval
 

@@ -91,6 +91,8 @@ expected:
 notes: "Reviewer R7, 2026-.."
 ```
 
+Every quote must occur in the fixture text after the quote normalisation of the [contract conventions](../agents/contract-conventions.md) (ADR 0064). `scripts/check-golden-sets.py` and the eval runner apply the same normalisation, so a golden quote and a model quote are judged alike.
+
 `industry` is one of the eight target industries or `other`. It is the industry of the customer in the first candidate (or of the publication, for an entry without a candidate), and it lets a check count the entries per industry (REQ-TEST-005, criterion 1).
 
 An entry for a publication that passes triage but yields no candidate has `candidates: []` and a `reason` string under `expected`:

@@ -142,10 +142,11 @@ Every candidate opportunity names the customer who has the problem, and the prob
 - Acceptance criteria:
   1. Each candidate holds `Finding`, `EvidenceQuote`, `Customer`, and `CustomerQuote`. A candidate for which the model cannot quote both a problem and a customer is not returned.
   2. `WhyNow` and `CurrentAlternative` are optional. When set, each has a quote (`WhyNowQuote`, `AlternativeQuote`). Otherwise they are empty, and the step never infers them.
-  3. The pipeline rejects an output when any quote does not occur in the publication text the step received (REQ-AGENT-008).
+  3. A quote must occur in the publication text the step received, after normalisation (REQ-AGENT-008, ADR 0064). An attempt with a quote that does not occur is retried with the failing candidate and field named.
   4. A generic or implied party ("users", "people") does not count as `Customer`.
   5. A publication that passes triage and has no quotable problem and customer yields an empty list with a Notes reason. The golden set holds at least three such entries (REQ-TEST-006).
   6. A publication whose stated burden belongs to a population or a sector as a whole, with no named customer (a role or organization type) that could adopt a product against it, yields an empty list, and `Notes` says so (ADR 0050).
+  7. On the last attempt, a candidate that fails a candidate-level check is dropped and recorded in the envelope's `Dropped` list, and the other candidates are kept. When none remain, the result is an empty list whose `Notes` say that every candidate failed its checks (ADR 0064).
 - Verification: contract test with stubbed responses that omit a customer or quote text that is not in the publication, and eval on the golden set
 
 ### REQ-PROC-010: Automatic recovery of phase 2 steps
