@@ -19,7 +19,8 @@ Requirement: REQ-AGENT-003. Feeds the Market Potential category (see [scoring](.
 ## Inputs
 
 - Problem Discovery output.
-- Research Analyst output: industries and technologies.
+- Research Analyst output: industries, technologies, and maturity (ADR 0070).
+- The candidate from extraction: `Finding`, `Customer`, and, when set, `WhyNow` and `CurrentAlternative`, each with its quote (ADR 0070).
 - The configured default currency (EUR) and geography (EU); global figures are allowed when stated.
 - Results of the search tool (REQ-AGENT-013).
 

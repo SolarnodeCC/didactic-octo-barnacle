@@ -20,6 +20,7 @@ Requirement: REQ-AGENT-006. Feeds the Strategic Relevance and Technical Feasibil
 
 - Research Analyst output: industries, technologies, and maturity.
 - Problem Discovery output.
+- The candidate from extraction: `Finding`, `Customer`, and, when set, `WhyNow` and `CurrentAlternative`, each with its quote (ADR 0070).
 - The target industries and focus areas from the [overview](../overview.md). An organization profile replaces them later (REQ-DASH-005).
 
 ## Output contract
@@ -38,7 +39,7 @@ Notes: string(max 400)?
 ## Rules
 
 - `StrategicRelevanceScore` is computed by plain code, not by the model: the highest `IndustryFit` value, raised by 5 points when that industry's `FocusMatch` is `partial` or by 10 points when it is `clear`, capped at 100. The model supplies `IndustryFit` and `FocusMatch`.
-- TechnicalFeasibility is a model estimate; it has no evidence requirement because the agent does not receive publication text. It starts from the research maturity: theoretical 0-29, lab result 30-59, prototype 60-79, field-tested 80-100. It is lowered for constraints such as missing data, regulation, or required hardware.
+- TechnicalFeasibility is a model estimate; it has no evidence requirement because the agent does not receive publication text. It may cite the candidate's quotes as `publication-quote` evidence (ADR 0070). It starts from the research maturity: theoretical 0-29, lab result 30-59, prototype 60-79, field-tested 80-100. It is lowered for constraints such as missing data, regulation, or required hardware.
 
 | ImplementationEffort | Meaning |
 |---|---|

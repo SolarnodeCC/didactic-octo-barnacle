@@ -2,7 +2,7 @@
 title: Agent requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-11-07
 ---
 
 # Agent requirements

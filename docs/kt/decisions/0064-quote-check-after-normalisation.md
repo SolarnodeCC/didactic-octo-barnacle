@@ -1,14 +1,14 @@
 ---
 title: "0064: Quote check after normalisation, and valid candidates are kept"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-07
 related: [REQ-AGENT-008, REQ-PROC-009, REQ-AGENT-009, REQ-TEST-006]
 ---
 
 # 0064: Quote check after normalisation, and valid candidates are kept
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-11-07
 - Answers: none
 - Changes: REQ-AGENT-008 AC2 and REQ-PROC-009 AC3, new REQ-PROC-009 AC7; [contract conventions](../agents/contract-conventions.md), [opportunity extraction](../agents/opportunity-extraction.md), and [golden sets](../test/golden-sets.md)

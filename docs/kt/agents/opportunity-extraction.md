@@ -51,7 +51,7 @@ The pipeline assigns each candidate an Id and links it to the publication before
 - A candidate needs both a quotable problem and a quotable customer. The model leaves out a candidate for which it cannot quote both.
 - `Customer` is a role or organization type. A generic or implied party ("users", "people") does not count. Code checks this against `extraction.generic_customer_terms` and fails a candidate whose whole `Customer`, after a leading `the`, `all`, `many`, or `most`, is a listed term (ADR 0066).
 - A burden that belongs to a population or a sector as a whole, with no named customer that could adopt a product against it, yields no candidate (ADR 0050). A named party that can act, such as a hospital or a bank's risk team, still yields one when both quotes exist.
-- `WhyNow` and `CurrentAlternative` stay empty when the text does not name them. They are never inferred. Later agents may supply them with search evidence (ADR 0013).
+- `WhyNow` and `CurrentAlternative` stay empty when the text does not name them. They are never inferred. Every later agent receives them with their quotes when they are set, and Competition may find further alternatives with the search tool (ADR 0013, ADR 0070).
 - An empty `Candidates` list is a valid result. `Notes` must say why none were found, for example: no quotable problem, no named customer, no party that can act on the burden, or out of industry scope. It can follow an accepted triage decision, because triage reads signals and extraction reads quotes.
 - One finding becomes one candidate. Several distinct problems in one publication yield several candidates, up to the configured maximum.
 - Extraction does not score, size markets, name competitors, or invent a product concept. Those belong to later agents.

@@ -1,14 +1,14 @@
 ---
 title: "0065: Extraction waits for full text at admission"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-07
 related: [REQ-PROC-011, REQ-PROC-008, REQ-DATA-006, REQ-DATA-004]
 ---
 
 # 0065: Extraction waits for full text at admission
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-11-07
 - Answers: none
 - Changes: new REQ-PROC-011; the phase 2 [solution](../phase-2/solution.md), [design](../phase-2/design.md), and [schema](../phase-2/schema.md)

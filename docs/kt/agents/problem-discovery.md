@@ -48,6 +48,7 @@ Notes: string(max 400)?
 | 5 | Critical: safety, compliance, or business continuity is at stake. |
 
 - The problem is stated from the customer's point of view, not as a research question.
+- `Customer` refines the extraction `Customer` (segment, role, industry) and never names a different party (ADR 0070).
 - One output describes one problem. A finding with several problems yields several candidates in extraction.
 
 ## Evals
