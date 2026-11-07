@@ -42,7 +42,7 @@ All calls to model providers, including embedding calls, go through Cloudflare A
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: README Technology Stack
 - Acceptance criteria:
   1. No component calls OpenAI, Anthropic, or another model provider directly.
@@ -55,7 +55,7 @@ Model spending stays within a configured budget.
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: KT review of cost and volume, ADR 0059
 - Depends on: REQ-NFR-003
 - Acceptance criteria:

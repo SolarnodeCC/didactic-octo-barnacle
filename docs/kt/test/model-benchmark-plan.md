@@ -129,12 +129,11 @@ The contracts it uses are in `packages/models` (`triage.ts`, `extraction.ts`, `a
 - A stub that answers with the labels passes every entry, which proves the golden sets fit the contracts.
 - Stubs that answer wrongly fail.
 
-Still to add for the benchmark:
+The model-call helper `callModel` (ADR 0003) and its usage records (REQ-NFR-011) exist since WP2 of the [phase 2 build plan](../phase-2/build-plan.md). Still to add for the benchmark:
 
-- The model-call helper through AI Gateway (ADR 0003).
+- The prompts `triage@1` and `extraction@1` (WP3), and a `ModelFn` that runs them through `callModel`.
 - The three-run stability check.
 - The model judge for `Finding` and `Customer` (OQ-020).
-- Usage records (REQ-NFR-011).
 
 ### Metrics
 

@@ -146,3 +146,35 @@ export {
   type TriageDecisionRow,
   type TriageDecisionStatus,
 } from "./processing.js";
+
+export {
+  BUDGET_CURRENCY,
+  ModelPriceSchema,
+  PriceTableSchema,
+  estimateCost,
+  type ModelPrice,
+  type PriceTable,
+} from "./price-table.js";
+
+export {
+  ProviderCallError,
+  classifyProviderError,
+  parseGeneration,
+  type ParsedGeneration,
+  type ProviderFailure,
+  type WorkersAiBinding,
+  type WorkersAiRunOptions,
+} from "./workers-ai.js";
+
+export { FakeWorkersAi, type FakeCall, type FakeReply } from "./fake-workers-ai.js";
+
+export {
+  callModel,
+  type CallModelDeps,
+  type CallModelRequest,
+  type CallModelResult,
+  type CallOutputMode,
+  type ModelConfig,
+  type ModelPrompt,
+  type ModelUsageStore,
+} from "./call-model.js";

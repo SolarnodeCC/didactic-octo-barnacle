@@ -28,7 +28,7 @@ Every model-backed step that exists in the current phase has a contract test for
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: test strategy
 - Acceptance criteria:
   1. The test fails when a field is missing, has the wrong type, or is outside its range.
