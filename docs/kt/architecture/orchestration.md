@@ -48,16 +48,19 @@ Market Analysis, Competition, and Relevance depend only on the Research Analyst 
 ```text
 Cron (OpenAlex / arXiv)
   → collector Workflow (pagination, dedup, source_record)
-      → queue document.ingest (license-gated PDF, REQ-DATA-004) and/or publication.embed
-          → document-processing Queue consumer (optional)
-          → embedding Worker
-          → queue publication.triage
-              → Triage Worker (rules, then cheap model)
-                  → if accepted: queue publication.extract
-                      → Extraction Worker → 0..N candidates
-                          → for each candidate: queue candidate.run
-                              → one Cloudflare Workflow per candidate
-                                 (agents + scoring; see diagram above)
+      → queue document.ingest (license-gated PDF, REQ-DATA-004)
+          → document consumer → queue document.extract_text → text consumer
+      → queue publication.embed → embedding consumer          (parallel, ADR 0053)
+      → queue publication.triage → triage consumer             (parallel, ADR 0053)
+          (rules, then cheap model; a pass waits for admission)
+Daily admission cron (ADR 0055)
+  → re-drives failed work (ADR 0063), then ranks the pool
+  → admits ready publications up to the daily limit (ADR 0065)
+      → queue publication.extract
+          → extraction consumer → 0..N candidates
+              → for each candidate: queue candidate.run (from phase 3)
+                  → one Cloudflare Workflow per candidate
+                     (agents + scoring; see diagram above)
 ```
 
 - Publication-level steps (triage, extraction) are Queue consumers in `apps/pipeline`, not the per-candidate Workflow.
@@ -99,7 +102,9 @@ Cron (OpenAlex / arXiv)
 | Evidence quote not found in the input | Treated as invalid output. |
 | Provider error, rate limit (429), or timeout | Retry with backoff, honoring `Retry-After`; counts toward the same attempt limit. |
 | Daily budget reached | No new runs start; running steps finish (REQ-NFR-005). |
-| Final failure | Step marked failed with errors stored; the opportunity is incomplete and not scored (REQ-SCORE-005). |
+| Final failure | Step marked failed with errors stored; the opportunity is incomplete and not scored (REQ-SCORE-005) until a re-drive succeeds (ADR 0063). |
+| Failed or budget-deferred work | Re-driven by the daily cron within limits, from the first failed step (REQ-PROC-010, REQ-AGENT-016, ADR 0063). |
+| A step failing for most calls | The step pauses after more than `recovery.breaker_failure_share` provider errors in an hour, sends one `step-paused` alert, and resumes after a successful probe (ADR 0063). |
 
 ## Models and prompts
 
@@ -108,9 +113,11 @@ Cron (OpenAlex / arXiv)
 - Changing a prompt or a model triggers the evals for that agent (REQ-TEST-004).
 - Temperature and other sampling settings are part of the model configuration and are versioned with it.
 
-## Admin recovery
+## Recovery
 
-A failed or incomplete candidate is rerun by an admin from the first failed step (REQ-ADM-002). A rerun creates a new pipeline run; completed steps are not repeated.
+Recovery needs no person (ADR 0063). The daily cron re-drives failed and budget-deferred work from the first failed step, reusing completed steps: transient failures up to `recovery.max_redrives` times, content failures once and then only after a model or prompt change (REQ-PROC-010, REQ-AGENT-016). Dead-lettered messages are replayed automatically, at most twice (REQ-DATA-012). Work that uses up its re-drives is marked `failed-final` and listed in the run report.
+
+An admin can still rerun a failed or incomplete candidate from the first failed step (REQ-ADM-002), for example after a prompt fix. A rerun creates a new pipeline run; completed steps are not repeated.
 
 ## Human review
 

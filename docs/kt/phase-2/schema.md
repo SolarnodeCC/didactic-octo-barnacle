@@ -33,6 +33,10 @@ Added columns:
 
 Migration 0009 is `infrastructure/cloudflare/migrations/0009_processing.sql`. The daily limit of `admission_day` is named `daily_limit`, because `LIMIT` is an SQL keyword. `triage_decision.reason` is empty only while a passing publication waits for its first admission; the row contracts are in `packages/models/src/processing.ts` and `model-call.ts`.
 
+## Re-drive state (ADR 0063)
+
+The `redrive` table (`item_kind` (`publication`, `candidate`), `item_id`, `step`, `failure_class` (`transient`, `content`), `count`, `last_attempt_at`, `last_model`, `last_prompt_version`, `final`), UNIQUE (`item_kind`, `item_id`, `step`), arrives in the migration of the first work package that re-drives. `processing_run.failures_json` lists the items marked `failed-final` that day.
+
 Signals are nullable: a rule rejection has no signals, no model, and no prompt version (REQ-PROC-006 AC2). The signal columns carry a `signal_` prefix because `trigger` is an SQL keyword. A publication is triaged once; triaging again with a new prompt version is a backfill that replaces the row, and its model calls stay recorded.
 
 ## Migration 0010: thin slice
@@ -61,6 +65,12 @@ New keys for [defaults](../architecture/defaults.md). They are added there in th
 | `retraction.lookback_days` | `30` | How far back the weekly retraction check looks (ADR 0061) |
 | `model.price_table_version` | `2026-11-06` | Versioned price table in `infrastructure/cloudflare`, used when the gateway gives no cost (REQ-NFR-011 AC2) |
 | `model.triage`, `model.extraction`, `model.embedding` | from the OQ-036 ADR | Model name, version, and sampling settings |
+| `extraction.generic_customer_terms` | `users`, `end users`, `people`, `persons`, `individuals`, `humans`, `everyone`, `society`, `the public` | A `Customer` equal to one of these fails its candidate (ADR 0066) |
+| `extraction.full_text_wait_hours` | `24` | How long admission waits for full text before it admits on the abstract (ADR 0065) |
+| `recovery.max_redrives` | `3` | Re-drives of a transient failure, at most one a day (ADR 0063) |
+| `recovery.max_redrives_per_day` | `20` | Items re-driven a day; re-driven extractions also count toward the daily limit (ADR 0063) |
+| `recovery.dead_letter_replay_hours` | `6` | Delay before a dead letter is replayed, at most twice (ADR 0063) |
+| `recovery.breaker_failure_share` | `0.5` | Share of `provider-error` calls in an hour that pauses a step (ADR 0063) |
 
 Schedules: admission at `0 11 * * *` UTC, after both ingestion crons. The retraction check stays `0 8 * * 1`. The slice trigger exists only in the local environment.
 

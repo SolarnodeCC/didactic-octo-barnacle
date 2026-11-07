@@ -18,8 +18,8 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 | WP3 | Prompts | REQ-PROC-008, REQ-PROC-009, REQ-TEST-002 | none: gate-enabling |
 | WP4 | Full text | REQ-DATA-006 | phase 2 start |
 | WP5 | Embeddings and search | REQ-PROC-001, REQ-PROC-002, REQ-PROC-003 | phase 2 start |
-| WP6 | Triage | REQ-PROC-005, REQ-PROC-006, REQ-PROC-008 | phase 2 start |
-| WP7 | Extraction | REQ-PROC-004, REQ-PROC-009 | phase 2 start |
+| WP6 | Triage | REQ-PROC-005, REQ-PROC-006, REQ-PROC-008, REQ-PROC-010, REQ-PROC-011, REQ-DATA-012, REQ-TEST-007 | phase 2 start |
+| WP7 | Extraction | REQ-PROC-004, REQ-PROC-009, REQ-TEST-007 | phase 2 start |
 | WP8 | Retractions | REQ-DATA-008, REQ-PROC-002 | phase 2 start |
 | WP9 | Budget and cost reporting | REQ-NFR-005 | phase 2 start |
 | WP10 | Thin slice | REQ-PROC-007 | phase 2 start |
@@ -30,6 +30,7 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 - Re-review and approve `requirements/processing.md` and `requirements/non-functional/platform.md`. REQ-PROC-008 and REQ-PROC-009 were added after their last review.
 - Move `agents/triage.md`, `agents/opportunity-extraction.md`, and `agents/contract-conventions.md` from `draft` to `approved`.
 - ADRs 0053 to 0061 are accepted, and OQ-041, OQ-042, and OQ-043 are answered (ADR 0059, 0060, 0061).
+- Decide ADRs 0063 to 0067 (automatic recovery, quote normalisation, full-text wait, code checks, eval metrics). Re-review the approved files they change: `requirements/processing.md`, `requirements/agents.md`, `requirements/data.md`, `requirements/admin.md`, `requirements/testing.md`, `requirements/non-functional/operations.md`, and `test/golden-sets.md`.
 - **Exit:** every phase 2 document is `approved`.
 
 ## WP1: Foundations
@@ -57,7 +58,7 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 
 ## WP3: Prompts
 
-- **`packages/prompts`:** `triage@1` and `extraction@1`, built from the signal table and rules of the agent documents, with publication text inside delimiters, and the sampling settings.
+- **`packages/prompts`:** `triage@1` and `extraction@1`, built from the signal table and rules of the agent documents, with publication text inside delimiters, and the sampling settings. Triage and extraction use temperature 0, so a decision step gives the same answer for the same input.
 - **Contract tests** for triage and extraction, using valid, invalid, and injection fixtures:
   - missing field, wrong type, out of range (REQ-TEST-002 AC1);
   - a quote that is not in the text, and a candidate with no customer (REQ-PROC-009 AC1, AC3);
@@ -88,6 +89,9 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 ## WP6: Triage
 
 - The triage consumer (rules, model, code), the producer in the page consumer, the admission cron, and `admission_day`.
+- **Admission readiness** (ADR 0065): admit a ranked publication only when its document state is final or `extraction.full_text_wait_hours` has passed. Needs the document states of WP4.
+- **Recovery** (ADR 0063): the `redrive` table, re-drive in the admission cron by failure class, the daily re-drive cap, the breaker and its `step-paused` alert, and dead-letter replay (REQ-DATA-012).
+- **Eval report** (ADR 0067): the triage `industry` field in the golden set and `scripts/check-golden-sets.py`, the confusion matrix, F1, and the breakdown per industry.
 - **Tests:**
   - each rule reason without a model call (REQ-PROC-006 AC1, REQ-PROC-005 AC1);
   - decision fields stored (REQ-PROC-006 AC2);
@@ -95,19 +99,28 @@ Twelve work packages. Each is one pull request or a short series, and names its 
   - ranking, tie-breaks, and the same order for the same input (REQ-PROC-008 AC4);
   - at most the daily limit admitted, the rest `daily-limit` and considered the next day (REQ-PROC-005 AC2);
   - a repeated admission trigger admits nothing twice;
-  - rejected publications still embedded and searchable (REQ-PROC-005 AC3).
+  - rejected publications still embedded and searchable (REQ-PROC-005 AC3);
+  - publications in each document state admitted or held, and admitted after the wait (REQ-PROC-011);
+  - each failure class re-driven within its limit, `failed-final` after the limit, the breaker, and dead-letter replay without duplicates (REQ-PROC-010, REQ-DATA-012);
+  - the eval report's triage metrics on stub models (REQ-TEST-007 AC1, AC5).
 - **Exit:** the triage eval on the configured model and prompt meets its threshold (REQ-PROC-006 AC3, REQ-PROC-008 AC6).
 
 ## WP7: Extraction
 
 - The extraction consumer, input-mode selection, the full-text cut, candidate IDs, and the `extraction_result` and `candidate` rows.
+- **Quotes** (ADR 0064): `normalizeForQuote` in `packages/models`, used by `missingQuotes`, the eval runner, and `scripts/check-golden-sets.py`; the stored quote is the matched source span; `callModel` also returns a last attempt that is valid but fails only its quote check, and the extraction step drops the failing candidates into `Dropped`.
+- **Generic customers** (ADR 0066): `extraction.generic_customer_terms`, checked in the extraction step; the report-only customer-quote check counted in the run report.
+- **Eval report** (ADR 0067): candidate matching by normalised quote overlap, the `optional` flag, the quote rates and positions, the Brier score, and stability.
+- A budget-refused extraction completes as `budget-deferred` (ADR 0063).
 - **Tests:**
   - each candidate references its publication and has a finding and an evidence quote (REQ-PROC-004 AC1);
   - zero to the maximum number of candidates, and an empty list with notes (REQ-PROC-004 AC2, REQ-PROC-009 AC5);
   - quote rejection and the optional fields left empty when not quoted (REQ-PROC-009 AC2, AC3);
   - a generic party rejected as customer by the eval set (REQ-PROC-009 AC4);
   - no candidate for a burden of a population or sector with no customer that can act, as in `gs-extraction-015` and `gs-extraction-020` (REQ-PROC-009 AC6, ADR 0050);
-  - `InputMode` recorded, and `Confidence` capped on abstract input (REQ-DATA-006 AC3).
+  - `InputMode` recorded, and `Confidence` capped on abstract input (REQ-DATA-006 AC3);
+  - a quote that differs only in typography passes and is stored as the source span; a candidate with a missing quote or a generic customer is dropped on the last attempt while the others are kept (REQ-AGENT-008 AC2, REQ-PROC-009 AC3, AC4, AC7);
+  - the eval report's extraction metrics on stub models (REQ-TEST-007 AC2 to AC4).
 - **Exit:** the extraction eval meets its threshold (REQ-PROC-004 AC3). The first run also reviews the rule of ADR 0050 (OQ-038) with real data.
 
 ## WP8: Retractions

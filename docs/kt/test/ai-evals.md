@@ -31,6 +31,8 @@ Agent output comes from language models and varies between runs. Exact assertion
 
 An entry passes when all checks pass.
 
+For triage and extraction the report also gives metrics that do not change the pass rule (REQ-TEST-007, ADR 0067): the confusion matrix, F1, and a breakdown per industry for triage; candidate precision, recall, and F1 by normalised quote overlap for extraction; the first-attempt, normalised-only, and dropped quote rates; where accepted quotes fall in the input; the Brier score of `Confidence`; and stability over three runs.
+
 ## Model judge
 
 - A model judge uses a different model or provider than the agent it grades (OQ-020).

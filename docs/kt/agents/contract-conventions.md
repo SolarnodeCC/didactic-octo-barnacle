@@ -42,6 +42,7 @@ InputMode: enum [abstract, full-text]
 OutputMode: enum [tool-use, json-schema, prompt-only]  # how the schema was enforced (REQ-AGENT-010)
 Attempts: integer 1..N          # attempts used, including failed ones (REQ-AGENT-009)
 Repairs: list<enum [unwrapped-json-string, stripped-code-fence]>  # repairs applied (REQ-AGENT-011)
+Dropped: list<{Index, Field, Reason}>  # items dropped on the last attempt; extraction only (ADR 0064)
 Output: object                  # the agent's output contract
 Evidence: list<Evidence> (0..20)
 ```
@@ -61,7 +62,12 @@ Evidence:
   RetrievedAt: string?          # ISO 8601 date, for external-url
 ```
 
-A publication quote must occur in the text the agent received. The pipeline checks this after validation and rejects the output if it does not.
+A publication quote must occur in the text the agent received. The pipeline checks this after validation and rejects the output if it does not (ADR 0064):
+
+- Before the substring test, the quote and the text are both normalised: Unicode NFKC; curly quotes and primes to straight; hyphens, dashes, and the minus sign to `-`; soft hyphens and zero-width characters removed; whitespace runs to one space, ends trimmed.
+- Letter case, ellipses, and words split by a line-break hyphen are not normalised.
+- The stored quote is the exact span of the source text that matched, so stored quotes are verbatim.
+- In a list of independent items (extraction candidates), an item that still fails on the last attempt is dropped and recorded in `Dropped`; the rest of the output is kept.
 
 A `none-found` item records that a comparison or search was done and found nothing, for example no related publications or no competitors. A contract allows it only for the fields that say so (Research Analyst `Novelty`, Competition `Gap`).
 
@@ -69,7 +75,7 @@ Agents that do not receive publication text, such as Relevance, cite `related-pu
 
 ## Confidence
 
-Fields named `Confidence` are a `number 0..1` that states how well the available input supports the output. Abstract-only input caps confidence at 0.7. Evals check that confidence is calibrated: entries with high confidence should pass more often than entries with low confidence.
+Fields named `Confidence` are a `number 0..1` that states how well the available input supports the output. Abstract-only input caps confidence at 0.7. Evals check that confidence is calibrated: entries with high confidence should pass more often than entries with low confidence. The eval report gives the Brier score and compares the top and bottom thirds by confidence (REQ-TEST-007). No pipeline decision reads `Confidence` until a later ADR shows it is calibrated (ADR 0067).
 
 ## Structured output and repair
 

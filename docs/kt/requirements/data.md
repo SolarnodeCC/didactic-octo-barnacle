@@ -177,3 +177,18 @@ Every Queue consumer and Workflow step tolerates repeated delivery.
   4. A dead-lettered message can be replayed without creating duplicates. In phase 1 this is the replay function; the admin route `POST /admin/queue/replay` arrives with the admin API in phase 4 (REQ-ADM-004).
   5. The pages of a run are stored in order: a page whose predecessor is not stored yet waits for it, and a page that is already counted is not counted again (ADR 0045).
 - Verification: integration test that delivers each message twice and replays a dead-lettered message
+
+### REQ-DATA-012: Automatic dead-letter replay
+
+Dead-lettered messages are replayed without a person, a limited number of times (ADR 0063).
+
+- Phase: 2
+- Priority: must
+- Status: planned
+- Source: ADR 0063
+- Depends on: REQ-DATA-011
+- Acceptance criteria:
+  1. A dead-lettered message is replayed automatically `recovery.dead_letter_replay_hours` after it was dead-lettered, at most twice per message ID, through the replay function of REQ-DATA-011 AC4.
+  2. A replay creates no duplicate rows, and a replayed page can reopen and finish its run.
+  3. After the second replay fails, the message stays dead-lettered and is listed in the run report; the `dead-letter` alert of REQ-NFR-019 is still sent for each dead letter.
+- Verification: integration test that dead-letters a message, advances the clock, and checks the replay count and the stored rows
