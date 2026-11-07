@@ -29,6 +29,13 @@ describe("REQ-DATA-001: OpenAlex client", () => {
     expect(url.searchParams.get("api_key")).toBeNull();
   });
 
+  it("REQ-DATA-009: ends the window on the day of the run when it is given one", () => {
+    const url = new URL(buildOpenAlexUrl({ FromDate: "2026-09-29", ToDate: "2026-10-30" }));
+    expect(url.searchParams.get("filter")).toBe(
+      "from_publication_date:2026-09-29,to_publication_date:2026-10-30,language:en",
+    );
+  });
+
   it("REQ-NFR-010: asks only for the fields the mapper reads", () => {
     // Every field of the work type, checked by the compiler: a new field must be listed.
     const fields: Record<keyof OpenAlexWork, true> = {

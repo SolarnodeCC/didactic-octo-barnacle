@@ -79,7 +79,7 @@ export type Harness = {
   /** What `eraseAuthor` and `reapplyErasures` need, on the same database and bucket. */
   Erasure: ErasureDeps;
   Clock: { Now: string };
-  OpenAlexRequests: Array<{ FromDate: string; Cursor?: string }>;
+  OpenAlexRequests: Array<{ FromDate: string; ToDate?: string; Cursor?: string }>;
   ArxivRequests: Array<{
     Start: number;
     MaxResults: number;

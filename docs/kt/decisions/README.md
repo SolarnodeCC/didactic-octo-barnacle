@@ -78,6 +78,8 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0065](0065-extraction-waits-for-full-text-at-admission.md) | Extraction waits for full text at admission | Proposed |
 | [0066](0066-code-checks-before-model-judgement.md) | Code checks before model judgement | Proposed |
 | [0067](0067-eval-metrics-and-calibration.md) | Eval metrics and calibration; Confidence stays out of decisions | Proposed |
+| [0068](0068-no-publication-dated-after-the-run-day.md) | No publication dated after the day of the run | Accepted |
+| [0069](0069-longer-retry-delay-after-http-429.md) | A longer retry delay after HTTP 429 from a PDF host | Accepted |
 
 ## When an ADR is needed
 

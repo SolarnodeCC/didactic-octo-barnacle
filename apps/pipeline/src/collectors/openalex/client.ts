@@ -4,6 +4,12 @@ import { type OpenAlexWork } from "./types.js";
 export type OpenAlexPageRequest = {
   /** First publication date to fetch, YYYY-MM-DD (REQ-DATA-009 computes it from the cursor). */
   FromDate: string;
+  /**
+   * Last publication date to fetch, YYYY-MM-DD: the day of the run (REQ-DATA-009 AC7). OpenAlex
+   * lists works with a publication date in the future, and the newest-first sort would return
+   * them before any real date. Omitted, no upper bound is sent.
+   */
+  ToDate?: string;
   /** Cursor from the previous page; omit for the first page. */
   Cursor?: string;
   PerPage?: number;
@@ -63,7 +69,11 @@ export const OPENALEX_WORK_FIELDS = [
 
 export function buildOpenAlexUrl(request: OpenAlexPageRequest): string {
   const params = new URLSearchParams();
-  const filters = [`from_publication_date:${request.FromDate}`, "language:en"];
+  const filters = [`from_publication_date:${request.FromDate}`];
+  if (request.ToDate) {
+    filters.push(`to_publication_date:${request.ToDate}`);
+  }
+  filters.push("language:en");
   const subfields = (request.SubfieldIds ?? []).map((id) => id.trim()).filter(Boolean);
   if (subfields.length > 0) {
     // One filter with OR values; OpenAlex allows at most 100 of them. Only the primary

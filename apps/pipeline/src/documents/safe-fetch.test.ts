@@ -176,6 +176,19 @@ describe("REQ-DATA-010: PDF fetcher", () => {
     );
   });
 
+  it("REQ-DATA-011: a 429 carries its status and the seconds of its Retry-After", async () => {
+    const asked = fetcherFor(new Response("", { status: 429, headers: { "retry-after": "120" } }));
+    expect(await failure(asked.fetchPdf("https://repo.example.org/a.pdf"))).toMatchObject({
+      Status: 429,
+      RetryAfterSeconds: 120,
+    });
+    const silent = fetcherFor(new Response("", { status: 429 }));
+    expect(await failure(silent.fetchPdf("https://repo.example.org/a.pdf"))).toMatchObject({
+      Status: 429,
+      RetryAfterSeconds: null,
+    });
+  });
+
   it("REQ-DATA-010: a network error is retryable", async () => {
     const { fetchPdf } = fetcherFor(() => Promise.reject(new TypeError("fetch failed")));
     expect(await failure(fetchPdf("https://repo.example.org/a.pdf"))).toMatchObject({

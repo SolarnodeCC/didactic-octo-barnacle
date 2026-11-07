@@ -105,6 +105,7 @@ function buildDeps(env: Env): PipelineDeps {
         fetchOpenAlexPage(
           {
             FromDate: request.FromDate,
+            ...(request.ToDate ? { ToDate: request.ToDate } : {}),
             PerPage: config.PageSize,
             ...(request.SubfieldIds ? { SubfieldIds: request.SubfieldIds } : {}),
             WorkTypes: config.OpenAlexScope.WorkTypes,

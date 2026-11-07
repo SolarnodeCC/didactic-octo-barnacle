@@ -67,9 +67,15 @@ describe("REQ-DATA-009: scheduled ingestion through the queue", () => {
     await h.Drain();
 
     expect(h.Count("publication")).toBe(3);
+    // Every request ends on the day of the run: OpenAlex lists future-dated works (AC7).
     expect(h.OpenAlexRequests).toEqual([
-      { FromDate: "2026-10-16", SubfieldIds: SCOPE_OPENALEX_SUBFIELD_IDS },
-      { FromDate: "2026-10-16", SubfieldIds: SCOPE_OPENALEX_SUBFIELD_IDS, Cursor: "cursor-2" },
+      { FromDate: "2026-10-16", ToDate: "2026-10-30", SubfieldIds: SCOPE_OPENALEX_SUBFIELD_IDS },
+      {
+        FromDate: "2026-10-16",
+        ToDate: "2026-10-30",
+        SubfieldIds: SCOPE_OPENALEX_SUBFIELD_IDS,
+        Cursor: "cursor-2",
+      },
     ]);
     const run = h.Run();
     expect(run["status"]).toBe("succeeded");
@@ -412,9 +418,26 @@ describe("REQ-DATA-009: a run that stops at the page cap is continued by the nex
 
     expect(c.OpenAlexRequests[2]).toEqual({
       FromDate: "2026-08-07",
+      ToDate: "2026-11-05",
       SubfieldIds: SCOPE_OPENALEX_SUBFIELD_IDS,
     });
     expect(c.Run()["status"]).toBe("succeeded");
+  });
+
+  it("REQ-DATA-009: no run stores a work dated after its own day", async () => {
+    const future = { ...makeWork(2), publication_date: "2026-11-02" };
+    h.SetOpenAlexPages([openAlexPage([makeWork(1), future], null)]);
+    await runScheduled(h.Deps, OPENALEX_CRON);
+    await h.Drain();
+
+    // The run day is 2026-10-30: the work dated 2 November is skipped and counted.
+    expect(h.Count("publication")).toBe(1);
+    expect(JSON.parse(h.Run()["counts_json"] as string)).toMatchObject({
+      Fetched: 2,
+      Created: 1,
+      Skipped: 1,
+      Failed: 0,
+    });
   });
 
   it("REQ-DATA-009: no run stores a work dated more than 90 days before its own day", async () => {

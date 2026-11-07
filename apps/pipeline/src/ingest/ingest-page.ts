@@ -139,8 +139,10 @@ export async function ingestOpenAlexWorks(
   /**
    * Work types and abstract rule of ADR 0048: a work outside them is skipped, whatever the
    * server-side filter did. Omitted, no work is skipped for its type or abstract.
+   * `LatestDate` (YYYY-MM-DD) is the day of the run: a work dated after it is skipped
+   * (REQ-DATA-009 AC7, ADR 0068).
    */
-  kind: { WorkTypes?: readonly string[]; RequireAbstract?: boolean } = {},
+  kind: { WorkTypes?: readonly string[]; RequireAbstract?: boolean; LatestDate?: string } = {},
 ): Promise<IngestResult> {
   const result = emptyResult();
   const fetchedAt = deps.Now();
@@ -153,7 +155,8 @@ export async function ingestOpenAlexWorks(
       !isOpenAlexTopicsInScope(openAlexTopicNames(work), topicNames) ||
       (types !== null && !types.has(work.type ?? "")) ||
       (kind.RequireAbstract === true && !hasAbstract) ||
-      (earliestDate !== undefined && published !== null && published < earliestDate)
+      (earliestDate !== undefined && published !== null && published < earliestDate) ||
+      (kind.LatestDate !== undefined && published !== null && published > kind.LatestDate)
     ) {
       result.Counts.Fetched += 1;
       result.Counts.Skipped += 1;

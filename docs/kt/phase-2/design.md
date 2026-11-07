@@ -71,6 +71,7 @@ In phase 2 the model queue's concurrency (8, equal to `model.semaphore_max`) is 
 4. **Admission cron** (ADR 0055), daily after ingestion:
    - It takes the decisions still `awaiting-admission` from the last `triage.admission_pool_days`.
    - It ranks them with `admitWithinDailyLimit`, using the limit minus the publications already admitted that UTC day (REQ-PROC-008 AC4).
+   - It leaves out a publication dated after the day of the run. The 613 OpenAlex works with a future date that were stored before ADR 0068 stay in the database, and a date in the future is no sign that a work is recent.
    - It admits a ranked publication only when it is ready: text stored or failed, no license-allowed PDF, or the document message finished without a document. After `extraction.full_text_wait_hours` every publication is ready. A publication that is not ready keeps its rank and waits (REQ-PROC-011, ADR 0065).
    - It sets the admitted to `accepted` and queues `publication.extract`.
    - The rest get `daily-limit`, stay in the pool, and are considered again the next day. A decision that leaves the pool keeps `daily-limit` as its final reason.

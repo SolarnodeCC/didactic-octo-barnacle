@@ -1,3 +1,4 @@
+import { retryAfterMs } from "../http/retry.js";
 import { checkPdfUrl } from "./url-policy.js";
 
 export type PdfFetchLimits = {
@@ -26,6 +27,10 @@ export class PdfFetchError extends Error {
     message: string,
     readonly Code: PdfFetchErrorCode,
     readonly Permanent: boolean,
+    /** HTTP status of a refused response, so the queue can wait longer after a 429. */
+    readonly Status: number | null = null,
+    /** Seconds from the `Retry-After` header of that response, when it had one. */
+    readonly RetryAfterSeconds: number | null = null,
   ) {
     super(message);
     this.name = "PdfFetchError";
@@ -158,10 +163,13 @@ export function createPdfFetcher(options: {
         }
         if (!response.ok) {
           await response.body?.cancel().catch(() => undefined);
+          const waitMs = retryAfterMs(response);
           throw new PdfFetchError(
             `HTTP ${response.status}`,
             "http-status",
             !isRetryableStatus(response.status),
+            response.status,
+            waitMs === null ? null : Math.ceil(waitMs / 1000),
           );
         }
 

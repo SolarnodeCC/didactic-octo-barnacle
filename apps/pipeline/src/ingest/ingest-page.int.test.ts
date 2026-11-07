@@ -70,6 +70,26 @@ describe("REQ-DATA-001: OpenAlex page ingestion", () => {
     expect(rows("publication")).toBe(1);
   });
 
+  it("REQ-DATA-009: a work dated after the day of the run is skipped, one dated that day is stored", async () => {
+    const { deps, rows } = setup();
+    const today = { ...work("work-complete.json"), publication_date: "2026-10-30" };
+    const future = {
+      ...work("work-complete.json"),
+      id: "https://openalex.org/W8",
+      publication_date: "2027-11-03",
+    };
+    const result = await ingestOpenAlexWorks(
+      deps,
+      [today, future],
+      SCOPE_OPENALEX_TOPIC_NAMES,
+      undefined,
+      { LatestDate: "2026-10-30" },
+    );
+
+    expect(result.Counts).toMatchObject({ Fetched: 2, Created: 1, Skipped: 1, Failed: 0 });
+    expect(rows("publication")).toBe(1);
+  });
+
   it("REQ-DATA-001: only the primary topic decides the scope, not a secondary topic", async () => {
     const { deps, rows } = setup();
     const inScope = work("work-complete.json").topics?.[0];

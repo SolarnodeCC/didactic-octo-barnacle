@@ -48,6 +48,7 @@ async function fetchAndIngest(deps: PipelineDeps, run: RunRow): Promise<FetchedP
   if (run.Source === "openalex") {
     const fetched = await deps.Sources.FetchOpenAlexPage({
       FromDate: requestFrom,
+      ToDate: runDay,
       SubfieldIds: deps.Config.OpenAlexScope.SubfieldIds,
       ...(run.PageCursor ? { Cursor: run.PageCursor } : {}),
     });
@@ -60,6 +61,7 @@ async function fetchAndIngest(deps: PipelineDeps, run: RunRow): Promise<FetchedP
         {
           WorkTypes: deps.Config.OpenAlexScope.WorkTypes,
           RequireAbstract: deps.Config.OpenAlexScope.RequireAbstract,
+          LatestDate: runDay,
         },
       ),
       HasMore: fetched.NextCursor !== null && fetched.Works.length > 0,

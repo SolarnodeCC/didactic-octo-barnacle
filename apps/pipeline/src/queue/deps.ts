@@ -33,6 +33,7 @@ export type PipelineDeps = {
   Sources: {
     FetchOpenAlexPage: (request: {
       FromDate: string;
+      ToDate?: string;
       Cursor?: string;
       SubfieldIds?: readonly string[];
     }) => Promise<OpenAlexPage>;
