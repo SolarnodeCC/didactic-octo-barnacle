@@ -1,5 +1,6 @@
 import { QueueMessageEnvelopeSchema } from "@roi/models";
 
+import { PdfFetchError } from "../documents/safe-fetch.js";
 import { handleDeadLetter } from "./dead-letter.js";
 import { type PipelineDeps } from "./deps.js";
 import { handleDocumentIngest } from "./document-ingest.js";
@@ -26,6 +27,33 @@ export function retryDelaySeconds(attempts: number, random: () => number = Math.
   const exponent = Math.max(0, Math.floor(attempts) - 1);
   const base = Math.min(RETRY_BASE_SECONDS * 2 ** exponent, RETRY_MAX_SECONDS);
   return Math.max(1, Math.round(base * (0.8 + 0.4 * random())));
+}
+
+/** First retry delay after a 429 from a PDF host; it doubles for each later delivery (ADR 0069). */
+export const RATE_LIMIT_BASE_SECONDS = 300;
+/** Longest retry delay after a 429, also the cap on a `Retry-After` from the host. */
+export const RATE_LIMIT_MAX_SECONDS = 3600;
+
+/**
+ * Delay before the next delivery of a PDF message that a host refused with HTTP 429:
+ * 5 minutes, 10, 20, ... up to an hour, or the host's `Retry-After` when that is longer,
+ * itself capped at an hour (REQ-DATA-011 AC6, REQ-NFR-021). A host that limits requests
+ * needs minutes, not the seconds of the delay for other errors. Jitter of ±20 % keeps
+ * messages for the same host from coming back together. PDF messages hold up no run
+ * (ADR 0047), so the longer wait costs nothing.
+ */
+export function rateLimitDelaySeconds(
+  attempts: number,
+  retryAfterSeconds: number | null,
+  random: () => number = Math.random,
+): number {
+  const exponent = Math.max(0, Math.floor(attempts) - 1);
+  const schedule = Math.min(RATE_LIMIT_BASE_SECONDS * 2 ** exponent, RATE_LIMIT_MAX_SECONDS);
+  const asked =
+    retryAfterSeconds === null
+      ? 0
+      : Math.min(Math.max(0, retryAfterSeconds), RATE_LIMIT_MAX_SECONDS);
+  return Math.max(1, Math.round(Math.max(schedule, asked) * (0.8 + 0.4 * random())));
 }
 
 /**
@@ -58,7 +86,12 @@ export async function consumeBatch(
         error: error instanceof Error ? error.name : "unknown",
         attempts: message.attempts,
       });
-      message.retry({ delaySeconds: retryDelaySeconds(message.attempts, random) });
+      const rateLimited = error instanceof PdfFetchError && error.Status === 429;
+      message.retry({
+        delaySeconds: rateLimited
+          ? rateLimitDelaySeconds(message.attempts, error.RetryAfterSeconds, random)
+          : retryDelaySeconds(message.attempts, random),
+      });
     }
   }
 }

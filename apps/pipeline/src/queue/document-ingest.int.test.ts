@@ -253,6 +253,23 @@ describe("REQ-DATA-010: license gate and safe fetching", () => {
     expect(h.Bucket.puts).toBe(1);
   });
 
+  it("REQ-DATA-011: a PDF host that answers 429 is retried after minutes, then dead-lettered", async () => {
+    const limited = new PdfFetchError("HTTP 429", "http-status", false, 429, 100);
+    h.SetPdfs({ [URL_A]: limited });
+    await ingestPage(h, [makeWork(1, { Pdf: { Url: URL_A, License: "cc-by" } })]);
+
+    expect(h.PdfRequests).toHaveLength(4); // first try and three retries
+    expect(h.Queue.deadLettered).toHaveLength(1);
+    // 5, 10, 20, and 40 minutes (a Retry-After of 100 s is shorter), each within the 20 %
+    // jitter. The fourth delivery asks for a retry too, and that sends it to the dead letters.
+    const delays = h.Queue.retries.map((retry) => retry.delaySeconds);
+    expect(delays).toHaveLength(4);
+    [300, 600, 1200, 2400].forEach((expected, index) => {
+      expect(delays[index]).toBeGreaterThanOrEqual(Math.round(expected * 0.8));
+      expect(delays[index]).toBeLessThanOrEqual(Math.round(expected * 1.2));
+    });
+  });
+
   it("REQ-DATA-010: the real fetcher refuses a non-https URL and an internal address without a request", async () => {
     const network = vi.fn(() => Promise.reject(new Error("must not be called")));
     const guarded = createHarness(

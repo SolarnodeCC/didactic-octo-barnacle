@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { consumeBatch, RETRY_MAX_SECONDS, retryDelaySeconds } from "./consume.js";
+import {
+  consumeBatch,
+  RATE_LIMIT_MAX_SECONDS,
+  rateLimitDelaySeconds,
+  RETRY_MAX_SECONDS,
+  retryDelaySeconds,
+} from "./consume.js";
 import { type QueueBatchLike } from "./types.js";
 import { createHarness } from "../test/harness.js";
 
@@ -76,5 +82,25 @@ describe("REQ-DATA-011: a failed message is retried after a growing delay", () =
       0,
     );
     expect(total).toBeGreaterThanOrEqual(150);
+  });
+});
+
+describe("REQ-DATA-011: a PDF host that answers 429 is given minutes, not seconds", () => {
+  const mid = () => 0.5;
+
+  it("REQ-DATA-011: the delay after a 429 starts at 5 minutes, doubles, and stops at an hour", () => {
+    expect([1, 2, 3, 4, 5].map((attempts) => rateLimitDelaySeconds(attempts, null, mid))).toEqual([
+      300, 600, 1200, 2400, 3600,
+    ]);
+    expect(rateLimitDelaySeconds(50, null, mid)).toBe(RATE_LIMIT_MAX_SECONDS);
+    expect(rateLimitDelaySeconds(1, null, () => 0)).toBe(240);
+    expect(rateLimitDelaySeconds(1, null, () => 1)).toBe(360);
+  });
+
+  it("REQ-DATA-011: a longer Retry-After wins, a shorter one does not, and an hour is the limit", () => {
+    expect(rateLimitDelaySeconds(1, 900, mid)).toBe(900);
+    expect(rateLimitDelaySeconds(1, 10, mid)).toBe(300);
+    expect(rateLimitDelaySeconds(1, 86_400, mid)).toBe(RATE_LIMIT_MAX_SECONDS);
+    expect(rateLimitDelaySeconds(1, -5, mid)).toBe(300);
   });
 });

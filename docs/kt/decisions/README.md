@@ -74,6 +74,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0061](0061-retraction-check-looks-back-30-days.md) | The weekly retraction check looks back 30 days | Accepted |
 | [0062](0062-replace-deprecated-benchmark-candidates.md) | Replace the benchmark candidates that Workers AI deprecates on 2026-11-20 | Accepted |
 | [0068](0068-no-publication-dated-after-the-run-day.md) | No publication dated after the day of the run | Accepted |
+| [0069](0069-longer-retry-delay-after-http-429.md) | A longer retry delay after HTTP 429 from a PDF host | Accepted |
 
 ## When an ADR is needed
 

@@ -169,7 +169,7 @@ Every Queue consumer and Workflow step tolerates repeated delivery.
 - Phase: 1
 - Priority: must
 - Status: done
-- Source: Readiness assessment; ADR 0004
+- Source: Readiness assessment; ADR 0004, ADR 0069
 - Depends on: REQ-DATA-009
 - Acceptance criteria:
   1. A consumer checks stored state before it works, so processing the same message twice gives the same stored result.
@@ -177,4 +177,5 @@ Every Queue consumer and Workflow step tolerates repeated delivery.
   3. A failed message is retried after a delay that doubles from 30 seconds, with jitter and at most 15 minutes (ADR 0045). A message that fails its retries goes to a dead-letter queue, and the run report counts dead-lettered messages (REQ-NFR-008).
   4. A dead-lettered message can be replayed without creating duplicates. In phase 1 this is the replay function; the admin route `POST /admin/queue/replay` arrives with the admin API in phase 4 (REQ-ADM-004).
   5. The pages of a run are stored in order: a page whose predecessor is not stored yet waits for it, and a page that is already counted is not counted again (ADR 0045).
+  6. A PDF message that a host refuses with HTTP 429 is retried after 5 minutes, then 10, 20, and 40, up to at most an hour, or after the `Retry-After` of the host when that is longer, capped at an hour. Other errors keep the delay of AC3 (ADR 0069).
 - Verification: integration test that delivers each message twice and replays a dead-lettered message
