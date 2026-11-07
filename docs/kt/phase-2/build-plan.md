@@ -27,10 +27,10 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 
 ## WP0: Readiness
 
-- Re-review and approve `requirements/processing.md` and `requirements/non-functional/platform.md`. REQ-PROC-008 and REQ-PROC-009 were added after their last review.
+- Re-review and approve `requirements/processing.md` and `requirements/non-functional/platform.md`. REQ-PROC-008 and REQ-PROC-009 were added after their last review. `requirements/processing.md` was re-reviewed and approved on 2026-11-07; `requirements/non-functional/platform.md` is still open.
 - Move `agents/triage.md`, `agents/opportunity-extraction.md`, and `agents/contract-conventions.md` from `draft` to `approved`.
 - ADRs 0053 to 0061 are accepted, and OQ-041, OQ-042, and OQ-043 are answered (ADR 0059, 0060, 0061).
-- ADRs 0063 to 0067 (automatic recovery, quote normalisation, full-text wait, code checks, eval metrics) and ADRs 0070 and 0071 (downstream context, quality monitoring) are accepted. Re-review the approved files they change: `requirements/processing.md`, `requirements/agents.md`, `requirements/data.md`, `requirements/admin.md`, `requirements/testing.md`, `requirements/non-functional/operations.md` (also REQ-NFR-023), and `test/golden-sets.md`.
+- ADRs 0063 to 0067 (automatic recovery, quote normalisation, full-text wait, code checks, eval metrics) and ADRs 0070 and 0071 (downstream context, quality monitoring) are accepted. The approved files they change were re-reviewed and approved on 2026-11-07: `requirements/processing.md`, `requirements/agents.md`, `requirements/data.md`, `requirements/admin.md`, `requirements/testing.md`, `requirements/non-functional/operations.md` (also REQ-NFR-023), `test/golden-sets.md`, and `open-questions.md`.
 - **Exit:** every phase 2 document is `approved`.
 
 ## WP1: Foundations

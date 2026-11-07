@@ -2,7 +2,7 @@
 title: Operations requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-07
 ---
 
 # Operations requirements
