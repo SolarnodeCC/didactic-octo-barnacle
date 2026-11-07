@@ -14,7 +14,7 @@ Phase 2 starts only when every gate below is closed ([Definition of Ready](../ro
 
 | Gate | State on 2026-11-06 | Owner | Evidence that closes it |
 |---|---|---|---|
-| Phase 1 exit | Met on the data criterion of ADR 0051 (arXiv 13,372 and OpenAlex about 11,100 publications with an abstract on 6 Nov); to be confirmed on the runs of 7 Nov after the ADR 0048 filter | Lead engineer | The re-run of `Staging scheduled checks` recorded in [ingestion scope](../data-sources/ingestion-scope.md), after ADR 0045, ADR 0047, and ADR 0048 |
+| Phase 1 exit | Met: the data criterion of ADR 0051 is confirmed on the runs of 7 Nov (arXiv 14,035 and OpenAlex 16,134 publications with an abstract; the first `succeeded` arXiv run) | Lead engineer | The 7 November result in [ingestion scope](../data-sources/ingestion-scope.md) |
 | OQ-014: legal phase-2 gate questions | Answered: questions 1 to 5 approved on 2026-11-06 with no conditions; the contact is `info@solarnode.cc`. Launch questions 6 to 12 stay open | `@SolarnodeCC` and legal | The [review brief](../legal/review-brief.md). Workers AI processing falls under the Cloudflare agreement of launch question 8 (ADR 0049) |
 | OQ-036: models for triage and extraction | Open; round one covers triage and extraction only, two candidates each (benchmark plan) | AI engineering lead | Benchmark ADR on the golden sets ([benchmark plan](../test/model-benchmark-plan.md)); needs WP1 to WP3 |
 | OQ-040: providers | Answered by ADR 0049: Workers AI for the pipeline, Anthropic as the eval judge only | `@SolarnodeCC` | ADR 0049 |
