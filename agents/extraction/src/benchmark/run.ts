@@ -1,0 +1,359 @@
+import {
+  type CallModelDeps,
+  type CallModelResult,
+  type CallOutputMode,
+  type ModelCallRecord,
+  type ModelUsageStore,
+  type PriceTable,
+  type WorkersAiBinding,
+  type WorkersAiRunOptions,
+} from "@roi/models";
+
+import {
+  runExtractionEval,
+  runTriageEval,
+  type EvalReport,
+  type TriageEvalReport,
+} from "../eval.js";
+import { type ExtractionEntry, type Threshold, type TriageEntry } from "../golden-set.js";
+import { extractionModelFn, triageModelFn } from "../model-fn.js";
+
+/**
+ * One benchmark round (docs/kt/test/model-benchmark-plan.md): every candidate of a step runs
+ * every golden-set item `Runs` times through `callModel` with the same prompt version and
+ * sampling settings. It records the plan's metrics per step and model, keeps every raw
+ * response, and stops starting new steps once the model cost reaches the budget.
+ */
+
+export type BenchmarkStep = "triage" | "extraction";
+
+export type BenchmarkPlan = {
+  /** Identifies the round in records, gateway logs, and the raw-response keys. */
+  BenchmarkId: string;
+  Steps: BenchmarkStep[];
+  /** Exact, pinned model IDs per step (REQ-AGENT-014). */
+  Models: Record<BenchmarkStep, string[]>;
+  Runs: number;
+  OutputMode: CallOutputMode;
+  /** Total model cost allowed for the round, in euro (the plan's budget is 50). */
+  BudgetEur: number;
+};
+
+export type BenchmarkInputs = {
+  Triage: { Entries: TriageEntry[]; Threshold: Threshold };
+  Extraction: { Entries: ExtractionEntry[]; Threshold: Threshold };
+};
+
+export type BenchmarkDeps = {
+  Ai: WorkersAiBinding;
+  GatewayId: string;
+  Prices: PriceTable;
+  MaxAttempts: number;
+  NewId: () => string;
+  Now: () => Date;
+  Sleep: (ms: number) => Promise<void>;
+  /** Progress lines, for example to stderr. */
+  Log?: (line: string) => void;
+};
+
+/** One raw provider response, with the publication and attempt it belongs to. */
+export type RawCall = {
+  BenchmarkId: string;
+  Step: BenchmarkStep;
+  Model: string;
+  Run: number;
+  PublicationId: string;
+  Call: number;
+  GatewayLogId: string | null;
+  Response: unknown;
+  Error: string | null;
+};
+
+export type RunSummary = {
+  Run: number;
+  PassRate: number;
+  ThresholdPassed: boolean;
+  SignalAgreement?: TriageEvalReport["SignalAgreement"];
+  Precision?: number;
+  Recall?: number;
+};
+
+export type ModelSummary = {
+  Step: BenchmarkStep;
+  Model: string;
+  Runs: RunSummary[];
+  MeanPassRate: number;
+  MinPassRate: number;
+  /** Share of items whose pass or fail is the same in every run. */
+  Stability: number;
+  Steps: number;
+  /** Share of steps accepted on the first attempt. */
+  FirstAttemptValid: number;
+  /** Share of accepted steps that needed a repair (REQ-AGENT-011). */
+  RepairRate: number;
+  /** Share of steps that failed after the last attempt. */
+  FailedAfterMaxAttempts: number;
+  BudgetRefused: number;
+  ProviderErrors: number;
+  LatencyMsP50: number;
+  LatencyMsP95: number;
+  CostEur: number;
+  CostPerStepEur: number;
+};
+
+export type BenchmarkResult = {
+  BenchmarkId: string;
+  Summaries: ModelSummary[];
+  Records: ModelCallRecord[];
+  Raw: RawCall[];
+  TotalCostEur: number;
+  /** True when the budget stopped steps from starting; the round is then incomplete. */
+  BudgetReached: boolean;
+};
+
+export function percentile(values: readonly number[], p: number): number {
+  if (values.length === 0) {
+    return 0;
+  }
+  const sorted = [...values].sort((a, b) => a - b);
+  const index = Math.min(sorted.length - 1, Math.max(0, Math.ceil((p / 100) * sorted.length) - 1));
+  return sorted[index] ?? 0;
+}
+
+/** Captures every response and error of the binding, so they can be kept and graded again. */
+class RecordingBinding implements WorkersAiBinding {
+  readonly Pending: Array<
+    Omit<RawCall, "BenchmarkId" | "Step" | "Model" | "Run" | "PublicationId">
+  > = [];
+  private calls = 0;
+
+  constructor(private readonly inner: WorkersAiBinding) {}
+
+  get aiGatewayLogId(): string | null {
+    return this.inner.aiGatewayLogId ?? null;
+  }
+
+  async run(
+    model: string,
+    inputs: Record<string, unknown>,
+    options: WorkersAiRunOptions,
+  ): Promise<unknown> {
+    this.calls += 1;
+    try {
+      const response = await this.inner.run(model, inputs, options);
+      this.Pending.push({
+        Call: this.calls,
+        GatewayLogId: this.aiGatewayLogId,
+        Response: response,
+        Error: null,
+      });
+      return response;
+    } catch (error) {
+      this.Pending.push({
+        Call: this.calls,
+        GatewayLogId: this.aiGatewayLogId,
+        Response: null,
+        Error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
+  }
+}
+
+class BudgetUsage implements ModelUsageStore {
+  readonly Records: ModelCallRecord[] = [];
+  SpentEur = 0;
+  Refused = 0;
+  constructor(private readonly limitEur: number) {}
+  budgetAllows(): Promise<boolean> {
+    const allowed = this.SpentEur < this.limitEur;
+    if (!allowed) {
+      this.Refused += 1;
+    }
+    return Promise.resolve(allowed);
+  }
+  record(record: ModelCallRecord): Promise<void> {
+    this.Records.push(record);
+    this.SpentEur += record.Cost.Amount;
+    return Promise.resolve();
+  }
+}
+
+export async function runBenchmark(
+  plan: BenchmarkPlan,
+  inputs: BenchmarkInputs,
+  deps: BenchmarkDeps,
+): Promise<BenchmarkResult> {
+  const binding = new RecordingBinding(deps.Ai);
+  const usage = new BudgetUsage(plan.BudgetEur);
+  const callDeps: CallModelDeps = {
+    Ai: binding,
+    GatewayId: deps.GatewayId,
+    Usage: usage,
+    Prices: deps.Prices,
+    MaxAttempts: deps.MaxAttempts,
+    NewId: deps.NewId,
+    Now: deps.Now,
+    Sleep: deps.Sleep,
+  };
+  const raw: RawCall[] = [];
+  const summaries: ModelSummary[] = [];
+
+  for (const step of plan.Steps) {
+    for (const model of plan.Models[step]) {
+      // Refuse an unpriced model before any call, like callModel does per step.
+      if (deps.Prices.Models[model] === undefined) {
+        throw new Error(`model ${model} has no price in table ${deps.Prices.Version}`);
+      }
+      const results: Array<{ Run: number; Result: CallModelResult<unknown> }> = [];
+      const runs: RunSummary[] = [];
+      const passedByEntry = new Map<string, boolean[]>();
+      const recordsBefore = usage.Records.length;
+      const refusedBefore = usage.Refused;
+
+      for (let run = 1; run <= plan.Runs; run += 1) {
+        const runId = `${plan.BenchmarkId}:${step}:${model}:r${run}`;
+        const onResult = (publicationId: string, result: CallModelResult<unknown>): void => {
+          results.push({ Run: run, Result: result });
+          for (const call of binding.Pending.splice(0)) {
+            raw.push({
+              BenchmarkId: plan.BenchmarkId,
+              Step: step,
+              Model: model,
+              Run: run,
+              PublicationId: publicationId,
+              ...call,
+            });
+          }
+        };
+        const options = {
+          Deps: callDeps,
+          Model: model,
+          RunId: runId,
+          OutputMode: plan.OutputMode,
+          OnResult: onResult,
+        };
+        let report: EvalReport | TriageEvalReport;
+        if (step === "triage") {
+          report = await runTriageEval(
+            inputs.Triage.Entries,
+            triageModelFn(options),
+            inputs.Triage.Threshold,
+          );
+          const triage = report as TriageEvalReport;
+          runs.push({
+            Run: run,
+            PassRate: triage.PassRate,
+            ThresholdPassed: triage.Passed,
+            SignalAgreement: triage.SignalAgreement,
+            Precision: triage.Precision,
+            Recall: triage.Recall,
+          });
+        } else {
+          report = await runExtractionEval(
+            inputs.Extraction.Entries,
+            extractionModelFn(options),
+            inputs.Extraction.Threshold,
+          );
+          runs.push({ Run: run, PassRate: report.PassRate, ThresholdPassed: report.Passed });
+        }
+        for (const entry of report.Entries) {
+          passedByEntry.set(entry.Id, [...(passedByEntry.get(entry.Id) ?? []), entry.Passed]);
+        }
+        deps.Log?.(
+          `${step} ${model} run ${run}/${plan.Runs}: pass rate ${report.PassRate.toFixed(3)}, spent EUR ${usage.SpentEur.toFixed(4)}`,
+        );
+      }
+
+      const records = usage.Records.slice(recordsBefore);
+      const attempted = results.filter(
+        (r) => r.Result.Ok || r.Result.Reason !== "budget-exhausted",
+      );
+      const ok = attempted.filter((r) => r.Result.Ok);
+      const latencies = records.filter((r) => r.Outcome === "ok").map((r) => r.LatencyMs);
+      const cost = records.reduce((sum, r) => sum + r.Cost.Amount, 0);
+      const passRates = runs.map((r) => r.PassRate);
+      const stableEntries = [...passedByEntry.values()].filter(
+        (passes) => passes.every((p) => p) || passes.every((p) => !p),
+      ).length;
+      summaries.push({
+        Step: step,
+        Model: model,
+        Runs: runs,
+        MeanPassRate: passRates.reduce((a, b) => a + b, 0) / Math.max(passRates.length, 1),
+        MinPassRate: passRates.length === 0 ? 0 : Math.min(...passRates),
+        Stability: passedByEntry.size === 0 ? 0 : stableEntries / passedByEntry.size,
+        Steps: attempted.length,
+        FirstAttemptValid:
+          attempted.length === 0
+            ? 0
+            : ok.filter((r) => r.Result.Ok && r.Result.Attempts === 1).length / attempted.length,
+        RepairRate:
+          ok.length === 0
+            ? 0
+            : ok.filter((r) => r.Result.Ok && r.Result.Repairs.length > 0).length / ok.length,
+        FailedAfterMaxAttempts:
+          attempted.length === 0 ? 0 : (attempted.length - ok.length) / attempted.length,
+        BudgetRefused: usage.Refused - refusedBefore,
+        ProviderErrors: records.filter((r) => r.Outcome === "provider-error").length,
+        LatencyMsP50: percentile(latencies, 50),
+        LatencyMsP95: percentile(latencies, 95),
+        CostEur: cost,
+        CostPerStepEur: attempted.length === 0 ? 0 : cost / attempted.length,
+      });
+    }
+  }
+
+  return {
+    BenchmarkId: plan.BenchmarkId,
+    Summaries: summaries,
+    Records: usage.Records,
+    Raw: raw,
+    TotalCostEur: usage.SpentEur,
+    BudgetReached: usage.Refused > 0,
+  };
+}
+
+function pct(value: number): string {
+  return `${(value * 100).toFixed(1)} %`;
+}
+
+/** A markdown report of a round, for the ADR that closes OQ-036. */
+export function formatBenchmarkMarkdown(result: BenchmarkResult, plan: BenchmarkPlan): string {
+  const lines = [
+    `# Model benchmark ${result.BenchmarkId}`,
+    "",
+    `Runs per item: ${plan.Runs}. Output mode: ${plan.OutputMode}. Total cost: EUR ${result.TotalCostEur.toFixed(4)} of EUR ${plan.BudgetEur}.`,
+    result.BudgetReached
+      ? "**The budget was reached: some steps did not start, so this round is incomplete.**"
+      : "The budget was not reached.",
+    "",
+    "| Step | Model | Mean pass rate | Min pass rate | Threshold met in all runs | Stability | First-attempt valid | Repair rate | Failed after max attempts | Provider errors | p50 / p95 latency (ms) | Cost per step (EUR) |",
+    "|---|---|---|---|---|---|---|---|---|---|---|---|",
+    ...result.Summaries.map(
+      (s) =>
+        `| ${s.Step} | \`${s.Model}\` | ${pct(s.MeanPassRate)} | ${pct(s.MinPassRate)} | ${s.Runs.every((r) => r.ThresholdPassed) ? "yes" : "no"} | ${pct(s.Stability)} | ${pct(s.FirstAttemptValid)} | ${pct(s.RepairRate)} | ${pct(s.FailedAfterMaxAttempts)} | ${s.ProviderErrors} | ${s.LatencyMsP50} / ${s.LatencyMsP95} | ${s.CostPerStepEur.toFixed(6)} |`,
+    ),
+  ];
+  const triage = result.Summaries.filter((s) => s.Step === "triage");
+  if (triage.length > 0) {
+    lines.push(
+      "",
+      "## Triage signal agreement (mean over runs)",
+      "",
+      "| Model | NamedParty | StatedHarm | Trigger | ExistingAlternative | Adoptable | Precision | Recall |",
+      "|---|---|---|---|---|---|---|---|",
+      ...triage.map((s) => {
+        const mean = (pick: (r: RunSummary) => number): string =>
+          pct(s.Runs.reduce((sum, r) => sum + pick(r), 0) / Math.max(s.Runs.length, 1));
+        return `| \`${s.Model}\` | ${mean((r) => r.SignalAgreement?.NamedParty ?? 0)} | ${mean((r) => r.SignalAgreement?.StatedHarm ?? 0)} | ${mean((r) => r.SignalAgreement?.Trigger ?? 0)} | ${mean((r) => r.SignalAgreement?.ExistingAlternative ?? 0)} | ${mean((r) => r.SignalAgreement?.Adoptable ?? 0)} | ${mean((r) => r.Precision ?? 0)} | ${mean((r) => r.Recall ?? 0)} |`;
+      }),
+    );
+  }
+  lines.push(
+    "",
+    "Extraction scores the deterministic checks only (schema, verbatim quotes, candidate count). The model judge for `Finding` and `Customer` (OQ-020) is not part of this round.",
+    "",
+  );
+  return lines.join("\n");
+}

@@ -2,6 +2,7 @@ import {
   callModel,
   extractionMissingQuotes,
   type CallModelDeps,
+  type CallModelResult,
   type CallOutputMode,
 } from "@roi/models";
 import {
@@ -31,6 +32,8 @@ export type CallModelFnOptions = {
   /** The `processing_run` of the benchmark, for the usage records. */
   RunId: string;
   OutputMode?: CallOutputMode;
+  /** Called with each step's result, so a benchmark can count attempts and repairs. */
+  OnResult?: (publicationId: string, result: CallModelResult<unknown>) => void;
 };
 
 export function triageModelFn(options: CallModelFnOptions): ModelFn {
@@ -53,6 +56,7 @@ export function triageModelFn(options: CallModelFnOptions): ModelFn {
       Prompt: built.Prompt,
       Contract: TRIAGE_CONTRACT,
     });
+    options.OnResult?.(publication.Id, result);
     return result.Ok ? result.Output : null;
   };
 }
@@ -86,6 +90,7 @@ export function extractionModelFn(
       Contract: contract,
       MissingQuotes: (output) => extractionMissingQuotes(output, built.QuoteText),
     });
+    options.OnResult?.(publication.Id, result);
     return result.Ok ? result.Output : null;
   };
 }

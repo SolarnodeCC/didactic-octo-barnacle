@@ -26,8 +26,14 @@ const DIRECT_PROVIDER = [
   /api\.together\.(xyz|ai)/u,
   /api\.deepseek\.com/u,
   /openrouter\.ai/u,
-  /\/accounts\/[^/\s"'`]+\/ai\/run/u,
 ];
+
+/**
+ * The AI REST route on api.cloudflare.com reaches Workers AI directly unless the request names
+ * a gateway, so a file that uses it must also send `cf-aig-gateway-id`.
+ */
+const AI_REST_ROUTE = /\/accounts\/[^/\s"'`]+\/ai\/run/u;
+const GATEWAY_HEADER = /["']cf-aig-gateway-id["']/u;
 
 function sourceFiles(dir: string): string[] {
   let entries: string[];
@@ -54,9 +60,13 @@ describe("REQ-NFR-003: no component calls a model provider directly", () => {
     expect(files.length).toBeGreaterThan(20);
     const hits = files.flatMap((file) => {
       const text = readFileSync(file, "utf8");
-      return DIRECT_PROVIDER.filter((pattern) => pattern.test(text)).map(
+      const hits = DIRECT_PROVIDER.filter((pattern) => pattern.test(text)).map(
         (pattern) => `${relative(root, file)}: ${pattern.source}`,
       );
+      if (AI_REST_ROUTE.test(text) && !GATEWAY_HEADER.test(text)) {
+        hits.push(`${relative(root, file)}: AI REST route without cf-aig-gateway-id`);
+      }
+      return hits;
     });
     expect(hits).toEqual([]);
   });
