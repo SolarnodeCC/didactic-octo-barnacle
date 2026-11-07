@@ -1,7 +1,7 @@
 ---
 title: Triage
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-07
 related: [REQ-PROC-005, REQ-PROC-006, REQ-PROC-008]
 ---

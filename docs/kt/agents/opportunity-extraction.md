@@ -1,7 +1,7 @@
 ---
 title: Opportunity extraction
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-07
 related: [REQ-PROC-004, REQ-PROC-009]
 ---
