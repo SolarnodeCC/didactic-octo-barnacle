@@ -47,6 +47,9 @@ importers:
       '@roi/models':
         specifier: workspace:*
         version: link:../../packages/models
+      '@roi/prompts':
+        specifier: workspace:*
+        version: link:../../packages/prompts
       yaml:
         specifier: ^2.4.2
         version: 2.9.1
@@ -110,6 +113,22 @@ importers:
 
   packages/models:
     dependencies:
+      zod:
+        specifier: ^4.1.12
+        version: 4.6.7
+    devDependencies:
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.12
+        version: 4.1.12(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(vite@7.3.7(@types/node@26.6.6)(yaml@2.9.1))
+
+  packages/prompts:
+    dependencies:
+      '@roi/models':
+        specifier: workspace:*
+        version: link:../models
       zod:
         specifier: ^4.1.12
         version: 4.6.7

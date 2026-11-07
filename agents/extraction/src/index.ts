@@ -16,3 +16,4 @@ export {
   type ModelFn,
   type TriageEvalReport,
 } from "./eval.js";
+export { extractionModelFn, triageModelFn, type CallModelFnOptions } from "./model-fn.js";

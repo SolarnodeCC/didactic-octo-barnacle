@@ -129,9 +129,9 @@ The contracts it uses are in `packages/models` (`triage.ts`, `extraction.ts`, `a
 - A stub that answers with the labels passes every entry, which proves the golden sets fit the contracts.
 - Stubs that answer wrongly fail.
 
-The model-call helper `callModel` (ADR 0003) and its usage records (REQ-NFR-011) exist since WP2 of the [phase 2 build plan](../phase-2/build-plan.md). Still to add for the benchmark:
+The model-call helper `callModel` (ADR 0003) and its usage records (REQ-NFR-011) exist since WP2 of the [phase 2 build plan](../phase-2/build-plan.md). The prompts `triage@1` and `extraction@1` are in `packages/prompts` since WP3, and `triageModelFn` and `extractionModelFn` in `agents/extraction` run them through `callModel` for the eval runner. Both prompts use temperature 0 for every candidate. Still to add for the benchmark:
 
-- The prompts `triage@1` and `extraction@1` (WP3), and a `ModelFn` that runs them through `callModel`.
+- The command that runs a round in the `evals` environment with the real binding, and keeps the raw responses in R2 (see [Method](#method)).
 - The three-run stability check.
 - The model judge for `Finding` and `Customer` (OQ-020).
 

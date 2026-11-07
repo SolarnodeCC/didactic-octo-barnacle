@@ -2,7 +2,7 @@
 title: Opportunity extraction
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-07
 related: [REQ-PROC-004, REQ-PROC-009]
 ---
 
@@ -55,6 +55,10 @@ The pipeline assigns each candidate an Id and links it to the publication before
 - An empty `Candidates` list is a valid result. `Notes` must say why none were found, for example: no quotable problem, no named customer, no party that can act on the burden, or out of industry scope. It can follow an accepted triage decision, because triage reads signals and extraction reads quotes.
 - One finding becomes one candidate. Several distinct problems in one publication yield several candidates, up to the configured maximum.
 - Extraction does not score, size markets, name competitors, or invent a product concept. Those belong to later agents.
+
+## Prompt
+
+`extraction@1` in `packages/prompts/src/extraction.ts` carries the rules above and the configured maximum. It sends the full text, cut at `extraction.full_text_max_chars`, when the document has extracted text, and the abstract otherwise. The quote check runs on exactly the text inside the `<publication>` delimiters; a delimiter tag inside the publication is defused first (REQ-NFR-006).
 
 ## Evals
 
