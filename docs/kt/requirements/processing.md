@@ -147,3 +147,22 @@ Every candidate opportunity names the customer who has the problem, and the prob
   5. A publication that passes triage and has no quotable problem and customer yields an empty list with a Notes reason. The golden set holds at least three such entries (REQ-TEST-006).
   6. A publication whose stated burden belongs to a population or a sector as a whole, with no named customer (a role or organization type) that could adopt a product against it, yields an empty list, and `Notes` says so (ADR 0050).
 - Verification: contract test with stubbed responses that omit a customer or quote text that is not in the publication, and eval on the golden set
+
+### REQ-PROC-010: Automatic recovery of phase 2 steps
+
+Triage, embedding, and extraction steps that end without a stored result are re-driven automatically, within limits, without an admin (ADR 0063).
+
+- Phase: 2
+- Priority: must
+- Status: planned
+- Source: ADR 0063
+- Depends on: REQ-PROC-008, REQ-AGENT-009, REQ-NFR-005
+- Acceptance criteria:
+  1. The daily admission cron re-drives a failed step from the first failed step and reuses stored outputs. A transient failure (`provider-error`, `budget-exhausted`, dead letter) is re-driven at most once a day and at most `recovery.max_redrives` times.
+  2. A content failure (`invalid-output`) is re-driven once on the next day, and again only after the step's model or prompt version has changed.
+  3. Re-driven extractions count toward `ingestion.daily_extraction_limit`, and at most `recovery.max_redrives_per_day` items are re-driven a day.
+  4. An extraction refused with `budget-exhausted` completes as `budget-deferred` and is picked up by the next day's cron.
+  5. When the limit is used up, the item is marked `failed-final`, stays out of later steps, and is listed in the run report (REQ-NFR-008).
+  6. When more than `recovery.breaker_failure_share` of a step's calls in the last hour end in `provider-error`, the step pauses, sends one `step-paused` alert, and resumes after a successful probe call. Waiting during a pause does not count as a re-drive.
+  7. A re-drive never creates a second `triage_decision`, `embedding`, or `extraction_result` for a publication.
+- Verification: integration test with the fake Workers AI binding for each failure class, the limits, the breaker, and a repeated trigger

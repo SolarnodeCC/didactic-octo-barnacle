@@ -98,11 +98,21 @@ In phase 2 the model queue's concurrency (8, equal to `model.semaphore_max`) is 
 
 - `budget.daily_eur` per environment. Before calibration it is the sum of the expected daily triage calls × the triage cost, the daily extraction limit × the extraction cost, and the expected daily embeddings × the embedding cost, times `budget.phase2_multiplier` (REQ-NFR-005 AC1, ADR 0059). `budget.expected_daily_triaged` and `budget.expected_daily_embeddings` come from the measured daily volume.
 - When `budget_day.spent` reaches the limit, `callModel` refuses new steps:
-  - The triage and embedding consumers complete those messages as `budget-deferred`, and the admission cron queues them again the next day.
+  - The triage, embedding, and extraction consumers complete those messages as `budget-deferred`, and the admission cron queues them again the next day (ADR 0063).
   - The admission cron admits nothing.
   - A `budget-stop` alert is sent once that day (REQ-NFR-005 AC2).
 - The overshoot is at most the steps already started: model-queue concurrency × `model.max_attempts` × the dearest call.
 - Each processing run report holds the cost per publication and per opportunity (candidate) for its day (REQ-NFR-005 AC3).
+
+## Recovery
+
+- The admission cron re-drives failed work after the retraction sweep and before it admits new publications (ADR 0063, REQ-PROC-010):
+  - a transient failure (`provider-error`, `budget-exhausted`, dead letter) once a day, up to `recovery.max_redrives`;
+  - a content failure (`invalid-output`) once on the next day, then only after the step's model or prompt version changed;
+  - at most `recovery.max_redrives_per_day` items, and re-driven extractions count toward the daily limit.
+- A step that uses up its re-drives is marked `failed-final` in `redrive` and listed in the run report.
+- Dead letters are replayed after `recovery.dead_letter_replay_hours`, at most twice per message ID (REQ-DATA-012).
+- The breaker pauses a step when more than `recovery.breaker_failure_share` of its calls in the last hour end in `provider-error`. The consumer completes new messages as `budget-deferred` without a call, one `step-paused` alert is sent, and a probe every 30 minutes resumes the step.
 
 ## Retractions
 

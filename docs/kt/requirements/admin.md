@@ -28,7 +28,7 @@ An admin can hide an opportunity from ranking and show it again.
 
 ### REQ-ADM-002: Rerun a failed candidate
 
-An admin can rerun a failed or incomplete candidate.
+An admin can rerun a failed or incomplete candidate. This is optional: failed candidates are re-driven automatically (REQ-AGENT-016, ADR 0063), and an admin rerun is for cases such as a prompt fix.
 
 - Phase: 4
 - Priority: must
