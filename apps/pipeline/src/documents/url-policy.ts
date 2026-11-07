@@ -31,6 +31,13 @@ const WILDCARD_DNS_DOMAINS = [
   "lacolhost.com",
 ];
 
+/**
+ * The platform's own domain (ADR 0026). A PDF URL comes from publication metadata that
+ * outside authors control, so it must never point the fetcher at the dashboard or API.
+ * Refused even when `AllowedHosts` lists it (REQ-NFR-021).
+ */
+const PLATFORM_DOMAINS = ["wispel.cc"];
+
 /** An IPv4 address written into a name, as `10.0.0.1.example.org` or `10-0-0-1.example.org`. */
 const EMBEDDED_IPV4 = /(^|[.-])\d{1,3}([.-])\d{1,3}\2\d{1,3}\2\d{1,3}($|[.-])/;
 
@@ -78,6 +85,9 @@ export function checkPdfUrl(raw: string, policy: UrlPolicy): UrlCheck {
     EMBEDDED_IPV4.test(host)
   ) {
     return { Ok: false, Reason: "host name embeds an IP address" };
+  }
+  if (PLATFORM_DOMAINS.some((domain) => host === domain || host.endsWith(`.${domain}`))) {
+    return { Ok: false, Reason: "host is the platform's own domain" };
   }
   if (policy.AllowedHosts.length > 0 && !matchesAllowed(host, policy.AllowedHosts)) {
     return { Ok: false, Reason: `host ${host} is not on the allowlist` };

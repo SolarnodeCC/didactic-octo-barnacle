@@ -72,6 +72,21 @@ describe("REQ-DATA-010: PDF URL policy", () => {
     expect(checkPdfUrl("https://arxiv.org/pdf/2401.00001", open).Ok).toBe(true);
   });
 
+  it("REQ-NFR-021: refuses the platform's own domain, even when allowlisted", () => {
+    for (const url of [
+      "https://wispel.cc/api/admin/runs",
+      "https://www.wispel.cc/a.pdf",
+      "https://WISPEL.CC./a.pdf",
+    ]) {
+      expect(refused(url), url).toMatch(/platform's own domain/);
+    }
+    expect(refused("https://wispel.cc/a.pdf", { AllowedHosts: ["wispel.cc"] })).toMatch(
+      /platform's own domain/,
+    );
+    expect(checkPdfUrl("https://notwispel.cc/a.pdf", open).Ok).toBe(true);
+    expect(checkPdfUrl("https://wispel.cc.example.org/a.pdf", open).Ok).toBe(true);
+  });
+
   it("REQ-DATA-010: refuses credentials, odd ports, and a trailing-dot trick", () => {
     expect(refused("https://user:pw@example.org/a.pdf")).toMatch(/credentials/);
     expect(refused("https://example.org:8443/a.pdf")).toMatch(/port 443/);
