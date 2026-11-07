@@ -76,6 +76,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0063](0063-automatic-recovery-without-an-admin.md) | Automatic recovery without an admin | Proposed |
 | [0064](0064-quote-check-after-normalisation.md) | Quote check after normalisation, and valid candidates are kept | Proposed |
 | [0065](0065-extraction-waits-for-full-text-at-admission.md) | Extraction waits for full text at admission | Proposed |
+| [0066](0066-code-checks-before-model-judgement.md) | Code checks before model judgement | Proposed |
 
 ## When an ADR is needed
 

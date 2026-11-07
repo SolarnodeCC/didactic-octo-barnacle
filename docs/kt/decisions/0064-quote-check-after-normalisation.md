@@ -37,7 +37,7 @@ A failed quote rejects the whole output, `callModel` retries with the error, and
 - **Stored quote.** After a match, the pipeline stores the exact span of the source text that matched, not the model's version. Stored quotes stay verbatim, and the dashboard shows the source's own characters.
 - **Candidates are dropped, not the whole output.** This applies to extraction, whose output is a list of independent candidates:
   - Attempts before the last fail as before, and the retry names the failing candidate and field.
-  - On the last attempt, a candidate that fails a candidate-level check (a quote not found, or a generic customer under ADR 0066) is dropped. The other candidates are kept.
+  - On the last attempt, a candidate that fails a candidate-level check (a quote not found, or a generic customer under [0066](0066-code-checks-before-model-judgement.md)) is dropped. The other candidates are kept.
   - Each dropped candidate is recorded in a new envelope field `Dropped: list<{Index, Field, Reason}>`.
   - When no candidate remains, the result is an empty list, and the pipeline sets `Notes` to say that every candidate failed its checks.
   - Output-level failures (schema, a missing `Notes` on an empty list) still fail the step.
