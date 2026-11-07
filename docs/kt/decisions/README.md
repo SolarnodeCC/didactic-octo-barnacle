@@ -73,6 +73,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0060](0060-golden-sets-of-triage-and-extraction-in-phase-2.md) | Golden sets of triage and extraction belong to phase 2 | Accepted |
 | [0061](0061-retraction-check-looks-back-30-days.md) | The weekly retraction check looks back 30 days | Accepted |
 | [0062](0062-replace-deprecated-benchmark-candidates.md) | Replace the benchmark candidates that Workers AI deprecates on 2026-11-20 | Accepted |
+| [0068](0068-no-publication-dated-after-the-run-day.md) | No publication dated after the day of the run | Accepted |
 
 ## When an ADR is needed
 

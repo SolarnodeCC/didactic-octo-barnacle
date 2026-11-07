@@ -2,7 +2,7 @@
 title: OpenAlex
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-07
 related: [REQ-DATA-001, REQ-DATA-007, REQ-DATA-008, REQ-DATA-009]
 ---
 
@@ -26,7 +26,7 @@ Used for publications, authors, institutions, topics, and citations. OpenAlex is
 
 - Scope: works filtered by publication date, by language (`language:en`), and by the topic map of the [ingestion scope](ingestion-scope.md). The request carries the configured subfield IDs as `primary_topic.subfield.id:A|B|…` (at most 100 values) and sorts by `publication_date:desc`, so a saved cursor stays stable between runs (ADR 0041). It also filters on `type:article|preprint|review|conference-paper` and `has_abstract:true` (ADR 0048). The collector also checks the primary topic, type, and abstract of every returned work and skips a work that fails one, so scope holds even when the ID list is empty or OpenAlex returns more than asked. Skipped works are counted in the run report.
 - Incremental runs filter on publication date with an overlap window (REQ-DATA-009). Check which date filters the account tier supports; filters on update date may need a paid tier.
-- A run stores only works published within `ingestion.max_age_days` of the day of the run, and skips older ones that the request returned (REQ-DATA-009 AC3, AC6). A run that continues an earlier one keeps that run's `from_publication_date` so its saved cursor stays valid.
+- A run stores only works published within `ingestion.max_age_days` of the day of the run, and skips older ones that the request returned (REQ-DATA-009 AC3, AC6). The request ends on the day of the run (`to_publication_date`), and the collector skips and counts a work dated later, because OpenAlex lists works with a future publication date (REQ-DATA-009 AC7, ADR 0068). A run that continues an earlier one keeps that run's `from_publication_date` so its saved cursor stays valid.
 - Use cursor paging for large result sets. Cursor paging past the first page needs a free API key (ADR 0034).
 - Use `per_page=100` and `select=` for only the fields above, so the daily budget goes further.
 - Failed or rate-limited requests retry with exponential backoff (REQ-DATA-001).

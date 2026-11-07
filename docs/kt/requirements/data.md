@@ -2,7 +2,7 @@
 title: Data requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-07
 ---
 
 # Data requirements
@@ -76,7 +76,7 @@ Ingestion runs on a schedule and fetches only what is new or changed since the l
 - Phase: 1
 - Priority: must
 - Status: done
-- Source: overview (continuous scanning)
+- Source: overview (continuous scanning), ADR 0068
 - Depends on: REQ-DATA-001, REQ-DATA-002
 - Acceptance criteria:
   1. Each source has a configured schedule and a stored cursor or date of its last successful run. Only a run that finished without failed items moves the cursor, so the next run covers the items that failed.
@@ -85,6 +85,7 @@ Ingestion runs on a schedule and fetches only what is new or changed since the l
   4. A run that stops at the page cap without a failed item is continued by the next run of that source from the saved cursor, so the whole window is covered over several runs without fetching the same first pages again. A run whose window begins before the maximum age of AC3 is not continued; a fresh window replaces it. Only the run that finishes the window moves the cursor of AC1, to the day the window began being fetched.
   5. Every run stores its start, end, record counts, and failures.
   6. The 90-day limit of AC3 applies to every source that fetches external publications, now and in future. A source states the date it measures in its data source document: OpenAlex measures the publication date (a work without one is kept and marked incomplete under REQ-DATA-005); arXiv measures the date of the first version, so a preprint first submitted before the limit is not stored even when it has a new version, while a new version of a preprint within the limit still updates its record (REQ-DATA-002 AC3, ADR 0042). Enrichment of stored publications (REQ-DATA-003) and PDF fetching follow the stored publications and need no window of their own.
+  7. No source stores a publication dated after the day of the run. The OpenAlex request ends its window on the day of the run, the collector skips and counts a work dated later, and the arXiv request already ends on the day of the run. A publication without a date is kept and marked incomplete (REQ-DATA-005) (ADR 0068).
 - Verification: integration test that runs ingestion twice over fixtures
 
 ## Document processing
