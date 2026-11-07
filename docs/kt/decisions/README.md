@@ -2,7 +2,7 @@
 title: Decisions index
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-07
 ---
 
 # Architecture decision records
@@ -72,6 +72,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0059](0059-phase-2-budget-by-cost-component.md) | Phase 2 budget by cost component | Accepted |
 | [0060](0060-golden-sets-of-triage-and-extraction-in-phase-2.md) | Golden sets of triage and extraction belong to phase 2 | Accepted |
 | [0061](0061-retraction-check-looks-back-30-days.md) | The weekly retraction check looks back 30 days | Accepted |
+| [0062](0062-replace-deprecated-benchmark-candidates.md) | Replace the benchmark candidates that Workers AI deprecates on 2026-11-20 | Accepted |
 
 ## When an ADR is needed
 

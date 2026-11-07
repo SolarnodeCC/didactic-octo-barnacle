@@ -2,7 +2,7 @@
 title: Model benchmark plan
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-07
 related: [REQ-AGENT-010, REQ-AGENT-012, REQ-AGENT-014, REQ-NFR-003, REQ-NFR-005, REQ-NFR-011, REQ-TEST-004, REQ-TEST-005, REQ-TEST-006]
 ---
 
@@ -24,6 +24,7 @@ The owner decided the following on 2026-11-01, and the rows marked 2026-11-06 on
 | Pass rule | The eval thresholds of REQ-TEST-006 (triage and extraction) and REQ-TEST-005 (the analysis agents), written before the first run (see [Thresholds](#thresholds)). |
 | Benchmark budget | Model cost of at most 50 euro in total. |
 | Account plan | The account has an active Workers Paid subscription, so no upgrade is needed (see [Account plan](#account-plan)). |
+| Deprecated candidates (2026-11-07) | Candidates that Cloudflare deprecates on 2026-11-20 are replaced: `gemma-4-26b-a4b-it` for the smaller steps, `deepseek-v4.1-flash-1017` next to `glm-5.3` for the larger ones ([ADR 0062](../decisions/0062-replace-deprecated-benchmark-candidates.md)). |
 
 ## Scope
 
@@ -50,31 +51,33 @@ Cloudflare model pages as read on 2026-11-01. Prices are US dollars per million 
 
 | Step | Candidates | Why |
 |---|---|---|
-| Triage | `glm-4.7-flash` ($0.06 / $0.40, 131k), `qwen3-30b-a3b-fp8` ($0.05 / $0.34, 32k) | Highest call volume, short input. Models that need no paid plan have a default limit of 300 requests per minute. |
-| Opportunity extraction | `deepseek-v4.1-flash-1017` ($0.30 / $1.20), `glm-5.3-flash` ($0.15 / $0.50) | Verbatim evidence quotes from an abstract. |
-| Research Analyst | `glm-5.3-flash`, `deepseek-v4.1-flash-1017`, `clairic` (typed fields only) | Feeds Scientific Novelty. Clairic returns typed values with confidence and spans, not free text. |
-| Problem Discovery | `glm-5.3-flash`, `deepseek-v4.1-flash-1017` | Rubric-based judgment on short input. |
-| Market Analysis | `glm-5.3` ($1.40 / $4.40), `deepseek-v4-pro-0813` ($1.32 / $3.96), `kimi-k2.6` ($0.95 / $4.00) | Search tool loop (REQ-AGENT-013) and calibrated ranges. |
-| Competition | `glm-5.3`, `deepseek-v4-pro-0813`, `kimi-k2.6` | Search tool loop and verifiable competitors. |
-| Relevance | `glm-5.3-flash`, `deepseek-v4.1-flash-1017` | No publication text, no search. |
-| Startup Generator | `glm-5.3`, `kimi-k2.6` | Synthesis of three earlier outputs. |
+| Triage | `glm-4.7-flash` ($0.06 / $0.40, 131k), `gemma-4-26b-a4b-it` ($0.10 / $0.30, 256k) | Highest call volume, short input. Models that need no paid plan have a default limit of 300 requests per minute. |
+| Opportunity extraction | `deepseek-v4.1-flash-1017` ($0.30 / $1.20), `gemma-4-26b-a4b-it` | Verbatim evidence quotes from an abstract. |
+| Research Analyst | `gemma-4-26b-a4b-it`, `deepseek-v4.1-flash-1017`, `clairic` (typed fields only) | Feeds Scientific Novelty. Clairic returns typed values with confidence and spans, not free text. |
+| Problem Discovery | `gemma-4-26b-a4b-it`, `deepseek-v4.1-flash-1017` | Rubric-based judgment on short input. |
+| Market Analysis | `glm-5.3` ($1.40 / $4.40), `deepseek-v4.1-flash-1017` | Search tool loop (REQ-AGENT-013) and calibrated ranges. |
+| Competition | `glm-5.3`, `deepseek-v4.1-flash-1017` | Search tool loop and verifiable competitors. |
+| Relevance | `gemma-4-26b-a4b-it`, `deepseek-v4.1-flash-1017` | No publication text, no search. |
+| Startup Generator | `glm-5.3`, `deepseek-v4.1-flash-1017` | Synthesis of three earlier outputs. |
+
+ADR 0062 replaced the candidates that Cloudflare deprecates on 2026-11-20 (`qwen3-30b-a3b-fp8`, `glm-5.3-flash`, `deepseek-v4-pro-0813`, `kimi-k2.6`, and `nemotron-3-120b-a12b`). From that date, requests to them fail with HTTP 410 and error code 5028 ([Cloudflare changelog](https://developers.cloudflare.com/changelog/post/2026-11-05-planned-model-deprecations/)). The `gemma-4-26b-a4b-it` model page was read again on 2026-11-07: 256k context, $0.10 / $0.30, Gemma 4 licence, function calling, reasoning, batch, and zero data retention.
 
 Also eligible, read on 2026-11-01. None of their pages shows a paid-plan notice, so the default limit of 300 requests per minute should apply (confirm in the first run). Add one to a step only to replace a candidate above.
 
 | Model | Context | Input / output | Notes |
 |---|---|---|---|
-| `gemma-4-26b-a4b-it` | 256k | $0.10 / $0.30 | Vision, reasoning, function calling, batch. Gemma licence. Also on the Workers Free plan. |
+| `qwen3.8-27b` | read the model page before use | read the model page before use | Named by Cloudflare as a smaller replacement on 2026-11-05. |
 | `gpt-oss-20b` | 128k | $0.20 / $0.30 | Reasoning, function calling, batch. |
 | `gpt-oss-120b` | 128k | $0.35 / $0.75 | Reasoning, function calling, batch. Possible for Market Analysis and Competition without the paid-model limit. |
-| `nemotron-3-120b-a12b` | 256k on the model page, 32k in the launch post | $0.50 / $1.50 | Reasoning, function calling. NVIDIA open model licence. Check the context before use. |
 
 Notes:
 
 - Keep two or three candidates per step. Every extra model multiplies the cost of a run.
 - Clairic is a preview. Its terms let Cloudflare stop it without compensation, so it is never the only model of a production step.
 - The largest candidate of a step serves as the reference for that step. There is no third-party reference.
-- These candidates require the Workers Paid plan or prepaid AI Gateway credit, and have a limit of 20 requests per minute per account and model (50 with prepaid credit): `glm-5.3`, `glm-5.3-flash`, `deepseek-v4-pro-0813`, `deepseek-v4-flash-0731`, `deepseek-v4.1-flash-1017`, and `kimi-k2.6`. The account has a Workers Paid subscription, so they are available (see [Account plan](#account-plan)); on Workers Free they would return a 403.
-- `glm-4.7-flash` and `qwen3-30b-a3b-fp8` fall under the default limit of 300 requests per minute for text generation, as far as the pages show.
+- These candidates require the Workers Paid plan or prepaid AI Gateway credit, and have a limit of 20 requests per minute per account and model (50 with prepaid credit): `glm-5.3` and `deepseek-v4.1-flash-1017`. The account has a Workers Paid subscription, so they are available (see [Account plan](#account-plan)); on Workers Free they would return a 403.
+- `glm-4.7-flash` and `gemma-4-26b-a4b-it` fall under the default limit of 300 requests per minute for text generation, as far as the pages show.
+- The embedding candidate `embeddinggemma-300m` of ADR 0010 is also deprecated on 2026-11-20. Cloudflare names `embeddinggemma-2` as its replacement, not yet available. The reference `bge-base-en-v1.5` is not affected.
 
 ## Account plan
 
@@ -179,7 +182,7 @@ Stop and ask the owner before the total model cost passes the budget of 50 euro.
 |---|---|
 | A small set gives noise | Three repeats, report spread, treat close results as equal |
 | A prompt suits one model | No per-model tuning in round one; a second round with the same budget per model |
-| The model catalog changes during the test | Pin versions, note the date, check again before the ADR |
+| The model catalog changes during the test | Pin versions, note the date, check again before the ADR. Check the Workers AI changelog for planned deprecations before each run (ADR 0062) |
 | Label errors | Re-label a sample, resolve disagreement before items enter the set |
 | Draft labels from an agent bias the result | The drafting agent is no candidate; the owner reviews every label |
 | The judge favors its own family | The judge is another model than the candidate; human sample |
