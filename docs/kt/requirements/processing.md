@@ -167,3 +167,20 @@ Triage, embedding, and extraction steps that end without a stored result are re-
   6. When more than `recovery.breaker_failure_share` of a step's calls in the last hour end in `provider-error`, the step pauses, sends one `step-paused` alert, and resumes after a successful probe call. Waiting during a pause does not count as a re-drive.
   7. A re-drive never creates a second `triage_decision`, `embedding`, or `extraction_result` for a publication.
 - Verification: integration test with the fake Workers AI binding for each failure class, the limits, the breaker, and a repeated trigger
+
+### REQ-PROC-011: Extraction waits for full text
+
+A passing publication is admitted to extraction only when its full text is stored or cannot come, or after a time limit, so its input does not depend on queue timing (ADR 0065).
+
+- Phase: 2
+- Priority: must
+- Status: planned
+- Source: ADR 0065
+- Depends on: REQ-PROC-008, REQ-DATA-006
+- Acceptance criteria:
+  1. The admission cron admits a ranked publication only when it is ready: its text is `text-extracted` or `text-failed`, it has no PDF URL with a license that allows storage, or its `document.ingest` message finished without a stored document.
+  2. A publication that is not ready keeps its rank in the pool and is considered again the next day; it does not use the daily limit.
+  3. After `extraction.full_text_wait_hours` since its triage decision, a publication is ready whatever its document state.
+  4. The ranking of REQ-PROC-008 AC4 does not change, and the same input gives the same admitted set.
+  5. The run report counts publications admitted on the abstract because the wait ran out.
+- Verification: integration test of the admission cron with publications in each document state and a clock past the wait

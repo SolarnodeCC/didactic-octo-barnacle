@@ -61,7 +61,7 @@ flowchart LR
 ```
 
 - Embedding and triage start from the same stored publication and do not wait for each other. Rejected publications are still embedded, so they stay searchable (REQ-PROC-005 AC3).
-- Extraction runs only for admitted publications. It reads the full text when the text consumer has stored it by then, and the abstract otherwise; the envelope's `InputMode` says which (REQ-DATA-006 AC3).
+- Extraction runs only for admitted publications. A publication is admitted only when its full text is stored or cannot come, or after `extraction.full_text_wait_hours` (REQ-PROC-011, ADR 0065). Extraction then reads the full text when it is stored, and the abstract otherwise; the envelope's `InputMode` says which (REQ-DATA-006 AC3).
 - Every model call, embeddings included, goes through one helper, which writes the usage record and checks the budget (REQ-NFR-003, REQ-NFR-005, REQ-NFR-011).
 
 ## Reused from phase 1

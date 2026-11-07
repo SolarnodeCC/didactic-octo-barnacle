@@ -75,6 +75,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0062](0062-replace-deprecated-benchmark-candidates.md) | Replace the benchmark candidates that Workers AI deprecates on 2026-11-20 | Accepted |
 | [0063](0063-automatic-recovery-without-an-admin.md) | Automatic recovery without an admin | Proposed |
 | [0064](0064-quote-check-after-normalisation.md) | Quote check after normalisation, and valid candidates are kept | Proposed |
+| [0065](0065-extraction-waits-for-full-text-at-admission.md) | Extraction waits for full text at admission | Proposed |
 
 ## When an ADR is needed
 
