@@ -72,6 +72,7 @@ In phase 2 the model queue's concurrency (8, equal to `model.semaphore_max`) is 
    - It takes the decisions still `awaiting-admission` from the last `triage.admission_pool_days`.
    - It ranks them with `admitWithinDailyLimit`, using the limit minus the publications already admitted that UTC day (REQ-PROC-008 AC4).
    - It leaves out a publication dated after the day of the run. The 613 OpenAlex works with a future date that were stored before ADR 0068 stay in the database, and a date in the future is no sign that a work is recent.
+   - It admits a ranked publication only when it is ready: text stored or failed, no license-allowed PDF, or the document message finished without a document. After `extraction.full_text_wait_hours` every publication is ready. A publication that is not ready keeps its rank and waits (REQ-PROC-011, ADR 0065).
    - It sets the admitted to `accepted` and queues `publication.extract`.
    - The rest get `daily-limit`, stay in the pool, and are considered again the next day. A decision that leaves the pool keeps `daily-limit` as its final reason.
    - The run is keyed by its day, so a repeated trigger admits nothing twice.
@@ -99,11 +100,21 @@ In phase 2 the model queue's concurrency (8, equal to `model.semaphore_max`) is 
 
 - `budget.daily_eur` per environment. Before calibration it is the sum of the expected daily triage calls × the triage cost, the daily extraction limit × the extraction cost, and the expected daily embeddings × the embedding cost, times `budget.phase2_multiplier` (REQ-NFR-005 AC1, ADR 0059). `budget.expected_daily_triaged` and `budget.expected_daily_embeddings` come from the measured daily volume.
 - When `budget_day.spent` reaches the limit, `callModel` refuses new steps:
-  - The triage and embedding consumers complete those messages as `budget-deferred`, and the admission cron queues them again the next day.
+  - The triage, embedding, and extraction consumers complete those messages as `budget-deferred`, and the admission cron queues them again the next day (ADR 0063).
   - The admission cron admits nothing.
   - A `budget-stop` alert is sent once that day (REQ-NFR-005 AC2).
 - The overshoot is at most the steps already started: model-queue concurrency × `model.max_attempts` × the dearest call.
 - Each processing run report holds the cost per publication and per opportunity (candidate) for its day (REQ-NFR-005 AC3).
+
+## Recovery
+
+- The admission cron re-drives failed work after the retraction sweep and before it admits new publications (ADR 0063, REQ-PROC-010):
+  - a transient failure (`provider-error`, `budget-exhausted`, dead letter) once a day, up to `recovery.max_redrives`;
+  - a content failure (`invalid-output`) once on the next day, then only after the step's model or prompt version changed;
+  - at most `recovery.max_redrives_per_day` items, and re-driven extractions count toward the daily limit.
+- A step that uses up its re-drives is marked `failed-final` in `redrive` and listed in the run report.
+- Dead letters are replayed after `recovery.dead_letter_replay_hours`, at most twice per message ID (REQ-DATA-012).
+- The breaker pauses a step when more than `recovery.breaker_failure_share` of its calls in the last hour end in `provider-error`. The consumer completes new messages as `budget-deferred` without a call, one `step-paused` alert is sent, and a probe every 30 minutes resumes the step.
 
 ## Retractions
 

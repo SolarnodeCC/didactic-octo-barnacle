@@ -142,8 +142,45 @@ Every candidate opportunity names the customer who has the problem, and the prob
 - Acceptance criteria:
   1. Each candidate holds `Finding`, `EvidenceQuote`, `Customer`, and `CustomerQuote`. A candidate for which the model cannot quote both a problem and a customer is not returned.
   2. `WhyNow` and `CurrentAlternative` are optional. When set, each has a quote (`WhyNowQuote`, `AlternativeQuote`). Otherwise they are empty, and the step never infers them.
-  3. The pipeline rejects an output when any quote does not occur in the publication text the step received (REQ-AGENT-008).
-  4. A generic or implied party ("users", "people") does not count as `Customer`.
+  3. A quote must occur in the publication text the step received, after normalisation (REQ-AGENT-008, ADR 0064). An attempt with a quote that does not occur is retried with the failing candidate and field named.
+  4. A generic or implied party ("users", "people") does not count as `Customer`. Code checks `Customer` against `extraction.generic_customer_terms` after normalisation, and a match fails the candidate (ADR 0066).
   5. A publication that passes triage and has no quotable problem and customer yields an empty list with a Notes reason. The golden set holds at least three such entries (REQ-TEST-006).
   6. A publication whose stated burden belongs to a population or a sector as a whole, with no named customer (a role or organization type) that could adopt a product against it, yields an empty list, and `Notes` says so (ADR 0050).
+  7. On the last attempt, a candidate that fails a candidate-level check is dropped and recorded in the envelope's `Dropped` list, and the other candidates are kept. When none remain, the result is an empty list whose `Notes` say that every candidate failed its checks (ADR 0064).
 - Verification: contract test with stubbed responses that omit a customer or quote text that is not in the publication, and eval on the golden set
+
+### REQ-PROC-010: Automatic recovery of phase 2 steps
+
+Triage, embedding, and extraction steps that end without a stored result are re-driven automatically, within limits, without an admin (ADR 0063).
+
+- Phase: 2
+- Priority: must
+- Status: planned
+- Source: ADR 0063
+- Depends on: REQ-PROC-008, REQ-AGENT-009, REQ-NFR-005
+- Acceptance criteria:
+  1. The daily admission cron re-drives a failed step from the first failed step and reuses stored outputs. A transient failure (`provider-error`, `budget-exhausted`, dead letter) is re-driven at most once a day and at most `recovery.max_redrives` times.
+  2. A content failure (`invalid-output`) is re-driven once on the next day, and again only after the step's model or prompt version has changed.
+  3. Re-driven extractions count toward `ingestion.daily_extraction_limit`, and at most `recovery.max_redrives_per_day` items are re-driven a day.
+  4. An extraction refused with `budget-exhausted` completes as `budget-deferred` and is picked up by the next day's cron.
+  5. When the limit is used up, the item is marked `failed-final`, stays out of later steps, and is listed in the run report (REQ-NFR-008).
+  6. When more than `recovery.breaker_failure_share` of a step's calls in the last hour end in `provider-error`, the step pauses, sends one `step-paused` alert, and resumes after a successful probe call. Waiting during a pause does not count as a re-drive.
+  7. A re-drive never creates a second `triage_decision`, `embedding`, or `extraction_result` for a publication.
+- Verification: integration test with the fake Workers AI binding for each failure class, the limits, the breaker, and a repeated trigger
+
+### REQ-PROC-011: Extraction waits for full text
+
+A passing publication is admitted to extraction only when its full text is stored or cannot come, or after a time limit, so its input does not depend on queue timing (ADR 0065).
+
+- Phase: 2
+- Priority: must
+- Status: planned
+- Source: ADR 0065
+- Depends on: REQ-PROC-008, REQ-DATA-006
+- Acceptance criteria:
+  1. The admission cron admits a ranked publication only when it is ready: its text is `text-extracted` or `text-failed`, it has no PDF URL with a license that allows storage, or its `document.ingest` message finished without a stored document.
+  2. A publication that is not ready keeps its rank in the pool and is considered again the next day; it does not use the daily limit.
+  3. After `extraction.full_text_wait_hours` since its triage decision, a publication is ready whatever its document state.
+  4. The ranking of REQ-PROC-008 AC4 does not change, and the same input gives the same admitted set.
+  5. The run report counts publications admitted on the abstract because the wait ran out.
+- Verification: integration test of the admission cron with publications in each document state and a clock past the wait
