@@ -2,7 +2,7 @@
 title: Ingestion scope
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-07
 related: [REQ-DATA-001, REQ-DATA-002, REQ-DATA-009, REQ-PROC-005, REQ-PROC-006]
 ---
 
@@ -98,3 +98,32 @@ The prices are per million input / output tokens, read on 6 November 2026 and co
 All figures are upper bounds for the cost. Replace them when OQ-036 picks the models and the first model calls of phase 2 give a measured cost (REQ-NFR-005).
 
 **Phase 1 exit data check (ADR 0051).** The exit needs at least 1,000 publications with a title and an abstract per source, over at least 7 publication days. This report meets it: arXiv 13,372 stored, all with abstract, over 744 publication days; OpenAlex about 11,100 of 14,028 with abstract, over 242 publication days. The daily volume above is a lower bound for the pipeline; the OpenAlex API count of ADR 0048 is about 3,400 works a day under the current filter.
+
+### 7 November 2026
+
+Read-only queries on the staging database at about 09:00 UTC, after the scheduled runs of 7 November (OpenAlex 06:00, arXiv 07:30 UTC) and the deploys of 6 November with the ADR 0048 filter. The `Staging scheduled checks` workflow could not be started from the agent session (HTTP 403 on the dispatch), so these figures come from the queries, not from that report. Counts only; no publication text was read.
+
+**Runs:** 24 in total; 1 succeeded, 19 partial, and 4 failed. The two new runs:
+
+| Run | Status | Window | Fetched | Created | Updated | Skipped | Failed | Dead-lettered |
+|---|---|---|---|---|---|---|---|---|
+| arXiv, 07:30 | **succeeded** (16 pages) | 23 Oct to 6 Nov | 1,539 | 662 | 1 | 876 | 0 | 0 |
+| OpenAlex, 06:00 | partial (page cap of 50) | 23 Oct to 6 Nov | 5,000 | 4,991 | 9 | 0 | 0 | 0 |
+
+The arXiv run is the first run of any source that finished its window. OpenAlex still stops at the page cap, as ADR 0048 expected.
+
+**Data criterion of the phase 1 exit (ADR 0051): met.**
+
+| Measure | arXiv | OpenAlex |
+|---|---|---|
+| Publications stored | 14,035 | 19,026 |
+| With abstract | 14,035 (100.0 %) | 16,134 (84.8 %) |
+| Publication days with an abstract | 744 | 175 |
+| Stored by the run of 7 November | 662, all with abstract | 4,991, all with abstract |
+
+- Since the ADR 0048 filter, every OpenAlex work stored has an abstract (4,991 of 4,991, against 79.4 % before).
+- Within the last 90 days, OpenAlex holds 15,353 works with an abstract over 91 publication days.
+- 613 OpenAlex works carry a publication date after 7 November 2026, up to November 2027. All were stored by runs before the ADR 0048 filter (the last on 6 November at 06:11 UTC); the run of 7 November stored none. REQ-DATA-009 AC3 limits how old a publication may be, not how far in the future its date may be.
+
+**Queue:** 3,748 `document.ingest` messages completed and 16 were dead-lettered. Five of them are new today, between 06:13 and 06:38 UTC, and ended on HTTP 503, 429, 429, 530, and 429 from the PDF hosts (alert issue 91). The 4 dead-lettered `source.fetch_page` messages are from 31 October to 4 November. In all, 20 messages are dead-lettered (15 on 6 November). The document queue retries a 429 and a 5xx, and has no limit per host.
+
