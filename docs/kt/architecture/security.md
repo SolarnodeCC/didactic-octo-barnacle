@@ -2,7 +2,7 @@
 title: Security and data protection
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-31
+last_reviewed: 2026-11-07
 related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-NFR-009, REQ-NFR-011, REQ-NFR-012, REQ-NFR-013, REQ-NFR-014, REQ-NFR-015, REQ-NFR-016, REQ-NFR-021, REQ-DATA-010, REQ-AGENT-013]
 ---
 
@@ -29,7 +29,7 @@ related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-N
 
 ## PDF fetcher
 
-`apps/pipeline/src/documents` holds the only code that downloads PDFs. It accepts `https` on port 443 and public host names; it refuses IP addresses in any notation, names that embed an IP address, public wildcard-DNS services such as `nip.io`, `localhost`, single-label names, and names ending in `.local`, `.internal`, `.lan`, or `.home.arpa`. It follows at most three redirects and checks each target again, reads at most `pdf.max_bytes`, stops at `pdf.timeout_ms`, and accepts a file only when it is served as `application/pdf` and starts with `%PDF-`. Workers cannot resolve DNS, so a public name that points to a private address is not detected by the Worker; Cloudflare does not route a Worker's requests to its own internal network, and `pdf.allowed_hosts` narrows the reach further when needed. The URL and license always come from the stored source record, never from a queue message.
+`apps/pipeline/src/documents` holds the only code that downloads PDFs. It accepts `https` on port 443 and public host names; it refuses IP addresses in any notation, names that embed an IP address, public wildcard-DNS services such as `nip.io`, the platform's own domain `wispel.cc` and its subdomains (ADR 0026; refused even when allowlisted, because a PDF URL comes from metadata that outside authors control), `localhost`, single-label names, and names ending in `.local`, `.internal`, `.lan`, or `.home.arpa`. It follows at most three redirects and checks each target again, reads at most `pdf.max_bytes`, stops at `pdf.timeout_ms`, and accepts a file only when it is served as `application/pdf` and starts with `%PDF-`. Workers cannot resolve DNS, so a public name that points to a private address is not detected by the Worker; Cloudflare does not route a Worker's requests to its own internal network, and `pdf.allowed_hosts` narrows the reach further when needed. The URL and license always come from the stored source record, never from a queue message.
 
 ## Authentication
 
