@@ -134,7 +134,7 @@ Output that does not match the contract is retried a limited number of times and
 
 - Phase: 3
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: agents index (rejected and retried, never passed on)
 - Acceptance criteria:
   1. Invalid output is retried up to the configured number of attempts, three by default, with the validation errors added to the retry.
@@ -148,7 +148,7 @@ Every agent call asks the model for output that matches the agent's output contr
 
 - Phase: 3
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: KT review of a comparable internal governance platform (typed output through forced tool use)
 - Depends on: REQ-NFR-003, REQ-AGENT-009
 - Acceptance criteria:
@@ -164,7 +164,7 @@ Output whose content is correct but whose wrapping is wrong is repaired by plain
 
 - Phase: 3
 - Priority: should
-- Status: planned
+- Status: in-progress
 - Source: KT review of a comparable internal governance platform (an array returned as a double-encoded JSON string)
 - Depends on: REQ-AGENT-009, REQ-NFR-008
 - Acceptance criteria:

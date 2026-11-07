@@ -1,0 +1,28 @@
+{
+  "Version": "2026-11-06",
+  "Source": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+  "UsdPerEur": 1.1165,
+  "ExchangeRateDate": "2026-11-06",
+  "Models": {
+    "@cf/zai-org/glm-4.7-flash": {
+      "InputUsdPerMillionTokens": 0.06,
+      "OutputUsdPerMillionTokens": 0.4
+    },
+    "@cf/google/gemma-4-26b-a4b-it": {
+      "InputUsdPerMillionTokens": 0.1,
+      "OutputUsdPerMillionTokens": 0.3
+    },
+    "@cf/deepseek-ai/deepseek-v4.1-flash-1017": {
+      "InputUsdPerMillionTokens": 0.3,
+      "OutputUsdPerMillionTokens": 1.2
+    },
+    "@cf/zai-org/glm-5.3": {
+      "InputUsdPerMillionTokens": 1.4,
+      "OutputUsdPerMillionTokens": 4.4
+    },
+    "@cf/baai/bge-base-en-v1.5": {
+      "InputUsdPerMillionTokens": 0.067,
+      "OutputUsdPerMillionTokens": 0
+    }
+  }
+}
