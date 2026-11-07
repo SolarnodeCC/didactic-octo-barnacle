@@ -28,6 +28,7 @@ export const QueueMessageIdsSchema = z
     Page: z.number().int().nonnegative().optional(),
     PublicationId: z.string().min(1).optional(),
     DocumentId: z.string().min(1).optional(),
+    CandidateId: z.string().min(1).optional(),
   })
   .strict();
 

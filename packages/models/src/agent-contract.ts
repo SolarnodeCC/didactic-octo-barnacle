@@ -56,6 +56,9 @@ export const EvidenceSchema = z
 export type Evidence = z.infer<typeof EvidenceSchema>;
 
 export const OutputModeSchema = z.enum(["tool-use", "json-schema", "prompt-only"]);
+/** Whether a step read the abstract or the full text. */
+export const InputModeSchema = z.enum(["abstract", "full-text"]);
+export type InputMode = z.infer<typeof InputModeSchema>;
 export const RepairKindSchema = z.enum(["unwrapped-json-string", "stripped-code-fence"]);
 export type RepairKind = z.infer<typeof RepairKindSchema>;
 
@@ -69,7 +72,7 @@ export function agentEnvelopeSchema<T extends z.ZodType>(output: T) {
     CandidateId: z.string().nullable(),
     Model: z.string().min(1),
     PromptVersion: z.string().min(1),
-    InputMode: z.enum(["abstract", "full-text"]),
+    InputMode: InputModeSchema,
     OutputMode: OutputModeSchema,
     Attempts: z.number().int().min(1),
     Repairs: z.array(RepairKindSchema),

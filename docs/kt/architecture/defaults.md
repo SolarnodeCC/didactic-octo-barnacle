@@ -2,7 +2,7 @@
 title: Runtime defaults
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-07
 related: [REQ-PROC-005, REQ-PROC-006, REQ-AGENT-007, REQ-AGENT-012, REQ-AGENT-013, REQ-DATA-011, REQ-NFR-005]
 ---
 
@@ -76,6 +76,19 @@ Payload of every message: `{ schemaVersion, type, ids: { runId?, source?, page?,
 |---|---|---|
 | `embedding.model` | `bge-base-en-v1.5` | Interim; benchmark at phase 2 start (ADR 0010) |
 | `embedding.recall_at_10_min` | `0.8` | Phase 2 exit gate |
+| `embedding.batch_size` | `50` | Messages per embedding call |
+
+## Processing (phase 2)
+
+Read by `loadProcessingConfig` in `apps/pipeline/src/processing-config.ts`. Only `processing.enabled` varies per environment, through the Worker variable `PROCESSING_ENABLED`.
+
+| Key | Default | Notes |
+|---|---|---|
+| `processing.enabled` | `false` | Turns the phase 2 consumers on per environment; an unrecognized value fails the Worker instead of turning processing on |
+| `triage.admission_pool_days` | `7` | How long a passing publication waits for admission (ADR 0055) |
+| `extraction.full_text_max_chars` | `24000` | Cut before the call; the quote check uses the cut text |
+| `retraction.lookback_days` | `30` | How far back the weekly retraction check looks (ADR 0061) |
+| `model.price_table_version` | `2026-11-06` | Price table used when the gateway gives no cost (REQ-NFR-011 AC2) |
 
 ## Budgets
 

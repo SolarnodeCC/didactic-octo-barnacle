@@ -76,6 +76,7 @@ export {
   EvidenceKindSchema,
   EvidenceSchema,
   IndustrySchema,
+  InputModeSchema,
   OutputModeSchema,
   RepairKindSchema,
   agentEnvelopeSchema,
@@ -83,6 +84,7 @@ export {
   repairModelOutput,
   type Evidence,
   type Industry,
+  type InputMode,
   type RepairKind,
   type RepairResult,
 } from "./agent-contract.js";
@@ -109,3 +111,38 @@ export {
   type ExtractionCandidate,
   type ExtractionOutput,
 } from "./extraction.js";
+
+export { CurrencyCodeSchema, MoneySchema, type Money } from "./money.js";
+
+export {
+  ModelCallKindSchema,
+  ModelCallOutcomeSchema,
+  ModelCallRecordSchema,
+  ModelCallRunKindSchema,
+  type ModelCallKind,
+  type ModelCallOutcome,
+  type ModelCallRecord,
+  type ModelCallRunKind,
+} from "./model-call.js";
+
+export {
+  ABSTRACT_CONFIDENCE_CAP,
+  CandidateHiddenReasonSchema,
+  CandidateRowSchema,
+  ExtractionResultRowSchema,
+  ProcessingRunCountsSchema,
+  ProcessingRunFailureSchema,
+  ProcessingRunKindSchema,
+  ProcessingRunSchema,
+  TriageDecisionRowSchema,
+  TriageDecisionStatusSchema,
+  type CandidateHiddenReason,
+  type CandidateRow,
+  type ExtractionResultRow,
+  type ProcessingRun,
+  type ProcessingRunCounts,
+  type ProcessingRunFailure,
+  type ProcessingRunKind,
+  type TriageDecisionRow,
+  type TriageDecisionStatus,
+} from "./processing.js";

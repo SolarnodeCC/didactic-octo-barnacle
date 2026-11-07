@@ -308,8 +308,20 @@ describe("REQ-NFR-009: only public author metadata is stored", () => {
         }
       }
     }
+    // Columns the pattern matches that hold no personal data, each with its reason.
+    const notPersonRelated: Record<string, string> = {
+      "embedding.model_name": "embedding model, for example bge-base-en-v1.5",
+      "embedding_index.model_name": "embedding model of a Vectorize index",
+      "embedding_index.vectorize_name": "Vectorize index name",
+      "model_call.step_name": "pipeline step, for example triage",
+      "triage_decision.signal_named_party":
+        "0/1 triage signal that the abstract names a customer group, never a person",
+    };
+    for (const column of Object.keys(notPersonRelated)) {
+      expect(found, `${column} is still in the schema`).toContain(column);
+    }
     // A new person-related column has to be added here on purpose, with a reason to store it.
-    expect(found.sort()).toEqual([
+    expect(found.filter((column) => !(column in notPersonRelated)).sort()).toEqual([
       "author.display_name",
       "author.orcid",
       "authorship.affiliation",
