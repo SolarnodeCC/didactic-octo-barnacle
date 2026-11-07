@@ -63,7 +63,7 @@ Alerts reach people by email and open a GitHub issue.
 - Source: Readiness assessment; operations monitoring
 - Depends on: REQ-NFR-008
 - Acceptance criteria:
-  1. An alert is raised for a failed scheduled run, a run past its time window, a budget stop, a dead-lettered message (REQ-DATA-011), a paused pipeline step (`step-paused`, ADR 0063), and a breach of the availability target (REQ-NFR-017).
+  1. An alert is raised for a failed scheduled run, a run past its time window, a budget stop, a dead-lettered message (REQ-DATA-011), a paused pipeline step (`step-paused`, ADR 0063), a drift in live output quality (`quality-drift`, ADR 0071), and a breach of the availability target (REQ-NFR-017).
   2. Each alert sends an email to the configured ops address and opens a GitHub issue in this repository with the label `alert`, the alert type, the environment, the run ID, the summary of the run report, and the path of the full report (served by the admin API from phase 4, REQ-ADM-004).
   3. A repeated alert with the same key (type, environment, source) within 24 hours adds a comment to the open issue instead of opening another issue or email.
   4. An alert never contains publication text, prompts, user data, or secrets.
@@ -88,3 +88,20 @@ Database changes and environment resources are created by versioned, repeatable 
   5. Each environment's token and account ID are secrets listed in [operations](../../operations.md), with the least permissions the environment needs.
   6. Production gets a prefix of `main` once a week: only commits that ran on staging for the soak time, with no unmet `Depends on #N`, no `hold` label, and no unreviewed drop or rename in a migration (ADR 0044).
 - Verification: integration test of the migrations and the bootstrap against local bindings; unit tests of the release plan
+
+### REQ-NFR-023: Quality monitoring of live output
+
+The daily run report shows the quality of live triage and extraction output and alerts when it drifts, without a model call (ADR 0071).
+
+- Phase: 2
+- Priority: should
+- Status: planned
+- Source: ADR 0071
+- Depends on: REQ-NFR-008, REQ-NFR-011, REQ-NFR-019
+- Acceptance criteria:
+  1. The daily processing run report has a quality section computed from stored rows: accept rate and signal shares; empty-extraction share, candidates per publication, and abstract-only share; first-attempt validity, repair, quote-failure, and drop rates per step; the report-only code checks of ADR 0066; the extraction `Confidence` histogram; counts per industry; where accepted quotes fall in the input; agreement between triage signals and extraction; and possible near-duplicate opportunities.
+  2. Near-duplicates are candidates whose publications are nearest neighbours at a cosine of at least `monitor.near_duplicate_cosine` in the current index and share a normalised `Customer`. They are counted only and use no new embedding.
+  3. Each rate is compared with its median over the previous `monitor.baseline_days`. A relative move of more than `monitor.drift_band`, on a day with at least `monitor.min_daily_items` items, raises one `quality-drift` alert per metric and day (REQ-NFR-019).
+  4. During the first `monitor.baseline_days` after processing starts, the section is reported without alerts.
+  5. The quality section holds counts and rates only, never publication text.
+- Verification: integration test that builds the report from seeded rows and checks a drift alert against a seeded baseline

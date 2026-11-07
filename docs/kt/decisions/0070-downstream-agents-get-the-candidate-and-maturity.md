@@ -31,7 +31,7 @@ In a pipeline without a person, a fact that one agent quoted and the next one ca
 
 1. **Pass the stored candidate to every downstream agent, and `Maturity` to Market Analysis and Competition.** Chosen. The candidate is small (eight short fields) and already stored.
 2. **Add trigger and alternative fields to the Problem Discovery output** and let it pass them on. Rejected: it copies verified quotes through a model step, where they can be rephrased and lose their check.
-3. **Give triage signals to extraction as hints.** Rejected: triage reads only the abstract with a cheap model, and its signals would anchor a step that reads more text. The agreement between triage signals and extraction results is measured instead (ADR 0071, proposed with this decision).
+3. **Give triage signals to extraction as hints.** Rejected: triage reads only the abstract with a cheap model, and its signals would anchor a step that reads more text. The agreement between triage signals and extraction results is measured instead ([0071](0071-automatic-quality-monitoring-from-run-signals.md)).
 4. **Let Market Analysis and Competition see each other's output.** Rejected: it serialises two steps that run in parallel today. The Startup Generator already reconciles them.
 
 ## Decision

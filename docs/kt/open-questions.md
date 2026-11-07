@@ -21,6 +21,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
 | OQ-036 | Which model runs each model-backed step? | Workers AI models only (ADR 0049). Round one of the [model benchmark plan](test/model-benchmark-plan.md) covers triage and extraction only, two candidates each (ADR 0062 replaced the candidates deprecated on 2026-11-20), three runs per item, as the [run plan](test/benchmark-round-one.md) sets out (waiting for the owner's go-ahead); pick the cheapest model that meets each step's threshold and record the result in an ADR | triage and extraction before phase 2 starts; the six analysis agents before phase 3 |
+| OQ-044 | Should a model judge grade a daily sample of live triage and extraction output? | Use a separate Workers AI model, so the data stays with Cloudflare, on a small daily sample, report-only, with its own budget line. It needs a change to ADR 0049, which limits the Anthropic judge to golden-set items. Until then the run-signal monitor of ADR 0071 is the live check | before phase 3 |
 
 ## Ownership
 

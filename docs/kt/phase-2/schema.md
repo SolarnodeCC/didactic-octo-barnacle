@@ -71,6 +71,10 @@ New keys for [defaults](../architecture/defaults.md). They are added there in th
 | `recovery.max_redrives_per_day` | `20` | Items re-driven a day; re-driven extractions also count toward the daily limit (ADR 0063) |
 | `recovery.dead_letter_replay_hours` | `6` | Delay before a dead letter is replayed, at most twice (ADR 0063) |
 | `recovery.breaker_failure_share` | `0.5` | Share of `provider-error` calls in an hour that pauses a step (ADR 0063) |
+| `monitor.baseline_days` | `14` | Days in the rolling median of each quality rate; no drift alert before that many days (ADR 0071) |
+| `monitor.drift_band` | `0.5` | Relative move from the median that counts as drift (ADR 0071) |
+| `monitor.min_daily_items` | `20` | Fewest items behind a rate before it can alert (ADR 0071) |
+| `monitor.near_duplicate_cosine` | `0.92` | Publication-vector cosine for counting possible near-duplicate opportunities (ADR 0071) |
 
 Schedules: admission at `0 11 * * *` UTC, after both ingestion crons. The retraction check stays `0 8 * * 1`. The slice trigger exists only in the local environment.
 
