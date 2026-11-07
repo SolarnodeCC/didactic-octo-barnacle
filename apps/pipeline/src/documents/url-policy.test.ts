@@ -72,6 +72,33 @@ describe("REQ-DATA-010: PDF URL policy", () => {
     expect(checkPdfUrl("https://arxiv.org/pdf/2401.00001", open).Ok).toBe(true);
   });
 
+  it("REQ-NFR-021: refuses names that encode an address in hex or as dashed IPv6", () => {
+    for (const url of [
+      "https://7f000001.c0a80001.rbndr.us/a.pdf", // rebinding service
+      "https://make-1.2.3.4-rebind-127.0.0.1-rr.1u.ms/a.pdf", // rebinding service
+      "https://7f000001.example.org/a.pdf", // 127.0.0.1
+      "https://files.0a000005.example.net/a.pdf", // 10.0.0.5
+      "https://a9fea9fe.example.org/a.pdf", // 169.254.169.254
+      "https://C0A80101.example.org/a.pdf", // 192.168.1.1, upper case
+      "https://ac100001.example.org/a.pdf", // 172.16.0.1
+      "https://64400001.example.org/a.pdf", // 100.64.0.1
+      "https://--1.example.org/a.pdf", // ::1
+      "https://fe80--1.example.org/a.pdf", // fe80::1
+      "https://fd00-0-0-0--5.example.org/a.pdf", // fd00::5
+    ]) {
+      expect(refused(url), url).toMatch(/embeds an IP address/);
+    }
+    for (const url of [
+      "https://1a2b3c4d.example.org/a.pdf", // hex label for a public address
+      "https://deadbeef.example.org/a.pdf", // no digit: a word, not an address
+      "https://cafe1234.example.org/a.pdf", // 202.254.18.52, public
+      "https://xn--mnchen-3ya.de/a.pdf", // punycode, not IPv6
+      "https://my-repo.example.org/a.pdf",
+    ]) {
+      expect(checkPdfUrl(url, open).Ok, url).toBe(true);
+    }
+  });
+
   it("REQ-NFR-021: refuses the platform's own domain, even when allowlisted", () => {
     for (const url of [
       "https://wispel.cc/api/admin/runs",
