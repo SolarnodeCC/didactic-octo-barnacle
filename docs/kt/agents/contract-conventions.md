@@ -1,8 +1,8 @@
 ---
 title: Agent contract conventions
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-10-28
+status: approved
+last_reviewed: 2026-11-07
 related: [REQ-AGENT-008, REQ-AGENT-009, REQ-AGENT-010, REQ-AGENT-011, REQ-NFR-006, REQ-TEST-002]
 ---
 

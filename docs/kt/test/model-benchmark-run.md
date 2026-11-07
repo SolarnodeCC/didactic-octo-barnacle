@@ -1,7 +1,7 @@
 ---
 title: Running a model benchmark round
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-07
 related: [REQ-NFR-003, REQ-NFR-005, REQ-NFR-011, REQ-AGENT-012, REQ-TEST-006]
 ---

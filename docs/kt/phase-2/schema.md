@@ -1,7 +1,7 @@
 ---
 title: Phase 2 schema, configuration, and bindings
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-07
 related: [REQ-NFR-020, REQ-NFR-011, REQ-PROC-001, REQ-PROC-006, REQ-PROC-009, REQ-DATA-006, REQ-DATA-008, REQ-PROC-007]
 ---

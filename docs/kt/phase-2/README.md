@@ -1,8 +1,8 @@
 ---
 title: Phase 2 delivery plan
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-11-06
+status: approved
+last_reviewed: 2026-11-07
 related: [REQ-PROC-007]
 ---
 

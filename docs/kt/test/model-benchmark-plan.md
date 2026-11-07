@@ -1,7 +1,7 @@
 ---
 title: Model benchmark plan
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-07
 related: [REQ-AGENT-010, REQ-AGENT-012, REQ-AGENT-014, REQ-NFR-003, REQ-NFR-005, REQ-NFR-011, REQ-TEST-004, REQ-TEST-005, REQ-TEST-006]
 ---
