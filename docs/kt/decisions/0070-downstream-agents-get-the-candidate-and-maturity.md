@@ -1,14 +1,14 @@
 ---
 title: "0070: Downstream agents get the candidate and maturity"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-07
 related: [REQ-AGENT-002, REQ-AGENT-003, REQ-AGENT-004, REQ-AGENT-005, REQ-AGENT-006, REQ-AGENT-007, REQ-PROC-009]
 ---
 
 # 0070: Downstream agents get the candidate and maturity
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-11-07
 - Answers: none
 - Changes: the inputs and rules of [Problem Discovery](../agents/problem-discovery.md), [Market Analysis](../agents/market-analysis.md), [Competition](../agents/competition.md), [Relevance](../agents/relevance.md), [Startup Generator](../agents/startup-generator.md), and one rule of [opportunity extraction](../agents/opportunity-extraction.md)

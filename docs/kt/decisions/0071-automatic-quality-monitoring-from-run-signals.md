@@ -1,14 +1,14 @@
 ---
 title: "0071: Automatic quality monitoring from run signals"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-07
 related: [REQ-NFR-023, REQ-NFR-008, REQ-NFR-019, REQ-TEST-007, REQ-PROC-008, REQ-PROC-009]
 ---
 
 # 0071: Automatic quality monitoring from run signals
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-11-07
 - Answers: none
 - Changes: new REQ-NFR-023; REQ-NFR-019 AC1 (the `quality-drift` alert); new OQ-044 in [open questions](../open-questions.md); WP9 of the phase 2 [build plan](../phase-2/build-plan.md)

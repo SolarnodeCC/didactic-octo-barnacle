@@ -73,15 +73,15 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0060](0060-golden-sets-of-triage-and-extraction-in-phase-2.md) | Golden sets of triage and extraction belong to phase 2 | Accepted |
 | [0061](0061-retraction-check-looks-back-30-days.md) | The weekly retraction check looks back 30 days | Accepted |
 | [0062](0062-replace-deprecated-benchmark-candidates.md) | Replace the benchmark candidates that Workers AI deprecates on 2026-11-20 | Accepted |
-| [0063](0063-automatic-recovery-without-an-admin.md) | Automatic recovery without an admin | Proposed |
-| [0064](0064-quote-check-after-normalisation.md) | Quote check after normalisation, and valid candidates are kept | Proposed |
-| [0065](0065-extraction-waits-for-full-text-at-admission.md) | Extraction waits for full text at admission | Proposed |
-| [0066](0066-code-checks-before-model-judgement.md) | Code checks before model judgement | Proposed |
-| [0067](0067-eval-metrics-and-calibration.md) | Eval metrics and calibration; Confidence stays out of decisions | Proposed |
+| [0063](0063-automatic-recovery-without-an-admin.md) | Automatic recovery without an admin | Accepted |
+| [0064](0064-quote-check-after-normalisation.md) | Quote check after normalisation, and valid candidates are kept | Accepted |
+| [0065](0065-extraction-waits-for-full-text-at-admission.md) | Extraction waits for full text at admission | Accepted |
+| [0066](0066-code-checks-before-model-judgement.md) | Code checks before model judgement | Accepted |
+| [0067](0067-eval-metrics-and-calibration.md) | Eval metrics and calibration; Confidence stays out of decisions | Accepted |
 | [0068](0068-no-publication-dated-after-the-run-day.md) | No publication dated after the day of the run | Accepted |
 | [0069](0069-longer-retry-delay-after-http-429.md) | A longer retry delay after HTTP 429 from a PDF host | Accepted |
-| [0070](0070-downstream-agents-get-the-candidate-and-maturity.md) | Downstream agents get the candidate and maturity | Proposed |
-| [0071](0071-automatic-quality-monitoring-from-run-signals.md) | Automatic quality monitoring from run signals | Proposed |
+| [0070](0070-downstream-agents-get-the-candidate-and-maturity.md) | Downstream agents get the candidate and maturity | Accepted |
+| [0071](0071-automatic-quality-monitoring-from-run-signals.md) | Automatic quality monitoring from run signals | Accepted |
 
 ## When an ADR is needed
 
