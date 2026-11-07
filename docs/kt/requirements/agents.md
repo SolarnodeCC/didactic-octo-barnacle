@@ -124,7 +124,7 @@ Agent claims can be traced to a source.
 - Source: overview principle Reliability
 - Acceptance criteria:
   1. Every field marked "evidence required" in a contract has at least one evidence item. An item of kind `none-found` records that a search or comparison found nothing; it satisfies the requirement only for the fields whose contract allows it.
-  2. An evidence quote from the publication is checked to occur in the publication text the agent received; an output with a quote that does not occur is rejected.
+  2. An evidence quote from the publication is checked to occur in the publication text the agent received, after both are normalised as in [contract conventions](../agents/contract-conventions.md) (ADR 0064); an output with a quote that does not occur is rejected. The stored quote is the exact span of the source text that matched.
   3. External sources are stored as URLs with the date they were retrieved.
 - Verification: contract test and eval
 
@@ -239,3 +239,19 @@ The Startup Generator writes a validation brief for each opportunity (ADR 0040).
   4. No new agent or pipeline step is added; the brief is part of the Startup Generator call (REQ-AGENT-007).
   5. The golden set for the Startup Generator holds a rubric for the kill question and the stop criterion, graded by a model judge (REQ-TEST-005).
 - Verification: contract test and eval
+
+### REQ-AGENT-016: Automatic recovery of candidate runs
+
+Candidate runs that fail or never start are re-driven automatically, within the limits of REQ-PROC-010, without an admin (ADR 0063).
+
+- Phase: 3
+- Priority: must
+- Status: planned
+- Source: ADR 0063
+- Depends on: REQ-PROC-010, REQ-AGENT-007, REQ-AGENT-009
+- Acceptance criteria:
+  1. A failed or incomplete candidate is re-driven by the daily cron from its first failed step, reusing the stored outputs of completed steps, with the failure classes and limits of REQ-PROC-010.
+  2. A `candidate.run` refused with `budget-exhausted` completes as `budget-deferred` and starts on a later day.
+  3. A candidate that uses up its re-drives is marked `failed-final`, stays incomplete and unscored (REQ-SCORE-005), and is listed in the run report.
+  4. The admin rerun of REQ-ADM-002 stays available and does not count toward the automatic limit.
+- Verification: integration test of the candidate Workflow with stubbed failures
