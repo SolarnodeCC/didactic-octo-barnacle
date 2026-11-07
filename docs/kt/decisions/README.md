@@ -80,6 +80,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0067](0067-eval-metrics-and-calibration.md) | Eval metrics and calibration; Confidence stays out of decisions | Proposed |
 | [0068](0068-no-publication-dated-after-the-run-day.md) | No publication dated after the day of the run | Accepted |
 | [0069](0069-longer-retry-delay-after-http-429.md) | A longer retry delay after HTTP 429 from a PDF host | Accepted |
+| [0070](0070-downstream-agents-get-the-candidate-and-maturity.md) | Downstream agents get the candidate and maturity | Proposed |
 
 ## When an ADR is needed
 

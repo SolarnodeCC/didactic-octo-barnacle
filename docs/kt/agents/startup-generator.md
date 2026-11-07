@@ -21,6 +21,7 @@ Requirements: REQ-AGENT-005 and REQ-AGENT-015 (validation brief). Covers the Sta
 
 - Problem Discovery, Market Analysis, Competition, and Relevance outputs.
 - Research Analyst output: technologies and maturity.
+- The candidate from extraction: `Finding`, `Customer`, and, when set, `WhyNow` and `CurrentAlternative`, each with its quote (ADR 0070).
 
 ## Output contract
 
@@ -60,6 +61,7 @@ BriefEntry:
 - NextSteps are concrete actions a team can start this quarter, for example "interview five HR leads about focus time".
 - Relevance `Constraints` and `ImplementationEffort` must shape `KeyRisks` and `NextSteps` (for example consent, regulation, or specialist skills).
 - The concept stays within the research finding; features that the publication does not support are listed as assumptions.
+- When the candidate has `WhyNow`, the `WhyNow` brief entry starts from it; otherwise the entry says that the publication names no trigger (ADR 0070).
 - The brief entries must be consistent with the inputs. They are not evidence, are not read by scoring or by the readiness label, and never state that an element has been validated.
 - `OpportunityType` values match the types in the [overview](../overview.md) goal.
 
