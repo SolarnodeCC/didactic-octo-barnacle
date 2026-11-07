@@ -2,7 +2,7 @@
 title: AI evals
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-07
 related: [REQ-TEST-004, REQ-TEST-005, REQ-NFR-003, REQ-AGENT-008, REQ-SCORE-006]
 ---
 
@@ -15,8 +15,8 @@ Agent output comes from language models and varies between runs. Exact assertion
 - One golden set per agent, for triage, and for opportunity extraction, of at least 20 entries each (REQ-TEST-005), stored under `evals/` in the agent's directory.
 - Each entry holds the input (paper metadata, abstract, and an extract when the license allows it), the outputs of earlier agents it depends on, and a reviewed expected outcome: required facts, acceptable ranges for numeric fields, and outcomes that must not occur.
 - Cover all eight target industries (at least one entry per industry) and include at least three papers that should yield no opportunity.
-- Each entry names its reviewer. Entries for an industry are reviewed by someone with knowledge of that industry, with at least one named reviewer per target industry and two reviewers on a shared sample to measure agreement (OQ-015).
-- When two reviewers label the same entries, their agreement is recorded; entries they disagree on are discussed before they enter the set.
+- Each entry names its reviewer. The reviewer is the owner, who confirms every entry. Agents draft and cross-check labels and never confirm one: a second agent from another model family labels the same entries blind, and the owner decides the entries on which they disagree (ADR 0070).
+- The agreement of the owner with that second agent on a shared sample of at least 20 entries is recorded, and the owner re-labels at least 10 entries after at least three days. Entries on which they disagree are decided before they enter the set.
 - Changes to a golden set need review by a code owner of `docs/kt`.
 
 ## How output is scored

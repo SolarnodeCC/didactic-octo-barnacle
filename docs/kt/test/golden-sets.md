@@ -2,30 +2,30 @@
 title: Golden sets and reviewers
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-03
+last_reviewed: 2026-11-07
 related: [REQ-TEST-004, REQ-TEST-005, REQ-SCORE-006, REQ-AGENT-001]
 ---
 
 # Golden sets and reviewers
 
-Plan that satisfies REQ-TEST-005 and closes the structure of OQ-015. Named people must be filled before phase 3 starts (roadmap Definition of Ready).
+Plan that satisfies REQ-TEST-005 and REQ-TEST-006. OQ-015 is answered by ADR 0070: one owner reviews, with agents to draft and cross-check.
 
 ## Reviewer slots (OQ-015)
 
 | Slot | Industry / scope | Name | Confirmed |
 |---|---|---|---|
-| R1 | Automotive | _named before phase 3_ | no |
-| R2 | Aerospace & Defense | _named before phase 3_ | no |
-| R3 | Consumer Products & Retail | _named before phase 3_ | no |
-| R4 | Energy & Utilities | _named before phase 3_ | no |
-| R5 | Banking (Finance) | _named before phase 3_ | no |
-| R6 | Insurance | _named before phase 3_ | no |
-| R7 | Public Sector | _named before phase 3_ | no |
-| R8 | Life Sciences | _named before phase 3_ | no |
-| R9 | Shared sample (agreement) | _named before phase 3_ | no |
-| R10 | Shared sample (agreement) | _named before phase 3_ | no |
+| R1 | Automotive | Owner (`@SolarnodeCC`) | 2026-11-07 |
+| R2 | Aerospace & Defense | Owner (`@SolarnodeCC`) | 2026-11-07 |
+| R3 | Consumer Products & Retail | Owner (`@SolarnodeCC`) | 2026-11-07 |
+| R4 | Energy & Utilities | Owner (`@SolarnodeCC`) | 2026-11-07 |
+| R5 | Banking (Finance) | Owner (`@SolarnodeCC`) | 2026-11-07 |
+| R6 | Insurance | Owner (`@SolarnodeCC`) | 2026-11-07 |
+| R7 | Public Sector | Owner (`@SolarnodeCC`) | 2026-11-07 |
+| R8 | Life Sciences | Owner (`@SolarnodeCC`) | 2026-11-07 |
+| R9 | Shared sample (agreement) | Owner (`@SolarnodeCC`) | 2026-11-07 |
+| R10 | Shared sample (agreement) | Second agent of another model family; agreement only, never confirms a label | not applicable |
 
-Each industry slot owns that industry's golden-set labels. R9 and R10 both label a shared sample of at least 20 opportunities so inter-rater agreement can be measured.
+The owner confirms the labels of every slot; agents draft and cross-check them (ADR 0070). R9 and R10 both label a shared sample of at least 20 opportunities, so the agreement of the owner with the second agent can be measured.
 
 ## Golden set sizes
 
@@ -153,6 +153,6 @@ expected:
 
 Evidence envelopes are required on agent expected outputs (unlike the short product examples). Injection fixtures live under `fixtures/injection/` (REQ-NFR-006).
 
-## Closing OQ-015
+## OQ-015
 
-OQ-015 is closed when every slot has a real name and confirmation date in this table, updated in the same pull request that removes the OQ row.
+OQ-015 is answered by ADR 0070. Outside expert review, before accuracy claims or launch, is OQ-044.
