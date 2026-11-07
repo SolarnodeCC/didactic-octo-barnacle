@@ -41,9 +41,9 @@ Starter configuration values. Stored as versioned config in `infrastructure/clou
 |---|---|---|---|
 | `source.fetch_page` | `1` | Cron / collector Workflow | Collector Worker |
 | `document.ingest` | `1` | Page consumer after the license gate | Document-processing Queue consumer; message ID `document:<publicationId>` |
-| `publication.embed` | `1` | Document processing or abstract-only path | Embedding Worker |
-| `publication.triage` | `1` | After embed (or abstract ready) | Triage Worker |
-| `publication.extract` | `1` | Triage accept | Extraction Worker |
+| `publication.embed` | `1` | Page consumer, when a publication is stored (ADR 0053) | Embedding consumer (`roi-embeddings-<env>`) |
+| `publication.triage` | `1` | Page consumer, when a publication is stored; runs in parallel with embedding (ADR 0053) | Triage consumer (`roi-models-<env>`) |
+| `publication.extract` | `1` | Daily admission cron, for admitted and re-driven publications (ADR 0055, ADR 0063, ADR 0065) | Extraction consumer (`roi-models-<env>`) |
 | `candidate.run` | `1` | Extraction (0..N) | Starts one candidate Workflow |
 | `queue.dead_letter` | `1` | Any consumer after max attempts | Automatic replay after `recovery.dead_letter_replay_hours`, at most twice (REQ-DATA-012); admin replay (REQ-DATA-011) |
 

@@ -48,16 +48,19 @@ Market Analysis, Competition, and Relevance depend only on the Research Analyst 
 ```text
 Cron (OpenAlex / arXiv)
   → collector Workflow (pagination, dedup, source_record)
-      → queue document.ingest (license-gated PDF, REQ-DATA-004) and/or publication.embed
-          → document-processing Queue consumer (optional)
-          → embedding Worker
-          → queue publication.triage
-              → Triage Worker (rules, then cheap model)
-                  → if accepted: queue publication.extract
-                      → Extraction Worker → 0..N candidates
-                          → for each candidate: queue candidate.run
-                              → one Cloudflare Workflow per candidate
-                                 (agents + scoring; see diagram above)
+      → queue document.ingest (license-gated PDF, REQ-DATA-004)
+          → document consumer → queue document.extract_text → text consumer
+      → queue publication.embed → embedding consumer          (parallel, ADR 0053)
+      → queue publication.triage → triage consumer             (parallel, ADR 0053)
+          (rules, then cheap model; a pass waits for admission)
+Daily admission cron (ADR 0055)
+  → re-drives failed work (ADR 0063), then ranks the pool
+  → admits ready publications up to the daily limit (ADR 0065)
+      → queue publication.extract
+          → extraction consumer → 0..N candidates
+              → for each candidate: queue candidate.run (from phase 3)
+                  → one Cloudflare Workflow per candidate
+                     (agents + scoring; see diagram above)
 ```
 
 - Publication-level steps (triage, extraction) are Queue consumers in `apps/pipeline`, not the per-candidate Workflow.

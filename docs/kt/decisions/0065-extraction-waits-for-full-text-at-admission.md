@@ -33,7 +33,7 @@ The phase 2 design says extraction "reads the full text when the text consumer h
   - it has no PDF URL with a license that allows storage (REQ-DATA-010); or
   - its `document.ingest` message has finished without a stored document.
 - The admission cron ranks all passing publications as before (REQ-PROC-008 AC4), and admits only ready ones in that order. A publication that is not ready keeps its place in the pool and is considered the next day.
-- After `extraction.full_text_wait_hours` (24) since its triage decision, a publication is ready whatever its document state, and it is extracted from the abstract.
+- After `extraction.full_text_wait_hours` (24) since its triage decision, a publication is ready whatever its document state, and it is extracted from the abstract unless its text has been stored by then.
 - The ranking does not change, so the same input still gives the same order. Readiness only decides whether a ranked publication is admitted today or later.
 
 ## Consequences

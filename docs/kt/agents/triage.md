@@ -12,7 +12,7 @@ Requirement: REQ-PROC-005, REQ-PROC-006, and REQ-PROC-008. A cheap filter before
 
 ## Responsible for
 
-- rejecting incomplete, retracted, out-of-scope, and already-processed publications with a recorded reason (rules)
+- rejecting incomplete, retracted, and out-of-scope publications with a recorded reason (rules); a publication is triaged once, so a repeated message changes nothing (REQ-DATA-011)
 - reading five signals from the title and abstract (model)
 - accepting by a fixed rule and admitting at most the daily limit to extraction (code)
 
