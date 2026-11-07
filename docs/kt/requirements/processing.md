@@ -71,7 +71,7 @@ Candidate opportunities are extracted from triaged publications and passed to th
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: README roadmap phase 2 and Core Workflow (Software Opportunity Discovery)
 - Depends on: REQ-PROC-005
 - Acceptance criteria:
@@ -118,7 +118,7 @@ The triage model reports five yes/no signals read from the title and abstract, a
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: ADR 0036
 - Depends on: REQ-PROC-005, REQ-PROC-006
 - Acceptance criteria:
@@ -136,7 +136,7 @@ Every candidate opportunity names the customer who has the problem, and the prob
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: ADR 0036, ADR 0050
 - Depends on: REQ-PROC-004, REQ-PROC-008
 - Acceptance criteria:

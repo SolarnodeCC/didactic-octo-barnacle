@@ -11,3 +11,4 @@ coverage/
 *.tsbuildinfo
 .DS_Store
 __pycache__/
+benchmark-out/

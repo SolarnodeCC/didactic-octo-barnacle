@@ -29,7 +29,7 @@ Publication text is treated as untrusted input to models.
 
 - Phase: 3
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: KT review of security
 - Acceptance criteria:
   1. Publication text is passed to models as delimited data, never as instructions.

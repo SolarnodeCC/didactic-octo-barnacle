@@ -2,7 +2,7 @@
 title: Triage
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-11-03
+last_reviewed: 2026-11-07
 related: [REQ-PROC-005, REQ-PROC-006, REQ-PROC-008]
 ---
 
@@ -59,6 +59,10 @@ The model judges from the title and abstract only.
 - Code accepts a publication when `NamedParty` and `StatedHarm` are both true, `TriageScore` is at or above `triage.accept_score_cut` (default 0.55, so three of five signals), and the daily limit is not reached. A publication that fails the signal rule gets `Reason: low-score`.
 - Accepted publications are ranked by `TriageScore`. Ties break by publication date (newest first), then by publication ID. Those above the daily limit get `daily-limit` and are considered again the next day.
 - Rejected publications stay searchable (REQ-PROC-005).
+
+## Prompt
+
+`triage@1` in `packages/prompts/src/triage.ts` carries the signal table above, asks for `Signals` and `Notes` only, and puts the title and abstract inside `<publication>` delimiters (REQ-NFR-006). The output contract is strict, so a model that returns `TriageScore`, `Accepted`, or any other field fails validation (REQ-PROC-008 AC1).
 
 ## Evals
 

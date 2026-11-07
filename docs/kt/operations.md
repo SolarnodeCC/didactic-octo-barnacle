@@ -2,7 +2,7 @@
 title: Operations
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-07
 related: [REQ-NFR-001, REQ-NFR-005, REQ-NFR-008, REQ-NFR-015, REQ-NFR-017, REQ-ADM-001, REQ-ADM-002]
 ---
 
@@ -133,6 +133,7 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 | `RESEND_API_KEY` | Sends invitation and sign-in emails (REQ-ACC-007) and alert emails (REQ-NFR-019) | Cloudflare Worker secret; GitHub Actions secret for deployment | preview, staging, production |
 | `RESEND_WEBHOOK_SECRET` | Verifies Resend bounce and complaint webhooks (REQ-ACC-007) | Worker secret | preview, staging, production |
 | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | Deploy with Wrangler and run the bootstrap script; the token has the least permissions each environment needs | GitHub Actions secret | preview, staging, production |
+| `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` (benchmark) | Run model benchmark rounds through AI Gateway ([running a round](test/model-benchmark-run.md)); the token has Workers AI Read, and R2 Edit only when raw responses go to R2 | GitHub environment `evals` or Cursor environment secret | evals |
 | `SCOPE_PR_TOKEN` | Opens the draft pull request of `OpenAlex scope sync`; fine-grained token for this repository with Contents and Pull requests write, so the CI checks run on that pull request (ADR 0046) | GitHub environment secret | staging |
 | `OPENALEX_API_KEY` | OpenAlex requests by the collector (REQ-DATA-001); free key required for cursor paging (ADR 0034) | Worker secret, uploaded by `Staging deploy` from the GitHub environment secret; also Cursor environment secret for local agent work | preview, staging, production |
 | `AI_GATEWAY_ACCOUNT_ID`, `AI_GATEWAY_API_TOKEN` | Route model calls through AI Gateway (REQ-NFR-003) | Worker secret | preview, staging, production |

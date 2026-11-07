@@ -2,7 +2,7 @@
 title: Test strategy
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-07
 related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-TEST-005, REQ-TEST-006]
 ---
 
@@ -28,6 +28,7 @@ related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-TEST-005, 
 - [AI evals](ai-evals.md): golden sets, scoring of model output, thresholds, and prompt regression.
 - [Golden sets](golden-sets.md): reviewer slots (OQ-015), sizes, item format, and threshold files.
 - [Model benchmark plan](model-benchmark-plan.md): how the model of each agent is chosen by measurement (OQ-036).
+- [Running a model benchmark round](model-benchmark-run.md): the `roi-benchmark` command, its credentials, budget, and output.
 - [Test data](test-data.md): fixtures, golden sets, and privacy rules.
 - [CI gates](ci-gates.md): which checks block a merge in each roadmap phase.
 - [Named reviews](named-reviews.md): requirements verified by a named review or CI script (REQ-TEST-001).

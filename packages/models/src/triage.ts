@@ -5,20 +5,27 @@ import { z } from "zod";
  * model reads five signals; plain code computes the score and the decision.
  */
 
-export const TriageSignalsSchema = z.object({
-  NamedParty: z.boolean(),
-  StatedHarm: z.boolean(),
-  Trigger: z.boolean(),
-  ExistingAlternative: z.boolean(),
-  Adoptable: z.boolean(),
-});
+export const TriageSignalsSchema = z
+  .object({
+    NamedParty: z.boolean(),
+    StatedHarm: z.boolean(),
+    Trigger: z.boolean(),
+    ExistingAlternative: z.boolean(),
+    Adoptable: z.boolean(),
+  })
+  .strict();
 export type TriageSignals = z.infer<typeof TriageSignalsSchema>;
 
-/** What the model returns. */
-export const TriageModelOutputSchema = z.object({
-  Signals: TriageSignalsSchema,
-  Notes: z.string().max(200).nullable(),
-});
+/**
+ * What the model returns. Strict: the model never returns `TriageScore`, `Accepted`, or any
+ * other field, because code decides (REQ-PROC-008 AC1).
+ */
+export const TriageModelOutputSchema = z
+  .object({
+    Signals: TriageSignalsSchema,
+    Notes: z.string().max(200).nullable(),
+  })
+  .strict();
 export type TriageModelOutput = z.infer<typeof TriageModelOutputSchema>;
 
 export const TriageReasonSchema = z.enum([
