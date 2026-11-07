@@ -93,3 +93,21 @@ Triage and opportunity extraction have reviewed golden sets with written thresho
   3. Changes to a golden set go through a pull request with a named reviewer.
   4. The pass threshold of each golden set is written down with a tolerance before the first eval run, and changes only through a reviewed pull request.
 - Verification: `scripts/check-golden-sets.py` in CI and code review
+
+### REQ-TEST-007: Eval report for triage and extraction
+
+The eval report shows where triage and extraction go wrong, not only whether they pass, and measures whether `Confidence` is calibrated (ADR 0067).
+
+- Phase: 2
+- Priority: must
+- Status: planned
+- Source: ADR 0067
+- Depends on: REQ-TEST-006, REQ-PROC-008, REQ-PROC-009
+- Acceptance criteria:
+  1. For triage the report gives the confusion matrix and the accuracy, precision, recall, and F1 of the accept decision, next to agreement per signal, overall and per industry. Triage golden entries carry an `industry` field.
+  2. For extraction the report matches expected and returned candidates by overlap of their normalised evidence quotes, and gives candidate precision, recall, and F1, and the accuracy on entries that should yield no candidate. Expected candidates marked `optional` count for neither.
+  3. The report gives the share of quotes that pass on the first attempt, that match only after normalisation, and of candidates dropped (ADR 0064), and where accepted quotes fall in the input text.
+  4. The report gives the Brier score of extraction `Confidence` against entry pass, and whether the top third by `Confidence` passes at least as often as the bottom third.
+  5. Over three runs the report gives agreement of the triage decision and signals and of the extraction candidate count.
+  6. These metrics are report-only: the entry pass rule and the thresholds of REQ-TEST-006 do not change.
+- Verification: unit tests of the eval runner with stub models whose answers produce known metric values

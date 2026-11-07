@@ -75,7 +75,7 @@ Agents that do not receive publication text, such as Relevance, cite `related-pu
 
 ## Confidence
 
-Fields named `Confidence` are a `number 0..1` that states how well the available input supports the output. Abstract-only input caps confidence at 0.7. Evals check that confidence is calibrated: entries with high confidence should pass more often than entries with low confidence.
+Fields named `Confidence` are a `number 0..1` that states how well the available input supports the output. Abstract-only input caps confidence at 0.7. Evals check that confidence is calibrated: entries with high confidence should pass more often than entries with low confidence. The eval report gives the Brier score and compares the top and bottom thirds by confidence (REQ-TEST-007). No pipeline decision reads `Confidence` until a later ADR shows it is calibrated (ADR 0067).
 
 ## Structured output and repair
 

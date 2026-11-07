@@ -48,5 +48,5 @@ A failed quote rejects the whole output, `callModel` retries with the error, and
 - An output that only differs from the source in typography passes on the first attempt, so fewer calls are spent on retries.
 - A publication with one bad candidate keeps its good ones instead of failing.
 - The quote check still proves that the quoted words occur in the source in that order.
-- The eval report shows how many quotes matched only after normalisation and how many candidates were dropped (ADR 0067), so a model that drifts toward paraphrase is visible.
+- The eval report shows how many quotes matched only after normalisation and how many candidates were dropped ([0067](0067-eval-metrics-and-calibration.md)), so a model that drifts toward paraphrase is visible.
 - `callModel` (WP2) changes in one place: when the last attempt is schema-valid but fails only its quote check, it also returns that output with the failing fields, so the extraction step can drop candidates. Steps whose output is not a list of independent items keep failing as before.

@@ -41,4 +41,4 @@ The phase 2 design says extraction "reads the full text when the text consumer h
 - A publication with a usable PDF is extracted from its full text unless the text takes longer than the wait. Publications without a PDF are admitted as before.
 - Most publications with a PDF wait at most one admission cycle, because the PDF and text queues usually finish within hours.
 - The run report counts publications that went in on the abstract because the wait ran out, so a slow text queue is visible.
-- The 24,000-character cut of `extraction.full_text_max_chars` is not changed. The eval report of ADR 0067 records where accepted quotes fall in the text, to show whether the cut loses evidence.
+- The 24,000-character cut of `extraction.full_text_max_chars` is not changed. The eval report of [0067](0067-eval-metrics-and-calibration.md) records where accepted quotes fall in the text, to show whether the cut loses evidence.

@@ -77,6 +77,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0064](0064-quote-check-after-normalisation.md) | Quote check after normalisation, and valid candidates are kept | Proposed |
 | [0065](0065-extraction-waits-for-full-text-at-admission.md) | Extraction waits for full text at admission | Proposed |
 | [0066](0066-code-checks-before-model-judgement.md) | Code checks before model judgement | Proposed |
+| [0067](0067-eval-metrics-and-calibration.md) | Eval metrics and calibration; Confidence stays out of decisions | Proposed |
 
 ## When an ADR is needed
 
