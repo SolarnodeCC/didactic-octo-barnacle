@@ -82,6 +82,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0069](0069-longer-retry-delay-after-http-429.md) | A longer retry delay after HTTP 429 from a PDF host | Accepted |
 | [0070](0070-downstream-agents-get-the-candidate-and-maturity.md) | Downstream agents get the candidate and maturity | Accepted |
 | [0071](0071-automatic-quality-monitoring-from-run-signals.md) | Automatic quality monitoring from run signals | Accepted |
+| [0072](0072-one-owner-reviews-the-golden-sets-with-agents.md) | One owner reviews the golden sets, with agents to draft and cross-check | Accepted |
 
 ## When an ADR is needed
 
