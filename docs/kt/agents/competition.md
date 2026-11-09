@@ -19,7 +19,8 @@ Requirement: REQ-AGENT-004. Feeds the Competitive Gap category (see [scoring](..
 ## Inputs
 
 - Problem Discovery output.
-- Research Analyst output: technologies.
+- Research Analyst output: technologies and maturity (ADR 0070).
+- The candidate from extraction: `Finding`, `Customer`, and, when set, `WhyNow` and `CurrentAlternative`, each with its quote (ADR 0070).
 - Results of the search tool (ADR 0013, REQ-AGENT-013).
 
 ## Output contract
@@ -57,6 +58,7 @@ Verified: boolean                           # true only when found by the search
 - `GapStrength` 5 is only valid when `Competitors` has no `Kind: direct` entry. A listed direct competitor means at least one existing solution addresses the problem, so `GapStrength` is at most 4.
 - A competitor is `Verified: true` only when a search result supports it. A competitor from model knowledge has `Verified: false`.
 - An empty competitor list needs a note that explains why none were found.
+- When the candidate has a `CurrentAlternative`, it appears in `Competitors`, normally with `Kind: substitute`, or `Notes` says why it is not a competitor. It is `Verified: true` only when a search result supports it (ADR 0070).
 
 ## Evals
 

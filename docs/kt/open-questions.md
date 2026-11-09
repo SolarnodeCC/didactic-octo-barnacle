@@ -14,13 +14,14 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
 | OQ-014 | May we widen full-text use (transient processing, quotes from non-redistributable papers), and do the source and model provider terms allow commercial use? | The phase-2 gate questions 1 to 5 of the [review brief](legal/review-brief.md) were approved on 2026-11-06. Still open: launch questions 6 to 12, among them transient processing of non-redistributable full text (item 9) and the processor agreements (item 8). Abstract-first stays (ADR 0014) until item 9 is answered | before launch |
-| OQ-044 | Which outside experts check the golden sets and the calibration set before accuracy claims or launch? | ADR 0070 has the owner review every label, with agents to draft and cross-check. That shows consistency, not agreement with independent experts. Proposal: one or two outside experts for the industries of the first customers, named before a claim of validated accuracy and before the launch checklist | before launch |
+| OQ-044 | Which outside experts check the golden sets and the calibration set before accuracy claims or launch? | ADR 0072 has the owner review every label, with agents to draft and cross-check. That shows consistency, not agreement with independent experts. Proposal: one or two outside experts for the industries of the first customers, named before a claim of validated accuracy and before the launch checklist | before launch |
 
 ## Models
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
 | OQ-036 | Which model runs each model-backed step? | Workers AI models only (ADR 0049). Round one of the [model benchmark plan](test/model-benchmark-plan.md) covers triage and extraction only, two candidates each (ADR 0062 replaced the candidates deprecated on 2026-11-20), three runs per item, as the [run plan](test/benchmark-round-one.md) sets out (waiting for the owner's go-ahead); pick the cheapest model that meets each step's threshold and record the result in an ADR | triage and extraction before phase 2 starts; the six analysis agents before phase 3 |
+| OQ-044 | Should a model judge grade a daily sample of live triage and extraction output? | Use a separate Workers AI model, so the data stays with Cloudflare, on a small daily sample, report-only, with its own budget line. It needs a change to ADR 0049, which limits the Anthropic judge to golden-set items. Until then the run-signal monitor of ADR 0071 is the live check | before phase 3 |
 
 ## Ownership
 
@@ -70,4 +71,4 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-041 | REQ-TEST-005 is split: triage and extraction golden sets are a phase 2 requirement, the six analysis agents stay in phase 3 | ADR 0060, REQ-TEST-006 |
 | OQ-042 | The weekly retraction check looks back 30 days | ADR 0061 |
 | OQ-043 | Phase 2 budget is built per cost component: triage, extraction, and embeddings, times 1.5, with the full-text input priced in | ADR 0059, REQ-NFR-005 |
-| OQ-015 | One owner reviews every golden-set entry; agents draft and cross-check, and never confirm a label; outside experts are OQ-044 | ADR 0070, [golden sets](test/golden-sets.md) |
+| OQ-015 | One owner reviews every golden-set entry; agents draft and cross-check, and never confirm a label; outside experts are OQ-044 | ADR 0072, [golden sets](test/golden-sets.md) |

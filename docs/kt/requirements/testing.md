@@ -71,10 +71,10 @@ Each of the six analysis agents has a reviewed golden set. The golden sets of tr
 - Phase: 3
 - Priority: must
 - Status: planned
-- Source: test strategy, ADR 0060, ADR 0070
+- Source: test strategy, ADR 0060, ADR 0072
 - Acceptance criteria:
   1. The golden set holds at least 20 entries per agent and covers all eight target industries (at least one entry per industry).
-  2. Each entry names its reviewer. The reviewer is the owner, who confirms every entry; agents may draft and cross-check labels and never confirm one (ADR 0070).
+  2. Each entry names its reviewer. The reviewer is the owner, who confirms every entry; agents may draft and cross-check labels and never confirm one (ADR 0072).
   3. Changes to the golden set go through a pull request with a named reviewer.
   4. The pass threshold of each golden set is written down with a tolerance before the first eval run, and changes only through a reviewed pull request.
 - Verification: code review
@@ -86,10 +86,10 @@ Triage and opportunity extraction have reviewed golden sets with written thresho
 - Phase: 2
 - Priority: must
 - Status: in-progress
-- Source: test strategy, OQ-041, ADR 0060, ADR 0070
+- Source: test strategy, OQ-041, ADR 0060, ADR 0072
 - Acceptance criteria:
   1. Each golden set holds at least 20 entries and covers all eight target industries (at least one entry per industry). The extraction set holds at least three entries that should yield no candidate.
-  2. Each entry names its reviewer. The reviewer is the owner, who confirms every entry; agents may draft and cross-check labels and never confirm one (ADR 0070).
+  2. Each entry names its reviewer. The reviewer is the owner, who confirms every entry; agents may draft and cross-check labels and never confirm one (ADR 0072).
   3. Changes to a golden set go through a pull request with a named reviewer.
   4. The pass threshold of each golden set is written down with a tolerance before the first eval run, and changes only through a reviewed pull request.
 - Verification: `scripts/check-golden-sets.py` in CI and code review

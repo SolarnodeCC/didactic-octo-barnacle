@@ -1,12 +1,12 @@
 ---
-title: "0070: One owner reviews the golden sets, with agents to draft and cross-check"
+title: "0072: One owner reviews the golden sets, with agents to draft and cross-check"
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-11-07
 related: [REQ-TEST-005, REQ-TEST-006, REQ-SCORE-006]
 ---
 
-# 0070: One owner reviews the golden sets, with agents to draft and cross-check
+# 0072: One owner reviews the golden sets, with agents to draft and cross-check
 
 - Decision status: Accepted
 - Date: 2026-11-07

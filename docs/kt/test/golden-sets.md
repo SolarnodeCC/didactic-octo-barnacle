@@ -8,7 +8,7 @@ related: [REQ-TEST-004, REQ-TEST-005, REQ-SCORE-006, REQ-AGENT-001]
 
 # Golden sets and reviewers
 
-Plan that satisfies REQ-TEST-005 and REQ-TEST-006. OQ-015 is answered by ADR 0070: one owner reviews, with agents to draft and cross-check.
+Plan that satisfies REQ-TEST-005 and REQ-TEST-006. OQ-015 is answered by ADR 0072: one owner reviews, with agents to draft and cross-check.
 
 ## Reviewer slots (OQ-015)
 
@@ -25,7 +25,7 @@ Plan that satisfies REQ-TEST-005 and REQ-TEST-006. OQ-015 is answered by ADR 007
 | R9 | Shared sample (agreement) | Owner (`@SolarnodeCC`) | 2026-11-07 |
 | R10 | Shared sample (agreement) | Second agent of another model family; agreement only, never confirms a label | not applicable |
 
-The owner confirms the labels of every slot; agents draft and cross-check them (ADR 0070). R9 and R10 both label a shared sample of at least 20 opportunities, so the agreement of the owner with the second agent can be measured.
+The owner confirms the labels of every slot; agents draft and cross-check them (ADR 0072). R9 and R10 both label a shared sample of at least 20 opportunities, so the agreement of the owner with the second agent can be measured.
 
 ## Golden set sizes
 
@@ -155,4 +155,4 @@ Evidence envelopes are required on agent expected outputs (unlike the short prod
 
 ## OQ-015
 
-OQ-015 is answered by ADR 0070. Outside expert review, before accuracy claims or launch, is OQ-044.
+OQ-015 is answered by ADR 0072. Outside expert review, before accuracy claims or launch, is OQ-044.

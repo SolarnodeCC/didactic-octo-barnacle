@@ -1,14 +1,14 @@
 ---
 title: "0066: Code checks before model judgement"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-07
 related: [REQ-PROC-009, REQ-AGENT-002, REQ-NFR-008]
 ---
 
 # 0066: Code checks before model judgement
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-11-07
 - Answers: none
 - Changes: REQ-PROC-009 AC4; [opportunity extraction](../agents/opportunity-extraction.md) and the phase 2 [schema](../phase-2/schema.md)

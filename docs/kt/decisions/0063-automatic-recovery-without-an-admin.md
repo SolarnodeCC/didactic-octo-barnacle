@@ -1,14 +1,14 @@
 ---
 title: "0063: Automatic recovery without an admin"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-07
 related: [REQ-PROC-010, REQ-DATA-012, REQ-AGENT-016, REQ-ADM-002, REQ-AGENT-009, REQ-DATA-011, REQ-NFR-005]
 ---
 
 # 0063: Automatic recovery without an admin
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-11-07
 - Answers: none
 - Changes: new REQ-PROC-010, REQ-DATA-012, and REQ-AGENT-016; the description of REQ-ADM-002; REQ-NFR-019 AC1 (the `step-paused` alert); [orchestration](../architecture/orchestration.md), the dead-letter row of [defaults](../architecture/defaults.md), and the phase 2 [design](../phase-2/design.md) and [schema](../phase-2/schema.md)

@@ -1,14 +1,14 @@
 ---
 title: "0067: Eval metrics and calibration; Confidence stays out of decisions"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-07
 related: [REQ-TEST-007, REQ-TEST-006, REQ-PROC-008, REQ-PROC-009, REQ-TEST-004]
 ---
 
 # 0067: Eval metrics and calibration; Confidence stays out of decisions
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-11-07
 - Answers: none
 - Changes: new REQ-TEST-007; [AI evals](../test/ai-evals.md), [golden sets](../test/golden-sets.md), and the Confidence section of [contract conventions](../agents/contract-conventions.md)

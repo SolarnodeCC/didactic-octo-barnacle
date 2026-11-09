@@ -1,7 +1,7 @@
 ---
 title: Phase 2 dependencies
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-07
 related: [REQ-NFR-005, REQ-NFR-002, REQ-NFR-020]
 ---
@@ -21,7 +21,7 @@ Phase 2 starts only when every gate below is closed ([Definition of Ready](../ro
 | OQ-038: population-level burden | Answered by ADR 0050 (REQ-PROC-009 AC6) | Product owner | ADR 0050; the first extraction eval run reviews the rule |
 | OQ-005 benchmark run (ADR 0010) | Reference model fixed; benchmark not run. Candidate `embeddinggemma-300m` is deprecated on 2026-11-20 and replaced by `embeddinggemma-2` once available (ADR 0062) | AI engineering lead | Recall report on the corpus of ADR 0057 and an ADR if the model changes from `bge-base-en-v1.5` |
 | Cost per publication (REQ-NFR-005) | Estimate recorded (EUR 0.0014) with placeholder token counts | Lead engineer | Estimate refreshed after the phase 1 exit run; budget formula of ADR 0059 |
-| Requirement and agent documents approved | Requirement files `approved` but reviewed before ADR 0036; agent documents `draft` | Product owner, AI engineering lead | WP0 |
+| Requirement and agent documents approved | Closed on 2026-11-07: the requirement files were re-reviewed after ADRs 0063 to 0067, 0070, and 0071, and `agents/triage.md`, `agents/opportunity-extraction.md`, and `agents/contract-conventions.md` are `approved` | Product owner, AI engineering lead | WP0 |
 
 ## Order of the work packages
 

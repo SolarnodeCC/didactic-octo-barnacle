@@ -1,8 +1,8 @@
 ---
 title: Phase 2 build plan
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-11-06
+status: approved
+last_reviewed: 2026-11-07
 related: [REQ-DATA-006, REQ-DATA-008, REQ-PROC-001, REQ-PROC-002, REQ-PROC-003, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-PROC-007, REQ-PROC-008, REQ-PROC-009, REQ-NFR-003, REQ-NFR-005, REQ-NFR-010, REQ-NFR-011, REQ-TEST-002]
 ---
 
@@ -21,17 +21,18 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 | WP6 | Triage | REQ-PROC-005, REQ-PROC-006, REQ-PROC-008, REQ-PROC-010, REQ-PROC-011, REQ-DATA-012, REQ-TEST-007 | phase 2 start |
 | WP7 | Extraction | REQ-PROC-004, REQ-PROC-009, REQ-TEST-007 | phase 2 start |
 | WP8 | Retractions | REQ-DATA-008, REQ-PROC-002 | phase 2 start |
-| WP9 | Budget and cost reporting | REQ-NFR-005 | phase 2 start |
+| WP9 | Budget and cost reporting | REQ-NFR-005, REQ-NFR-023 | phase 2 start |
 | WP10 | Thin slice | REQ-PROC-007 | phase 2 start |
 | WP11 | Throughput and exit | REQ-NFR-010, phase 2 exit | phase 2 start |
 
 ## WP0: Readiness
 
-- Re-review and approve `requirements/processing.md` and `requirements/non-functional/platform.md`. REQ-PROC-008 and REQ-PROC-009 were added after their last review.
-- Move `agents/triage.md`, `agents/opportunity-extraction.md`, and `agents/contract-conventions.md` from `draft` to `approved`.
+- Re-review and approve `requirements/processing.md` and `requirements/non-functional/platform.md`. REQ-PROC-008 and REQ-PROC-009 were added after their last review. Both were re-reviewed and approved on 2026-11-07.
+- Move `agents/triage.md`, `agents/opportunity-extraction.md`, and `agents/contract-conventions.md` from `draft` to `approved`. Done on 2026-11-07.
 - ADRs 0053 to 0061 are accepted, and OQ-041, OQ-042, and OQ-043 are answered (ADR 0059, 0060, 0061).
-- Decide ADRs 0063 to 0067 (automatic recovery, quote normalisation, full-text wait, code checks, eval metrics). Re-review the approved files they change: `requirements/processing.md`, `requirements/agents.md`, `requirements/data.md`, `requirements/admin.md`, `requirements/testing.md`, `requirements/non-functional/operations.md`, and `test/golden-sets.md`.
+- ADRs 0063 to 0067 (automatic recovery, quote normalisation, full-text wait, code checks, eval metrics) and ADRs 0070 and 0071 (downstream context, quality monitoring) are accepted. The approved files they change were re-reviewed and approved on 2026-11-07: `requirements/processing.md`, `requirements/agents.md`, `requirements/data.md`, `requirements/admin.md`, `requirements/testing.md`, `requirements/non-functional/operations.md` (also REQ-NFR-023), `test/golden-sets.md`, and `open-questions.md`.
 - **Exit:** every phase 2 document is `approved`.
+- Met on 2026-11-07: the phase 2 plan files (`phase-2/*.md`) and the phase 2 test documents (`test/ai-evals.md`, `test/model-benchmark-plan.md`, `test/model-benchmark-run.md`, `test/benchmark-round-one.md`) are `approved`, as are the documents above.
 
 ## WP1: Foundations
 
@@ -132,7 +133,8 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 ## WP9: Budget and cost reporting
 
 - `budget_day` from configuration, the `budget-stop` alert, deferral and re-queueing of deferred messages, and the processing run report with cost per publication and per opportunity.
-- **Tests:** budget from the formula per environment (REQ-NFR-005 AC1); stop behavior and one alert per day (AC2); cost figures in the report (AC3).
+- **Quality section** (ADR 0071): the daily report's quality metrics, the 14-day baseline, and the `quality-drift` alert.
+- **Tests:** budget from the formula per environment (REQ-NFR-005 AC1); stop behavior and one alert per day (AC2); cost figures in the report (AC3); the quality section from seeded rows and a drift alert against a seeded baseline (REQ-NFR-023).
 - **Exit:** the first staging day replaces the cost estimate in [ingestion scope](../data-sources/ingestion-scope.md) with a measured cost (ADR 0032).
 
 ## WP10: Thin slice

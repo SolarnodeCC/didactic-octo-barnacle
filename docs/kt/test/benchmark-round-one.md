@@ -1,7 +1,7 @@
 ---
 title: Benchmark round one run plan
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-07
 related: [REQ-AGENT-014, REQ-NFR-005, REQ-PROC-008, REQ-PROC-009, REQ-TEST-006]
 ---
