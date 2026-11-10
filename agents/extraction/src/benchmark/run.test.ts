@@ -151,8 +151,15 @@ describe("REQ-TEST-006: the benchmark command", () => {
       Runs: 3,
       BudgetEur: 50,
       Gateway: "roi-staging",
+      TimeoutMs: 600_000,
+      Stream: true,
       DryRun: false,
     });
+    expect(parseBenchmarkArgs(["--no-stream", "--timeout-ms", "90000"])).toMatchObject({
+      Stream: false,
+      TimeoutMs: 90_000,
+    });
+    expect(parseBenchmarkArgs(["--timeout-ms", "0"])).toBeNull();
     expect(
       parseBenchmarkArgs(["--step", "triage", "--models", "@cf/a/b,@cf/c/d", "--runs", "1"]),
     ).toMatchObject({

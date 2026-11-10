@@ -8,14 +8,17 @@ import { DATA_NOT_INSTRUCTIONS, defuseTags, delimit } from "./delimiters.js";
 import { type BuiltPrompt, type Sampling } from "./prompt.js";
 
 /**
- * `extraction@1`: one triaged publication in, zero or more candidate opportunities out, each
+ * `extraction@2`: one triaged publication in, zero or more candidate opportunities out, each
  * with a quoted problem and a quoted customer (docs/kt/agents/opportunity-extraction.md,
  * REQ-PROC-004, REQ-PROC-009, ADR 0036, ADR 0050).
+ *
+ * `extraction@2` has the text of `extraction@1` and a larger output budget, for the reasoning
+ * that comes before the answer (ADR 0076).
  */
 
-export const EXTRACTION_PROMPT_VERSION = "extraction@1";
+export const EXTRACTION_PROMPT_VERSION = "extraction@2";
 
-export const EXTRACTION_SAMPLING: Sampling = { Temperature: 0, MaxTokens: 4096 };
+export const EXTRACTION_SAMPLING: Sampling = { Temperature: 0, MaxTokens: 8192 };
 
 /** `extraction.full_text_max_chars` (docs/kt/architecture/defaults.md). */
 export const DEFAULT_FULL_TEXT_MAX_CHARS = 24_000;

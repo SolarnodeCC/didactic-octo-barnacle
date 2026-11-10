@@ -2,7 +2,7 @@
 title: Decisions index
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 ---
 
 # Architecture decision records
@@ -85,6 +85,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0072](0072-one-owner-reviews-the-golden-sets-with-agents.md) | One owner reviews the golden sets, with agents to draft and cross-check | Accepted |
 | [0073](0073-unreachable-pdf-is-a-data-outcome.md) | A PDF host that stays unreachable is a data outcome, not an alert | Accepted |
 | [0074](0074-ci-secret-scoping-and-response-caps.md) | Environment jobs on main only, secrets per step, capped responses, and release cooldowns | Accepted |
+| [0076](0076-stream-benchmark-calls-and-larger-output-budget.md) | Stream benchmark calls, and a larger output budget for reasoning models | Proposed |
 
 ## When an ADR is needed
 

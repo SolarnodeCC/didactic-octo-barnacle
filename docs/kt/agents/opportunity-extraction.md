@@ -2,7 +2,7 @@
 title: Opportunity extraction
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 related: [REQ-PROC-004, REQ-PROC-009]
 ---
 
@@ -58,7 +58,7 @@ The pipeline assigns each candidate an Id and links it to the publication before
 
 ## Prompt
 
-`extraction@1` in `packages/prompts/src/extraction.ts` carries the rules above and the configured maximum. It sends the full text, cut at `extraction.full_text_max_chars`, when the document has extracted text, and the abstract otherwise. The quote check runs on exactly the text inside the `<publication>` delimiters; a delimiter tag inside the publication is defused first (REQ-NFR-006).
+`extraction@2` in `packages/prompts/src/extraction.ts` (the text of `extraction@1` with an output budget of 8192 tokens, [ADR 0076](../decisions/0076-stream-benchmark-calls-and-larger-output-budget.md)) carries the rules above and the configured maximum. It sends the full text, cut at `extraction.full_text_max_chars`, when the document has extracted text, and the abstract otherwise. The quote check runs on exactly the text inside the `<publication>` delimiters; a delimiter tag inside the publication is defused first (REQ-NFR-006).
 
 ## Evals
 

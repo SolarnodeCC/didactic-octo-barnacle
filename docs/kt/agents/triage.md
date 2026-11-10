@@ -2,7 +2,7 @@
 title: Triage
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 related: [REQ-PROC-005, REQ-PROC-006, REQ-PROC-008]
 ---
 
@@ -62,7 +62,7 @@ The model judges from the title and abstract only.
 
 ## Prompt
 
-`triage@1` in `packages/prompts/src/triage.ts` carries the signal table above, asks for `Signals` and `Notes` only, and puts the title and abstract inside `<publication>` delimiters (REQ-NFR-006). The output contract is strict, so a model that returns `TriageScore`, `Accepted`, or any other field fails validation (REQ-PROC-008 AC1).
+`triage@2` in `packages/prompts/src/triage.ts` (the text of `triage@1` with an output budget of 8192 tokens for reasoning models, [ADR 0076](../decisions/0076-stream-benchmark-calls-and-larger-output-budget.md)) carries the signal table above, asks for `Signals` and `Notes` only, and puts the title and abstract inside `<publication>` delimiters (REQ-NFR-006). The output contract is strict, so a model that returns `TriageScore`, `Accepted`, or any other field fails validation (REQ-PROC-008 AC1).
 
 ## Evals
 

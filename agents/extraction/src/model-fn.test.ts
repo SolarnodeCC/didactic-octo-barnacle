@@ -42,7 +42,7 @@ function deps(replies: FakeReply[]) {
 }
 
 describe("REQ-TEST-006: the eval runner scores a model through callModel and the prompts", () => {
-  it("REQ-TEST-006: triage@1 with labelled replies passes every golden-set entry", async () => {
+  it("REQ-TEST-006: triage@2 with labelled replies passes every golden-set entry", async () => {
     const set = loadTriageSet();
     const replies: FakeReply[] = set.map((entry) => {
       const s = entry.expected.signals;
@@ -69,11 +69,11 @@ describe("REQ-TEST-006: the eval runner scores a model through callModel and the
     expect(report.PassRate).toBe(1);
     expect(ai.Remaining).toBe(0);
     expect(records).toHaveLength(set.length);
-    expect(new Set(records.map((r) => r.PromptVersion))).toEqual(new Set(["triage@1"]));
+    expect(new Set(records.map((r) => r.PromptVersion))).toEqual(new Set(["triage@2"]));
     expect(ai.Calls[0]?.Inputs.temperature).toBe(0);
   });
 
-  it("REQ-TEST-006: extraction@1 with labelled replies passes, so every labelled quote is in the text sent", async () => {
+  it("REQ-TEST-006: extraction@2 with labelled replies passes, so every labelled quote is in the text sent", async () => {
     const set = loadExtractionSet();
     const replies: FakeReply[] = set.map((entry) => ({
       Kind: "output",

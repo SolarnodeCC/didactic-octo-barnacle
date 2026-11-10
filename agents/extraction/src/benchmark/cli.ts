@@ -34,7 +34,8 @@ export const BENCHMARK_USAGE = [
   "Usage: roi-benchmark [--step triage|extraction|all] [--models <id,id>] [--runs <n>]",
   "                     [--budget-eur <n>] [--gateway <id>] [--out <dir>] [--limit <n>]",
   "                     [--output-mode json-schema|prompt-only] [--prices <file>]",
-  "                     [--r2-bucket <name>] [--min-interval-ms <n>] [--dry-run]",
+  "                     [--r2-bucket <name>] [--min-interval-ms <n>] [--timeout-ms <n>]",
+  "                     [--no-stream] [--dry-run]",
   "",
   "Live runs read CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN (Workers AI Read) from the",
   "environment. --dry-run answers with the golden-set labels and needs no credentials.",
@@ -52,6 +53,10 @@ export type BenchmarkArgs = {
   Prices: string;
   R2Bucket: string | null;
   MinIntervalMs: number;
+  /** Longest time one call may take, from request to the last streamed token. */
+  TimeoutMs: number;
+  /** Stream responses, so a slow reasoning model is not cut off by a proxy (ADR 0076). */
+  Stream: boolean;
   DryRun: boolean;
 };
 
@@ -80,12 +85,18 @@ export function parseBenchmarkArgs(args: readonly string[]): BenchmarkArgs | nul
     Prices: join(REPO_ROOT, "infrastructure/cloudflare/prices/2026-11-06.json"),
     R2Bucket: null,
     MinIntervalMs: 3000,
+    TimeoutMs: 600_000,
+    Stream: true,
     DryRun: false,
   };
   for (let i = 0; i < args.length; i += 1) {
     const flag = args[i];
     if (flag === "--dry-run") {
       parsed.DryRun = true;
+      continue;
+    }
+    if (flag === "--no-stream") {
+      parsed.Stream = false;
       continue;
     }
     const value = args[i + 1];
@@ -133,6 +144,12 @@ export function parseBenchmarkArgs(args: readonly string[]): BenchmarkArgs | nul
         const ms = Number(value);
         if (!Number.isInteger(ms) || ms < 0) return null;
         parsed.MinIntervalMs = ms;
+        break;
+      }
+      case "--timeout-ms": {
+        const ms = positive(value, true);
+        if (ms === null) return null;
+        parsed.TimeoutMs = ms;
         break;
       }
       case "--gateway":
@@ -250,7 +267,8 @@ export async function runBenchmarkCommand(
       AccountId: accountId,
       ApiToken: apiToken,
       MinIntervalMs: args.MinIntervalMs,
-      TimeoutMs: 120_000,
+      TimeoutMs: args.TimeoutMs,
+      Stream: args.Stream,
       ...(options.Fetch ? { Fetch: options.Fetch } : {}),
     });
   }

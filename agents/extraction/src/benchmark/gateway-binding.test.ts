@@ -1,7 +1,7 @@
-import { ProviderCallError } from "@roi/models";
+import { parseGeneration, ProviderCallError } from "@roi/models";
 import { describe, expect, it } from "vitest";
 
-import { GatewayRestBinding, putR2Object } from "./gateway-binding.js";
+import { assembleEventStream, GatewayRestBinding, putR2Object } from "./gateway-binding.js";
 
 const ACCOUNT = "0123456789abcdef0123456789abcdef";
 
@@ -93,6 +93,127 @@ describe("REQ-NFR-003: the benchmark calls Workers AI through AI Gateway", () =>
           Fetch,
         }),
     ).toThrow(/CLOUDFLARE_API_TOKEN/);
+  });
+});
+
+function sse(events: unknown[]): string {
+  return [...events.map((e) => `data: ${JSON.stringify(e)}`), "data: [DONE]", ""].join("\n\n");
+}
+
+describe("REQ-NFR-003: streamed calls through AI Gateway", () => {
+  it("REQ-NFR-003: AC1 a streamed call uses the per-model route, names the gateway, and rebuilds the reply", async () => {
+    const calls: Captured[] = [];
+    const fetchStub = (url: string | URL | Request, init?: RequestInit): Promise<Response> => {
+      calls.push({ Url: String(url), Init: init ?? {} });
+      return Promise.resolve(
+        new Response(
+          sse([
+            { choices: [{ delta: { reasoning_content: "Think. " }, finish_reason: null }] },
+            { choices: [{ delta: { content: '{"Ans' }, finish_reason: null }] },
+            {
+              choices: [{ delta: { content: 'wer": true}' }, finish_reason: "stop" }],
+              usage: { prompt_tokens: 0, completion_tokens: 1, total_tokens: 1 },
+            },
+            {
+              response: "",
+              usage: { prompt_tokens: 25, completion_tokens: 207, total_tokens: 232 },
+            },
+          ]),
+          {
+            status: 200,
+            headers: { "content-type": "text/event-stream", "cf-aig-log-id": "log_s" },
+          },
+        ),
+      );
+    };
+    const ai = new GatewayRestBinding({
+      AccountId: ACCOUNT,
+      ApiToken: "token-value",
+      MinIntervalMs: 0,
+      TimeoutMs: 1000,
+      Stream: true,
+      Fetch: fetchStub as typeof fetch,
+    });
+    const result = await ai.run(
+      "@cf/google/gemma-4-26b-a4b-it",
+      { messages: [], max_tokens: 10 },
+      { gateway: { id: "roi-staging" } },
+    );
+    expect(calls[0]?.Url).toBe(
+      `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT}/ai/run/@cf/google/gemma-4-26b-a4b-it`,
+    );
+    expect(JSON.parse(String(calls[0]?.Init.body))).toEqual({
+      messages: [],
+      max_tokens: 10,
+      stream: true,
+    });
+    const headers = calls[0]?.Init.headers as Record<string, string>;
+    expect(headers["cf-aig-gateway-id"]).toBe("roi-staging");
+    expect(ai.aiGatewayLogId).toBe("log_s");
+    expect(parseGeneration(result)).toEqual({
+      Output: '{"Answer": true}',
+      InputTokens: 25,
+      OutputTokens: 207,
+    });
+  });
+
+  it("REQ-NFR-011: a stream that ends in reasoning only gives empty content and the real token count", () => {
+    const result = assembleEventStream(
+      sse([
+        { choices: [{ delta: { reasoning: "long thought" }, finish_reason: "length" }] },
+        { usage: { prompt_tokens: 900, completion_tokens: 1024 } },
+      ]),
+    );
+    expect(result).toMatchObject({
+      choices: [{ message: { content: "", reasoning: "long thought" }, finish_reason: "length" }],
+    });
+    expect(parseGeneration(result)).toMatchObject({ Output: "", OutputTokens: 1024 });
+  });
+
+  it("REQ-NFR-003: a stream of response pieces keeps the response shape", () => {
+    const result = assembleEventStream(
+      sse([
+        { response: '{"a":' },
+        { response: "1}", usage: { prompt_tokens: 3, completion_tokens: 2 } },
+      ]),
+    );
+    expect(parseGeneration(result)).toEqual({ Output: '{"a":1}', InputTokens: 3, OutputTokens: 2 });
+  });
+
+  it("REQ-AGENT-012: an error event in the stream is a retryable provider error", () => {
+    let error: unknown;
+    try {
+      assembleEventStream(sse([{ errors: [{ code: 3040, message: "Capacity exceeded" }] }]));
+    } catch (caught) {
+      error = caught;
+    }
+    expect(error).toBeInstanceOf(ProviderCallError);
+    expect(error).toMatchObject({ Status: 502, message: "Capacity exceeded" });
+  });
+
+  it("REQ-AGENT-012: a streamed call that fails before the stream keeps its HTTP status", async () => {
+    const { Fetch } = stubFetch([
+      {
+        Status: 429,
+        Body: {
+          success: false,
+          errors: [{ code: 3040, message: "Capacity temporarily exceeded" }],
+        },
+        Headers: { "retry-after": "5" },
+      },
+    ]);
+    const ai = new GatewayRestBinding({
+      AccountId: ACCOUNT,
+      ApiToken: "token-value",
+      MinIntervalMs: 0,
+      TimeoutMs: 1000,
+      Stream: true,
+      Fetch,
+    });
+    const error = await ai
+      .run("@cf/zai-org/glm-4.7-flash", {}, { gateway: { id: "roi-staging" } })
+      .catch((e: unknown) => e);
+    expect(error).toMatchObject({ Status: 429, RetryAfterSeconds: 5 });
   });
 });
 
