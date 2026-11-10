@@ -155,6 +155,10 @@ describe("REQ-TEST-006: the benchmark command", () => {
       Stream: true,
       DryRun: false,
     });
+    // The price table of `model.price_table_version` (REQ-NFR-011, ADR 0078).
+    expect(parseBenchmarkArgs([])?.Prices).toMatch(
+      /infrastructure\/cloudflare\/prices\/2026-11-10\.json$/u,
+    );
     expect(parseBenchmarkArgs(["--no-stream", "--timeout-ms", "90000"])).toMatchObject({
       Stream: false,
       TimeoutMs: 90_000,
@@ -193,7 +197,7 @@ describe("REQ-TEST-006: the benchmark command", () => {
     const summary = JSON.parse(readFileSync(join(dir, "summary.json"), "utf8")) as {
       PriceTableVersion: string;
     };
-    expect(summary.PriceTableVersion).toBe("2026-11-06");
+    expect(summary.PriceTableVersion).toBe("2026-11-10");
     expect(readFileSync(join(dir, "report.md"), "utf8")).toContain("# Model benchmark");
     const records = readFileSync(join(dir, "model-calls.jsonl"), "utf8").split("\n");
     expect(records).toHaveLength(result.Records.length);

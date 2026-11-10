@@ -2,7 +2,7 @@
 title: Phase 2 delivery plan
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 related: [REQ-PROC-007]
 ---
 
@@ -15,6 +15,6 @@ How phase 2 of the [roadmap](../roadmap.md) is delivered: what it builds, how it
 | [Solution](solution.md) | Outcome, scope, the 16 phase 2 requirements, what stays out, and the data flow |
 | [Approach](approach.md) | Gate-first, model-free build, one work package per pull request, and how the exit criteria are shown |
 | [Design](design.md) | Components per package, queues and message types, the model-call helper, search, triage admission, budget, retractions, and the thin slice |
-| [Schema](schema.md) | Migrations 0009 and 0010, configuration keys, and bindings |
+| [Schema](schema.md) | Migrations 0009 to 0011, configuration keys, and bindings |
 | [Build plan](build-plan.md) | Work packages WP0 to WP11 with requirements, outputs, tests, and exit evidence |
 | [Dependencies](dependencies.md) | Gates and their owners, the order of the work packages, services, libraries, and cost limits |

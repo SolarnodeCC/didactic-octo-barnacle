@@ -131,7 +131,7 @@ export const EXPECTED_PHASE1_TABLES: ExpectedTable[] = [
 ];
 
 /**
- * Tables of migration 0009 (docs/kt/phase-2/schema.md), required by the phase 2 row
+ * Tables of migrations 0009 and 0010 (docs/kt/phase-2/schema.md), required by the phase 2 row
  * contracts in @roi/models (REQ-NFR-011, REQ-PROC-006, REQ-PROC-009).
  */
 export const EXPECTED_PHASE2_TABLES: ExpectedTable[] = [
@@ -162,6 +162,7 @@ export const EXPECTED_PHASE2_TABLES: ExpectedTable[] = [
       "prompt_version",
       "attempt",
       "input_tokens",
+      "cached_input_tokens",
       "output_tokens",
       "latency_ms",
       "cost_amount",

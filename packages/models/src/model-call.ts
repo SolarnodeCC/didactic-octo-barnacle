@@ -34,6 +34,8 @@ export const ModelCallRecordSchema = z
     PromptVersion: z.string().min(1).max(64).nullable(),
     Attempt: z.number().int().min(1),
     InputTokens: NonNegativeInt,
+    /** Input tokens served from the prompt cache, a part of `InputTokens` (ADR 0078). */
+    CachedInputTokens: NonNegativeInt,
     OutputTokens: NonNegativeInt,
     LatencyMs: NonNegativeInt,
     Cost: MoneySchema.refine((money) => money.Amount >= 0, "cost is not negative"),
@@ -48,6 +50,13 @@ export const ModelCallRecordSchema = z
   })
   .strict()
   .superRefine((record, ctx) => {
+    if (record.CachedInputTokens > record.InputTokens) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["CachedInputTokens"],
+        message: "cached input tokens are a part of the input tokens (ADR 0078)",
+      });
+    }
     if (record.Estimated && record.PriceTableVersion === null) {
       ctx.addIssue({
         code: "custom",

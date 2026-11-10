@@ -87,6 +87,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0074](0074-ci-secret-scoping-and-response-caps.md) | Environment jobs on main only, secrets per step, capped responses, and release cooldowns | Accepted |
 | [0076](0076-stream-benchmark-calls-and-larger-output-budget.md) | Stream benchmark calls, and a larger output budget for reasoning models | Proposed |
 | [0077](0077-full-workers-observability.md) | Keep every log line and trace of the deployed Worker | Accepted |
+| [0078](0078-cached-input-tokens-in-the-cost-estimate.md) | Bill cached input tokens at the cached-input price in the cost estimate | Proposed |
 
 ## When an ADR is needed
 

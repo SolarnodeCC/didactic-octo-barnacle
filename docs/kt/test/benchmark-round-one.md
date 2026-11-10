@@ -2,7 +2,7 @@
 title: Benchmark round one run plan
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 related: [REQ-AGENT-014, REQ-NFR-005, REQ-PROC-008, REQ-PROC-009, REQ-TEST-006]
 ---
 
@@ -18,7 +18,7 @@ How round one of the [model benchmark plan](model-benchmark-plan.md) is run for 
 | Opportunity extraction | `deepseek-v4.1-flash-1017`, `gemma-4-26b-a4b-it` | 38 | 3 | 228 |
 | **Total** | | | | **774** |
 
-- The command is `agents/extraction/src/benchmark/cli.ts` (`pnpm --filter @roi/extraction benchmark`). It uses the shared `callModel` helper, the versioned prompts of `packages/prompts`, and the price table `infrastructure/cloudflare/prices/2026-11-06.json`.
+- The command is `agents/extraction/src/benchmark/cli.ts` (`pnpm --filter @roi/extraction benchmark`). It uses the shared `callModel` helper, the versioned prompts of `packages/prompts`, and the price table `infrastructure/cloudflare/prices/2026-11-10.json`, which prices cached input tokens (ADR 0078).
 - It scores the deterministic checks only: schema, verbatim quotes, candidate count, agreement per signal, and the accept decision derived by code. The Anthropic judge for `Finding` and `Customer` (OQ-020) is not part of this round, so no judge key is needed.
 - The pass rule is the threshold file of each step: an entry pass rate of 0.85 with a tolerance of 0.05 ([golden sets](golden-sets.md#threshold-values)). Every candidate of a step gets the same prompt and settings.
 
