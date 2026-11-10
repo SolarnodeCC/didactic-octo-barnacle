@@ -39,4 +39,4 @@ A security audit of the repository on 2026-11-05 found the security design sound
 
 - A workflow with an environment can no longer be run from a branch, not even for a test. Test changes to these workflows on `main` after review, or with a dry-run input.
 - A dependency fix released less than three days ago needs a deliberate exception (`minimumReleaseAgeExclude`) in the pull request that takes it.
-- Follow-up work, not done here: a separate read-only Cloudflare token for the drift and measure jobs; a dual-key transition for `ERASURE_HASH_KEY` (see [privacy](../architecture/privacy.md)); CodeQL or another static analysis in CI; and a second code owner, so a review is independent of the author.
+- Follow-up work, not done here: a separate read-only Cloudflare token for the drift and measure jobs; a dual-key transition for `ERASURE_HASH_KEY` (see [privacy](../architecture/privacy.md)); and a second code owner, so a review is independent of the author.
