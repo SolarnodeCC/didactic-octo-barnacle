@@ -49,7 +49,11 @@ Every consumer uses the existing claim in `queue_message_log`, the growing retry
 Implementation (WP2): `callModel` in `packages/models/src/call-model.ts`, with the binding interface and error classes in `workers-ai.ts` and `FakeWorkersAi` for tests. The D1 store that writes `model_call` and `budget_day` in one batch is `apps/pipeline/src/store/model-usage.ts`. Further rules:
 
 - The price tables are `infrastructure/cloudflare/prices/<version>.json`: list prices in US dollars and the euro exchange rate of that day. A model whose list price has a cached-input price carries it as `CachedInputUsdPerMillionTokens`; the cost is uncached input tokens at the input price, plus cached input tokens (`usage.prompt_tokens_details.cached_tokens`) at the cached price, plus output tokens at the output price (ADR 0078). A published table is never changed; new prices get a new version. Costs are recorded in euro, the currency of the daily budget, rounded to 1e-8. A model with no price in the configured table is refused before the first call, so every record carries a cost.
-- The binding returns no gateway cost today, so every record is `estimated` with the table version. The first `evals` calls confirm this (ADR 0054).
+- The binding returns no gateway cost, so every record is `estimated` with the table version (ADR 0054). Checked on 2026-11-10 with two `extraction@2` calls of `deepseek-v4.1-flash-1017` on golden-set entry `gs-extraction-001`, through the `AI` binding (`wrangler dev`, where the AI binding always runs remotely) and the gateway `roi-staging`:
+  - The response has `id`, `object`, `created`, `model`, `choices`, and `usage`, and no cost field.
+  - `usage.prompt_tokens_details.cached_tokens` is present (704 of 828 input tokens on both calls), so `CachedInputTokens` comes from the binding as it does from the REST API (ADR 0078).
+  - The estimate of each record equals the cost the gateway logged for the same call (USD 0.0022986240 and 0.0018582240), and `aiGatewayLogId` gives the gateway log ID that `gateway_request_id` stores, so a later job can match estimated records to the gateway logs by request ID (ADR 0054).
+  - The first `evals` calls repeat this check (ADR 0078).
 - A 429, a 5xx, or an error with no status is retried with exponential backoff from 500 ms, capped at 30 s, or after `Retry-After` when that is longer. Any other 4xx, such as 410 for a deprecated model, fails the step at once.
 - A retry after invalid output adds the previous answer and the validation errors to the messages (REQ-AGENT-009 AC1).
 
