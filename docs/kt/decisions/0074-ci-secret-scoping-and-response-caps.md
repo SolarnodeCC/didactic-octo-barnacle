@@ -1,12 +1,12 @@
 ---
-title: "0073: Environment jobs on main only, secrets per step, capped responses, and release cooldowns"
+title: "0074: Environment jobs on main only, secrets per step, capped responses, and release cooldowns"
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-11-10
 related: [REQ-NFR-001, REQ-NFR-021, REQ-DATA-010]
 ---
 
-# 0073: Environment jobs on main only, secrets per step, capped responses, and release cooldowns
+# 0074: Environment jobs on main only, secrets per step, capped responses, and release cooldowns
 
 - Decision status: Accepted
 - Date: 2026-11-10

@@ -22,9 +22,9 @@ here, in CI, on every pull request. Rules (see docs/kt/decisions/0033-repository
     start such a workflow as its own run with `gh workflow run` instead (ADR 0046).
 12. A job that uses an `environment` runs only on `main`: its `if` contains
     `github.ref == 'refs/heads/main'`, so a branch cannot read the environment's secrets
-    even when the environment's branch policy is changed (ADR 0073).
+    even when the environment's branch policy is changed (ADR 0074).
 13. A job that uses an `environment` puts no secret in its job-level `env`: secrets go to
-    the steps that need them, so dependency install scripts never see them (ADR 0073).
+    the steps that need them, so dependency install scripts never see them (ADR 0074).
 """
 
 from __future__ import annotations

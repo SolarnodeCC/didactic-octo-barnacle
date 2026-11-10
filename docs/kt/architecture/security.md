@@ -24,9 +24,9 @@ related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-N
 | Secrets exposed to untrusted code in CI | Pull request jobs run without secrets; live evals only for branches in this repository, in a protected `evals` environment that requires reviewer approval (ADR 0006) | REQ-TEST-003, REQ-TEST-004 |
 | Redistribution of copyrighted papers | License recorded per document; PDFs stored and served only when the license allows it | REQ-DATA-010 |
 | Vulnerable dependencies | Dependabot for npm, pip, and GitHub Actions; pinned versions; `pnpm audit:ci` in CI (ADR 0033) | REQ-NFR-021, see [CI gates](../test/ci-gates.md) |
-| A CI or deploy change weakens the pipeline's own security | `scripts/check-hardening.py` fails the pull request: SHA-pinned actions, no stored checkout token, least-privilege `permissions`, no `pull_request_target`, no script injection, default code owner, environment jobs only on `main` with secrets scoped to steps; staging deploys only after green checks (ADR 0073) | REQ-NFR-021 |
-| A hung or hostile upstream stalls the Worker, or a retry duplicates an alert | Timeout per request, capped `Retry-After`, capped response size, no XML document type declarations, no retry of a non-idempotent request after an unclear outcome, Resend idempotency key (ADR 0073) | REQ-NFR-021 |
-| A hijacked release of a dependency or of pnpm reaches CI or the Worker | Dependabot cooldown of seven days, pnpm `minimumReleaseAge` of three days, `packageManager` pinned with its hash, lockfile installs only (ADR 0073) | REQ-NFR-021 |
+| A CI or deploy change weakens the pipeline's own security | `scripts/check-hardening.py` fails the pull request: SHA-pinned actions, no stored checkout token, least-privilege `permissions`, no `pull_request_target`, no script injection, default code owner, environment jobs only on `main` with secrets scoped to steps; staging deploys only after green checks (ADR 0074) | REQ-NFR-021 |
+| A hung or hostile upstream stalls the Worker, or a retry duplicates an alert | Timeout per request, capped `Retry-After`, capped response size, no XML document type declarations, no retry of a non-idempotent request after an unclear outcome, Resend idempotency key (ADR 0074) | REQ-NFR-021 |
+| A hijacked release of a dependency or of pnpm reaches CI or the Worker | Dependabot cooldown of seven days, pnpm `minimumReleaseAge` of three days, `packageManager` pinned with its hash, lockfile installs only (ADR 0074) | REQ-NFR-021 |
 
 ## PDF fetcher
 
@@ -71,5 +71,5 @@ default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src
 ## Model providers
 
 - All calls go through AI Gateway (REQ-NFR-003), which is the single place to log, rate-limit, and switch providers.
-- Each gateway has Authenticated Gateway turned on, so only callers with the gateway token (a Worker secret) can spend through it (ADR 0073).
+- Each gateway has Authenticated Gateway turned on, so only callers with the gateway token (a Worker secret) can spend through it (ADR 0074).
 - Provider keys are stored as secrets of the gateway or the Worker, never in code.

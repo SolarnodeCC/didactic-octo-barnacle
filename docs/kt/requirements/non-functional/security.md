@@ -123,7 +123,7 @@ The repository, its CI, and the collector's outbound requests keep their securit
 - Phase: 1
 - Priority: must
 - Status: in-progress
-- Source: Code review of 2026-10-31; ADR 0033; security audit of 2026-11-05 (ADR 0073)
+- Source: Code review of 2026-10-31; ADR 0033; security audit of 2026-11-05 (ADR 0074)
 - Depends on: REQ-NFR-001, REQ-DATA-001, REQ-DATA-010
 - Acceptance criteria:
   1. `scripts/check-hardening.py` runs in CI and fails when: a workflow action is not pinned to a commit SHA; `actions/checkout` keeps credentials; a workflow has no top-level `permissions`; a workflow uses `pull_request_target`, or uses secrets on `pull_request`; a `run` script interpolates event data or inputs; Dependabot misses github-actions, pip, or npm; CODEOWNERS has no default owner; `wrangler.toml` turns on workers.dev or preview URLs; or CI does not audit dependencies; a `workflow_run` workflow is not limited to `branches: [main]`; a job passes `secrets: inherit`; or a job calls a local workflow whose jobs use an environment, whose secrets would not reach it (ADR 0046).
@@ -133,9 +133,9 @@ The repository, its CI, and the collector's outbound requests keep their securit
   5. A queue message that fails is logged with the queue name and the error class, never the error text.
   6. The PDF fetcher refuses names that embed an IP address and the public wildcard-DNS services listed in code, in addition to the rules of REQ-DATA-010.
   7. The collector Worker has no workers.dev address and no preview URLs.
-  8. Every job that uses a GitHub environment runs only on `main` (`if: github.ref == 'refs/heads/main'`) and passes secrets only to the steps that need them, never in its job-level `env`, so a branch cannot read them and dependency install scripts never see them. `scripts/check-hardening.py` fails otherwise (ADR 0073).
-  9. The collector reads at most `http.max_response_bytes` from one OpenAlex or arXiv response, and refuses an arXiv feed with a document type declaration (ADR 0073).
-  10. New dependency versions wait before they are used: Dependabot waits seven days after a release, pnpm resolves only versions at least three days old, and `packageManager` pins pnpm with its hash (ADR 0073).
+  8. Every job that uses a GitHub environment runs only on `main` (`if: github.ref == 'refs/heads/main'`) and passes secrets only to the steps that need them, never in its job-level `env`, so a branch cannot read them and dependency install scripts never see them. `scripts/check-hardening.py` fails otherwise (ADR 0074).
+  9. The collector reads at most `http.max_response_bytes` from one OpenAlex or arXiv response, and refuses an arXiv feed with a document type declaration (ADR 0074).
+  10. New dependency versions wait before they are used: Dependabot waits seven days after a release, pnpm resolves only versions at least three days old, and `packageManager` pins pnpm with its hash (ADR 0074).
   11. A failure reason in an alert cannot notify a GitHub account: `@name` is broken up before the text leaves the pipeline.
 - Verification: `scripts/check-hardening.py` in CI, unit tests, and code review. Required reviewers on the GitHub environment `staging` and required status checks on `main` are repository settings; [operations](../../operations.md) lists them for the quarterly review.
 

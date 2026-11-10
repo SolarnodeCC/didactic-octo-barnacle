@@ -5,5 +5,5 @@ packages:
   - "infrastructure/*"
 
 # Resolve only versions published at least three days ago (minutes), so a hijacked release
-# is found before it is installed (REQ-NFR-021, ADR 0073).
+# is found before it is installed (REQ-NFR-021, ADR 0074).
 minimumReleaseAge: 4320

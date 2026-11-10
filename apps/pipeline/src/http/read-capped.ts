@@ -1,7 +1,7 @@
 import { HttpRequestError } from "./retry.js";
 
 /**
- * The most a collector reads from one API response (REQ-NFR-021, ADR 0073). A page of 100
+ * The most a collector reads from one API response (REQ-NFR-021, ADR 0074). A page of 100
  * works or entries is well under 2 MB; the cap stops a broken or hostile upstream from
  * filling the Worker's memory.
  */

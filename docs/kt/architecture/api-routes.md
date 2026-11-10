@@ -13,7 +13,7 @@ Concrete routes for `apps/api`. Request and response bodies are Zod schemas in `
 ## Conventions
 
 - Data API prefix: `/api/v1/`. Auth prefix: `/auth/`. Admin prefix: `/admin/`.
-- Session cookie is shared across prefixes (REQ-ACC-004, ADR 0018). It is named with the `__Host-` prefix and set with `Secure`, `HttpOnly`, `SameSite=Lax`, and `Path=/`, without `Domain`, so it is never sent to another host or read by script (ADR 0073). The CSRF cookie also uses `__Host-` and `Secure`, without `HttpOnly` (see CSRF issuance).
+- Session cookie is shared across prefixes (REQ-ACC-004, ADR 0018). It is named with the `__Host-` prefix and set with `Secure`, `HttpOnly`, `SameSite=Lax`, and `Path=/`, without `Domain`, so it is never sent to another host or read by script (ADR 0074). The CSRF cookie also uses `__Host-` and `Secure`, without `HttpOnly` (see CSRF issuance).
 - Every state-changing method (`POST`, `PATCH`, `DELETE`) requires a valid CSRF token and a matching `Origin` (REQ-NFR-014).
 - Errors use `{ error: { code, message, referenceId } }` (REQ-API-003). Stable codes are listed below.
 - Pagination uses `cursor` and `limit` (default 25, max 100) unless noted.
