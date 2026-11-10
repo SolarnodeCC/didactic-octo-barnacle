@@ -1,4 +1,5 @@
 import { fetchWithBackoff, type BackoffOptions, type FetchFn } from "../../http/retry.js";
+import { DEFAULT_MAX_RESPONSE_BYTES, readTextCapped } from "../../http/read-capped.js";
 import { type OpenAlexWork } from "./types.js";
 
 export type OpenAlexPageRequest = {
@@ -108,7 +109,7 @@ function openAlexHeaders(apiKey?: string): Record<string, string> {
 /** Fetch one page of works (REQ-DATA-001); failed requests retry with backoff. */
 export async function fetchOpenAlexPage(
   request: OpenAlexPageRequest,
-  deps: { Fetch: FetchFn; Backoff: BackoffOptions },
+  deps: { Fetch: FetchFn; Backoff: BackoffOptions; MaxResponseBytes?: number },
 ): Promise<OpenAlexPage> {
   const response = await fetchWithBackoff(
     deps.Fetch,
@@ -116,7 +117,8 @@ export async function fetchOpenAlexPage(
     { headers: openAlexHeaders(request.ApiKey) },
     deps.Backoff,
   );
-  const body = (await response.json()) as OpenAlexResponse;
+  const text = await readTextCapped(response, deps.MaxResponseBytes ?? DEFAULT_MAX_RESPONSE_BYTES);
+  const body = JSON.parse(text) as OpenAlexResponse;
   return {
     Works: body.results ?? [],
     NextCursor: body.meta?.next_cursor ?? null,

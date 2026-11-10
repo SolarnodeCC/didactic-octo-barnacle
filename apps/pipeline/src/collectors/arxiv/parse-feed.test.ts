@@ -12,6 +12,16 @@ const feed = readFileSync(
 );
 
 describe("REQ-DATA-002: arXiv Atom feed parsing", () => {
+  it("REQ-NFR-021: refuses a feed with a document type declaration (entity expansion)", () => {
+    const hostile = `<?xml version="1.0"?><!DOCTYPE feed [<!ENTITY a "aaaaaaaaaa"><!ENTITY b "&a;&a;&a;">]><feed><entry><title>&b;</title></entry></feed>`;
+    expect(() => parseArxivFeed(hostile)).toThrow(/document type declaration/u);
+  });
+
+  it("REQ-DATA-002: still decodes the standard XML entities", () => {
+    const xml = `<feed xmlns="http://www.w3.org/2005/Atom"><entry><title>A &amp; B &lt;C&gt;</title></entry></feed>`;
+    expect(parseArxivFeed(xml)[0]?.title).toBe("A & B <C>");
+  });
+
   it("REQ-DATA-002: parses entries into ArxivEntry records", () => {
     const [first] = parseArxivFeed(feed);
     expect(first).toEqual({
