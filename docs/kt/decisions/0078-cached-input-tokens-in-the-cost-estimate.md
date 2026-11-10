@@ -1,14 +1,14 @@
 ---
 title: "0078: Bill cached input tokens at the cached-input price in the cost estimate"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-10
 related: [REQ-NFR-005, REQ-NFR-011, REQ-NFR-020]
 ---
 
 # 0078: Bill cached input tokens at the cached-input price in the cost estimate
 
-- Decision status: Proposed
+- Decision status: Accepted
 - Date: 2026-11-10
 - Changes: the price table format and the new table `infrastructure/cloudflare/prices/2026-11-10.json`, `model.price_table_version` in [defaults](../architecture/defaults.md), the `model_call` row of the [phase 2 schema](../phase-2/schema.md) (migration 0010), and the number of the thin-slice migration (now 0011). No requirement changes.
 
