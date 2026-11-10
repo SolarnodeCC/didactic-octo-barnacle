@@ -233,38 +233,50 @@ describe("REQ-DATA-010: license gate and safe fetching", () => {
     expect(h.Queue.deadLettered).toHaveLength(0);
   });
 
-  it("REQ-DATA-010: a transient failure is retried, dead-lettered, and stored after a replay", async () => {
+  it("REQ-DATA-010: a host that stays down is recorded as unavailable, not dead-lettered, and tried again later", async () => {
     const down = new PdfFetchError("HTTP 503", "http-status", false);
     h.SetPdfs({ [URL_A]: down });
     await ingestPage(h, [makeWork(1, { Pdf: { Url: URL_A, License: "cc-by" } })]);
 
     expect(h.PdfRequests).toHaveLength(4); // first try and three retries
-    expect(h.Queue.deadLettered).toHaveLength(1);
+    expect(h.Queue.deadLettered).toEqual([]); // no dead letter, so no alert (ADR 0073)
     expect(documents(h)).toEqual([]);
-    const run = h.Run();
-    expect(run["status"]).toBe("succeeded"); // a PDF problem does not fail the ingestion run
+    expect(h.Run()["status"]).toBe("succeeded"); // a PDF problem does not fail the ingestion run
+    const logged = h.Database.Raw.prepare(
+      "SELECT status, last_error FROM queue_message_log WHERE message_id LIKE 'document:%'",
+    ).get() as { status: string; last_error: string };
+    expect(logged.status).toBe("failed");
+    expect(logged.last_error).toBe("unavailable after 4 attempts: http-status: HTTP 503");
 
-    const messageId = (h.Queue.deadLettered[0] as { MessageId: string }).MessageId;
+    // The next run that stores the publication queues its PDF again, and the host is back.
     h.SetPdfs({ [URL_A]: pdfBytes("paper one") });
-    expect(await replayDeadLetter(h.Deps, messageId)).toBe("replayed");
-    await h.Drain();
+    h.Clock.Now = "2026-10-31T06:00:00.000Z";
+    await ingestPage(h, [makeWork(1, { Pdf: { Url: URL_A, License: "cc-by" } })]);
 
     expect(documents(h)).toHaveLength(1);
     expect(h.Bucket.puts).toBe(1);
   });
 
-  it("REQ-DATA-011: a PDF host that answers 429 is retried after minutes, then dead-lettered", async () => {
+  it("REQ-DATA-011: an error of the pipeline itself is still dead-lettered and alerted", async () => {
+    h.SetPdfs({ [URL_A]: new Error("bucket write failed") });
+    await ingestPage(h, [makeWork(1, { Pdf: { Url: URL_A, License: "cc-by" } })]);
+
+    expect(h.Queue.deadLettered).toHaveLength(1);
+    expect(documents(h)).toEqual([]);
+  });
+
+  it("REQ-DATA-011: a PDF host that answers 429 is retried after minutes, then recorded as unavailable", async () => {
     const limited = new PdfFetchError("HTTP 429", "http-status", false, 429, 100);
     h.SetPdfs({ [URL_A]: limited });
     await ingestPage(h, [makeWork(1, { Pdf: { Url: URL_A, License: "cc-by" } })]);
 
     expect(h.PdfRequests).toHaveLength(4); // first try and three retries
-    expect(h.Queue.deadLettered).toHaveLength(1);
-    // 5, 10, 20, and 40 minutes (a Retry-After of 100 s is shorter), each within the 20 %
-    // jitter. The fourth delivery asks for a retry too, and that sends it to the dead letters.
+    expect(h.Queue.deadLettered).toEqual([]);
+    // 5, 10, and 20 minutes (a Retry-After of 100 s is shorter), each within the 20 %
+    // jitter. The fourth delivery gives up and records the PDF as unavailable (ADR 0073).
     const delays = h.Queue.retries.map((retry) => retry.delaySeconds);
-    expect(delays).toHaveLength(4);
-    [300, 600, 1200, 2400].forEach((expected, index) => {
+    expect(delays).toHaveLength(3);
+    [300, 600, 1200].forEach((expected, index) => {
       expect(delays[index]).toBeGreaterThanOrEqual(Math.round(expected * 0.8));
       expect(delays[index]).toBeLessThanOrEqual(Math.round(expected * 1.2));
     });

@@ -74,7 +74,7 @@ export async function consumeBatch(
       } else if (
         QueueMessageEnvelopeSchema.safeParse(message.body).data?.Type === "document.ingest"
       ) {
-        await handleDocumentIngest(deps, message.body);
+        await handleDocumentIngest(deps, message.body, { Attempts: message.attempts });
       } else {
         await handleFetchPage(deps, message.body);
       }
