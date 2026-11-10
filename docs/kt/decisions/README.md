@@ -85,11 +85,12 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0072](0072-one-owner-reviews-the-golden-sets-with-agents.md) | One owner reviews the golden sets, with agents to draft and cross-check | Accepted |
 | [0073](0073-unreachable-pdf-is-a-data-outcome.md) | A PDF host that stays unreachable is a data outcome, not an alert | Accepted |
 | [0074](0074-ci-secret-scoping-and-response-caps.md) | Environment jobs on main only, secrets per step, capped responses, and release cooldowns | Accepted |
-| [0076](0076-stream-benchmark-calls-and-larger-output-budget.md) | Stream benchmark calls, and a larger output budget for reasoning models | Proposed |
+| [0076](0076-stream-benchmark-calls-and-larger-output-budget.md) | Stream benchmark calls, and a larger output budget for reasoning models | Accepted |
 | [0077](0077-full-workers-observability.md) | Keep every log line and trace of the deployed Worker | Accepted |
 | [0078](0078-cached-input-tokens-in-the-cost-estimate.md) | Bill cached input tokens at the cached-input price in the cost estimate | Accepted |
 | [0080](0080-no-outside-expert-review-and-no-claim-of-independent-validation.md) | No outside expert review, and no claim of independent validation | Accepted |
 | [0081](0081-workers-ai-judge-for-a-daily-sample-of-live-output.md) | A Workers AI judge grades a small daily sample of live output | Accepted |
+| [0082](0082-benchmark-round-one-selects-no-model.md) | Benchmark round one selects no model for triage or extraction | Accepted |
 
 ## When an ADR is needed
 

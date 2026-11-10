@@ -1,14 +1,14 @@
 ---
 title: "0076: Stream benchmark calls, and a larger output budget for reasoning models"
 owner: "@SolarnodeCC"
-status: draft
+status: approved
 last_reviewed: 2026-11-10
 related: [REQ-AGENT-010, REQ-AGENT-014, REQ-NFR-003, REQ-NFR-005, REQ-NFR-011, REQ-TEST-006]
 ---
 
 # 0076: Stream benchmark calls, and a larger output budget for reasoning models
 
-- Decision status: Proposed
+- Decision status: Accepted (with round one, [ADR 0082](0082-benchmark-round-one-selects-no-model.md))
 - Date: 2026-11-10
 - Changes: the prompt versions `triage@1` and `extraction@1` (now `triage@2` and `extraction@2`), and the transport of the benchmark command in [running a round](../test/model-benchmark-run.md). No requirement changes.
 
