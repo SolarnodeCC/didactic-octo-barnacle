@@ -2,13 +2,13 @@
 title: Phase 2 schema, configuration, and bindings
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 related: [REQ-NFR-020, REQ-NFR-011, REQ-PROC-001, REQ-PROC-006, REQ-PROC-009, REQ-DATA-006, REQ-DATA-008, REQ-PROC-007]
 ---
 
 # Phase 2 schema, configuration, and bindings
 
-Both migrations are expand-only (ADR 0028, REQ-NFR-020) and follow the conventions of [schema migration 0001](../architecture/schema-migration-0001.md): ULID text keys, ISO-8601 UTC text times, and booleans as 0/1. When a migration lands, its tables move into that document's implementation notes and `EXPECTED_PHASE1_TABLES` gains a phase 2 list.
+The migrations are expand-only (ADR 0028, REQ-NFR-020) and follow the conventions of [schema migration 0001](../architecture/schema-migration-0001.md): ULID text keys, ISO-8601 UTC text times, and booleans as 0/1. When a migration lands, its tables move into that document's implementation notes and `EXPECTED_PHASE1_TABLES` gains a phase 2 list.
 
 ## Migration 0009: processing
 
@@ -17,7 +17,7 @@ It extends the tables planned in schema migration 0001 with the fields that REQ-
 | Table | Columns | Keys and indexes |
 |---|---|---|
 | `processing_run` | `id`, `kind` (`daily`, `backfill`, `retraction-check`, `slice`), `day`, `status`, `started_at`, `ended_at`, `counts_json`, `failures_json` | UNIQUE (`kind`, `day`) for `daily`; index `day` |
-| `model_call` | `id`, `run_kind` (`processing`, `pipeline`), `run_id`, `step_name`, `agent`, `publication_id`, `candidate_id`, `model`, `prompt_version`, `attempt`, `input_tokens`, `output_tokens`, `latency_ms`, `cost_amount`, `cost_currency`, `price_table_version`, `estimated`, `outcome` (`ok`, `invalid-output`, `provider-error`), `gateway_request_id`, `call_kind` (`model`, `search`), `search_query`, `search_result_count`, `created_at` | index (`run_kind`, `run_id`); index `created_at`. No prompt or publication text |
+| `model_call` | `id`, `run_kind` (`processing`, `pipeline`), `run_id`, `step_name`, `agent`, `publication_id`, `candidate_id`, `model`, `prompt_version`, `attempt`, `input_tokens`, `cached_input_tokens` (from migration 0010), `output_tokens`, `latency_ms`, `cost_amount`, `cost_currency`, `price_table_version`, `estimated`, `outcome` (`ok`, `invalid-output`, `provider-error`), `gateway_request_id`, `call_kind` (`model`, `search`), `search_query`, `search_result_count`, `created_at` | index (`run_kind`, `run_id`); index `created_at`. No prompt or publication text |
 | `budget_day` | `day`, `limit_amount`, `spent_amount`, `currency`, `stopped_at`, `alerted_at` | PRIMARY `day` |
 | `embedding_index` | `id`, `binding`, `vectorize_name`, `model_name`, `model_version`, `dimensions`, `metric`, `current`, `backfill_started_at`, `backfill_done_at` | UNIQUE `vectorize_name`; at most one row with `current = 1` |
 | `embedding` | `id`, `publication_id`, `embedding_index_id`, `vectorize_id`, `model_name`, `model_version`, `input_kind` (`title-abstract`, `title-only`), `created_at` | UNIQUE (`publication_id`, `embedding_index_id`) |
@@ -39,7 +39,13 @@ The `redrive` table (`item_kind` (`publication`, `candidate`), `item_id`, `step`
 
 Signals are nullable: a rule rejection has no signals, no model, and no prompt version (REQ-PROC-006 AC2). The signal columns carry a `signal_` prefix because `trigger` is an SQL keyword. A publication is triaged once; triaging again with a new prompt version is a backfill that replaces the row, and its model calls stay recorded.
 
-## Migration 0010: thin slice
+## Migration 0010: cached input tokens
+
+`model_call.cached_input_tokens` (INTEGER, NOT NULL, default 0, between 0 and `input_tokens`): the input tokens the provider served from its prompt cache, as Workers AI reports them in `usage.prompt_tokens_details.cached_tokens`. They are a part of `input_tokens` and are billed at the cached-input price of the price table, so the stored cost can be recomputed from the row and its `price_table_version` ([ADR 0078](../decisions/0078-cached-input-tokens-in-the-cost-estimate.md)). The column is added with `ALTER TABLE ... ADD COLUMN`: rows written before it, and a Worker that does not write it, read 0. Migration 0010 is `infrastructure/cloudflare/migrations/0010_model_call_cached_input_tokens.sql`.
+
+## Migration 0011: thin slice
+
+ADR 0054 planned this migration as 0010; it became 0011 when migration 0010 went to cached input tokens (ADR 0078).
 
 The tables of schema migration 0001 for the pipeline, with these changes:
 
@@ -63,7 +69,7 @@ New keys for [defaults](../architecture/defaults.md). They are added there in th
 | `embedding.batch_size` | `50` | Messages per embedding call |
 | `budget.expected_daily_triaged`, `budget.expected_daily_embeddings` | from the measured daily volume | Largest measured day until a steady state is known (ADR 0059) |
 | `retraction.lookback_days` | `30` | How far back the weekly retraction check looks (ADR 0061) |
-| `model.price_table_version` | `2026-11-06` | Versioned price table in `infrastructure/cloudflare`, used when the gateway gives no cost (REQ-NFR-011 AC2) |
+| `model.price_table_version` | `2026-11-10` | Versioned price table in `infrastructure/cloudflare`, used when the gateway gives no cost (REQ-NFR-011 AC2); cached input tokens at the cached-input price (ADR 0078) |
 | `model.triage`, `model.extraction`, `model.embedding` | from the OQ-036 ADR | Model name, version, and sampling settings |
 | `extraction.generic_customer_terms` | `users`, `end users`, `people`, `persons`, `individuals`, `humans`, `everyone`, `society`, `the public` | A `Customer` equal to one of these fails its candidate (ADR 0066) |
 | `extraction.full_text_wait_hours` | `24` | How long admission waits for full text before it admits on the abstract (ADR 0065) |

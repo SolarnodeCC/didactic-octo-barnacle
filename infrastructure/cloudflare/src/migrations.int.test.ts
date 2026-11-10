@@ -31,6 +31,7 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
       "0007_ingestion_run_window_end.sql",
       "0008_source_record_openalex_lower_idx.sql",
       "0009_processing.sql",
+      "0010_model_call_cached_input_tokens.sql",
     ]);
   });
 
@@ -49,6 +50,7 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
       "0007_ingestion_run_window_end.sql",
       "0008_source_record_openalex_lower_idx.sql",
       "0009_processing.sql",
+      "0010_model_call_cached_input_tokens.sql",
     ]);
 
     for (const table of [...EXPECTED_PHASE1_TABLES, ...EXPECTED_PHASE2_TABLES]) {
@@ -234,6 +236,39 @@ describe("REQ-NFR-020: migration 0009 is expand-only", () => {
     expect(db.prepare("SELECT status FROM document WHERE id = 'doc_1'").get()).toEqual({
       status: "text-failed",
     });
+  });
+});
+
+describe("REQ-NFR-020: migration 0010 is expand-only", () => {
+  it("REQ-NFR-020: REQ-NFR-011 0010 adds cached_input_tokens on top of 0009 with data, and the 0009 insert still runs", () => {
+    const db = new Database(":memory:");
+    for (const file of listMigrationFiles().filter((name) => name < "0010")) {
+      db.exec(readMigrationSql(file));
+    }
+    const insert0009 = db.prepare(
+      "INSERT INTO model_call (id, run_kind, run_id, step_name, model, attempt, input_tokens, cost_currency, outcome, created_at) VALUES (?, 'processing', 'run_1', 'triage', 'm', 1, 900, 'EUR', 'ok', '2026-11-10T12:00:00Z')",
+    );
+    insert0009.run("mc_1");
+
+    db.exec(readMigrationSql("0010_model_call_cached_input_tokens.sql"));
+
+    // A Worker of the previous version writes without the column; the row reads as uncached.
+    insert0009.run("mc_2");
+    expect(db.prepare("SELECT id, cached_input_tokens FROM model_call ORDER BY id").all()).toEqual([
+      { id: "mc_1", cached_input_tokens: 0 },
+      { id: "mc_2", cached_input_tokens: 0 },
+    ]);
+  });
+
+  it("REQ-NFR-011: AC1 cached input tokens are a non-negative part of the input tokens", () => {
+    const db = migratedDb();
+    const insert = db.prepare(
+      "INSERT INTO model_call (id, run_kind, run_id, step_name, model, attempt, input_tokens, cached_input_tokens, cost_currency, outcome, created_at) VALUES (?, 'processing', 'run_1', 'extraction', 'm', 1, 1027, ?, 'EUR', 'ok', '2026-11-10T12:00:00Z')",
+    );
+    insert.run("mc_1", 960);
+    insert.run("mc_2", 1027);
+    expect(() => insert.run("mc_3", 1028)).toThrow(/CHECK/);
+    expect(() => insert.run("mc_4", -1)).toThrow(/CHECK/);
   });
 });
 

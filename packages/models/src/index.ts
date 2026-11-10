@@ -154,6 +154,7 @@ export {
   estimateCost,
   type ModelPrice,
   type PriceTable,
+  type TokenUsage,
 } from "./price-table.js";
 
 export {

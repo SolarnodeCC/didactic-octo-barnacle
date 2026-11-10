@@ -2,7 +2,7 @@
 title: Phase 2 dependencies
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 related: [REQ-NFR-005, REQ-NFR-002, REQ-NFR-020]
 ---
 
@@ -15,7 +15,7 @@ Phase 2 starts only when every gate below is closed ([Definition of Ready](../ro
 | Gate | State on 2026-11-06 | Owner | Evidence that closes it |
 |---|---|---|---|
 | Phase 1 exit | Met: the data criterion of ADR 0051 is confirmed on the runs of 7 Nov (arXiv 14,035 and OpenAlex 16,134 publications with an abstract; the first `succeeded` arXiv run) | Lead engineer | The 7 November result in [ingestion scope](../data-sources/ingestion-scope.md) |
-| OQ-014: legal phase-2 gate questions | Answered: questions 1 to 5 approved on 2026-11-06 with no conditions; the contact is `info@solarnode.cc`. Launch questions 6 to 12 stay open | `@SolarnodeCC` and legal | The [review brief](../legal/review-brief.md). Workers AI processing falls under the Cloudflare agreement of launch question 8 (ADR 0049) |
+| Legal phase-2 gate questions | Answered: questions 1 to 5 approved on 2026-11-06 with no conditions; the contact is `info@solarnode.cc`. Launch questions 6 to 12 are a launch checklist item | `@SolarnodeCC` and legal | The [review brief](../legal/review-brief.md). Workers AI processing falls under the Cloudflare agreement of launch question 8 (ADR 0049) |
 | OQ-036: models for triage and extraction | Open; round one covers triage and extraction only, two candidates each (benchmark plan) | AI engineering lead | Benchmark ADR on the golden sets ([benchmark plan](../test/model-benchmark-plan.md)); needs WP1 to WP3 |
 | OQ-040: providers | Answered by ADR 0049: Workers AI for the pipeline, Anthropic as the eval judge only | `@SolarnodeCC` | ADR 0049 |
 | OQ-038: population-level burden | Answered by ADR 0050 (REQ-PROC-009 AC6) | Product owner | ADR 0050; the first extraction eval run reviews the rule |
@@ -59,7 +59,7 @@ flowchart TD
 | Vectorize | Publication vectors | Index exists (ADR 0027); metadata indexes new | Maximum metadata indexes; topK with metadata returned; delete-by-ID batch size |
 | Queues | Text, embedding, model queues | Three queues and their dead-letter queues | Batch size, delivery delay (maximum 12 hours), concurrency |
 | Workflows | Candidate Workflow, thin slice only | Yes | Steps per instance; local development support |
-| D1 | New tables | Migrations 0009 and 0010 | Rows written per batch; database size |
+| D1 | New tables | Migrations 0009, 0010, and 0011 | Rows written per batch; database size |
 | R2 | Extracted text under `texts/` | New prefix | none new |
 
 No new service outside the stack is added (REQ-NFR-002). The Cloudflare-hosted PDF conversion of ADR 0009 stays a fallback that would need its own ADR.

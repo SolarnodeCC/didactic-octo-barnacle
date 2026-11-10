@@ -20,7 +20,7 @@ Tables, configuration keys, and bindings are in [schema](schema.md). Behavior th
 | `agents/extraction` | `runTriageStep` and `runExtractionStep`: pure functions from input to validated output through `callModel`; an eval command that runs the existing eval runner on `callModel` for the benchmark |
 | `apps/pipeline` | Consumers for embedding, triage, extraction, and text extraction; the admission cron; the retraction check; budget handling; the thin-slice Workflow with stub steps; run-report fields for processing |
 | `apps/api` (new, minimal) | One read-only route for the thin slice (ADR 0058) |
-| `infrastructure/cloudflare` | Migrations 0009 and 0010; Workers AI, Vectorize, Workflow, and queue bindings; new crons; bootstrap entries for the new queues and the Vectorize metadata indexes; the price table |
+| `infrastructure/cloudflare` | Migrations 0009, 0010, and 0011; Workers AI, Vectorize, Workflow, and queue bindings; new crons; bootstrap entries for the new queues and the Vectorize metadata indexes; the price table |
 
 ## Queues and message types
 
@@ -43,13 +43,17 @@ Every consumer uses the existing claim in `queue_message_log`, the growing retry
 1. Checks the daily budget at the first attempt of a step, never on a retry, so a step that has started finishes (REQ-NFR-005 AC2).
 2. Calls the Workers AI binding with the environment's AI Gateway and request metadata: run ID, step, and agent (REQ-NFR-003 AC2, ADR 0054).
 3. Applies the two code repairs (`repairModelOutput`), validates the contract, and checks every quote against the input text. A failure is retried with the validation errors, up to `model.max_attempts`. A 429 or 5xx is retried with backoff and `Retry-After` and counts toward the same limit.
-4. Writes one `model_call` row per attempt: tokens, latency, cost as `Money`, `price_table_version`, `estimated`, and the outcome (`ok`, `invalid-output`, `provider-error`). The row never holds prompt or publication text (REQ-NFR-011).
+4. Writes one `model_call` row per attempt: input tokens with the cached part, output tokens, latency, cost as `Money`, `price_table_version`, `estimated`, and the outcome (`ok`, `invalid-output`, `provider-error`). The row never holds prompt or publication text (REQ-NFR-011).
 5. Adds the cost to `budget_day` in the same batch.
 
 Implementation (WP2): `callModel` in `packages/models/src/call-model.ts`, with the binding interface and error classes in `workers-ai.ts` and `FakeWorkersAi` for tests. The D1 store that writes `model_call` and `budget_day` in one batch is `apps/pipeline/src/store/model-usage.ts`. Further rules:
 
-- The price tables are `infrastructure/cloudflare/prices/<version>.json`: list prices in US dollars and the euro exchange rate of that day. Costs are recorded in euro, the currency of the daily budget, rounded to 1e-8. A model with no price in the configured table is refused before the first call, so every record carries a cost.
-- The binding returns no gateway cost today, so every record is `estimated` with the table version. The first `evals` calls confirm this (ADR 0054).
+- The price tables are `infrastructure/cloudflare/prices/<version>.json`: list prices in US dollars and the euro exchange rate of that day. A model whose list price has a cached-input price carries it as `CachedInputUsdPerMillionTokens`; the cost is uncached input tokens at the input price, plus cached input tokens (`usage.prompt_tokens_details.cached_tokens`) at the cached price, plus output tokens at the output price (ADR 0078). A published table is never changed; new prices get a new version. Costs are recorded in euro, the currency of the daily budget, rounded to 1e-8. A model with no price in the configured table is refused before the first call, so every record carries a cost.
+- The binding returns no gateway cost, so every record is `estimated` with the table version (ADR 0054). Checked on 2026-11-10 with two `extraction@2` calls of `deepseek-v4.1-flash-1017` on golden-set entry `gs-extraction-001`, through the `AI` binding (`wrangler dev`, where the AI binding always runs remotely) and the gateway `roi-staging`:
+  - The response has `id`, `object`, `created`, `model`, `choices`, and `usage`, and no cost field.
+  - `usage.prompt_tokens_details.cached_tokens` is present (704 of 828 input tokens on both calls), so `CachedInputTokens` comes from the binding as it does from the REST API (ADR 0078).
+  - The estimate of each record equals the cost the gateway logged for the same call (USD 0.0022986240 and 0.0018582240), and `aiGatewayLogId` gives the gateway log ID that `gateway_request_id` stores, so a later job can match estimated records to the gateway logs by request ID (ADR 0054).
+  - The first `evals` calls repeat this check (ADR 0078).
 - A 429, a 5xx, or an error with no status is retried with exponential backoff from 500 ms, capped at 30 s, or after `Retry-After` when that is longer. Any other 4xx, such as 410 for a deprecated model, fails the step at once.
 - A retry after invalid output adds the previous answer and the validation errors to the messages (REQ-AGENT-009 AC1).
 
@@ -120,7 +124,7 @@ In phase 2 the model queue's concurrency (8, equal to `model.semaphore_max`) is 
 
 - Ingestion already sets `publication.retracted` and never clears it.
 - The weekly retraction check (`0 8 * * 1`) asks OpenAlex for retracted works, and arXiv for withdrawals, among the stored publications of the last `retraction.lookback_days` (30 days, ADR 0061), and sets the flag (REQ-DATA-008 AC1).
-- The daily admission cron starts with a sweep of flagged publications not yet handled. It deletes their vectors from every index, hides their candidates and, from migration 0010, their opportunities with `hidden_reason = retracted`, and stamps `retraction_handled_at` (REQ-DATA-008 AC2, AC3; REQ-PROC-002 AC2).
+- The daily admission cron starts with a sweep of flagged publications not yet handled. It deletes their vectors from every index, hides their candidates and, from migration 0011, their opportunities with `hidden_reason = retracted`, and stamps `retraction_handled_at` (REQ-DATA-008 AC2, AC3; REQ-PROC-002 AC2).
 
 ## Thin slice
 

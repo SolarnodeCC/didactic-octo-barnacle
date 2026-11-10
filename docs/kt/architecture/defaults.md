@@ -2,7 +2,7 @@
 title: Runtime defaults
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 related: [REQ-PROC-005, REQ-PROC-006, REQ-AGENT-007, REQ-AGENT-012, REQ-AGENT-013, REQ-DATA-011, REQ-NFR-005]
 ---
 
@@ -89,7 +89,7 @@ Read by `loadProcessingConfig` in `apps/pipeline/src/processing-config.ts`. Only
 | `triage.admission_pool_days` | `7` | How long a passing publication waits for admission (ADR 0055) |
 | `extraction.full_text_max_chars` | `24000` | Cut before the call; the quote check uses the cut text |
 | `retraction.lookback_days` | `30` | How far back the weekly retraction check looks (ADR 0061) |
-| `model.price_table_version` | `2026-11-06` | Price table used when the gateway gives no cost (REQ-NFR-011 AC2) |
+| `model.price_table_version` | `2026-11-10` | Price table used when the gateway gives no cost (REQ-NFR-011 AC2); it has cached-input prices (ADR 0078) |
 
 ## Budgets
 

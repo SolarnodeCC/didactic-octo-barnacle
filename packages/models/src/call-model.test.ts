@@ -4,7 +4,12 @@ import { callModel, type CallModelDeps, type ModelUsageStore } from "./call-mode
 import { extractionMissingQuotes, extractionOutputSchema } from "./extraction.js";
 import { FakeWorkersAi, type FakeReply } from "./fake-workers-ai.js";
 import { ModelCallRecordSchema, type ModelCallRecord } from "./model-call.js";
-import { estimateCost, type PriceTable } from "./price-table.js";
+import {
+  estimateCost,
+  ModelPriceSchema,
+  PriceTableSchema,
+  type PriceTable,
+} from "./price-table.js";
 import { TriageModelOutputSchema } from "./triage.js";
 import { classifyProviderError, parseGeneration, ProviderCallError } from "./workers-ai.js";
 
@@ -264,7 +269,9 @@ describe("REQ-NFR-011: one usage record per attempt", () => {
       PriceTableVersion: "2026-11-06",
       Cost: { Amount: 0.41200179, Currency: "EUR" },
     });
-    expect(estimateCost(prices, "@cf/unknown/model", 1, 1)).toBeNull();
+    expect(
+      estimateCost(prices, "@cf/unknown/model", { InputTokens: 1, OutputTokens: 1 }),
+    ).toBeNull();
   });
 
   it("REQ-NFR-011: AC2 a model without a price is refused before any call", async () => {
@@ -321,12 +328,136 @@ describe("REQ-TEST-002: the helper runs without a live model", () => {
   it("REQ-TEST-002: both response shapes give the output and token counts", () => {
     expect(
       parseGeneration({ response: "{}", usage: { prompt_tokens: 5, completion_tokens: 2 } }),
-    ).toEqual({ Output: "{}", InputTokens: 5, OutputTokens: 2 });
+    ).toEqual({ Output: "{}", InputTokens: 5, OutputTokens: 2, CachedInputTokens: 0 });
     expect(
       parseGeneration({
         choices: [{ message: { content: "{}" } }],
         usage: { input_tokens: 4, output_tokens: 1 },
       }),
-    ).toEqual({ Output: "{}", InputTokens: 4, OutputTokens: 1 });
+    ).toEqual({ Output: "{}", InputTokens: 4, OutputTokens: 1, CachedInputTokens: 0 });
+  });
+});
+
+const DEEPSEEK = "@cf/deepseek-ai/deepseek-v4.1-flash-1017";
+
+/** List prices of 2026-11-10 at one dollar per euro, so the estimate reads in US dollars. */
+const cachedPrices: PriceTable = {
+  Version: "2026-11-10",
+  Source: "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+  UsdPerEur: 1,
+  ExchangeRateDate: "2026-11-09",
+  Models: {
+    [MODEL]: { InputUsdPerMillionTokens: 0.06, OutputUsdPerMillionTokens: 0.4 },
+    [DEEPSEEK]: {
+      InputUsdPerMillionTokens: 0.3,
+      CachedInputUsdPerMillionTokens: 0.006,
+      OutputUsdPerMillionTokens: 1.2,
+    },
+  },
+};
+
+/**
+ * Token counts and the cost AI Gateway logged (US dollars) for three extraction calls of the
+ * round-one sample in `roi-staging` on 2026-11-10 (ADR 0078). Only counts and costs are kept.
+ */
+const LOGGED_DEEPSEEK_CALLS = [
+  { InputTokens: 1027, CachedInputTokens: 960, OutputTokens: 2443, GatewayUsd: 0.0029574599 },
+  { InputTokens: 1466, CachedInputTokens: 1152, OutputTokens: 521, GatewayUsd: 0.0007263119 },
+  { InputTokens: 2069, CachedInputTokens: 1408, OutputTokens: 811, GatewayUsd: 0.0011799479 },
+];
+
+describe("REQ-NFR-011: cached input tokens are billed at the cached price (ADR 0078)", () => {
+  it("REQ-NFR-011: AC4 the estimate of a cached DeepSeek call matches the cost the gateway logged", () => {
+    for (const call of LOGGED_DEEPSEEK_CALLS) {
+      const cost = estimateCost(cachedPrices, DEEPSEEK, call);
+      // Costs are rounded to 1e-8 of the budget currency.
+      expect(cost?.Amount).toBeCloseTo(call.GatewayUsd, 8);
+      // Billing every input token at the full price overstates the call.
+      const uncached = estimateCost(cachedPrices, DEEPSEEK, { ...call, CachedInputTokens: 0 });
+      expect(uncached?.Amount ?? 0).toBeGreaterThan(call.GatewayUsd * 1.05);
+    }
+  });
+
+  it("REQ-NFR-011: AC2 cost is uncached input, cached input, and output at their own prices", () => {
+    const usage = { InputTokens: 1_000_000, CachedInputTokens: 600_000, OutputTokens: 1_000_000 };
+    // 400k x 0.3 + 600k x 0.006 + 1M x 1.2 = 0.12 + 0.0036 + 1.2 dollars.
+    expect(estimateCost(cachedPrices, DEEPSEEK, usage)?.Amount).toBeCloseTo(1.3236, 10);
+    // A model with no cached price bills cached tokens at its input price.
+    expect(estimateCost(cachedPrices, MODEL, usage)?.Amount).toBeCloseTo(0.46, 10);
+    // A cached count above the input count is capped at the input count.
+    expect(
+      estimateCost(cachedPrices, DEEPSEEK, { ...usage, CachedInputTokens: 2_000_000 })?.Amount,
+    ).toBeCloseTo(0.006 + 1.2, 10);
+  });
+
+  it("REQ-NFR-011: AC1 the cached count is read from usage.prompt_tokens_details", () => {
+    expect(
+      parseGeneration({
+        choices: [{ message: { content: "{}" } }],
+        usage: {
+          prompt_tokens: 1027,
+          completion_tokens: 2443,
+          prompt_tokens_details: { cached_tokens: 960 },
+        },
+      }),
+    ).toEqual({ Output: "{}", InputTokens: 1027, OutputTokens: 2443, CachedInputTokens: 960 });
+    expect(
+      parseGeneration({
+        response: "{}",
+        usage: { input_tokens: 10, output_tokens: 1, input_tokens_details: { cached_tokens: 4 } },
+      }),
+    ).toMatchObject({ CachedInputTokens: 4 });
+    // Never more than the input, never negative, and zero when absent or unreadable.
+    for (const [details, expected] of [
+      [{ cached_tokens: 50 }, 10],
+      [{ cached_tokens: -3 }, 0],
+      [{ cached_tokens: "7" }, 0],
+      [null, 0],
+    ] as const) {
+      expect(
+        parseGeneration({
+          response: "{}",
+          usage: { prompt_tokens: 10, completion_tokens: 1, prompt_tokens_details: details },
+        }).CachedInputTokens,
+      ).toBe(expected);
+    }
+  });
+
+  it("REQ-NFR-011: AC1 callModel records the cached tokens and their cost", async () => {
+    const { usage, deps } = setup([
+      {
+        Kind: "output",
+        Output: triage,
+        InputTokens: 1027,
+        CachedInputTokens: 960,
+        OutputTokens: 2443,
+      },
+    ]);
+    const result = await callModel(
+      { ...deps, Prices: cachedPrices },
+      { ...request, Config: { ...request.Config, Model: DEEPSEEK } },
+    );
+    expect(result).toMatchObject({ Ok: true });
+    expect(usage.Records[0]).toMatchObject({
+      Model: DEEPSEEK,
+      InputTokens: 1027,
+      CachedInputTokens: 960,
+      OutputTokens: 2443,
+      PriceTableVersion: "2026-11-10",
+      Cost: { Amount: 0.00295746, Currency: "EUR" },
+    });
+  });
+
+  it("REQ-NFR-011: AC2 a price table refuses a cached price above the input price", () => {
+    expect(
+      ModelPriceSchema.safeParse({
+        InputUsdPerMillionTokens: 0.3,
+        CachedInputUsdPerMillionTokens: 0.31,
+        OutputUsdPerMillionTokens: 1.2,
+      }).success,
+    ).toBe(false);
+    expect(
+      PriceTableSchema.parse(cachedPrices).Models[DEEPSEEK]?.CachedInputUsdPerMillionTokens,
+    ).toBe(0.006);
   });
 });

@@ -2,7 +2,7 @@
 title: Knowledge transfer index
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-10
 ---
 
 # Knowledge transfer (KT) documents
@@ -26,7 +26,7 @@ The documents in `docs/kt/` are the source of truth for the Research Opportunity
 11. [Operations](operations.md): checks, CI, environments, deployment, monitoring, and secrets handling.
 12. [Decisions](decisions/README.md): architecture decision records (ADRs).
 13. [Open questions](open-questions.md): decisions still to be made, with a proposal and a deadline phase.
-14. [Legal](legal/README.md): legal review brief for OQ-014 and launch DPAs.
+14. [Legal](legal/README.md): legal review brief and launch DPAs.
 15. [Examples](examples/README.md): example outputs as YAML files.
 
 ## Rules for KT documents

@@ -69,8 +69,10 @@ function tokenTotal(usage: Record<string, unknown>): number {
 /**
  * Rebuilds one response from the `data:` lines of a Workers AI stream. Models stream either
  * OpenAI chunks (`choices[].delta`) or `{ response }` pieces; some send per-chunk usage and a
- * final event with the totals, so the usage with the largest total is kept. An error event
- * becomes a retryable provider error.
+ * final event with the totals, so the usage with the largest total is kept, as a whole object.
+ * Its `prompt_tokens_details` (the cached input tokens, ADR 0078) comes with it; when that event
+ * has none, the details of an earlier event are kept. An error event becomes a retryable
+ * provider error.
  */
 export function assembleEventStream(text: string): Record<string, unknown> {
   let content = "";
@@ -121,7 +123,11 @@ export function assembleEventStream(text: string): Record<string, unknown> {
       event.usage !== undefined &&
       (usage === null || tokenTotal(event.usage) >= tokenTotal(usage))
     ) {
-      usage = event.usage;
+      const details: unknown = (usage as Record<string, unknown> | null)?.prompt_tokens_details;
+      usage =
+        event.usage.prompt_tokens_details === undefined && details !== undefined
+          ? { ...event.usage, prompt_tokens_details: details }
+          : event.usage;
     }
   }
   const usageField = usage === null ? {} : { usage };

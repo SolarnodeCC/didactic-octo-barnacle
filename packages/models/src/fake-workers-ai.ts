@@ -10,7 +10,14 @@ import {
  * It never calls a live model (REQ-TEST-002 AC2).
  */
 export type FakeReply =
-  | { Kind: "output"; Output: unknown; InputTokens?: number; OutputTokens?: number }
+  | {
+      Kind: "output";
+      Output: unknown;
+      InputTokens?: number;
+      OutputTokens?: number;
+      /** Reported as `usage.prompt_tokens_details.cached_tokens` when set. */
+      CachedInputTokens?: number;
+    }
   | { Kind: "error"; Status: number | null; Message?: string; RetryAfterSeconds?: number };
 
 export type FakeCall = {
@@ -58,6 +65,9 @@ export class FakeWorkersAi implements WorkersAiBinding {
       usage: {
         prompt_tokens: reply.InputTokens ?? 100,
         completion_tokens: reply.OutputTokens ?? 20,
+        ...(reply.CachedInputTokens === undefined
+          ? {}
+          : { prompt_tokens_details: { cached_tokens: reply.CachedInputTokens } }),
       },
     });
   }

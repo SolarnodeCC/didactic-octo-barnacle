@@ -2,7 +2,7 @@
 title: arXiv
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-05
+last_reviewed: 2026-11-10
 related: [REQ-DATA-002, REQ-DATA-008, REQ-DATA-010]
 ---
 
@@ -35,7 +35,7 @@ A preprint is in scope when its primary category or a cross-listed category is i
 
 ## Licensing
 
-arXiv metadata, including abstracts, is available under CC0. The PDF of each preprint has its own license, chosen by the authors. Many grant arXiv a distribution license only, which does not allow us to redistribute the PDF. Store and show a PDF only when its license allows it (REQ-DATA-010, OQ-014); otherwise link to arXiv.
+arXiv metadata, including abstracts, is available under CC0. The PDF of each preprint has its own license, chosen by the authors. Many grant arXiv a distribution license only, which does not allow us to redistribute the PDF. Store and show a PDF only when its license allows it (REQ-DATA-010, [legal review brief](../legal/review-brief.md)); otherwise link to arXiv.
 
 ## Verify before implementing
 

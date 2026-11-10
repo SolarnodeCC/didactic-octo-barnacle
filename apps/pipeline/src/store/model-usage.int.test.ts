@@ -117,12 +117,20 @@ describe("REQ-NFR-011: usage records in D1", () => {
 
     const totals = await usageTotalsForDay(test.Db, "2026-11-07");
     expect(totals.map(({ CostAmount: _cost, ...rest }) => rest)).toEqual([
-      { StepName: "triage", Agent: null, Calls: 2, InputTokens: 1000, OutputTokens: 200 },
+      {
+        StepName: "triage",
+        Agent: null,
+        Calls: 2,
+        InputTokens: 1000,
+        CachedInputTokens: 0,
+        OutputTokens: 200,
+      },
       {
         StepName: "triage",
         Agent: "research-analyst",
         Calls: 1,
         InputTokens: 100,
+        CachedInputTokens: 0,
         OutputTokens: 10,
       },
     ]);
@@ -133,6 +141,57 @@ describe("REQ-NFR-011: usage records in D1", () => {
     ).spent_amount;
     expect(totals.reduce((sum, total) => sum + total.CostAmount, 0)).toBeCloseTo(spent, 12);
     expect(await usageTotalsForDay(test.Db, "2026-11-08")).toEqual([]);
+  });
+
+  it("REQ-NFR-011: AC4 a cached call stores its cached tokens and a cost the row explains (ADR 0078)", async () => {
+    const deepseek = "@cf/deepseek-ai/deepseek-v4.1-flash-1017";
+    const ai = new FakeWorkersAi([
+      {
+        Kind: "output",
+        Output: triage,
+        InputTokens: 1027,
+        CachedInputTokens: 960,
+        OutputTokens: 2443,
+      },
+    ]);
+    const { test, callDeps } = deps(ai, 5);
+    const cachedPrices: PriceTable = {
+      ...prices,
+      Version: "2026-11-10",
+      UsdPerEur: 1.1193,
+      ExchangeRateDate: "2026-11-09",
+      Models: {
+        [deepseek]: {
+          InputUsdPerMillionTokens: 0.3,
+          CachedInputUsdPerMillionTokens: 0.006,
+          OutputUsdPerMillionTokens: 1.2,
+        },
+      },
+    };
+    const call = request("pub_1");
+    await callModel(
+      { ...callDeps, Prices: cachedPrices },
+      { ...call, Config: { ...call.Config, Model: deepseek } },
+    );
+    const row = test.Raw.prepare(
+      "SELECT input_tokens, cached_input_tokens, output_tokens, cost_amount, price_table_version FROM model_call",
+    ).get() as {
+      input_tokens: number;
+      cached_input_tokens: number;
+      output_tokens: number;
+      cost_amount: number;
+      price_table_version: string;
+    };
+    expect(row).toMatchObject({
+      input_tokens: 1027,
+      cached_input_tokens: 960,
+      output_tokens: 2443,
+      price_table_version: "2026-11-10",
+    });
+    // The gateway logged USD 0.0029574599 for this call; the row holds it in euro.
+    expect(row.cost_amount * 1.1193).toBeCloseTo(0.0029574599, 7);
+    const [total] = await usageTotalsForDay(test.Db, "2026-11-07");
+    expect(total).toMatchObject({ InputTokens: 1027, CachedInputTokens: 960, OutputTokens: 2443 });
   });
 
   it("REQ-NFR-011: a cost in another currency than the budget is refused", async () => {

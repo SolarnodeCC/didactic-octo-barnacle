@@ -35,7 +35,7 @@ Calls go to the AI REST API on `api.cloudflare.com` with the header `cf-aig-gate
 
 ## Budget
 
-The command counts the estimated cost of every attempt in euro from the price table (`infrastructure/cloudflare/prices/2026-11-06.json` unless `--prices` names another).
+The command counts the estimated cost of every attempt in euro from the price table (`infrastructure/cloudflare/prices/2026-11-10.json` unless `--prices` names another). Cached input tokens are counted at the cached-input price where the table has one (ADR 0078).
 
 - Once the total reaches `--budget-eur` (50 by default, the budget of the plan), it starts no new step.
 - A step that has started finishes its retries (REQ-NFR-005).

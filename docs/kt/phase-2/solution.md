@@ -2,7 +2,7 @@
 title: Phase 2 solution
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 related: [REQ-DATA-006, REQ-DATA-008, REQ-PROC-001, REQ-PROC-002, REQ-PROC-003, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-PROC-007, REQ-PROC-008, REQ-PROC-009, REQ-NFR-003, REQ-NFR-005, REQ-NFR-010, REQ-NFR-011, REQ-TEST-002]
 ---
 
@@ -33,7 +33,7 @@ Phase 2 is done when the [exit criteria](../roadmap.md#exit-criteria) hold: reca
 - The six analysis agents, the search tool, and the per-candidate Workflow with real agents: phase 3. The thin slice uses stub steps in their place.
 - The scoring engine, data API, auth and admin API, and dashboard: phase 4. The thin slice gets one read-only route, local and preview only (ADR 0058).
 - User-facing opportunity search (REQ-API-006, REQ-DASH-015): phase 4. Phase 2 builds the search function it will call.
-- Semantic Scholar (REQ-DATA-003) and wider full-text use: wait for the legal answer to OQ-014 ([review brief](../legal/review-brief.md)).
+- Semantic Scholar (REQ-DATA-003) and wider full-text use: wait for the legal answer to launch question 9 or 10 ([review brief](../legal/review-brief.md)).
 - External model providers for pipeline steps: Workers AI only (ADR 0049).
 
 ## Data flow

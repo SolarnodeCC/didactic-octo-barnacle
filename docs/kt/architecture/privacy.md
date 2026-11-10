@@ -2,13 +2,13 @@
 title: Privacy and data retention
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-10
 related: [REQ-NFR-009, REQ-NFR-015, REQ-NFR-016, REQ-ACC-008, REQ-ACC-009, REQ-ACC-011]
 ---
 
 # Privacy and data retention
 
-The baseline for the EU launch. The default market is the EU, so the platform treats GDPR as binding. Legal wording of the terms and the privacy policy is written by the legal owner (OQ-014); this document is the engineering input to it.
+The baseline for the EU launch. The default market is the EU, so the platform treats GDPR as binding. Legal wording of the terms and the privacy policy is written by the legal owner ([legal review brief](../legal/review-brief.md)); this document is the engineering input to it.
 
 ## Personal data held
 
@@ -39,7 +39,7 @@ Transfers outside the EU rely on the standard contractual clauses or the process
 - **Balance:** the data is already public in scholarly records; authors expect it to be cited. It is never shown outside provenance, never used to score, rank, or profile a person (REQ-NFR-016 AC3), and never sent to a model provider as a person-level record.
 - **Safeguards:** an author can ask for erasure at any time (below); an erased author is not stored again.
 
-Legal confirms or replaces this assessment (OQ-014). Until then the lawful basis in the table above stays "to confirm with legal".
+Legal confirms or replaces this assessment ([legal review brief](../legal/review-brief.md)). Until then the lawful basis in the table above stays "to confirm with legal".
 
 ## Notice to authors
 
@@ -50,7 +50,7 @@ Authors are not users. The notice is a public page, linked from the footer, that
 - **User**: account deletion in settings (REQ-ACC-008).
 - **Author**: a request to the support contact. An admin finds the stored author records (an ORCID identifies one author; an arXiv author has one record per paper and is found by exact name) and erases each of them (`eraseAuthor`; the route `POST /admin/authors/:id/erase` comes with the admin API in phase 4). Erasure removes the author record and every affiliation. The publications stay. It also clears the title-and-first-author key of the author's publications, which holds the first author's normalized name. The reason is a code (`author-request`, `legal-order`, `ingested-in-error`), never free text.
 - **Not stored again:** the next ingestion would fetch the same work and store the author again, so an erased author is put on an erasure list. The list holds an HMAC-SHA256 of the stored author ID, keyed with the Worker secret `ERASURE_HASH_KEY`, and a reason code: no name, ORCID, or affiliation. Ingestion skips listed authors. Without the key, ingestion stops instead of storing an author (ADR 0031).
-- **Changing the key:** the list cannot be re-hashed with a new `ERASURE_HASH_KEY`, because it holds no author ID and the erased records are gone. A new key would let every erased author be stored again. Do not change the key. If it may have leaked, the way out is a transition in which the author guard checks hashes under both the old and the new key (a second secret, `ERASURE_HASH_KEY_PREVIOUS`) and new erasures use the new key. That transition is not built yet; ADR 0074 records it as follow-up work.
+- **One key, never rotated:** the list cannot be re-hashed with a new `ERASURE_HASH_KEY`, because it holds no author ID and the erased records are gone, so a new key would let every erased author be stored again. The key lives in the GitHub environment secrets and as an offline copy in the owner's password manager. If it leaks, someone with the list could test known ORCIDs against it. Rotating would not prevent that for the existing entries, so a dual-key transition was considered and declined (ADR 0074, update 2026-11-10).
 - **Audit:** an audit event `author.erased` with an opaque actor, the erasure ID, the reason code, and counts. It holds no personal data (REQ-NFR-016 AC2).
 - **What erasure does not change:** the text of publications (titles, abstracts, stored PDFs) can contain the author's name. Publications are removed separately, on request or when ingested by mistake (data model, deletion).
 - **Backups**: D1 Time Travel keeps history for a limited period. A restore applies the list of erasures made since the restore point before the database serves traffic (REQ-NFR-015). The erasure list is also kept in the document bucket (`erasures/<hash>.json`), which a database restore does not touch, and `reapplyErasures` puts the entries back and removes any listed author the restored data brought back. The longest time a deleted record can remain in a backup is stated in the privacy policy.

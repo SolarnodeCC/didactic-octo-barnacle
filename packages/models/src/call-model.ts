@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { repairModelOutput, type RepairKind } from "./agent-contract.js";
 import { type ModelCallRecord, type ModelCallRunKind } from "./model-call.js";
-import { BUDGET_CURRENCY, estimateCost, type PriceTable } from "./price-table.js";
+import { BUDGET_CURRENCY, estimateCost, type PriceTable, type TokenUsage } from "./price-table.js";
 import {
   classifyProviderError,
   parseGeneration,
@@ -178,7 +178,14 @@ export async function callModel<S extends z.ZodObject>(
       response = await deps.Ai.run(config.Model, inputs, options);
     } catch (error) {
       const failure = classifyProviderError(error);
-      await writeRecord(deps, request, attempt, 0, 0, Date.now() - started, "provider-error");
+      await writeRecord(
+        deps,
+        request,
+        attempt,
+        { InputTokens: 0, OutputTokens: 0 },
+        Date.now() - started,
+        "provider-error",
+      );
       lastReason = "provider-error";
       lastErrors = [
         failure.Status === null ? failure.Message : `HTTP ${failure.Status}: ${failure.Message}`,
@@ -214,15 +221,7 @@ export async function callModel<S extends z.ZodObject>(
     }
 
     const ok = errors.length === 0 && output !== null;
-    await writeRecord(
-      deps,
-      request,
-      attempt,
-      generation.InputTokens,
-      generation.OutputTokens,
-      latency,
-      ok ? "ok" : "invalid-output",
-    );
+    await writeRecord(deps, request, attempt, generation, latency, ok ? "ok" : "invalid-output");
     if (ok) {
       return {
         Ok: true,
@@ -248,14 +247,14 @@ async function writeRecord<S extends z.ZodObject>(
   deps: CallModelDeps,
   request: CallModelRequest<S>,
   attempt: number,
-  inputTokens: number,
-  outputTokens: number,
+  usage: TokenUsage,
   latencyMs: number,
   outcome: ModelCallRecord["Outcome"],
 ): Promise<void> {
   // The binding returns no gateway cost, so the cost is estimated from the price table
-  // (REQ-NFR-011 AC2, ADR 0054). A provider error is billed nothing.
-  const cost = estimateCost(deps.Prices, request.Config.Model, inputTokens, outputTokens) ?? {
+  // (REQ-NFR-011 AC2, ADR 0054), with cached input at its own price (ADR 0078). A provider
+  // error is billed nothing.
+  const cost = estimateCost(deps.Prices, request.Config.Model, usage) ?? {
     Amount: 0,
     Currency: BUDGET_CURRENCY,
   };
@@ -271,8 +270,9 @@ async function writeRecord<S extends z.ZodObject>(
     Model: request.Config.Model,
     PromptVersion: request.Config.PromptVersion,
     Attempt: attempt,
-    InputTokens: inputTokens,
-    OutputTokens: outputTokens,
+    InputTokens: usage.InputTokens,
+    CachedInputTokens: Math.min(usage.CachedInputTokens ?? 0, usage.InputTokens),
+    OutputTokens: usage.OutputTokens,
     LatencyMs: Math.max(0, Math.round(latencyMs)),
     Cost: cost,
     PriceTableVersion: deps.Prices.Version,

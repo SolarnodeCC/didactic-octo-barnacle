@@ -2,33 +2,24 @@
 title: Open questions
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 ---
 
 # Open questions
 
 Questions that block or shape the build. Each has a proposal and the phase by which it must be answered. An answered question becomes an ADR or a change to a KT document, and its row is removed in the same pull request. IDs are never reused.
 
-## Legal and people
-
-| ID | Question | Proposal | Decide before |
-|---|---|---|---|
-| OQ-014 | May we widen full-text use (transient processing, quotes from non-redistributable papers), and do the source and model provider terms allow commercial use? | The phase-2 gate questions 1 to 5 of the [review brief](legal/review-brief.md) were approved on 2026-11-06. Still open: launch questions 6 to 12, among them transient processing of non-redistributable full text (item 9) and the processor agreements (item 8). Abstract-first stays (ADR 0014) until item 9 is answered | before launch |
-| OQ-044 | Which outside experts check the golden sets and the calibration set before accuracy claims or launch? | ADR 0072 has the owner review every label, with agents to draft and cross-check. That shows consistency, not agreement with independent experts. Proposal: one or two outside experts for the industries of the first customers, named before a claim of validated accuracy and before the launch checklist | before launch |
-
 ## Models
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
 | OQ-036 | Which model runs each model-backed step? | Workers AI models only (ADR 0049). Round one of the [model benchmark plan](test/model-benchmark-plan.md) covers triage and extraction only, two candidates each (ADR 0062 replaced the candidates deprecated on 2026-11-20), three runs per item, as the [run plan](test/benchmark-round-one.md) sets out (waiting for the owner's go-ahead); pick the cheapest model that meets each step's threshold and record the result in an ADR | triage and extraction before phase 2 starts; the six analysis agents before phase 3 |
-| OQ-044 | Should a model judge grade a daily sample of live triage and extraction output? | Use a separate Workers AI model, so the data stays with Cloudflare, on a small daily sample, report-only, with its own budget line. It needs a change to ADR 0049, which limits the Anthropic judge to golden-set items. Until then the run-signal monitor of ADR 0071 is the live check | before phase 3 |
 
 ## Ownership
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
-| OQ-034 | Who is the named owner per role once the team is staffed? | The MVP has one owner, `@SolarnodeCC`, for all areas; split the owner roles of the [KT README](README.md#ownership) and `.github/CODEOWNERS` when more people join | before launch |
-| OQ-035 | Which hostnames do staging and preview use under `wispel.cc`, and does the API or admin area get its own subdomain? | Keep one site per environment on one registrable domain (ADR 0016); name the hostnames when the first environment is deployed, then record them in operations | before phase 4 launch checklist |
+| OQ-035 | Which hostnames do staging and preview use under `wispel.cc`, and does the API or admin area get its own subdomain? | Keep one site per environment on one registrable domain (ADR 0016); name the hostnames when the first environment is deployed, then record them in operations. The owner confirmed on 2026-11-10 that this is decided in phase 4 | before phase 4 launch checklist |
 
 ## Answered
 
@@ -71,4 +62,8 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-041 | REQ-TEST-005 is split: triage and extraction golden sets are a phase 2 requirement, the six analysis agents stay in phase 3 | ADR 0060, REQ-TEST-006 |
 | OQ-042 | The weekly retraction check looks back 30 days | ADR 0061 |
 | OQ-043 | Phase 2 budget is built per cost component: triage, extraction, and embeddings, times 1.5, with the full-text input priced in | ADR 0059, REQ-NFR-005 |
-| OQ-015 | One owner reviews every golden-set entry; agents draft and cross-check, and never confirm a label; outside experts are OQ-044 | ADR 0072, [golden sets](test/golden-sets.md) |
+| OQ-015 | One owner reviews every golden-set entry; agents draft and cross-check, and never confirm a label; outside expert review is not planned (ADR 0080) | ADR 0072, ADR 0080, [golden sets](test/golden-sets.md) |
+| OQ-034 | Single owner `@SolarnodeCC` accepted for the MVP, confirmed by the owner on 2026-11-10. A review cannot be independent of the author until a second person joins (ADR 0074). The compensating controls are the CI gates with `check-hardening`, CodeQL, and the soak time of the weekly production release. Revisit when anyone else joins | ADR 0074, ADR 0044, [KT README](README.md#ownership) |
+| OQ-044 | No outside expert review of the golden sets or the calibration set; the product makes no claim of independent validation | ADR 0080 |
+| OQ-045 | A separate Workers AI model judges a small daily sample of live triage and extraction output, report-only, with its own budget line (this question was first numbered OQ-044 as well) | ADR 0081 |
+| OQ-014 | Closed as an open question at the owner's request on 2026-11-10. The phase-2 gate questions 1 to 5 of the legal review brief were approved on 2026-11-06. Launch questions 6 to 12 stay obligations, now an item of the launch checklist in operations, and the platform stays abstract-first (ADR 0014) until the question on transient processing of non-redistributable full text is answered | [Legal review brief](legal/review-brief.md), [Operations](operations.md#launch-checklist-planned) |

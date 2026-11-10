@@ -2,7 +2,7 @@
 title: Golden sets and reviewers
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 related: [REQ-TEST-004, REQ-TEST-005, REQ-SCORE-006, REQ-AGENT-001]
 ---
 
@@ -155,4 +155,4 @@ Evidence envelopes are required on agent expected outputs (unlike the short prod
 
 ## OQ-015
 
-OQ-015 is answered by ADR 0072. Outside expert review, before accuracy claims or launch, is OQ-044.
+OQ-015 is answered by ADR 0072. No outside expert review is planned, and the product claims no independent validation (ADR 0080).

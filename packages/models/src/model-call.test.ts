@@ -15,6 +15,7 @@ const record: ModelCallRecord = {
   PromptVersion: "triage@1",
   Attempt: 1,
   InputTokens: 512,
+  CachedInputTokens: 0,
   OutputTokens: 96,
   LatencyMs: 840,
   Cost: { Amount: 0.0000691, Currency: "USD" },
@@ -43,6 +44,20 @@ describe("REQ-NFR-011: model call records", () => {
       ModelCallRecordSchema.safeParse({ ...record, Cost: { Amount: -0.01, Currency: "USD" } })
         .success,
     ).toBe(false);
+  });
+
+  it("REQ-NFR-011: AC2 cached input tokens are a non-negative part of the input tokens", () => {
+    expect(
+      ModelCallRecordSchema.parse({ ...record, CachedInputTokens: 512 }).CachedInputTokens,
+    ).toBe(512);
+    expect(ModelCallRecordSchema.safeParse({ ...record, CachedInputTokens: 513 }).success).toBe(
+      false,
+    );
+    expect(ModelCallRecordSchema.safeParse({ ...record, CachedInputTokens: -1 }).success).toBe(
+      false,
+    );
+    const { CachedInputTokens: _cached, ...withoutCached } = record;
+    expect(ModelCallRecordSchema.safeParse(withoutCached).success).toBe(false);
   });
 
   it("REQ-NFR-011: AC2 an estimated cost names its price table version", () => {

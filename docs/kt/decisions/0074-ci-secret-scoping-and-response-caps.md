@@ -39,4 +39,13 @@ A security audit of the repository on 2026-11-05 found the security design sound
 
 - A workflow with an environment can no longer be run from a branch, not even for a test. Test changes to these workflows on `main` after review, or with a dry-run input.
 - A dependency fix released less than three days ago needs a deliberate exception (`minimumReleaseAgeExclude`) in the pull request that takes it.
-- Follow-up work, not done here: a separate read-only Cloudflare token for the drift and measure jobs; a dual-key transition for `ERASURE_HASH_KEY` (see [privacy](../architecture/privacy.md)); and a second code owner, so a review is independent of the author.
+- Follow-up work at the time: a separate read-only Cloudflare token, a dual-key transition for `ERASURE_HASH_KEY`, and a second code owner. The update below settles all three.
+
+## Update 2026-11-10
+
+The owner decided on the follow-up work:
+
+- **Read-only token:** considered and dropped. One `CLOUDFLARE_API_TOKEN` per environment is kept, as in ADR 0046. The main-only guard, step-scoped secrets, and release cooldowns of this ADR already limit what a compromised dependency could reach.
+- **`ERASURE_HASH_KEY`:** one key, never rotated, kept in the environment secrets and as an offline copy. A dual-key transition would protect only the entries made after a rotation, so it is not built ([privacy](../architecture/privacy.md)).
+- **Second code owner:** deferred until someone joins (OQ-034). Until then a review cannot be independent of the author.
+- **Repository settings:** the owner confirmed the environment branch limits, secret scanning with push protection, private vulnerability reporting, and the private repository on 2026-11-10.
