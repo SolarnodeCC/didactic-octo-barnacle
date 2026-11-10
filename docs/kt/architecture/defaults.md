@@ -54,6 +54,7 @@ Payload of every message: `{ schemaVersion, type, ids: { runId?, source?, page?,
 | Key | Default | Notes |
 |---|---|---|
 | `pdf.max_bytes` | `26214400` | 25 MiB; a larger file is refused (REQ-DATA-010 AC4) |
+| `http.max_response_bytes` | `16777216` | 16 MiB; the most read from one OpenAlex or arXiv API response (REQ-NFR-021, ADR 0074) |
 | `pdf.timeout_ms` | `20000` | One deadline for all redirects and the download |
 | `pdf.max_redirects` | `3` | Each redirect target is checked again |
 | `pdf.allowed_hosts` | empty | Empty means any public host; a list limits fetching to those hosts and their subdomains (ADR 0029) |

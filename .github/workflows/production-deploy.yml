@@ -38,9 +38,6 @@ jobs:
     permissions:
       contents: write
       checks: read
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -101,11 +98,16 @@ jobs:
       - name: Apply migrations
         if: ${{ inputs.migrate }}
         working-directory: infrastructure/cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: pnpm exec wrangler d1 migrations apply DB --env production --remote
 
       - name: Deploy the Worker with its secrets
         working-directory: infrastructure/cloudflare
         env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           ERASURE_HASH_KEY: ${{ secrets.ERASURE_HASH_KEY }}
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
           ALERT_GITHUB_TOKEN: ${{ secrets.ALERT_GITHUB_TOKEN }}
@@ -129,6 +131,9 @@ jobs:
 
       - name: Show the live deployment
         working-directory: infrastructure/cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: pnpm exec wrangler deployments list --env production
 
       - name: Tag the released commit

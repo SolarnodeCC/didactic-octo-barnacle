@@ -46,6 +46,7 @@ describe("REQ-DATA-010: PDF URL policy", () => {
     for (const url of [
       "https://localhost/a.pdf",
       "https://app.localhost/a.pdf",
+      "https://localhost.example.org/a.pdf",
       "https://printer.local/a.pdf",
       "https://db.internal/a.pdf",
       "https://files.corp.lan/a.pdf",

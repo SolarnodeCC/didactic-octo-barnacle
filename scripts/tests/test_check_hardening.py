@@ -54,6 +54,22 @@ class HardeningTest(ScriptTestCase):
             "caller.yml: job deploy calls staging-deploy.yml, which uses an environment"
         )
 
+    def test_req_nfr_021_fails_on_an_environment_job_without_a_main_guard(self) -> None:
+        self.replace(
+            ".github/workflows/staging-measure.yml", "    if: github.ref == 'refs/heads/main'\n", ""
+        )
+        self.assert_fails_with(
+            "staging-measure.yml: job measure uses an environment; add `if: github.ref =="
+        )
+
+    def test_req_nfr_021_fails_on_a_secret_in_the_job_env_of_an_environment_job(self) -> None:
+        self.replace(
+            ".github/workflows/staging-measure.yml",
+            "    steps:\n",
+            "    env:\n      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}\n    steps:\n",
+        )
+        self.assert_fails_with("job measure uses an environment; move secrets from the job `env`")
+
     def test_req_nfr_021_fails_when_dependabot_drops_an_ecosystem(self) -> None:
         self.replace(".github/dependabot.yml", "package-ecosystem: npm", "package-ecosystem: cargo")
         self.assert_fails_with("dependabot.yml: add the `npm` ecosystem")

@@ -1,3 +1,4 @@
+import { DEFAULT_MAX_RESPONSE_BYTES, readTextCapped } from "../../http/read-capped.js";
 import { fetchWithBackoff, type BackoffOptions, type FetchFn } from "../../http/retry.js";
 import { isArxivCategoryInScope, SCOPE_ARXIV_CATEGORIES } from "../../normalize/scope.js";
 import { parseArxivFeed } from "./parse-feed.js";
@@ -56,7 +57,13 @@ export function buildArxivUrl(request: ArxivPageRequest): string {
  */
 export async function fetchArxivPage(
   request: ArxivPageRequest,
-  deps: { Fetch: FetchFn; Backoff: BackoffOptions; WaitForSlot: () => Promise<void> },
+  deps: {
+    Fetch: FetchFn;
+    Backoff: BackoffOptions;
+    WaitForSlot: () => Promise<void>;
+    /** Largest response read (default `DEFAULT_MAX_RESPONSE_BYTES`, REQ-NFR-021). */
+    MaxResponseBytes?: number;
+  },
 ): Promise<ArxivPage> {
   const categories = request.Categories ?? SCOPE_ARXIV_CATEGORIES;
   const rateLimitedFetch: FetchFn = async (input, init) => {
@@ -69,7 +76,9 @@ export async function fetchArxivPage(
     { headers: { accept: "application/atom+xml" } },
     deps.Backoff,
   );
-  const returned = parseArxivFeed(await response.text());
+  const returned = parseArxivFeed(
+    await readTextCapped(response, deps.MaxResponseBytes ?? DEFAULT_MAX_RESPONSE_BYTES),
+  );
   const entries = returned.filter((entry) =>
     isArxivCategoryInScope([entry.primaryCategory, ...entry.categories], categories),
   );

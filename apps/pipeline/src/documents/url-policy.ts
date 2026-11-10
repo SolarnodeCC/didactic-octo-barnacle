@@ -118,7 +118,7 @@ export function checkPdfUrl(raw: string, policy: UrlPolicy): UrlCheck {
   if (isIpLiteral(host)) {
     return { Ok: false, Reason: "IP addresses are not allowed" };
   }
-  if (!host.includes(".") || host === "localhost") {
+  if (!host.includes(".") || host.split(".").includes("localhost")) {
     return { Ok: false, Reason: "host is not a public name" };
   }
   if (INTERNAL_SUFFIXES.some((suffix) => host.endsWith(suffix))) {

@@ -123,6 +123,12 @@ describe("REQ-NFR-019: failure reasons are shortened before they leave the pipel
     expect(text.length).toBeLessThanOrEqual(160);
   });
 
+  it("REQ-NFR-021: breaks @mentions so an alert issue notifies nobody", () => {
+    expect(sanitizeReason("title mentions @octocat and a@b")).toBe(
+      "title mentions @\u200boctocat and a@\u200bb",
+    );
+  });
+
   it("REQ-NFR-019: leaves a short plain reason as it is", () => {
     expect(sanitizeReason("UNIQUE constraint failed")).toBe("UNIQUE constraint failed");
   });

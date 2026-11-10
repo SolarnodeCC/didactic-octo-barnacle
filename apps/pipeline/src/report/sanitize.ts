@@ -9,6 +9,8 @@ export function sanitizeReason(reason: string): string {
   const cleaned = reason
     .replace(/https?:\/\/\S+/gi, "[link]")
     .replace(/\b[A-Za-z0-9_-]{32,}\b/g, "[token]")
+    // A reason ends up in a GitHub issue: `@name` would notify that account (REQ-NFR-021).
+    .replace(/@(?=[A-Za-z0-9])/g, "@\u200b")
     .replace(/\s+/g, " ")
     .trim();
   return cleaned.length > MAX_REASON_LENGTH

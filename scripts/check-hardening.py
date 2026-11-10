@@ -20,6 +20,11 @@ here, in CI, on every pull request. Rules (see docs/kt/decisions/0033-repository
 11. No job calls (`uses:`) a local workflow whose jobs use an `environment`. Environment
     secrets do not reach a job of a called workflow, so it would run with empty credentials;
     start such a workflow as its own run with `gh workflow run` instead (ADR 0046).
+12. A job that uses an `environment` runs only on `main`: its `if` contains
+    `github.ref == 'refs/heads/main'`, so a branch cannot read the environment's secrets
+    even when the environment's branch policy is changed (ADR 0074).
+13. A job that uses an `environment` puts no secret in its job-level `env`: secrets go to
+    the steps that need them, so dependency install scripts never see them (ADR 0074).
 """
 
 from __future__ import annotations
@@ -37,6 +42,8 @@ SHA_PIN = re.compile(r"^[^@\s]+@[0-9a-f]{40}$")
 UNTRUSTED = re.compile(
     r"\$\{\{\s*(github\.event\.|github\.head_ref|inputs\.|github\.event_name\s*==)", re.I
 )
+
+MAIN_GUARD = "github.ref == 'refs/heads/main'"
 
 errors: list[str] = []
 
@@ -74,6 +81,14 @@ def check_workflows() -> None:
             if not isinstance(run_trigger, dict) or run_trigger["workflow_run"].get("branches") != ["main"]:
                 fail(f"{name}: limit `workflow_run` to `branches: [main]`")
         for job_name, job in (workflow.get("jobs") or {}).items():
+            if "environment" in job:
+                if MAIN_GUARD not in str(job.get("if", "")):
+                    fail(f"{name}: job {job_name} uses an environment; add `if: {MAIN_GUARD}`")
+                if any("secrets." in str(value) for value in (job.get("env") or {}).values()):
+                    fail(
+                        f"{name}: job {job_name} uses an environment; move secrets from the job "
+                        "`env` to the steps that need them"
+                    )
             if job.get("secrets") == "inherit":
                 fail(f"{name}: job {job_name} must not pass `secrets: inherit`")
             called = job.get("uses")

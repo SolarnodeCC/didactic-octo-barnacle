@@ -41,8 +41,16 @@ function isWithdrawn(entry: XmlEntry): boolean {
   return /\bwithdrawn\b/i.test(`${text(entry["arxiv:comment"])} ${text(entry.summary)}`);
 }
 
-/** Parse an arXiv Atom API response into entries (REQ-DATA-002). */
+/**
+ * Parse an arXiv Atom API response into entries (REQ-DATA-002). The Atom feed never has a
+ * document type declaration; one is refused, because it can declare entities that expand
+ * into far more text than was downloaded (REQ-NFR-021, ADR 0074). The standard XML
+ * entities such as `&amp;` are still decoded.
+ */
 export function parseArxivFeed(xml: string): ArxivEntry[] {
+  if (/<!DOCTYPE/iu.test(xml)) {
+    throw new Error("arXiv feed has a document type declaration, which is not allowed");
+  }
   const parsed = parser.parse(xml) as { feed?: { entry?: XmlEntry[] } };
   return (parsed.feed?.entry ?? []).map((entry): ArxivEntry => {
     const categories = (entry.category ?? [])
