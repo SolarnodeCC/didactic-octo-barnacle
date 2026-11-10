@@ -2,7 +2,7 @@
 title: Running a model benchmark round
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 related: [REQ-NFR-003, REQ-NFR-005, REQ-NFR-011, REQ-AGENT-012, REQ-TEST-006]
 ---
 
@@ -14,7 +14,7 @@ How to run a round of the [model benchmark plan](model-benchmark-plan.md) (OQ-03
 
 For each step and each candidate model, the command runs every golden-set item `--runs` times (three by default):
 
-- It runs the prompt version of the step (`triage@1` or `extraction@1`) through `callModel`, with the same sampling settings for every model.
+- It runs the prompt version of the step (`triage@2` or `extraction@2`, [ADR 0073](../decisions/0073-stream-benchmark-calls-and-larger-output-budget.md)) through `callModel`, with the same sampling settings for every model.
 - It scores the accepted output with the eval runner and its thresholds.
 - It records one usage record per attempt (REQ-NFR-011) and keeps every raw response and provider error.
 
@@ -28,6 +28,8 @@ Without `--models` it runs round one of [ADR 0062](../decisions/0062-replace-dep
 Calls go to the AI REST API on `api.cloudflare.com` with the header `cf-aig-gateway-id`, so every call passes through the named AI Gateway (REQ-NFR-003). The gateway is `roi-staging` unless `--gateway` names another.
 
 - Each call carries the run, step, and agent as gateway metadata, and sets `cf-aig-skip-cache` so the three runs are independent samples.
+- Each call streams its response (server-sent events) on the per-model route `/ai/run/<model>`, and the command rebuilds the full response before `callModel` reads it. A reasoning model can take more than a minute before its first answer token; a stream starts at once, so a proxy that closes requests without a response after about 30 seconds does not cut it off (ADR 0073). `--no-stream` turns this off.
+- One call may take at most `--timeout-ms` (600,000, ten minutes, by default), from the request to the last streamed token.
 - Calls are spaced at least 3 seconds apart (`--min-interval-ms`), which keeps a paid model under 20 requests per minute.
 - A 429 is retried after its `Retry-After`. A 410, which a deprecated model returns, fails the step at once.
 
@@ -49,6 +51,8 @@ A live run reads two environment variables and never writes them anywhere:
 |---|---|
 | `CLOUDFLARE_ACCOUNT_ID` | The 32-character account ID of the project's Cloudflare account |
 | `CLOUDFLARE_API_TOKEN` | A token with **Workers AI: Read** for that account, and **Workers R2 Storage: Edit** when `--r2-bucket` is used |
+
+Node's built-in `fetch` ignores `HTTPS_PROXY`. Behind an HTTPS proxy, as in a cloud agent session, run the command with `NODE_USE_ENV_PROXY=1` (Node 24); without it the calls bypass the proxy, and a token that the proxy injects is never sent (every call then fails with "Authentication error").
 
 Keep the token in the GitHub environment `evals` or the Cursor environment secrets ([operations](../operations.md)), never in the repository. `--dry-run` answers every call with the golden-set labels and needs no credentials; use it to check the command and the report before spending.
 

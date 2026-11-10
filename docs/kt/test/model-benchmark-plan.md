@@ -2,7 +2,7 @@
 title: Model benchmark plan
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 related: [REQ-AGENT-010, REQ-AGENT-012, REQ-AGENT-014, REQ-NFR-003, REQ-NFR-005, REQ-NFR-011, REQ-TEST-004, REQ-TEST-005, REQ-TEST-006]
 ---
 
@@ -129,7 +129,7 @@ The contracts it uses are in `packages/models` (`triage.ts`, `extraction.ts`, `a
 - A stub that answers with the labels passes every entry, which proves the golden sets fit the contracts.
 - Stubs that answer wrongly fail.
 
-The model-call helper `callModel` (ADR 0003) and its usage records (REQ-NFR-011) exist since WP2 of the [phase 2 build plan](../phase-2/build-plan.md). The prompts `triage@1` and `extraction@1` are in `packages/prompts` since WP3, and `triageModelFn` and `extractionModelFn` in `agents/extraction` run them through `callModel` for the eval runner. Both prompts use temperature 0 for every candidate. The command `roi-benchmark` runs a round through AI Gateway, with three runs per item and the stability of each item across runs. It enforces the budget and keeps the raw responses locally and in R2; see [running a round](model-benchmark-run.md). Still to add for the benchmark:
+The model-call helper `callModel` (ADR 0003) and its usage records (REQ-NFR-011) exist since WP2 of the [phase 2 build plan](../phase-2/build-plan.md). The prompts `triage@1` and `extraction@1` are in `packages/prompts` since WP3, replaced by `triage@2` and `extraction@2` with a larger output budget for reasoning models ([ADR 0073](../decisions/0073-stream-benchmark-calls-and-larger-output-budget.md)), and `triageModelFn` and `extractionModelFn` in `agents/extraction` run them through `callModel` for the eval runner. Both prompts use temperature 0 for every candidate. The command `roi-benchmark` runs a round through AI Gateway, with three runs per item and the stability of each item across runs. It enforces the budget and keeps the raw responses locally and in R2; see [running a round](model-benchmark-run.md). Still to add for the benchmark:
 
 - The model judge for `Finding` and `Customer` (OQ-020).
 

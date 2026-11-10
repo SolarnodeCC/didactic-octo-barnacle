@@ -51,7 +51,7 @@ function run(output: unknown, input: ExtractionInput = publication) {
 describe("REQ-TEST-002: extraction contract test", () => {
   it("REQ-TEST-002: AC1 a valid output with all quotes in the text passes", async () => {
     const { Result } = await run(valid);
-    expect(Result).toMatchObject({ Ok: true, Attempts: 1, PromptVersion: "extraction@1" });
+    expect(Result).toMatchObject({ Ok: true, Attempts: 1, PromptVersion: "extraction@2" });
   });
 
   it("REQ-TEST-002: AC1 a missing field, a wrong type, and an out-of-range value each fail", async () => {

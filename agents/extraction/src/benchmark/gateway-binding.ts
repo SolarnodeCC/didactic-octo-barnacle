@@ -5,6 +5,13 @@ import { ProviderCallError, type WorkersAiBinding, type WorkersAiRunOptions } fr
  * api.cloudflare.com with the `cf-aig-gateway-id` header, so every call goes through the named
  * AI Gateway (REQ-NFR-003) and is logged there with its run, step, and agent metadata.
  * Without that header Workers AI would be called directly, so the header is always sent.
+ *
+ * With `Stream`, the call uses the per-model route with `stream: true` and rebuilds the
+ * OpenAI-shaped response from the server-sent events. A reasoning model can take more than a
+ * minute before its first answer token, and an HTTPS proxy between the command and Cloudflare
+ * may close a request that has no response after about 30 seconds; a stream starts at once.
+ * The rebuilt response has the same fields `parseGeneration` reads, so `callModel` and the
+ * usage records see no difference.
  */
 export type GatewayRestOptions = {
   AccountId: string;
@@ -13,6 +20,8 @@ export type GatewayRestOptions = {
   /** Shortest time between two calls, so a paid model's limit of 20 per minute holds. */
   MinIntervalMs: number;
   TimeoutMs: number;
+  /** Stream the response (server-sent events) instead of waiting for the whole body. */
+  Stream?: boolean;
   Fetch?: typeof fetch;
   Sleep?: (ms: number) => Promise<void>;
   Now?: () => number;
@@ -32,6 +41,103 @@ function retryAfterSeconds(value: string | null): number | null {
   }
   const seconds = Number(value);
   return Number.isFinite(seconds) && seconds >= 0 ? seconds : null;
+}
+
+type StreamChoice = {
+  delta?: { content?: unknown; reasoning?: unknown; reasoning_content?: unknown };
+  finish_reason?: unknown;
+};
+
+type StreamEvent = {
+  response?: unknown;
+  choices?: StreamChoice[];
+  usage?: Record<string, unknown>;
+  error?: unknown;
+  errors?: Array<{ code?: number; message?: string }>;
+};
+
+function tokenTotal(usage: Record<string, unknown>): number {
+  const total = usage.total_tokens;
+  if (typeof total === "number") {
+    return total;
+  }
+  const input = typeof usage.prompt_tokens === "number" ? usage.prompt_tokens : 0;
+  const output = typeof usage.completion_tokens === "number" ? usage.completion_tokens : 0;
+  return input + output;
+}
+
+/**
+ * Rebuilds one response from the `data:` lines of a Workers AI stream. Models stream either
+ * OpenAI chunks (`choices[].delta`) or `{ response }` pieces; some send per-chunk usage and a
+ * final event with the totals, so the usage with the largest total is kept. An error event
+ * becomes a retryable provider error.
+ */
+export function assembleEventStream(text: string): Record<string, unknown> {
+  let content = "";
+  let reasoning = "";
+  let response = "";
+  let sawChoices = false;
+  let finishReason: unknown = null;
+  let usage: Record<string, unknown> | null = null;
+  for (const rawLine of text.split(/\r?\n/u)) {
+    const line = rawLine.trim();
+    if (!line.startsWith("data:")) {
+      continue;
+    }
+    const data = line.slice("data:".length).trim();
+    if (data === "" || data === "[DONE]") {
+      continue;
+    }
+    let event: StreamEvent;
+    try {
+      event = JSON.parse(data) as StreamEvent;
+    } catch {
+      throw new ProviderCallError("unreadable stream event", 502);
+    }
+    if (event.error !== undefined || (event.errors?.length ?? 0) > 0) {
+      const message =
+        event.errors?.map((e) => e.message ?? `code ${String(e.code)}`).join("; ") ||
+        (typeof event.error === "string" ? event.error : JSON.stringify(event.error));
+      throw new ProviderCallError(message, 502);
+    }
+    if (typeof event.response === "string") {
+      response += event.response;
+    }
+    for (const choice of event.choices ?? []) {
+      sawChoices = true;
+      const delta = choice.delta ?? {};
+      if (typeof delta.content === "string") {
+        content += delta.content;
+      }
+      const thought = delta.reasoning_content ?? delta.reasoning;
+      if (typeof thought === "string") {
+        reasoning += thought;
+      }
+      if (choice.finish_reason !== null && choice.finish_reason !== undefined) {
+        finishReason = choice.finish_reason;
+      }
+    }
+    if (
+      event.usage !== undefined &&
+      (usage === null || tokenTotal(event.usage) >= tokenTotal(usage))
+    ) {
+      usage = event.usage;
+    }
+  }
+  const usageField = usage === null ? {} : { usage };
+  if (!sawChoices) {
+    return { response, ...usageField };
+  }
+  return {
+    choices: [
+      {
+        index: 0,
+        message: { role: "assistant", content, reasoning: reasoning === "" ? null : reasoning },
+        finish_reason: finishReason,
+      },
+    ],
+    ...usageField,
+  };
 }
 
 export class GatewayRestBinding implements WorkersAiBinding {
@@ -75,13 +181,26 @@ export class GatewayRestBinding implements WorkersAiBinding {
     if (options.gateway.metadata !== undefined) {
       headers["cf-aig-metadata"] = JSON.stringify(options.gateway.metadata);
     }
-    const response = await this.fetchFn(`${API_BASE}/accounts/${this.options.AccountId}/ai/run`, {
+    const stream = this.options.Stream === true;
+    // The streamed route names the model in the path, as Cloudflare documents it.
+    const url = stream
+      ? `${API_BASE}/accounts/${this.options.AccountId}/ai/run/${model}`
+      : `${API_BASE}/accounts/${this.options.AccountId}/ai/run`;
+    const signal = AbortSignal.timeout(this.options.TimeoutMs);
+    const response = await this.fetchFn(url, {
       method: "POST",
       headers,
-      body: JSON.stringify({ model, input: inputs }),
-      signal: AbortSignal.timeout(this.options.TimeoutMs),
+      body: JSON.stringify(stream ? { ...inputs, stream: true } : { model, input: inputs }),
+      signal,
     });
     this.aiGatewayLogId = response.headers.get("cf-aig-log-id");
+    if (
+      stream &&
+      response.ok &&
+      (response.headers.get("content-type") ?? "").includes("text/event-stream")
+    ) {
+      return assembleEventStream(await response.text());
+    }
     let body: Envelope | null;
     try {
       body = (await response.json()) as Envelope;

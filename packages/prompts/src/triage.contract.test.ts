@@ -44,7 +44,7 @@ function run(output: unknown, abstract = publication.Abstract) {
 describe("REQ-TEST-002: triage contract test", () => {
   it("REQ-TEST-002: AC1 a valid output passes on the first attempt", async () => {
     const { Result } = await run(valid);
-    expect(Result).toMatchObject({ Ok: true, Attempts: 1, PromptVersion: "triage@1" });
+    expect(Result).toMatchObject({ Ok: true, Attempts: 1, PromptVersion: "triage@2" });
   });
 
   it("REQ-TEST-002: AC1 a missing signal fails after every attempt", async () => {
