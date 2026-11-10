@@ -43,6 +43,10 @@ export type IngestConfig = {
     MaxRedirects: number;
     /** Empty means any public host; a list limits fetching to those hosts (REQ-DATA-010 AC4). */
     AllowedHosts: readonly string[];
+    /** Share of a UTC day's PDF messages dead-lettered above which one alert is raised (ADR 0073). */
+    DeadLetterAlertShare: number;
+    /** Fewest PDF messages in a day before that share is judged (ADR 0073). */
+    DeadLetterAlertMinMessages: number;
   };
 };
 
@@ -61,7 +65,14 @@ export const DEFAULT_INGEST_CONFIG: IngestConfig = {
     WorkTypes: ["article", "preprint", "review", "conference-paper"],
     RequireAbstract: true,
   },
-  Pdf: { MaxBytes: 25 * 1024 * 1024, TimeoutMs: 20_000, MaxRedirects: 3, AllowedHosts: [] },
+  Pdf: {
+    MaxBytes: 25 * 1024 * 1024,
+    TimeoutMs: 20_000,
+    MaxRedirects: 3,
+    AllowedHosts: [],
+    DeadLetterAlertShare: 0.05,
+    DeadLetterAlertMinMessages: 200,
+  },
 };
 
 /** Cron expressions (UTC) of docs/kt/architecture/defaults.md, one per source. */

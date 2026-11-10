@@ -83,6 +83,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0070](0070-downstream-agents-get-the-candidate-and-maturity.md) | Downstream agents get the candidate and maturity | Accepted |
 | [0071](0071-automatic-quality-monitoring-from-run-signals.md) | Automatic quality monitoring from run signals | Accepted |
 | [0072](0072-one-owner-reviews-the-golden-sets-with-agents.md) | One owner reviews the golden sets, with agents to draft and cross-check | Accepted |
+| [0073](0073-pdf-dead-letters-alert-by-daily-rate.md) | PDF dead letters alert by daily rate, and 526 and 530 are permanent | Accepted |
 
 ## When an ADR is needed
 

@@ -2,7 +2,7 @@
 title: Operations requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 ---
 
 # Operations requirements
@@ -63,7 +63,7 @@ Alerts reach people by email and open a GitHub issue.
 - Source: Readiness assessment; operations monitoring
 - Depends on: REQ-NFR-008
 - Acceptance criteria:
-  1. An alert is raised for a failed scheduled run, a run past its time window, a budget stop, a dead-lettered message (REQ-DATA-011), a paused pipeline step (`step-paused`, ADR 0063), a drift in live output quality (`quality-drift`, ADR 0071), and a breach of the availability target (REQ-NFR-017).
+  1. An alert is raised for a failed scheduled run, a run past its time window, a budget stop, a dead-lettered message (REQ-DATA-011; for a PDF download only when the day's share of dead-lettered `document.ingest` messages crosses a threshold, `pdf-dead-letter-rate`, ADR 0073), a paused pipeline step (`step-paused`, ADR 0063), a drift in live output quality (`quality-drift`, ADR 0071), and a breach of the availability target (REQ-NFR-017).
   2. Each alert sends an email to the configured ops address and opens a GitHub issue in this repository with the label `alert`, the alert type, the environment, the run ID, the summary of the run report, and the path of the full report (served by the admin API from phase 4, REQ-ADM-004).
   3. A repeated alert with the same key (type, environment, source) within 24 hours adds a comment to the open issue instead of opening another issue or email.
   4. An alert never contains publication text, prompts, user data, or secrets.

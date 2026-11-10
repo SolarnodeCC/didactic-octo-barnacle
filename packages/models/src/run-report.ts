@@ -41,6 +41,7 @@ export const AlertTypeSchema = z.enum([
   "failed-run",
   "run-timeout",
   "dead-letter",
+  "pdf-dead-letter-rate",
   "budget-stop",
   "availability-breach",
 ]);

@@ -2,7 +2,7 @@
 title: Pipeline orchestration
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-05
+last_reviewed: 2026-11-10
 related: [REQ-AGENT-007, REQ-AGENT-009, REQ-AGENT-011, REQ-AGENT-012, REQ-AGENT-013, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-SCORE-007, REQ-ADM-002]
 ---
 
@@ -74,7 +74,7 @@ Daily admission cron (ADR 0055)
 - Each page is one `source.fetch_page` message. The consumer claims the message in `queue_message_log`, fetches the page, stores it, and writes the counts, the next page cursor, and the message state in one batch. A repeated delivery finds the message `completed` and does nothing.
 - The next page is queued before that batch is written. If the Worker stops in between, the same page is stored again, which changes nothing, and the next page is the same message.
 - The last page closes the run: `succeeded`, or `partial` when an item failed or the page cap was reached. A run that ends `partial` or `failed` stores no window end, so the next run covers the same days again. A run that stopped at the page cap with no failed item keeps the cursor of the page it did not fetch (OpenAlex cursor, arXiv offset); the next run of that source continues there with the same window, and the run that finishes the window stores the window end of the first run of the chain (ADR 0035). Stored publications are not duplicated (REQ-DATA-001, REQ-DATA-002).
-- After a page is stored, each publication with a PDF URL and a license that allows storage gets a `document.ingest` message on the document queue, which runs apart from the pages (ADR 0047), unless it has a document or a finished message. The consumer takes the URL and license from the stored source record, fetches the file with the PDF fetcher, and stores it under `pdfs/<sha256>.pdf` in R2 with a `document` row. A file that can never work (not a PDF, too large, refused URL, 404) completes the message with the reason in `last_error`; a timeout or 5xx is retried and can be dead-lettered. A PDF problem never fails an ingestion run.
+- After a page is stored, each publication with a PDF URL and a license that allows storage gets a `document.ingest` message on the document queue, which runs apart from the pages (ADR 0047), unless it has a document or a finished message. The consumer takes the URL and license from the stored source record, fetches the file with the PDF fetcher, and stores it under `pdfs/<sha256>.pdf` in R2 with a `document` row. A file that can never work (not a PDF, too large, refused URL, 404, or a 526 or 530 from the publisher's Cloudflare) completes the message with the reason in `last_error`; a timeout, 429, or other 5xx is retried and can be dead-lettered. A dead-lettered PDF raises no alert of its own; one alert is raised when the day's share of them crosses `pdf.dead_letter_alert_share` (ADR 0073). A PDF problem never fails an ingestion run.
 - A message that fails its retries goes to the dead-letter queue. The dead-letter consumer marks it, counts it in its run, and closes that run as `failed`. Replaying the message reopens the run, and the page can finish it.
 - A new start is skipped while the previous run of that source is `running`, until it is older than `ingestion.run_timeout_hours`.
 

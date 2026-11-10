@@ -93,6 +93,15 @@ export async function handleDeadLetter(
 
   await deps.Db.batch(statements);
   deps.Log?.("dead_letter.recorded", { messageId: envelope.MessageId, runId, reason: detail });
+
+  // A PDF that a publisher's server fails to deliver is routine (about 1% a day on staging).
+  // It stays recorded and counted, but alerts only when the day's share crosses a threshold
+  // (ADR 0073, REQ-NFR-019 AC1).
+  if (envelope.Type === "document.ingest") {
+    await notifyDocumentRate(deps, now);
+    return "recorded";
+  }
+
   const report = runId ? await reportForAlert(deps, runId, now) : null;
   await notify(deps, {
     Type: "dead-letter",
@@ -103,4 +112,35 @@ export async function handleDeadLetter(
     ...(report ? { Report: report } : {}),
   });
   return "recorded";
+}
+
+/**
+ * Raises one `pdf-dead-letter-rate` alert on the dead letter that lifts the share of
+ * dead-lettered `document.ingest` messages of this UTC day above `Pdf.DeadLetterAlertShare`,
+ * once the day has at least `Pdf.DeadLetterAlertMinMessages` messages (ADR 0073). The
+ * summary carries counts only (REQ-NFR-019 AC4).
+ */
+async function notifyDocumentRate(deps: PipelineDeps, now: string): Promise<void> {
+  const { DeadLetterAlertShare: share, DeadLetterAlertMinMessages: minMessages } = deps.Config.Pdf;
+  const day = now.slice(0, 10);
+  const counts = await deps.Db.prepare(
+    "SELECT COUNT(*) AS total, SUM(CASE WHEN status = 'dead-lettered' THEN 1 ELSE 0 END) AS dead FROM queue_message_log WHERE type = 'document.ingest' AND substr(updated_at, 1, 10) = ?",
+  )
+    .bind(day)
+    .first<{ total: number; dead: number | null }>();
+  const total = counts?.total ?? 0;
+  const dead = counts?.dead ?? 0;
+  if (total < minMessages || dead < 1) {
+    return;
+  }
+  const crossed = dead / total > share && (dead - 1) / total <= share;
+  if (!crossed) {
+    return;
+  }
+  const percent = ((dead / total) * 100).toFixed(1);
+  await notify(deps, {
+    Type: "pdf-dead-letter-rate",
+    Source: "document.ingest",
+    Summary: `${dead} of ${total} PDF messages on ${day} (${percent}%) were dead-lettered, above the ${(share * 100).toFixed(0)}% threshold.`,
+  });
 }

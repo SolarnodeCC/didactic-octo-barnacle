@@ -42,7 +42,16 @@ export type FetchedPdf = { Bytes: Uint8Array<ArrayBuffer>; FinalUrl: string };
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
 const PDF_MAGIC = [0x25, 0x50, 0x44, 0x46, 0x2d]; // "%PDF-"
 
+/**
+ * Cloudflare answers 526 when the publisher's TLS certificate is invalid and 530 when its
+ * origin cannot be resolved; neither passes on a retry, so they are permanent (ADR 0073).
+ */
+const PERMANENT_SERVER_STATUSES = new Set([526, 530]);
+
 function isRetryableStatus(status: number): boolean {
+  if (PERMANENT_SERVER_STATUSES.has(status)) {
+    return false;
+  }
   return status === 408 || status === 429 || status >= 500;
 }
 

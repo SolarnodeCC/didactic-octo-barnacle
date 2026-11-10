@@ -33,6 +33,7 @@ describe("REQ-NFR-019: alert types", () => {
       "failed-run",
       "run-timeout",
       "dead-letter",
+      "pdf-dead-letter-rate",
       "budget-stop",
       "availability-breach",
     ]);

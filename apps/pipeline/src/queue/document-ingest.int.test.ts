@@ -3,6 +3,8 @@ import { createHash } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { consumeBatch } from "./consume.js";
+import { type AlertEvent } from "../alerts/types.js";
+import { DEFAULT_INGEST_CONFIG } from "../config.js";
 import { replayDeadLetter } from "./replay.js";
 import { createPdfFetcher, PdfFetchError } from "../documents/safe-fetch.js";
 import { runScheduled } from "../schedule/run-scheduled.js";
@@ -368,5 +370,102 @@ describe("REQ-DATA-004: PDFs have their own queue", () => {
     expect(await replayDeadLetter(deps, messageId)).toBe("replayed");
     expect(h.Queue.sent).toHaveLength(pageMessages);
     expect(documents.size).toBe(1);
+  });
+});
+
+describe("REQ-NFR-019: PDF dead letters alert by daily rate, not one by one", () => {
+  function collectAlerts(harness: Harness): AlertEvent[] {
+    const alerts: AlertEvent[] = [];
+    harness.Deps.Alert = (event) => {
+      alerts.push(event);
+      return Promise.resolve();
+    };
+    return alerts;
+  }
+
+  it("REQ-NFR-019: a dead-lettered PDF is recorded but raises no alert of its own", async () => {
+    const alerts = collectAlerts(h);
+    h.SetPdfs({ [URL_A]: new PdfFetchError("HTTP 503", "http-status", false, 503) });
+    await ingestPage(h, [makeWork(1, { Pdf: { Url: URL_A, License: "cc-by" } })]);
+
+    expect(h.Queue.deadLettered).toHaveLength(1);
+    const log = h.Database.Raw.prepare(
+      "SELECT status, last_error FROM queue_message_log WHERE type = 'document.ingest'",
+    ).get() as Record<string, unknown>;
+    expect(log["status"]).toBe("dead-lettered");
+    expect(log["last_error"]).toMatch(/HTTP 503/);
+    expect(h.Run()["status"]).toBe("succeeded");
+    expect(alerts).toEqual([]);
+  });
+
+  it("REQ-NFR-019: one rate alert when a day's PDF dead-letter share crosses the threshold", async () => {
+    const rated = createHarness({
+      Pdf: {
+        ...DEFAULT_INGEST_CONFIG.Pdf,
+        DeadLetterAlertShare: 0.4,
+        DeadLetterAlertMinMessages: 2,
+      },
+    });
+    const alerts = collectAlerts(rated);
+    rated.SetPdfs({
+      [URL_A]: new PdfFetchError("HTTP 503", "http-status", false, 503),
+      [URL_B]: pdfBytes("paper two"),
+    });
+    await ingestPage(rated, [
+      makeWork(1, { Pdf: { Url: URL_A, License: "cc-by" } }),
+      makeWork(2, { Pdf: { Url: URL_B, License: "cc-by" } }),
+    ]);
+
+    expect(rated.Queue.deadLettered).toHaveLength(1);
+    expect(alerts).toHaveLength(1);
+    expect(alerts[0]).toMatchObject({ Type: "pdf-dead-letter-rate", Source: "document.ingest" });
+    expect(alerts[0]?.Summary).toMatch(/^1 of 2 PDF messages on \d{4}-\d{2}-\d{2} \(50\.0%\)/);
+  });
+
+  it("REQ-NFR-019: no rate alert while the day has fewer PDF messages than the minimum", async () => {
+    const small = createHarness({
+      Pdf: {
+        ...DEFAULT_INGEST_CONFIG.Pdf,
+        DeadLetterAlertShare: 0.4,
+        DeadLetterAlertMinMessages: 3,
+      },
+    });
+    const alerts = collectAlerts(small);
+    small.SetPdfs({
+      [URL_A]: new PdfFetchError("HTTP 503", "http-status", false, 503),
+      [URL_B]: pdfBytes("paper two"),
+    });
+    await ingestPage(small, [
+      makeWork(1, { Pdf: { Url: URL_A, License: "cc-by" } }),
+      makeWork(2, { Pdf: { Url: URL_B, License: "cc-by" } }),
+    ]);
+
+    expect(small.Queue.deadLettered).toHaveLength(1);
+    expect(alerts).toEqual([]);
+  });
+
+  it("REQ-NFR-019: a dead-lettered source page still raises a dead-letter alert", async () => {
+    const alerts = collectAlerts(h);
+    const down = () => new Error("OpenAlex down");
+    h.SetOpenAlexPages([down(), down(), down(), down()]);
+    await runScheduled(h.Deps, OPENALEX_CRON);
+    await h.Drain({ MaxRetries: 3 });
+
+    expect(h.Queue.deadLettered).toHaveLength(1);
+    expect(alerts.map((alert) => alert.Type)).toContain("dead-letter");
+  });
+
+  it("REQ-DATA-010: a PDF host with an invalid certificate is completed without retries", async () => {
+    const alerts = collectAlerts(h);
+    h.SetPdfs({ [URL_A]: new PdfFetchError("HTTP 526", "http-status", true, 526) });
+    await ingestPage(h, [makeWork(1, { Pdf: { Url: URL_A, License: "cc-by" } })]);
+
+    expect(h.PdfRequests).toHaveLength(1);
+    expect(h.Queue.deadLettered).toHaveLength(0);
+    const log = h.Database.Raw.prepare(
+      "SELECT status FROM queue_message_log WHERE type = 'document.ingest'",
+    ).get() as Record<string, unknown>;
+    expect(log["status"]).toBe("completed");
+    expect(alerts).toEqual([]);
   });
 });

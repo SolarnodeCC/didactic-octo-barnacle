@@ -176,6 +176,21 @@ describe("REQ-DATA-010: PDF fetcher", () => {
     );
   });
 
+  it("REQ-DATA-010: an invalid publisher certificate (526) or unknown origin (530) is permanent", async () => {
+    for (const status of [526, 530]) {
+      const refused = fetcherFor(new Response("", { status }));
+      expect(await failure(refused.fetchPdf("https://repo.example.org/a.pdf"))).toMatchObject({
+        Code: "http-status",
+        Permanent: true,
+        Status: status,
+      });
+    }
+    const unreachable = fetcherFor(new Response("", { status: 522 }));
+    expect((await failure(unreachable.fetchPdf("https://repo.example.org/a.pdf"))).Permanent).toBe(
+      false,
+    );
+  });
+
   it("REQ-DATA-011: a 429 carries its status and the seconds of its Retry-After", async () => {
     const asked = fetcherFor(new Response("", { status: 429, headers: { "retry-after": "120" } }));
     expect(await failure(asked.fetchPdf("https://repo.example.org/a.pdf"))).toMatchObject({

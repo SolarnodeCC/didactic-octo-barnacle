@@ -2,7 +2,7 @@
 title: Runtime defaults
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 related: [REQ-PROC-005, REQ-PROC-006, REQ-AGENT-007, REQ-AGENT-012, REQ-AGENT-013, REQ-DATA-011, REQ-NFR-005]
 ---
 
@@ -57,6 +57,8 @@ Payload of every message: `{ schemaVersion, type, ids: { runId?, source?, page?,
 | `pdf.timeout_ms` | `20000` | One deadline for all redirects and the download |
 | `pdf.max_redirects` | `3` | Each redirect target is checked again |
 | `pdf.allowed_hosts` | empty | Empty means any public host; a list limits fetching to those hosts and their subdomains (ADR 0029) |
+| `pdf.dead_letter_alert_share` | `0.05` | Share of a UTC day's `document.ingest` messages dead-lettered above which one `pdf-dead-letter-rate` alert is raised (ADR 0073) |
+| `pdf.dead_letter_alert_min_messages` | `200` | Fewest `document.ingest` messages in a day before that share is judged (ADR 0073) |
 
 ## Search tool I/O
 
