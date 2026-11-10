@@ -103,6 +103,7 @@ The full-text PDF of an ingested publication is stored when it is openly availab
   2. The PDF is stored once, keyed by its content hash, and linked to its publication record.
   3. A publication without an available PDF is still ingested and marked as having no PDF.
   4. PDF downloads run on their own queue, so a slow or failing download never delays the pages of a run (ADR 0047).
+  5. A PDF whose host still fails (5xx, 429, or timeout) after the retries is recorded as unavailable, with the reason, and raises no alert. It is queued again the next time a run stores the publication. An error of the pipeline itself still goes to the dead-letter queue and alerts (ADR 0073).
 - Verification: integration test with local object storage
 
 ### REQ-DATA-005: Metadata extraction
@@ -169,15 +170,15 @@ Every Queue consumer and Workflow step tolerates repeated delivery.
 - Phase: 1
 - Priority: must
 - Status: done
-- Source: Readiness assessment; ADR 0004, ADR 0069
+- Source: Readiness assessment; ADR 0004, ADR 0069, ADR 0073
 - Depends on: REQ-DATA-009
 - Acceptance criteria:
   1. A consumer checks stored state before it works, so processing the same message twice gives the same stored result.
   2. Queue messages are typed records with a schema version and carry IDs only, never large payloads.
-  3. A failed message is retried after a delay that doubles from 30 seconds, with jitter and at most 15 minutes (ADR 0045). A message that fails its retries goes to a dead-letter queue, and the run report counts dead-lettered messages (REQ-NFR-008).
+  3. A failed message is retried after a delay that doubles from 30 seconds, with jitter and at most 15 minutes (ADR 0045). A message that fails its retries goes to a dead-letter queue, and the run report counts dead-lettered messages (REQ-NFR-008). The exception is a PDF whose host still fails after the retries: it is recorded as unavailable instead (REQ-DATA-004 AC5, ADR 0073).
   4. A dead-lettered message can be replayed without creating duplicates. In phase 1 this is the replay function; the admin route `POST /admin/queue/replay` arrives with the admin API in phase 4 (REQ-ADM-004).
   5. The pages of a run are stored in order: a page whose predecessor is not stored yet waits for it, and a page that is already counted is not counted again (ADR 0045).
-  6. A PDF message that a host refuses with HTTP 429 is retried after 5 minutes, then 10, 20, and 40, up to at most an hour, or after the `Retry-After` of the host when that is longer, capped at an hour. Other errors keep the delay of AC3 (ADR 0069).
+  6. A PDF message that a host refuses with HTTP 429 is retried after 5 minutes, then 10 and 20, or after the `Retry-After` of the host when that is longer, capped at an hour. Other errors keep the delay of AC3 (ADR 0069). The delivery after the last retry gives up (ADR 0073).
 - Verification: integration test that delivers each message twice and replays a dead-lettered message
 
 ### REQ-DATA-012: Automatic dead-letter replay

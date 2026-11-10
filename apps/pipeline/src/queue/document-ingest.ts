@@ -16,6 +16,7 @@ export type DocumentOutcome =
   | "no-storable-pdf"
   | "refused"
   | "same-file-stored"
+  | "unavailable"
   | "duplicate"
   | "dead-lettered";
 
@@ -36,10 +37,14 @@ async function finish(
   return outcome;
 }
 
+/** How many times the queue has delivered this message, 1 for the first delivery. */
+export type Delivery = { Attempts: number };
+
 async function ingest(
   deps: PipelineDeps,
   publicationId: string,
   messageId: string,
+  delivery: Delivery,
 ): Promise<DocumentOutcome> {
   if (await findDocumentByPublication(deps.Db, publicationId)) {
     return finish(deps, messageId, "already-stored", null);
@@ -64,6 +69,29 @@ async function ingest(
         host: new URL(source.Url).hostname,
       });
       return finish(deps, messageId, "refused", `${error.Code}: ${error.message}`);
+    }
+    if (error instanceof PdfFetchError && delivery.Attempts > deps.Config.Pdf.MaxRetries) {
+      // The host still fails (5xx, 429, timeout) after every retry. That is a missing PDF,
+      // not a fault of the pipeline: record it and let the publication stay abstract-only,
+      // instead of dead-lettering it and raising an alert for each one (ADR 0073). The
+      // message stays `failed`, not `completed`, so the PDF is queued again the next time a
+      // run stores this publication.
+      deps.Log?.("document.unavailable", {
+        publicationId,
+        code: error.Code,
+        status: error.Status,
+        host: new URL(source.Url).hostname,
+        attempts: delivery.Attempts,
+      });
+      await markFailed(
+        deps.Db,
+        messageId,
+        new Error(
+          `unavailable after ${delivery.Attempts} attempts: ${error.Code}: ${error.message}`,
+        ),
+        deps.Now(),
+      );
+      return "unavailable";
     }
     throw error;
   }
@@ -103,11 +131,14 @@ async function ingest(
  * Consumer of `document.ingest` (REQ-DATA-004). The PDF URL and license come from the
  * stored source record, never from the message. The file is stored once, under its
  * content hash, and linked to its publication. A repeated delivery finds the message
- * completed. Errors that can pass (timeout, 5xx) are thrown so the queue retries.
+ * completed. Errors that can pass (timeout, 5xx, 429) are thrown so the queue retries; on
+ * the delivery after the last retry they are recorded as `unavailable` (ADR 0073). Any
+ * other error, such as a database failure, still dead-letters the message and alerts.
  */
 export async function handleDocumentIngest(
   deps: PipelineDeps,
   body: unknown,
+  delivery: Delivery = { Attempts: 1 },
 ): Promise<DocumentOutcome> {
   const envelope = QueueMessageEnvelopeSchema.parse(body);
   const claim = await claimMessage(deps.Db, envelope, deps.Now());
@@ -120,7 +151,7 @@ export async function handleDocumentIngest(
     if (envelope.Type !== "document.ingest" || publicationId === undefined) {
       throw new Error("document.ingest needs a PublicationId");
     }
-    return await ingest(deps, publicationId, envelope.MessageId);
+    return await ingest(deps, publicationId, envelope.MessageId, delivery);
   } catch (error) {
     await markFailed(deps.Db, envelope.MessageId, error, deps.Now());
     deps.Log?.("document.failed", {
