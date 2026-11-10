@@ -9,12 +9,6 @@ last_reviewed: 2026-11-10
 
 Questions that block or shape the build. Each has a proposal and the phase by which it must be answered. An answered question becomes an ADR or a change to a KT document, and its row is removed in the same pull request. IDs are never reused.
 
-## Legal and people
-
-| ID | Question | Proposal | Decide before |
-|---|---|---|---|
-| OQ-014 | May we widen full-text use (transient processing, quotes from non-redistributable papers), and do the source and model provider terms allow commercial use? | The phase-2 gate questions 1 to 5 of the [review brief](legal/review-brief.md) were approved on 2026-11-06. Still open: launch questions 6 to 12, among them transient processing of non-redistributable full text (item 9) and the processor agreements (item 8). Abstract-first stays (ADR 0014) until item 9 is answered | before launch |
-
 ## Models
 
 | ID | Question | Proposal | Decide before |
@@ -72,3 +66,4 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-034 | Single owner `@SolarnodeCC` accepted for the MVP, confirmed by the owner on 2026-11-10. A review cannot be independent of the author until a second person joins (ADR 0074). The compensating controls are the CI gates with `check-hardening`, CodeQL, and the soak time of the weekly production release. Revisit when anyone else joins | ADR 0074, ADR 0044, [KT README](README.md#ownership) |
 | OQ-044 | No outside expert review of the golden sets or the calibration set; the product makes no claim of independent validation | ADR 0080 |
 | OQ-045 | A separate Workers AI model judges a small daily sample of live triage and extraction output, report-only, with its own budget line (this question was first numbered OQ-044 as well) | ADR 0081 |
+| OQ-014 | Closed as an open question at the owner's request on 2026-11-10. The phase-2 gate questions 1 to 5 of the legal review brief were approved on 2026-11-06. Launch questions 6 to 12 stay obligations, now an item of the launch checklist in operations, and the platform stays abstract-first (ADR 0014) until the question on transient processing of non-redistributable full text is answered | [Legal review brief](legal/review-brief.md), [Operations](operations.md#launch-checklist-planned) |

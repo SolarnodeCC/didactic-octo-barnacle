@@ -2,7 +2,7 @@
 title: Semantic Scholar
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-10
 related: [REQ-DATA-003]
 ---
 
@@ -23,4 +23,4 @@ Used for paper metadata, citation graphs, and its recommendation engine. Enrichm
 ## Verify before implementing
 
 - API key requirements and rate limits.
-- The API license agreement, in particular whether commercial use and storing results are allowed (OQ-014).
+- The API license agreement, in particular whether commercial use and storing results are allowed ([legal review brief](../legal/review-brief.md), launch question 10).

@@ -35,9 +35,9 @@ How phase 2 is delivered (solution, approach, design, build order, and dependenc
 A phase starts when:
 
 1. The requirement files for its requirements are `approved` (see [requirements review](requirements/README.md#review)).
-2. The open questions marked for that phase in [open questions](open-questions.md) are answered or have an accepted ADR. OQ-005 is closed (ADR 0010); the phase-2 gate questions of OQ-014 were approved on 2026-11-06 ([review brief](legal/review-brief.md)), and its launch questions remain open; OQ-015 is answered by ADR 0072 (the owner reviews, with agents to draft and cross-check); no outside expert review is planned (ADR 0080).
+2. The open questions marked for that phase in [open questions](open-questions.md) are answered or have an accepted ADR. OQ-005 is closed (ADR 0010); the phase-2 gate questions of the legal review brief were approved on 2026-11-06 ([review brief](legal/review-brief.md)), and its launch questions are an item of the launch checklist in [operations](operations.md); OQ-015 is answered by ADR 0072 (the owner reviews, with agents to draft and cross-check); no outside expert review is planned (ADR 0080).
 3. The previous phase meets its exit criteria.
-4. Phase 2 also needs the written legal answer to the phase-2 gate questions of OQ-014 ([review brief](legal/review-brief.md), approved on 2026-11-06) and the cost per publication from phase 1 (REQ-NFR-005), which is an estimate from real phase 1 data (ADR 0032) because phase 1 makes no model calls; the first measured cost comes from the first model calls in phase 2.
+4. Phase 2 also needs the written legal answer to the phase-2 gate questions of the legal review brief ([review brief](legal/review-brief.md), approved on 2026-11-06) and the cost per publication from phase 1 (REQ-NFR-005), which is an estimate from real phase 1 data (ADR 0032) because phase 1 makes no model calls; the first measured cost comes from the first model calls in phase 2.
 
 ## Exit criteria
 
