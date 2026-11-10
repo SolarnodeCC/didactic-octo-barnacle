@@ -57,7 +57,7 @@ Staging is deployed by `.github/workflows/staging-deploy.yml`, run from `main` o
 
 Do not use Cloudflare Workers Builds to deploy `roi-pipeline-staging` (including Preview builds with `npx wrangler preview`). That path skips migrations and the secrets-file upload. Keep Workers Builds **Preview Builds** off for that Worker; staging stays on the GitHub Actions workflow above. The Wrangler `[env.preview]` environment in `infrastructure/cloudflare/wrangler.toml` is separate and remains for on-request preview deploys when that environment exists.
 
-Settings outside the repository cannot be checked by `scripts/check-hardening.py`. Review them every quarter and after any change of owners (REQ-NFR-021, ADR 0033):
+Settings outside the repository cannot be checked by `scripts/check-hardening.py`. Review them every quarter and after any change of owners (REQ-NFR-021, ADR 0033). The owner last confirmed the environment branch limits, secret scanning with push protection, private vulnerability reporting, and the private repository on 2026-11-10:
 
 | Setting | Expected |
 |---|---|
@@ -68,7 +68,7 @@ Settings outside the repository cannot be checked by `scripts/check-hardening.py
 | Private vulnerability reporting | On, so the route in `SECURITY.md` works |
 | Code scanning (CodeQL default setup) | On for `actions`, `javascript-typescript`, and `python`, on pull requests and `main` |
 | Dependency graph and Dependabot alerts | On, so Dependabot security updates and GitHub's dependency review action work |
-| Cloudflare API token | Least permissions for the environment (see the secrets table). Recommended: a second, read-only token for the drift report and `Staging measure`, once the workflows take one (ADR 0074) |
+| Cloudflare API token | Least permissions for the environment (see the secrets table), and a separate read-only token `CLOUDFLARE_API_TOKEN_READONLY` for the drift report (ADR 0074) |
 | Repository visibility | Private while alert issues are opened here: they hold run IDs, failure reasons, and host names (REQ-NFR-019). Move `ALERT_GITHUB_REPO` to a private operations repository before this one is made public |
 | Workers Builds on `roi-pipeline-staging` | Preview Builds off; no automatic deploy that replaces Staging deploy |
 
@@ -77,6 +77,7 @@ Set these in the GitHub environment `staging` before the first run:
 | Kind | Name | Needed |
 |---|---|---|
 | Secret | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | yes |
+| Secret | `CLOUDFLARE_API_TOKEN_READONLY` | recommended; until it is set, the drift report uses `CLOUDFLARE_API_TOKEN` |
 | Secret | `ERASURE_HASH_KEY` (32 or more random characters) | yes; the workflow stops without it |
 | Secret | `OPENALEX_API_KEY` | yes for full OpenAlex runs; cursor paging past the first page needs a free key (ADR 0034) |
 | Secret | `ALERT_GITHUB_TOKEN`, `RESEND_API_KEY` | for alerts; without them that channel is off |
@@ -136,6 +137,7 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 | `RESEND_API_KEY` | Sends invitation and sign-in emails (REQ-ACC-007) and alert emails (REQ-NFR-019) | Cloudflare Worker secret; GitHub Actions secret for deployment | preview, staging, production |
 | `RESEND_WEBHOOK_SECRET` | Verifies Resend bounce and complaint webhooks (REQ-ACC-007) | Worker secret | preview, staging, production |
 | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | Deploy with Wrangler and run the bootstrap script; the token has the least permissions each environment needs | GitHub Actions secret | preview, staging, production |
+| `CLOUDFLARE_API_TOKEN_READONLY` | The drift report (`Report drift` in `Staging bootstrap` and `Staging scheduled checks`, and the resource check before `Staging deploy`), which only lists resources. Account permissions: D1 Read, Workers R2 Storage Read, Queues Read, Vectorize Read, AI Gateway Read. While it is missing, those steps fall back to `CLOUDFLARE_API_TOKEN`. `Staging measure` keeps the full token: it runs SQL with `wrangler d1 execute --remote`, and Cloudflare does not document that D1 Read is enough for that (ADR 0074) | GitHub Actions secret | staging |
 | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` (benchmark) | Run model benchmark rounds through AI Gateway ([running a round](test/model-benchmark-run.md)); the token has Workers AI Read, and R2 Edit only when raw responses go to R2 | GitHub environment `evals` or Cursor environment secret | evals |
 | `SCOPE_PR_TOKEN` | Opens the draft pull request of `OpenAlex scope sync`; fine-grained token for this repository with Contents and Pull requests write, so the CI checks run on that pull request (ADR 0046) | GitHub environment secret | staging |
 | `OPENALEX_API_KEY` | OpenAlex requests by the collector (REQ-DATA-001); free key required for cursor paging (ADR 0034) | Worker secret, uploaded by `Staging deploy` from the GitHub environment secret; also Cursor environment secret for local agent work | preview, staging, production |
@@ -143,7 +145,7 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 | `SEARCH_PROVIDER_API_KEY` | Primary web search provider for Market Analysis and Competition (ADR 0022) | Worker secret | preview, staging, production |
 | `SEARCH_PROVIDER_FALLBACK_API_KEY` | Second search provider for benchmark and failover (ADR 0022) | Worker secret | preview, staging, production |
 | `ALERT_GITHUB_TOKEN` | Opens and comments on alert issues; a fine-grained token for this repository only, with the permission Issues: read and write and no other (REQ-NFR-019 AC5) | Cloudflare Worker secret | preview, staging, production |
-| `ERASURE_HASH_KEY` | Keys the erasure list of erased authors: at least 32 random characters. Ingestion stops without it. Losing or changing it makes the list useless, so keep it with the other secrets (REQ-NFR-016, ADR 0031) | Cloudflare Worker secret | staging, production |
+| `ERASURE_HASH_KEY` | Keys the erasure list of erased authors: at least 32 random characters. Ingestion stops without it. Losing or changing it makes the list useless: keep it with the other secrets and an offline copy in the owner's password manager, and never rotate it ([privacy](architecture/privacy.md), REQ-NFR-016, ADR 0031, ADR 0074) | Cloudflare Worker secret | staging, production |
 | `ALERT_EMAIL_TO` | Ops address that receives alert emails (REQ-NFR-019); kept out of the repository | Worker variable | preview, staging, production |
 | `ALERT_EMAIL_FROM` | Sender of alert emails: `onboarding@resend.dev` in staging (delivers only to the Resend account owner); an address on the verified domain in production (ADR 0030) | Worker variable (`wrangler.toml`) | staging, production |
 | `ALERT_GITHUB_REPO` | `owner/repo` that receives alert issues | Worker variable (`wrangler.toml`) | staging, production |

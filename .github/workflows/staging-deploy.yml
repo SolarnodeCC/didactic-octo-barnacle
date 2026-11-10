@@ -5,7 +5,8 @@ name: Staging deploy
 # keeps working), then uploads the Worker together with its secrets in one version.
 # The GitHub environment `staging` supplies:
 #   secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, ERASURE_HASH_KEY (required),
-#            OPENALEX_API_KEY, ALERT_GITHUB_TOKEN, RESEND_API_KEY (optional)
+#            OPENALEX_API_KEY, ALERT_GITHUB_TOKEN, RESEND_API_KEY,
+#            CLOUDFLARE_API_TOKEN_READONLY (optional; the resource check uses it, ADR 0074)
 #   variable: ALERT_EMAIL_TO (optional)
 # A missing optional value only switches that feature off. See docs/kt/operations.md.
 
@@ -68,7 +69,7 @@ jobs:
       - name: Stop on missing resources
         # A binding to a queue or bucket that does not exist fails the deploy; say why first.
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_READONLY || secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: node infrastructure/cloudflare/dist/bootstrap-cli.js --env staging --fail-on-drift
 
