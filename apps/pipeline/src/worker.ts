@@ -113,7 +113,11 @@ function buildDeps(env: Env): PipelineDeps {
             ...(request.Cursor ? { Cursor: request.Cursor } : {}),
             ...(env.OPENALEX_API_KEY ? { ApiKey: env.OPENALEX_API_KEY } : {}),
           },
-          { Fetch: workerFetch, Backoff: backoff },
+          {
+            Fetch: workerFetch,
+            Backoff: backoff,
+            MaxResponseBytes: config.Http.MaxResponseBytes,
+          },
         ),
       FetchArxivPage: (request) =>
         fetchArxivPage(
@@ -127,6 +131,7 @@ function buildDeps(env: Env): PipelineDeps {
             Fetch: workerFetch,
             Backoff: backoff,
             WaitForSlot: arxivSlot,
+            MaxResponseBytes: config.Http.MaxResponseBytes,
           },
         ),
     },

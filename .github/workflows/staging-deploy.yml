@@ -32,9 +32,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: staging
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -70,6 +67,9 @@ jobs:
 
       - name: Stop on missing resources
         # A binding to a queue or bucket that does not exist fails the deploy; say why first.
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: node infrastructure/cloudflare/dist/bootstrap-cli.js --env staging --fail-on-drift
 
       - name: Check the erasure key
@@ -85,11 +85,16 @@ jobs:
       - name: Apply migrations
         if: ${{ inputs.migrate }}
         working-directory: infrastructure/cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: pnpm exec wrangler d1 migrations apply DB --env staging --remote
 
       - name: Deploy the Worker with its secrets
         working-directory: infrastructure/cloudflare
         env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           ERASURE_HASH_KEY: ${{ secrets.ERASURE_HASH_KEY }}
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
           ALERT_GITHUB_TOKEN: ${{ secrets.ALERT_GITHUB_TOKEN }}
@@ -112,4 +117,7 @@ jobs:
 
       - name: Show the live deployment
         working-directory: infrastructure/cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: pnpm exec wrangler deployments list --env staging

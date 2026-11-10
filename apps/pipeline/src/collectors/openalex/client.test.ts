@@ -105,6 +105,17 @@ describe("REQ-DATA-001: OpenAlex client", () => {
     });
   });
 
+  it("REQ-NFR-021: refuses a response larger than the configured cap", async () => {
+    const fetchFn: FetchFn = () =>
+      Promise.resolve(Response.json({ results: [], meta: { next_cursor: "x".repeat(200) } }));
+    await expect(
+      fetchOpenAlexPage(
+        { FromDate: "2026-09-29" },
+        { Fetch: fetchFn, Backoff: backoff, MaxResponseBytes: 100 },
+      ),
+    ).rejects.toThrow(/larger than 100 bytes/u);
+  });
+
   it("REQ-DATA-001: omits Authorization when there is no key", async () => {
     const headersSeen: Array<Record<string, string>> = [];
     const fetchFn: FetchFn = (_input, init) => {

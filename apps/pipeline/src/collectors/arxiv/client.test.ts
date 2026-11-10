@@ -98,4 +98,20 @@ describe("REQ-DATA-002: arXiv client on a recorded empty feed", () => {
 
     expect(page).toEqual({ Entries: [], OutOfScope: 0, Returned: 0 });
   });
+
+  it("REQ-NFR-021: refuses a response larger than the configured cap", async () => {
+    const fetchFn: FetchFn = () => Promise.resolve(new Response(feed));
+
+    await expect(
+      fetchArxivPage(
+        {},
+        {
+          Fetch: fetchFn,
+          Backoff: backoff,
+          WaitForSlot: () => Promise.resolve(),
+          MaxResponseBytes: 64,
+        },
+      ),
+    ).rejects.toThrow(/larger than 64 bytes/u);
+  });
 });

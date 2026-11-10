@@ -65,8 +65,10 @@ Settings outside the repository cannot be checked by `scripts/check-hardening.py
 | GitHub environment `production` | Own protection rules (for example a required reviewer or wait timer); deployment limited to the `main` branch |
 | Branch protection on `main` | Pull request required with at least one approval and code owner review; status checks `parse` and `toolchain` required; no force pushes |
 | Secret scanning and push protection | On (REQ-NFR-001) |
+| Private vulnerability reporting | On, so the route in `SECURITY.md` works |
 | Dependency graph and Dependabot alerts | On, so Dependabot security updates and GitHub's dependency review action work |
-| Cloudflare API token | Least permissions for the environment (see the secrets table) |
+| Cloudflare API token | Least permissions for the environment (see the secrets table). Recommended: a second, read-only token for the drift report and `Staging measure`, once the workflows take one (ADR 0073) |
+| Repository visibility | Private while alert issues are opened here: they hold run IDs, failure reasons, and host names (REQ-NFR-019). Move `ALERT_GITHUB_REPO` to a private operations repository before this one is made public |
 | Workers Builds on `roi-pipeline-staging` | Preview Builds off; no automatic deploy that replaces Staging deploy |
 
 Set these in the GitHub environment `staging` before the first run:

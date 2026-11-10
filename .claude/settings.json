@@ -3,7 +3,8 @@
     "deny": [
       "Read(.env)",
       "Read(.env.*)",
-      "Read(!.env.example)",
+      "Read(.dev.vars)",
+      "Read(.dev.vars.*)",
       "Read(*.pem)",
       "Read(secrets/**)"
     ]

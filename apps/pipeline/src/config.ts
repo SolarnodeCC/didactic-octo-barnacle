@@ -21,7 +21,8 @@ export type IngestConfig = {
   RunTimeoutHours: number;
   /** Seconds before the next arXiv page is delivered (`arxiv.min_request_interval_ms`). */
   ArxivPageDelaySeconds: number;
-  Http: { MaxAttempts: number; BaseMs: number };
+  /** `MaxResponseBytes` caps one API response from OpenAlex or arXiv (REQ-NFR-021). */
+  Http: { MaxAttempts: number; BaseMs: number; MaxResponseBytes: number };
   /** What an OpenAlex work must match to be stored (docs/kt/data-sources/ingestion-scope.md). */
   OpenAlexScope: {
     /** Field and subfield names of the topic map; a work needs one of them (REQ-DATA-001 AC1). */
@@ -54,7 +55,7 @@ export const DEFAULT_INGEST_CONFIG: IngestConfig = {
   PageSize: 100,
   RunTimeoutHours: 6,
   ArxivPageDelaySeconds: 3,
-  Http: { MaxAttempts: 3, BaseMs: 500 },
+  Http: { MaxAttempts: 3, BaseMs: 500, MaxResponseBytes: 16 * 1024 * 1024 },
   OpenAlexScope: {
     TopicNames: SCOPE_OPENALEX_TOPIC_NAMES,
     SubfieldIds: SCOPE_OPENALEX_SUBFIELD_IDS,

@@ -37,7 +37,7 @@ Do not invent credentials, commit secrets, or add a second license. Open a pull 
 - Markdown: other files may add instructions but must not contradict the KT documents in `docs/kt/`. Use a fenced code block with a language tag for commands, JSON, YAML, and diagrams. Keep secrets, tokens, and local machine paths out.
 - JSON: commit strict JSON, with no comments and no trailing commas. Keep secrets, snapshot IDs, and machine-local paths out. `.cursor/environment.json` holds `install` and, when a server exists, `start`; dependency installs go in `install` and long-running processes in `start`.
 - YAML: name the GitHub Actions secret or Cursor environment secret instead of writing a secret value. Quote values that contain `:`, `#`, or leading wildcard characters. Keep `.cursor/config/bugbot.yaml` to the documented Bugbot keys: `version`, `triggers`, `review`, `prSummary`, and `autofix`.
-- `.claude/settings.json` denies Claude Code reads of `.env` files (except `.env.example`), `*.pem` files, and `secrets/**` directories.
+- `.claude/settings.json` denies Claude Code reads of `.env` files, Wrangler's local secret files (`.dev.vars`), `*.pem` files, and `secrets/**` directories. Deny rules have no exceptions, so `.env.*` also covers `.env.example`.
 
 ## Cursor Cloud specific instructions
 
