@@ -27,7 +27,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
-| OQ-034 | Who is the named owner per role once the team is staffed? | The MVP has one owner, `@SolarnodeCC`, for all areas; split the owner roles of the [KT README](README.md#ownership) and `.github/CODEOWNERS` when more people join | before launch |
+| OQ-034 | Who is the named owner per role once the team is staffed? | The MVP has one owner, `@SolarnodeCC`, for all areas; split the owner roles of the [KT README](README.md#ownership) and `.github/CODEOWNERS` when more people join. The security audit of 2026-11-05 flagged the single code owner: until a second owner exists, a review cannot be independent of the author (ADR 0074) | before launch |
 | OQ-035 | Which hostnames do staging and preview use under `wispel.cc`, and does the API or admin area get its own subdomain? | Keep one site per environment on one registrable domain (ADR 0016); name the hostnames when the first environment is deployed, then record them in operations | before phase 4 launch checklist |
 
 ## Answered
