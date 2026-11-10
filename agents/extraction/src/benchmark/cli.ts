@@ -82,7 +82,7 @@ export function parseBenchmarkArgs(args: readonly string[]): BenchmarkArgs | nul
     Out: "benchmark-out",
     Limit: null,
     OutputMode: "json-schema",
-    Prices: join(REPO_ROOT, "infrastructure/cloudflare/prices/2026-11-06.json"),
+    Prices: join(REPO_ROOT, "infrastructure/cloudflare/prices/2026-11-10.json"),
     R2Bucket: null,
     MinIntervalMs: 3000,
     TimeoutMs: 600_000,

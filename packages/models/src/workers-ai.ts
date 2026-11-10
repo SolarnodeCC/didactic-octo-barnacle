@@ -74,12 +74,16 @@ export type ParsedGeneration = {
   Output: unknown;
   InputTokens: number;
   OutputTokens: number;
+  /** Input tokens served from the prompt cache, a part of `InputTokens` (ADR 0078). */
+  CachedInputTokens: number;
 };
 
 /**
  * Read a Workers AI text-generation response. Models answer either `{ response, usage }` or
  * the OpenAI shape `{ choices: [{ message: { content } }], usage }`; with JSON-schema output
  * `response` may already be an object. Token counts default to zero when absent.
+ * Cached input tokens come from `usage.prompt_tokens_details.cached_tokens` (the OpenAI shape
+ * Workers AI uses) or `usage.input_tokens_details.cached_tokens`, and never exceed the input.
  */
 export function parseGeneration(response: unknown): ParsedGeneration {
   const body = (response ?? {}) as Record<string, unknown>;
@@ -93,5 +97,16 @@ export function parseGeneration(response: unknown): ParsedGeneration {
     numberField(usage, "prompt_tokens") ?? numberField(usage, "input_tokens") ?? 0;
   const outputTokens =
     numberField(usage, "completion_tokens") ?? numberField(usage, "output_tokens") ?? 0;
-  return { Output: output, InputTokens: inputTokens, OutputTokens: outputTokens };
+  const details =
+    usage !== null && typeof usage === "object"
+      ? ((usage as Record<string, unknown>).prompt_tokens_details ??
+        (usage as Record<string, unknown>).input_tokens_details)
+      : undefined;
+  const cached = Math.max(0, numberField(details, "cached_tokens") ?? 0);
+  return {
+    Output: output,
+    InputTokens: inputTokens,
+    OutputTokens: outputTokens,
+    CachedInputTokens: Math.min(cached, inputTokens),
+  };
 }

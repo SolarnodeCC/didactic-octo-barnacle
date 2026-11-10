@@ -154,7 +154,48 @@ describe("REQ-NFR-003: streamed calls through AI Gateway", () => {
       Output: '{"Answer": true}',
       InputTokens: 25,
       OutputTokens: 207,
+      CachedInputTokens: 0,
     });
+  });
+
+  it("REQ-NFR-011: the rebuilt stream keeps the cached input tokens of the usage (ADR 0078)", () => {
+    const result = assembleEventStream(
+      sse([
+        { choices: [{ delta: { content: "{}" }, finish_reason: null }] },
+        {
+          choices: [{ delta: {}, finish_reason: "stop" }],
+          usage: {
+            prompt_tokens: 1027,
+            completion_tokens: 2443,
+            total_tokens: 3470,
+            prompt_tokens_details: { cached_tokens: 960 },
+          },
+        },
+      ]),
+    );
+    expect(result.usage).toMatchObject({ prompt_tokens_details: { cached_tokens: 960 } });
+    expect(parseGeneration(result)).toEqual({
+      Output: "{}",
+      InputTokens: 1027,
+      OutputTokens: 2443,
+      CachedInputTokens: 960,
+    });
+
+    // A final total without details keeps the details of an earlier usage event.
+    const later = assembleEventStream(
+      sse([
+        {
+          response: "{}",
+          usage: {
+            prompt_tokens: 1027,
+            completion_tokens: 1,
+            prompt_tokens_details: { cached_tokens: 960 },
+          },
+        },
+        { response: "", usage: { prompt_tokens: 1027, completion_tokens: 2443 } },
+      ]),
+    );
+    expect(parseGeneration(later)).toMatchObject({ OutputTokens: 2443, CachedInputTokens: 960 });
   });
 
   it("REQ-NFR-011: a stream that ends in reasoning only gives empty content and the real token count", () => {
@@ -177,7 +218,12 @@ describe("REQ-NFR-003: streamed calls through AI Gateway", () => {
         { response: "1}", usage: { prompt_tokens: 3, completion_tokens: 2 } },
       ]),
     );
-    expect(parseGeneration(result)).toEqual({ Output: '{"a":1}', InputTokens: 3, OutputTokens: 2 });
+    expect(parseGeneration(result)).toEqual({
+      Output: '{"a":1}',
+      InputTokens: 3,
+      OutputTokens: 2,
+      CachedInputTokens: 0,
+    });
   });
 
   it("REQ-AGENT-012: an error event in the stream is a retryable provider error", () => {

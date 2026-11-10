@@ -31,10 +31,10 @@ export function createModelUsageStore(db: SqlDatabase, dailyLimit: Money): Model
           .prepare(
             `INSERT INTO model_call (
               id, run_kind, run_id, step_name, agent, publication_id, candidate_id, model,
-              prompt_version, attempt, input_tokens, output_tokens, latency_ms, cost_amount,
-              cost_currency, price_table_version, estimated, outcome, gateway_request_id,
-              call_kind, search_query, search_result_count, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              prompt_version, attempt, input_tokens, cached_input_tokens, output_tokens,
+              latency_ms, cost_amount, cost_currency, price_table_version, estimated, outcome,
+              gateway_request_id, call_kind, search_query, search_result_count, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           )
           .bind(
             record.Id,
@@ -48,6 +48,7 @@ export function createModelUsageStore(db: SqlDatabase, dailyLimit: Money): Model
             record.PromptVersion,
             record.Attempt,
             record.InputTokens,
+            record.CachedInputTokens,
             record.OutputTokens,
             record.LatencyMs,
             record.Cost.Amount,
@@ -79,6 +80,8 @@ export type UsageTotal = {
   Agent: string | null;
   Calls: number;
   InputTokens: number;
+  /** A part of `InputTokens`, billed at the cached-input price (ADR 0078). */
+  CachedInputTokens: number;
   OutputTokens: number;
   CostAmount: number;
 };
@@ -87,6 +90,7 @@ export async function usageTotalsForDay(db: SqlDatabase, day: string): Promise<U
   const { results } = await db
     .prepare(
       `SELECT step_name, agent, COUNT(*) AS calls, SUM(input_tokens) AS input_tokens,
+              SUM(cached_input_tokens) AS cached_input_tokens,
               SUM(output_tokens) AS output_tokens, SUM(cost_amount) AS cost_amount
        FROM model_call
        WHERE created_at >= ? AND created_at < ?
@@ -99,6 +103,7 @@ export async function usageTotalsForDay(db: SqlDatabase, day: string): Promise<U
       agent: string | null;
       calls: number;
       input_tokens: number;
+      cached_input_tokens: number;
       output_tokens: number;
       cost_amount: number;
     }>();
@@ -107,6 +112,7 @@ export async function usageTotalsForDay(db: SqlDatabase, day: string): Promise<U
     Agent: row.agent,
     Calls: row.calls,
     InputTokens: row.input_tokens,
+    CachedInputTokens: row.cached_input_tokens,
     OutputTokens: row.output_tokens,
     CostAmount: row.cost_amount,
   }));
