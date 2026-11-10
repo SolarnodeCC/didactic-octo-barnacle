@@ -45,7 +45,7 @@ A security audit of the repository on 2026-11-05 found the security design sound
 
 The owner decided on the follow-up work:
 
-- **Read-only token:** the steps that only list resources (`Report drift` in `Staging bootstrap` and `Staging scheduled checks`, and the resource check before `Staging deploy`) use `CLOUDFLARE_API_TOKEN_READONLY`, and fall back to `CLOUDFLARE_API_TOKEN` until that secret exists. `Staging measure` keeps the full token, because it runs SQL through `wrangler d1 execute --remote` and Cloudflare does not document that D1 Read is enough. The permissions are in [operations](../operations.md).
+- **Read-only token:** considered and dropped. One `CLOUDFLARE_API_TOKEN` per environment is kept, as in ADR 0046. The main-only guard, step-scoped secrets, and release cooldowns of this ADR already limit what a compromised dependency could reach.
 - **`ERASURE_HASH_KEY`:** one key, never rotated, kept in the environment secrets and as an offline copy. A dual-key transition would protect only the entries made after a rotation, so it is not built ([privacy](../architecture/privacy.md)).
 - **Second code owner:** deferred until someone joins (OQ-034). Until then a review cannot be independent of the author.
 - **Repository settings:** the owner confirmed the environment branch limits, secret scanning with push protection, private vulnerability reporting, and the private repository on 2026-11-10.
