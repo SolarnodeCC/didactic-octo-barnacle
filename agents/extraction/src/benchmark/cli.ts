@@ -55,7 +55,7 @@ export type BenchmarkArgs = {
   MinIntervalMs: number;
   /** Longest time one call may take, from request to the last streamed token. */
   TimeoutMs: number;
-  /** Stream responses, so a slow reasoning model is not cut off by a proxy (ADR 0073). */
+  /** Stream responses, so a slow reasoning model is not cut off by a proxy (ADR 0076). */
   Stream: boolean;
   DryRun: boolean;
 };

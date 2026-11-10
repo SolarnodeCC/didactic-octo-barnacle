@@ -10,7 +10,7 @@ import { type BuiltPrompt, type Sampling } from "./prompt.js";
  *
  * `triage@2` has the text of `triage@1` and a larger output budget: reasoning models spend
  * their tokens on reasoning before the answer, and 1024 tokens ended every round-one sample
- * call before any JSON (ADR 0073).
+ * call before any JSON (ADR 0076).
  */
 
 export const TRIAGE_PROMPT_VERSION = "triage@2";

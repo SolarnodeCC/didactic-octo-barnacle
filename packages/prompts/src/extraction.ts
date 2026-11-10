@@ -13,7 +13,7 @@ import { type BuiltPrompt, type Sampling } from "./prompt.js";
  * REQ-PROC-004, REQ-PROC-009, ADR 0036, ADR 0050).
  *
  * `extraction@2` has the text of `extraction@1` and a larger output budget, for the reasoning
- * that comes before the answer (ADR 0073).
+ * that comes before the answer (ADR 0076).
  */
 
 export const EXTRACTION_PROMPT_VERSION = "extraction@2";

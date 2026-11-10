@@ -1,12 +1,12 @@
 ---
-title: "0073: Stream benchmark calls, and a larger output budget for reasoning models"
+title: "0076: Stream benchmark calls, and a larger output budget for reasoning models"
 owner: "@SolarnodeCC"
 status: draft
 last_reviewed: 2026-11-10
 related: [REQ-AGENT-010, REQ-AGENT-014, REQ-NFR-003, REQ-NFR-005, REQ-NFR-011, REQ-TEST-006]
 ---
 
-# 0073: Stream benchmark calls, and a larger output budget for reasoning models
+# 0076: Stream benchmark calls, and a larger output budget for reasoning models
 
 - Decision status: Proposed
 - Date: 2026-11-10

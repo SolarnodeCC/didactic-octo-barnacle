@@ -43,6 +43,11 @@ export type IngestConfig = {
     MaxRedirects: number;
     /** Empty means any public host; a list limits fetching to those hosts (REQ-DATA-010 AC4). */
     AllowedHosts: readonly string[];
+    /**
+     * `max_retries` of the document queue in wrangler.toml. On the delivery after the last
+     * retry, a host that still fails is recorded as `unavailable`, not dead-lettered (ADR 0073).
+     */
+    MaxRetries: number;
   };
 };
 
@@ -61,7 +66,13 @@ export const DEFAULT_INGEST_CONFIG: IngestConfig = {
     WorkTypes: ["article", "preprint", "review", "conference-paper"],
     RequireAbstract: true,
   },
-  Pdf: { MaxBytes: 25 * 1024 * 1024, TimeoutMs: 20_000, MaxRedirects: 3, AllowedHosts: [] },
+  Pdf: {
+    MaxBytes: 25 * 1024 * 1024,
+    TimeoutMs: 20_000,
+    MaxRedirects: 3,
+    AllowedHosts: [],
+    MaxRetries: 3,
+  },
 };
 
 /** Cron expressions (UTC) of docs/kt/architecture/defaults.md, one per source. */
