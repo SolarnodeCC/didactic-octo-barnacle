@@ -105,6 +105,7 @@ Cron expressions (UTC) are in [defaults](architecture/defaults.md).
 
 - Every ingestion and pipeline run writes a run report with counts and failures (REQ-NFR-008).
 - A failed scheduled run, a run that exceeds its time window, a budget stop, a dead-lettered message, or a breach of the availability target (REQ-NFR-017) raises an alert (REQ-NFR-019). An alert sends an email to the ops address and opens a GitHub issue labeled `alert`; repeats within 24 hours comment on the open issue.
+- The staging and production Workers keep every log line and trace in Workers Observability, with issue detection on (REQ-NFR-008, ADR 0077).
 - AI Gateway shows tokens, cost, and latency per agent (REQ-NFR-003).
 
 ## Runbooks

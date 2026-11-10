@@ -42,3 +42,22 @@ describe("REQ-DATA-004: PDF downloads have their own queue in every environment"
     },
   );
 });
+
+describe("REQ-NFR-008: deployed Workers keep every log line and trace", () => {
+  it.each(["staging", "production"])(
+    "REQ-NFR-008: %s persists all logs and traces and turns on issue detection",
+    (environment) => {
+      const table = `[env.${environment}.observability`;
+      expect(wrangler).toContain(
+        `${table}]\nenabled = true\nhead_sampling_rate = 1\nredact_query_string = false\n`,
+      );
+      expect(wrangler).toContain(
+        `${table}.logs]\nenabled = true\nhead_sampling_rate = 1\ninvocation_logs = true\npersist = true\n`,
+      );
+      expect(wrangler).toContain(
+        `${table}.traces]\nenabled = true\nhead_sampling_rate = 1\npersist = true\n`,
+      );
+      expect(wrangler).toContain(`${table}.issue_detection]\nenabled = true\n`);
+    },
+  );
+});
