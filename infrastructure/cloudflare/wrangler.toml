@@ -126,8 +126,26 @@ vars = { ENVIRONMENT = "staging", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo
 [env.staging.triggers]
 crons = ["0 6 * * *", "30 7 * * *"]
 
-# Keep the structured log lines (REQ-NFR-008) so a run can be followed afterwards.
+# Keep every log line and trace (REQ-NFR-008) so a run can be followed afterwards; the
+# same settings as the dashboard's Observability page (ADR 0077). Outbound query strings
+# carry no secrets (keys go in headers), so they are kept readable.
 [env.staging.observability]
+enabled = true
+head_sampling_rate = 1
+redact_query_string = false
+
+[env.staging.observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+persist = true
+
+[env.staging.observability.traces]
+enabled = true
+head_sampling_rate = 1
+persist = true
+
+[env.staging.observability.issue_detection]
 enabled = true
 
 [[env.staging.d1_databases]]
@@ -187,8 +205,26 @@ vars = { ENVIRONMENT = "production", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-o
 [env.production.triggers]
 crons = ["0 6 * * *", "30 7 * * *"]
 
-# Keep the structured log lines (REQ-NFR-008) so a run can be followed afterwards.
+# Keep every log line and trace (REQ-NFR-008) so a run can be followed afterwards; the
+# same settings as the dashboard's Observability page (ADR 0077). Outbound query strings
+# carry no secrets (keys go in headers), so they are kept readable.
 [env.production.observability]
+enabled = true
+head_sampling_rate = 1
+redact_query_string = false
+
+[env.production.observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+persist = true
+
+[env.production.observability.traces]
+enabled = true
+head_sampling_rate = 1
+persist = true
+
+[env.production.observability.issue_detection]
 enabled = true
 
 [[env.production.d1_databases]]

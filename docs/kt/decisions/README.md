@@ -86,6 +86,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0073](0073-unreachable-pdf-is-a-data-outcome.md) | A PDF host that stays unreachable is a data outcome, not an alert | Accepted |
 | [0074](0074-ci-secret-scoping-and-response-caps.md) | Environment jobs on main only, secrets per step, capped responses, and release cooldowns | Accepted |
 | [0076](0076-stream-benchmark-calls-and-larger-output-budget.md) | Stream benchmark calls, and a larger output budget for reasoning models | Proposed |
+| [0077](0077-full-workers-observability.md) | Keep every log line and trace of the deployed Worker | Accepted |
 
 ## When an ADR is needed
 
