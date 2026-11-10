@@ -8,7 +8,7 @@ related: [REQ-AGENT-014, REQ-NFR-005, REQ-PROC-008, REQ-PROC-009, REQ-TEST-006]
 
 # Benchmark round one: run plan
 
-How round one of the [model benchmark plan](model-benchmark-plan.md) is run for triage and opportunity extraction (OQ-036). It adds no requirement. The owner approves this plan before the first live call, because the run spends model budget.
+How round one of the [model benchmark plan](model-benchmark-plan.md) is run for triage and opportunity extraction (OQ-036). It adds no requirement. The owner approves this plan before the first live call, because the run spends model budget. It ran on 2026-11-10; see the [results](benchmark-round-one-results.md) and [ADR 0082](../decisions/0082-benchmark-round-one-selects-no-model.md).
 
 ## What is run
 

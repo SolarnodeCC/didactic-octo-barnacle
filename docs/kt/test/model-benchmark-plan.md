@@ -193,7 +193,7 @@ Stop and ask the owner before the total model cost passes the budget of 50 euro.
 4. Build the harness on the shared model-call helper and the eval runner, with cost recording.
 5. Round one: all candidates, fixed prompt.
 6. Round two: finalists, one reasoning variant, optional prompt tuning.
-7. Write the ADR, update the model configuration, and close OQ-036.
+7. Write the ADR, update the model configuration, and close OQ-036. Round one selected no model ([ADR 0082](../decisions/0082-benchmark-round-one-selects-no-model.md)); the owner chooses the changes for round two.
 
 ADR 0049 already updated the [technology stack](../architecture/technology-stack.md), [privacy](../architecture/privacy.md), [operations](../operations.md), `README.md`, and `AGENTS.md` to Workers AI for the pipeline. The ADR that closes OQ-036 names the model per step and updates the model configuration.
 

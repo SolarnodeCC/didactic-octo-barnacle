@@ -70,7 +70,7 @@ New keys for [defaults](../architecture/defaults.md). They are added there in th
 | `budget.expected_daily_triaged`, `budget.expected_daily_embeddings` | from the measured daily volume | Largest measured day until a steady state is known (ADR 0059) |
 | `retraction.lookback_days` | `30` | How far back the weekly retraction check looks (ADR 0061) |
 | `model.price_table_version` | `2026-11-10` | Versioned price table in `infrastructure/cloudflare`, used when the gateway gives no cost (REQ-NFR-011 AC2); cached input tokens at the cached-input price (ADR 0078) |
-| `model.triage`, `model.extraction`, `model.embedding` | from the OQ-036 ADR | Model name, version, and sampling settings |
+| `model.triage`, `model.extraction`, `model.embedding` | from the ADR that closes OQ-036; `model.triage` and `model.extraction` are not set, because round one qualified no model ([ADR 0082](../decisions/0082-benchmark-round-one-selects-no-model.md)) | Model name, version, and sampling settings |
 | `extraction.generic_customer_terms` | `users`, `end users`, `people`, `persons`, `individuals`, `humans`, `everyone`, `society`, `the public` | A `Customer` equal to one of these fails its candidate (ADR 0066) |
 | `extraction.full_text_wait_hours` | `24` | How long admission waits for full text before it admits on the abstract (ADR 0065) |
 | `recovery.max_redrives` | `3` | Re-drives of a transient failure, at most one a day (ADR 0063) |
