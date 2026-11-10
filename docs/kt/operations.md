@@ -2,7 +2,7 @@
 title: Operations
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-10
 related: [REQ-NFR-001, REQ-NFR-005, REQ-NFR-008, REQ-NFR-015, REQ-NFR-017, REQ-ADM-001, REQ-ADM-002]
 ---
 
@@ -158,6 +158,7 @@ The first production launch is an invited pilot without billing (see the non-goa
 - Author erasure reachable by an admin (`POST /admin/authors/:id/erase`), `ERASURE_HASH_KEY` set, and an erasure tested on staging (REQ-NFR-016).
 - Terms, privacy policy, author notice, and support contact published (REQ-ACC-011, [privacy](architecture/privacy.md)).
 - Data processing agreements signed with Cloudflare, the model providers, Resend, and the search provider.
+- Launch questions 6 to 12 of the [legal review brief](legal/review-brief.md) are answered in writing, among them the terms for transient processing of non-redistributable full text and the storage terms of the search providers (ADR 0039).
 - Retention job running (REQ-NFR-015) and a restore drill done (REQ-NFR-017).
 - Calibrated daily budget set (ADR 0023), the GitHub label `alert` created, and the alert email address and GitHub issue creation tested (REQ-NFR-019).
 - At least one active admin and a tested admin recovery path (REQ-ADM-001, REQ-ADM-002).

@@ -1,14 +1,14 @@
 ---
-title: Legal review brief (OQ-014)
+title: Legal review brief
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-10
 related: [REQ-DATA-010, REQ-ACC-011, REQ-NFR-016]
 ---
 
-# Legal review brief (OQ-014)
+# Legal review brief
 
-Written answers from a named legal contact close OQ-014. Phase 2 does not start without the answers marked **phase-2 gate** below; they were approved on 2026-11-06 (see [Answers](#answers)). Until the launch questions are answered, the platform stays abstract-first and stores only license-permitted PDFs (ADR 0014).
+Written answers from the legal contact cover the questions below. The **phase-2 gate** answers were approved on 2026-11-06 (see [Answers](#answers)). Launch questions 6 to 12 are an item of the launch checklist in [operations](../operations.md#launch-checklist-planned), no longer an open question (closed as OQ-014 on 2026-11-10). Until they are answered, the platform stays abstract-first and stores only license-permitted PDFs (ADR 0014).
 
 ## Named contact
 

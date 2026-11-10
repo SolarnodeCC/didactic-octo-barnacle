@@ -2,13 +2,13 @@
 title: Privacy and data retention
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-10
 related: [REQ-NFR-009, REQ-NFR-015, REQ-NFR-016, REQ-ACC-008, REQ-ACC-009, REQ-ACC-011]
 ---
 
 # Privacy and data retention
 
-The baseline for the EU launch. The default market is the EU, so the platform treats GDPR as binding. Legal wording of the terms and the privacy policy is written by the legal owner (OQ-014); this document is the engineering input to it.
+The baseline for the EU launch. The default market is the EU, so the platform treats GDPR as binding. Legal wording of the terms and the privacy policy is written by the legal owner ([legal review brief](../legal/review-brief.md)); this document is the engineering input to it.
 
 ## Personal data held
 
@@ -39,7 +39,7 @@ Transfers outside the EU rely on the standard contractual clauses or the process
 - **Balance:** the data is already public in scholarly records; authors expect it to be cited. It is never shown outside provenance, never used to score, rank, or profile a person (REQ-NFR-016 AC3), and never sent to a model provider as a person-level record.
 - **Safeguards:** an author can ask for erasure at any time (below); an erased author is not stored again.
 
-Legal confirms or replaces this assessment (OQ-014). Until then the lawful basis in the table above stays "to confirm with legal".
+Legal confirms or replaces this assessment ([legal review brief](../legal/review-brief.md)). Until then the lawful basis in the table above stays "to confirm with legal".
 
 ## Notice to authors
 

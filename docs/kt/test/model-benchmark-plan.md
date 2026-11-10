@@ -101,7 +101,7 @@ The owner labels the items. An agent prepares draft labels, and the owner review
 
 - The drafting agent must not be a candidate in the benchmark, so its bias does not favor a candidate.
 - A draft label that the owner did not review is not used.
-- Each entry names its reviewer (golden sets). The owner is the reviewer of every entry (ADR 0072, which answers OQ-015). Outside experts are OQ-044.
+- Each entry names its reviewer (golden sets). The owner is the reviewer of every entry (ADR 0072, which answers OQ-015). No outside expert review is planned (ADR 0080).
 - Re-label a sample of at least 10 items a few days later, and have a second agent of another model family label the same items blind, to estimate label noise.
 
 ## Method
