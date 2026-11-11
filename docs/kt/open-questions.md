@@ -2,7 +2,7 @@
 title: Open questions
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-10
+last_reviewed: 2026-11-11
 ---
 
 # Open questions
@@ -13,7 +13,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
-| OQ-036 | Which model runs each model-backed step? | Workers AI models only (ADR 0049). Round one of the [model benchmark plan](test/model-benchmark-plan.md) covers triage and extraction only, two candidates each (ADR 0062 replaced the candidates deprecated on 2026-11-20), three runs per item, as the [run plan](test/benchmark-round-one.md) sets out; pick the cheapest model that meets each step's threshold and record the result in an ADR. Round one ran on 2026-11-10 and no candidate met a threshold (triage at best 46.2 %, extraction 61.4 %, against 0.85), so both steps stay open ([ADR 0082](decisions/0082-benchmark-round-one-selects-no-model.md), [results](test/benchmark-round-one-results.md)); the owner chooses the changes for round two | triage and extraction before phase 2 starts; the six analysis agents before phase 3 |
+| OQ-036 | Which model runs each model-backed step? | Workers AI models only (ADR 0049). Round one of the [model benchmark plan](test/model-benchmark-plan.md) covers triage and extraction only, two candidates each (ADR 0062 replaced the candidates deprecated on 2026-11-20), three runs per item, as the [run plan](test/benchmark-round-one.md) sets out; pick the cheapest model that meets each step's threshold and record the result in an ADR. Round one (2026-11-10) qualified no candidate ([ADR 0082](decisions/0082-benchmark-round-one-selects-no-model.md)). Round two (2026-11-11) answered triage: `gemma-4-26b-a4b-it` with thinking off, under the pass rule of [ADR 0087](decisions/0087-triage-passes-on-the-decision-with-a-signal-floor.md) ([ADR 0088](decisions/0088-benchmark-round-two-selects-the-triage-model.md), [results](test/benchmark-round-two-results.md)). Extraction stays open: DeepSeek passed 87.2 / 76.9 / 82.1 %, and every run must reach 0.80; the owner chooses the changes for round three | triage and extraction before phase 2 starts; the six analysis agents before phase 3 |
 
 ## Ownership
 

@@ -2,7 +2,7 @@
 title: Triage
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-10
+last_reviewed: 2026-11-11
 related: [REQ-PROC-005, REQ-PROC-006, REQ-PROC-008]
 ---
 
@@ -73,4 +73,6 @@ The golden set holds at least 20 publications. Each entry has the expected value
 - At least three entries pass triage.
 - Rule rejections carry the expected `Reason`.
 
-The eval reports agreement per signal, and the precision and recall of the accept decision.
+The eval reports agreement per signal, and the precision and recall of the accept decision. An entry passes when the decision is the labelled one; a run passes when that share meets the threshold and every signal agrees with the labels on at least 80 % of the entries ([ADR 0087](../decisions/0087-triage-passes-on-the-decision-with-a-signal-floor.md)).
+
+The model is `gemma-4-26b-a4b-it` with thinking off (`model.triage`, [ADR 0088](../decisions/0088-benchmark-round-two-selects-the-triage-model.md)).

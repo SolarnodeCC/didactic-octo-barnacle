@@ -48,11 +48,24 @@ const ExtractionEntrySchema = z.object({
 export type TriageEntry = z.infer<typeof TriageEntrySchema> & { Publication: Publication };
 export type ExtractionEntry = z.infer<typeof ExtractionEntrySchema> & { Publication: Publication };
 
-export const ThresholdSchema = z.object({
-  metric: z.literal("entry-pass-rate"),
-  minimum: z.number().min(0).max(1),
-  tolerance: z.number().min(0).max(1),
-});
+const Share = z.number().min(0).max(1);
+
+/**
+ * `entry-pass-rate`: an entry passes when every check passes. `decision-pass-rate` (triage,
+ * ADR 0087): an entry passes on the schema and the accept decision, and a run also needs the
+ * agreement of every signal to reach `signalFloor`.
+ */
+export const ThresholdSchema = z.discriminatedUnion("metric", [
+  z.object({ metric: z.literal("entry-pass-rate"), minimum: Share, tolerance: Share }).strict(),
+  z
+    .object({
+      metric: z.literal("decision-pass-rate"),
+      minimum: Share,
+      tolerance: Share,
+      signalFloor: Share,
+    })
+    .strict(),
+]);
 export type Threshold = z.infer<typeof ThresholdSchema>;
 
 function loadPublication(dir: string, fixture: string): Publication {

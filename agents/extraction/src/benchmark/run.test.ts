@@ -56,6 +56,21 @@ function plan(overrides: Partial<BenchmarkPlan> = {}): BenchmarkPlan {
   };
 }
 
+/** Signals that all read the opposite of the labelled decision, so the derived decision is wrong (ADR 0087). */
+function wrongDecision(index: number) {
+  const opposite = !triage[index]!.expected.accepted;
+  return {
+    ...signals(index),
+    Signals: {
+      NamedParty: opposite,
+      StatedHarm: opposite,
+      Trigger: opposite,
+      ExistingAlternative: opposite,
+      Adoptable: opposite,
+    },
+  };
+}
+
 function deps(replies: FakeReply[]) {
   let id = 0;
   return {
@@ -78,10 +93,7 @@ describe("REQ-TEST-006: the benchmark round", () => {
   it("REQ-TEST-006: runs every item once per run and scores pass rate and stability", async () => {
     // Run 1: all four right. Run 2: the first is fenced (repaired), the second fails twice
     // then passes, the third is wrong on every attempt, the fourth is right.
-    const wrong = {
-      ...signals(2),
-      Signals: { ...signals(2).Signals, NamedParty: !signals(2).Signals.NamedParty },
-    };
+    const wrong = wrongDecision(2);
     const replies: FakeReply[] = [
       ...[0, 1, 2, 3].map((i) => ({ Kind: "output" as const, Output: signals(i) })),
       { Kind: "output", Output: "```json\n" + JSON.stringify(signals(0)) + "\n```" },
@@ -139,16 +151,13 @@ describe("REQ-TEST-006: the benchmark round", () => {
   });
 
   it("REQ-TEST-006: a round resumed after its first run gives the same result without repeating calls", async () => {
-    const wrong = {
-      ...signals(2),
-      Signals: { ...signals(2).Signals, NamedParty: !signals(2).Signals.NamedParty },
-    };
+    const wrong = wrongDecision(2);
     const run1: FakeReply[] = [0, 1, 2, 3].map((i) => ({ Kind: "output", Output: signals(i) }));
     const run2: FakeReply[] = [
       { Kind: "output", Output: signals(0) },
       { Kind: "error", Status: 503 },
       { Kind: "output", Output: signals(1) },
-      // Valid against the schema, so accepted at once; the eval fails it on a signal.
+      // Valid against the schema, so accepted at once; the eval fails it on the decision.
       { Kind: "output", Output: wrong },
       { Kind: "output", Output: signals(3) },
     ];

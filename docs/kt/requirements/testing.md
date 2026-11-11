@@ -2,7 +2,7 @@
 title: Test requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-11
 ---
 
 # Test requirements
@@ -86,13 +86,14 @@ Triage and opportunity extraction have reviewed golden sets with written thresho
 - Phase: 2
 - Priority: must
 - Status: in-progress
-- Source: test strategy, OQ-041, ADR 0060, ADR 0072
+- Source: test strategy, OQ-041, ADR 0060, ADR 0072, ADR 0087
 - Acceptance criteria:
   1. Each golden set holds at least 20 entries and covers all eight target industries (at least one entry per industry). The extraction set holds at least three entries that should yield no candidate.
   2. Each entry names its reviewer. The reviewer is the owner, who confirms every entry; agents may draft and cross-check labels and never confirm one (ADR 0072).
   3. Changes to a golden set go through a pull request with a named reviewer.
   4. The pass threshold of each golden set is written down with a tolerance before the first eval run, and changes only through a reviewed pull request.
-- Verification: `scripts/check-golden-sets.py` in CI and code review
+  5. A triage entry passes when its output matches the schema and the accept decision derived from its signals is the labelled one. A triage run passes only when that share meets the threshold and each signal agrees with the labels on at least the threshold's `signalFloor` of the entries (ADR 0087).
+- Verification: `scripts/check-golden-sets.py` in CI, the tests of `agents/extraction/src/eval.test.ts`, and code review
 
 ### REQ-TEST-007: Eval report for triage and extraction
 

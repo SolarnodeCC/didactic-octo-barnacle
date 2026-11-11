@@ -1,3 +1,5 @@
+import { type ModelConfig } from "@roi/models";
+
 /**
  * Runtime configuration of phase 2 processing (docs/kt/phase-2/schema.md, defaults in
  * docs/kt/architecture/defaults.md). Nothing reads it yet: the consumers that use it arrive
@@ -18,6 +20,11 @@ export type ProcessingConfig = {
   PriceTableVersion: string;
   /** `model.max_attempts`: attempts per step, including retries (REQ-AGENT-009). */
   ModelMaxAttempts: number;
+  /**
+   * `model.triage`: the model of the triage step, chosen by benchmark round two (ADR 0088,
+   * OQ-036). Temperature and output budget come with the prompt version (`TRIAGE_SAMPLING`).
+   */
+  TriageModel: ModelConfig;
 };
 
 export const DEFAULT_PROCESSING_CONFIG: ProcessingConfig = {
@@ -28,6 +35,12 @@ export const DEFAULT_PROCESSING_CONFIG: ProcessingConfig = {
   RetractionLookbackDays: 30,
   PriceTableVersion: "2026-11-11",
   ModelMaxAttempts: 3,
+  TriageModel: {
+    Model: "@cf/google/gemma-4-26b-a4b-it",
+    PromptVersion: "triage@2",
+    OutputMode: "json-schema",
+    Reasoning: { Thinking: false },
+  },
 };
 
 /** The Worker variables the loader reads; every one is optional and falls back to the default. */

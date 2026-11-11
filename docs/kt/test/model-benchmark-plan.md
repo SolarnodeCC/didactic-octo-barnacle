@@ -193,7 +193,7 @@ Stop and ask the owner before the total model cost passes the budget of 50 euro.
 4. Build the harness on the shared model-call helper and the eval runner, with cost recording.
 5. Round one: all candidates, fixed prompt.
 6. Round two: finalists, one reasoning variant, optional prompt tuning. The owner chose the candidates, the variant, and the changes to labels and prompts before it ([ADR 0084](../decisions/0084-triage-label-review-round-two.md), [ADR 0085](../decisions/0085-one-primary-extraction-candidate.md), [ADR 0086](../decisions/0086-benchmark-round-two-candidates.md)).
-7. Write the ADR, update the model configuration, and close OQ-036. Round one selected no model ([ADR 0082](../decisions/0082-benchmark-round-one-selects-no-model.md)); the owner chooses the changes for round two.
+7. Write the ADR, update the model configuration, and close OQ-036. Round one selected no model ([ADR 0082](../decisions/0082-benchmark-round-one-selects-no-model.md)). Round two selected `gemma-4-26b-a4b-it` with thinking off for triage and no model for extraction ([ADR 0088](../decisions/0088-benchmark-round-two-selects-the-triage-model.md), [results](benchmark-round-two-results.md)); the owner chooses the changes for an extraction round three.
 
 ADR 0049 already updated the [technology stack](../architecture/technology-stack.md), [privacy](../architecture/privacy.md), [operations](../operations.md), `README.md`, and `AGENTS.md` to Workers AI for the pipeline. The ADR that closes OQ-036 names the model per step and updates the model configuration.
 

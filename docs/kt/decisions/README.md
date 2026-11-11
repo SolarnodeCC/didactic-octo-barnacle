@@ -95,6 +95,8 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0084](0084-triage-label-review-round-two.md) | Round-two review of the triage golden-set labels | Accepted |
 | [0085](0085-one-primary-extraction-candidate.md) | Extraction returns one primary candidate | Accepted |
 | [0086](0086-benchmark-round-two-candidates.md) | Benchmark round two candidates, a reasoning variant, and price table 2026-11-11 | Accepted |
+| [0087](0087-triage-passes-on-the-decision-with-a-signal-floor.md) | The triage eval passes on the accept decision, with a floor on every signal | Accepted |
+| [0088](0088-benchmark-round-two-selects-the-triage-model.md) | Benchmark round two selects Gemma with thinking off for triage; extraction stays open | Accepted |
 
 ## When an ADR is needed
 
