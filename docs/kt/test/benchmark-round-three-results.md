@@ -40,6 +40,8 @@ Entries that failed at least once, with the result per run:
 | `gs-extraction-003` | fail, pass, fail | No candidate: the organization read as bare |
 | `gs-extraction-010` | pass, fail, pass | An evidence quote with "was" for the text's "is" |
 
+The owner reviewed these entries after the round and kept every label, widening only the customer quote of `003` ([ADR 0092](../decisions/0092-label-review-after-benchmark-round-three.md)); the eval does not score label quotes, so the results stand.
+
 Compared with round two: `006`, `017`, `021`, and `039`, which failed there on industry scope, on a qualified organization, on the rule of ADR 0050, or on LaTeX markup, pass in every run. Count failures fell from 18 to 13, quote failures from 3 to 1, and schema failures from 1 to 0. Over the three runs DeepSeek returned more candidates than labelled 11 times, fewer 2 times, and the labelled number 104 times.
 
 ## Cost
