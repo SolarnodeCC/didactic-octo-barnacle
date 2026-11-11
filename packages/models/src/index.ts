@@ -176,6 +176,7 @@ export {
   type CallModelResult,
   type CallOutputMode,
   type ModelConfig,
+  type ReasoningSetting,
   type ModelPrompt,
   type ModelUsageStore,
 } from "./call-model.js";

@@ -4,6 +4,8 @@ import {
   type CallModelDeps,
   type CallModelResult,
   type CallOutputMode,
+  type ModelConfig,
+  type ReasoningSetting,
 } from "@roi/models";
 import {
   EXTRACTION_PROMPT_VERSION,
@@ -32,16 +34,20 @@ export type CallModelFnOptions = {
   /** The `processing_run` of the benchmark, for the usage records. */
   RunId: string;
   OutputMode?: CallOutputMode;
+  /** A reasoning setting other than the model's default (ADR 0086). */
+  Reasoning?: ReasoningSetting;
   /** Called with each step's result, so a benchmark can count attempts and repairs. */
   OnResult?: (publicationId: string, result: CallModelResult<unknown>) => void;
 };
 
+function withReasoning(config: ModelConfig, reasoning: ReasoningSetting | undefined): ModelConfig {
+  return reasoning === undefined ? config : { ...config, Reasoning: reasoning };
+}
+
 export function triageModelFn(options: CallModelFnOptions): ModelFn {
-  const config = modelConfig(
-    options.Model,
-    TRIAGE_PROMPT_VERSION,
-    TRIAGE_SAMPLING,
-    options.OutputMode,
+  const config = withReasoning(
+    modelConfig(options.Model, TRIAGE_PROMPT_VERSION, TRIAGE_SAMPLING, options.OutputMode),
+    options.Reasoning,
   );
   return async (publication) => {
     const built = buildTriagePrompt({ Title: publication.Title, Abstract: publication.Abstract });
@@ -64,11 +70,9 @@ export function triageModelFn(options: CallModelFnOptions): ModelFn {
 export function extractionModelFn(
   options: CallModelFnOptions & { MaxCandidates?: number },
 ): ModelFn {
-  const config = modelConfig(
-    options.Model,
-    EXTRACTION_PROMPT_VERSION,
-    EXTRACTION_SAMPLING,
-    options.OutputMode,
+  const config = withReasoning(
+    modelConfig(options.Model, EXTRACTION_PROMPT_VERSION, EXTRACTION_SAMPLING, options.OutputMode),
+    options.Reasoning,
   );
   const contract = extractionContract(options.MaxCandidates);
   return async (publication) => {

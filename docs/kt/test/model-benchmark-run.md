@@ -18,12 +18,14 @@ For each step and each candidate model, the command runs every golden-set item `
 - It scores the accepted output with the eval runner and its thresholds.
 - It records one usage record per attempt (REQ-NFR-011) and keeps every raw response and provider error.
 
-Without `--models` it runs round one of [ADR 0062](../decisions/0062-replace-deprecated-benchmark-candidates.md):
+Without `--models` it runs round two of [ADR 0086](../decisions/0086-benchmark-round-two-candidates.md):
 
 | Step | Candidates |
 |---|---|
-| Triage | `@cf/zai-org/glm-4.7-flash`, `@cf/google/gemma-4-26b-a4b-it` |
-| Opportunity extraction | `@cf/deepseek-ai/deepseek-v4.1-flash-1017`, `@cf/google/gemma-4-26b-a4b-it` |
+| Triage | `@cf/google/gemma-4-26b-a4b-it`, `@cf/google/gemma-4-26b-a4b-it+reasoning=off`, `@cf/openai/gpt-oss-120b` |
+| Opportunity extraction | `@cf/deepseek-ai/deepseek-v4.1-flash-1017`, `@cf/openai/gpt-oss-120b` |
+
+A candidate is a pinned model ID, optionally followed by `+reasoning=off`, `+reasoning=low`, `+reasoning=medium`, or `+reasoning=high`. `off` switches thinking off for a model with an on/off switch (`chat_template_kwargs.enable_thinking`); the levels set `reasoning.effort` for a model with effort levels. The report and the raw responses use the whole string, so a model and its variant are reported apart; the usage records keep the bare model ID (REQ-AGENT-014). Round one of [ADR 0062](../decisions/0062-replace-deprecated-benchmark-candidates.md) ran `@cf/zai-org/glm-4.7-flash` and `@cf/google/gemma-4-26b-a4b-it` for triage and `@cf/deepseek-ai/deepseek-v4.1-flash-1017` and `@cf/google/gemma-4-26b-a4b-it` for extraction.
 
 Calls go to the AI REST API on `api.cloudflare.com` with the header `cf-aig-gateway-id`, so every call passes through the named AI Gateway (REQ-NFR-003). The gateway is `roi-staging` unless `--gateway` names another.
 
@@ -35,7 +37,7 @@ Calls go to the AI REST API on `api.cloudflare.com` with the header `cf-aig-gate
 
 ## Budget
 
-The command counts the estimated cost of every attempt in euro from the price table (`infrastructure/cloudflare/prices/2026-11-10.json` unless `--prices` names another). Cached input tokens are counted at the cached-input price where the table has one (ADR 0078).
+The command counts the estimated cost of every attempt in euro from the price table (`infrastructure/cloudflare/prices/2026-11-11.json` unless `--prices` names another). Cached input tokens are counted at the cached-input price where the table has one (ADR 0078).
 
 - Once the total reaches `--budget-eur` (50 by default, the budget of the plan), it starts no new step.
 - A step that has started finishes its retries (REQ-NFR-005).

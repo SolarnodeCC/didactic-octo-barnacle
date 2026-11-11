@@ -94,6 +94,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0083](0083-benchmark-checkpoint-and-resume.md) | The benchmark command checkpoints each run and can resume a round | Accepted |
 | [0084](0084-triage-label-review-round-two.md) | Round-two review of the triage golden-set labels | Accepted |
 | [0085](0085-one-primary-extraction-candidate.md) | Extraction returns one primary candidate | Accepted |
+| [0086](0086-benchmark-round-two-candidates.md) | Benchmark round two candidates, a reasoning variant, and price table 2026-11-11 | Accepted |
 
 ## When an ADR is needed
 
