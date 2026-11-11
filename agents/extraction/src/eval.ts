@@ -38,7 +38,7 @@ export type EvalReport = {
   Passed: boolean;
 };
 
-function report(entries: EntryResult[], threshold: Threshold): EvalReport {
+export function report(entries: EntryResult[], threshold: Threshold): EvalReport {
   const passRate =
     entries.length === 0 ? 0 : entries.filter((e) => e.Passed).length / entries.length;
   return {

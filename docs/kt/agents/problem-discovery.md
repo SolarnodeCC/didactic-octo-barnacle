@@ -2,7 +2,7 @@
 title: Problem Discovery Agent
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-11
 related: [REQ-AGENT-002]
 ---
 
@@ -51,6 +51,10 @@ Notes: string(max 400)?
 - `Customer` refines the extraction `Customer` (segment, role, industry) and never names a different party (ADR 0070).
 - One output describes one problem. A finding with several problems yields several candidates in extraction.
 
+## Prompt
+
+`problem-discovery@1` in `packages/prompts/src/problem-discovery.ts` carries the rules above and the eight industries with their focus areas. It sends the title and abstract without LaTeX markup, the candidate with its quotes, `WhyNow` and `CurrentAlternative` when set, and the Research Analyst output, inside the `<publication>` delimiters ([ADR 0093](../decisions/0093-analysis-agents-benchmark.md)).
+
 ## Evals
 
-Golden set entries hold the required facts of the problem, the expected customer industry, and an acceptable PainLevel range.
+Golden set entries hold the required facts of the problem, the expected customer industry, and an acceptable PainLevel range. A model judge decides whether each required fact is present, following the rubric `agents/analysis/evals/problem-discovery.rubric.md` (ADR 0093).

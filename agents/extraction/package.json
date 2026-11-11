@@ -12,6 +12,7 @@
     "benchmark": "node ./dist/benchmark/cli.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.6.0",
     "@roi/models": "workspace:*",
     "@roi/prompts": "workspace:*",
     "yaml": "^2.4.2",
