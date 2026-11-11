@@ -99,6 +99,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0088](0088-benchmark-round-two-selects-the-triage-model.md) | Benchmark round two selects Gemma with thinking off for triage; extraction stays open | Accepted |
 | [0089](0089-extraction-reads-text-without-latex-markup.md) | Extraction reads the title and abstract without LaTeX markup | Accepted |
 | [0090](0090-extraction-prompt-four-and-benchmark-round-three.md) | Extraction prompt four and benchmark round three | Accepted |
+| [0091](0091-benchmark-round-three-selects-the-extraction-model.md) | Benchmark round three selects DeepSeek for extraction | Accepted |
 
 ## When an ADR is needed
 

@@ -57,7 +57,7 @@ It adds no organization-scoped table. Those arrive with phase 4 (ADR 0019).
 
 ## Configuration keys
 
-New keys for [defaults](../architecture/defaults.md). They are added there in the pull request that first reads them. WP1 added `processing.enabled`, `triage.admission_pool_days`, `extraction.full_text_max_chars`, `embedding.batch_size`, `retraction.lookback_days`, and `model.price_table_version`; ADR 0088 added `model.triage`.
+New keys for [defaults](../architecture/defaults.md). They are added there in the pull request that first reads them. WP1 added `processing.enabled`, `triage.admission_pool_days`, `extraction.full_text_max_chars`, `embedding.batch_size`, `retraction.lookback_days`, and `model.price_table_version`; ADR 0088 added `model.triage` and ADR 0091 `model.extraction`.
 
 | Key | Default | Notes |
 |---|---|---|
@@ -71,7 +71,8 @@ New keys for [defaults](../architecture/defaults.md). They are added there in th
 | `retraction.lookback_days` | `30` | How far back the weekly retraction check looks (ADR 0061) |
 | `model.price_table_version` | `2026-11-11` | Versioned price table in `infrastructure/cloudflare`, used when the gateway gives no cost (REQ-NFR-011 AC2); cached input tokens at the cached-input price (ADR 0078) |
 | `model.triage` | `@cf/google/gemma-4-26b-a4b-it`, thinking off, `triage@2`, `json-schema` | Chosen by benchmark round two ([ADR 0088](../decisions/0088-benchmark-round-two-selects-the-triage-model.md)); temperature and output budget come with the prompt version |
-| `model.extraction`, `model.embedding` | from the ADR that closes OQ-036 for extraction; `model.extraction` is not set, because no candidate qualified in rounds one and two ([ADR 0082](../decisions/0082-benchmark-round-one-selects-no-model.md), [ADR 0088](../decisions/0088-benchmark-round-two-selects-the-triage-model.md)) | Model name, version, sampling settings, and the reasoning setting when not the model's default (ADR 0086) |
+| `model.extraction` | `@cf/deepseek-ai/deepseek-v4.1-flash-1017`, default reasoning, `extraction@4`, `json-schema` | Chosen by benchmark round three ([ADR 0091](../decisions/0091-benchmark-round-three-selects-the-extraction-model.md)); temperature and output budget come with the prompt version |
+| `model.embedding` | `embedding.model` until the embedding benchmark of ADR 0010 (OQ-005) | Model name, version, sampling settings, and the reasoning setting when not the model's default (ADR 0086) |
 | `extraction.generic_customer_terms` | `users`, `end users`, `people`, `persons`, `individuals`, `humans`, `everyone`, `society`, `the public` | A `Customer` equal to one of these fails its candidate (ADR 0066) |
 | `extraction.full_text_wait_hours` | `24` | How long admission waits for full text before it admits on the abstract (ADR 0065) |
 | `recovery.max_redrives` | `3` | Re-drives of a transient failure, at most one a day (ADR 0063) |
