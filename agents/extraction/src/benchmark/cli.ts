@@ -3,7 +3,20 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } fr
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { FakeWorkersAi, PriceTableSchema, type FakeReply } from "@roi/models";
+import Anthropic from "@anthropic-ai/sdk";
+import { FakeWorkersAi, PriceTableSchema, TARGET_INDUSTRY_KEYS, type FakeReply } from "@roi/models";
+
+import { type FactJudge } from "../analysis/eval.js";
+import {
+  loadAnalysisThreshold,
+  loadProblemDiscoverySet,
+  loadRelevanceSet,
+  loadResearchAnalystSet,
+  type ProblemDiscoveryEntry,
+  type RelevanceEntry,
+  type ResearchAnalystEntry,
+} from "../analysis/golden-set.js";
+import { createClaudeJudge, judgeGatewayBaseUrl, loadRubric } from "../analysis/judge.js";
 
 import {
   loadExtractionSet,
@@ -14,12 +27,15 @@ import {
 } from "../golden-set.js";
 import { GatewayRestBinding, putR2Object } from "./gateway-binding.js";
 import {
+  ANALYSIS_STEPS,
   formatBenchmarkMarkdown,
   parseCandidate,
   runBenchmark,
   type BenchmarkPlan,
+  type BenchmarkInputs,
   type BenchmarkResult,
   type BenchmarkStep,
+  type JudgeContext,
   type RunCheckpoint,
 } from "./run.js";
 
@@ -27,7 +43,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(here, "../../../..");
 
 /** Round one of the benchmark plan (ADR 0062). */
-export const ROUND_ONE: Record<BenchmarkStep, string[]> = {
+export const ROUND_ONE: Partial<Record<BenchmarkStep, string[]>> = {
   triage: ["@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it"],
   extraction: ["@cf/deepseek-ai/deepseek-v4.1-flash-1017", "@cf/google/gemma-4-26b-a4b-it"],
 };
@@ -36,7 +52,7 @@ export const ROUND_ONE: Record<BenchmarkStep, string[]> = {
  * Round two, the default (ADR 0086): the best candidate of round one per step, gpt-oss-120b,
  * and for triage Gemma with thinking off.
  */
-export const ROUND_TWO: Record<BenchmarkStep, string[]> = {
+export const ROUND_TWO: Partial<Record<BenchmarkStep, string[]>> = {
   triage: [
     "@cf/google/gemma-4-26b-a4b-it",
     "@cf/google/gemma-4-26b-a4b-it+reasoning=off",
@@ -45,8 +61,39 @@ export const ROUND_TWO: Record<BenchmarkStep, string[]> = {
   extraction: ["@cf/deepseek-ai/deepseek-v4.1-flash-1017", "@cf/openai/gpt-oss-120b"],
 };
 
+/**
+ * The analysis round (ADR 0093): the triage and extraction winners for each of the three
+ * analysis agents with a golden set.
+ */
+const ANALYSIS_CANDIDATES = [
+  "@cf/google/gemma-4-26b-a4b-it+reasoning=off",
+  "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
+];
+export const ANALYSIS_ROUND: Partial<Record<BenchmarkStep, string[]>> = {
+  "research-analyst": ANALYSIS_CANDIDATES,
+  "problem-discovery": ANALYSIS_CANDIDATES,
+  relevance: ANALYSIS_CANDIDATES,
+};
+
+/** The default candidates per step: round two for triage and extraction, the analysis round. */
+export const DEFAULT_CANDIDATES: Partial<Record<BenchmarkStep, string[]>> = {
+  ...ROUND_TWO,
+  ...ANALYSIS_ROUND,
+};
+
+const STEP_VALUES: Record<string, BenchmarkStep[]> = {
+  all: ["triage", "extraction"],
+  analysis: [...ANALYSIS_STEPS],
+  triage: ["triage"],
+  extraction: ["extraction"],
+  "research-analyst": ["research-analyst"],
+  "problem-discovery": ["problem-discovery"],
+  relevance: ["relevance"],
+};
+
 export const BENCHMARK_USAGE = [
-  "Usage: roi-benchmark [--step triage|extraction|all] [--models <id,id>] [--runs <n>]",
+  "Usage: roi-benchmark [--step triage|extraction|all|research-analyst|problem-discovery|relevance|analysis]",
+  "                     [--models <id,id>] [--runs <n>]",
   "                     [--budget-eur <n>] [--gateway <id>] [--out <dir>] [--limit <n>]",
   "                     [--output-mode json-schema|prompt-only] [--prices <file>]",
   "                     [--r2-bucket <name>] [--min-interval-ms <n>] [--timeout-ms <n>]",
@@ -58,7 +105,9 @@ export const BENCHMARK_USAGE = [
   "(--step, --models, --runs, --limit, --budget-eur, --output-mode).",
   "",
   "Live runs read CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN (Workers AI Read) from the",
-  "environment. --dry-run answers with the golden-set labels and needs no credentials.",
+  "environment. problem-discovery also needs EVAL_ANTHROPIC_API_KEY for its fact judge, reached",
+  "through the Anthropic route of the same gateway. --dry-run answers with the golden-set labels",
+  "and needs no credentials. `all` is triage and extraction; `analysis` is the three analysis steps.",
 ].join("\n");
 
 export type BenchmarkArgs = {
@@ -153,15 +202,14 @@ export function parseBenchmarkArgs(args: readonly string[]): BenchmarkArgs | nul
         if (!BENCHMARK_ID.test(value)) return null;
         parsed.Resume = value;
         break;
-      case "--step":
-        if (value === "all") {
-          parsed.Steps = ["triage", "extraction"];
-        } else if (value === "triage" || value === "extraction") {
-          parsed.Steps = [value];
-        } else {
+      case "--step": {
+        const steps = STEP_VALUES[value];
+        if (steps === undefined) {
           return null;
         }
+        parsed.Steps = steps;
         break;
+      }
       case "--models": {
         const models = value.split(",").map((m) => m.trim());
         if (models.some((m) => parseCandidate(m) === null)) {
@@ -231,17 +279,75 @@ export function parseBenchmarkArgs(args: readonly string[]): BenchmarkArgs | nul
   return parsed;
 }
 
+type GoldenSets = {
+  triage: TriageEntry[];
+  extraction: ExtractionEntry[];
+  researchAnalyst: ResearchAnalystEntry[];
+  problemDiscovery: ProblemDiscoveryEntry[];
+  relevance: RelevanceEntry[];
+};
+
+/** Labelled answers of the analysis steps, for a dry run. */
+function analysisLabels(step: BenchmarkStep, sets: GoldenSets): unknown[] {
+  if (step === "research-analyst") {
+    return sets.researchAnalyst.map((entry) => ({
+      Novelty: entry.handoff.novelty,
+      NoveltyRationale: "As labelled.",
+      RelatedPublicationIds: entry.Neighbors.slice(0, 1).map((n) => n.Id),
+      Maturity: entry.expected.maturity,
+      Industry: [
+        ...new Set([...entry.expected.industriesInclude, ...entry.handoff.industry]),
+      ].slice(0, 4),
+      Technology: entry.handoff.technology.slice(0, 5),
+      Confidence: 0.6,
+      Notes: null,
+    }));
+  }
+  if (step === "problem-discovery") {
+    return sets.problemDiscovery.map((entry) => ({
+      Problem: entry.expected.requiredFacts.join("; ").slice(0, 280),
+      Customer: {
+        Segment: entry.Candidate.customer.slice(0, 120),
+        Role: "lead",
+        Industry: entry.expected.customerIndustry,
+      },
+      PainLevel: entry.expected.painLevelRange[0],
+      PainRationale: "As labelled.",
+      Confidence: 0.6,
+      Notes: null,
+    }));
+  }
+  return sets.relevance.map((entry) => ({
+    IndustryFit: Object.fromEntries(
+      TARGET_INDUSTRY_KEYS.map((key) => [
+        key,
+        key === entry.expected.bestIndustry ? entry.expected.strategicRelevanceRange[0] : 0,
+      ]),
+    ),
+    FocusMatch: Object.fromEntries(TARGET_INDUSTRY_KEYS.map((key) => [key, "none"])),
+    TechnicalFeasibility: entry.expected.technicalFeasibilityRange[0],
+    ImplementationEffort: entry.expected.implementationEffort,
+    Constraints: [],
+    Confidence: 0.6,
+    Notes: null,
+  }));
+}
+
 function labelReplies(
   steps: BenchmarkStep[],
   runs: number,
-  modelsPerStep: Record<BenchmarkStep, string[]>,
-  triage: TriageEntry[],
-  extraction: ExtractionEntry[],
+  modelsPerStep: Partial<Record<BenchmarkStep, string[]>>,
+  sets: GoldenSets,
 ): FakeReply[] {
+  const { triage, extraction } = sets;
   const replies: FakeReply[] = [];
   for (const step of steps) {
-    for (let m = 0; m < modelsPerStep[step].length * runs; m += 1) {
-      if (step === "triage") {
+    for (let m = 0; m < (modelsPerStep[step] ?? []).length * runs; m += 1) {
+      if ((ANALYSIS_STEPS as readonly string[]).includes(step)) {
+        for (const output of analysisLabels(step, sets)) {
+          replies.push({ Kind: "output", Output: output });
+        }
+      } else if (step === "triage") {
         for (const entry of triage) {
           const s = entry.expected.signals;
           replies.push({
@@ -285,6 +391,32 @@ function labelReplies(
   return replies;
 }
 
+function benchmarkInputs(steps: readonly BenchmarkStep[], sets: GoldenSets): BenchmarkInputs {
+  const inputs: BenchmarkInputs = {};
+  if (steps.includes("triage")) {
+    inputs.Triage = { Entries: sets.triage, Threshold: loadThreshold("triage") };
+  }
+  if (steps.includes("extraction")) {
+    inputs.Extraction = { Entries: sets.extraction, Threshold: loadThreshold("extraction") };
+  }
+  if (steps.includes("research-analyst")) {
+    inputs.ResearchAnalyst = {
+      Entries: sets.researchAnalyst,
+      Threshold: loadAnalysisThreshold("research-analyst"),
+    };
+  }
+  if (steps.includes("problem-discovery")) {
+    inputs.ProblemDiscovery = {
+      Entries: sets.problemDiscovery,
+      Threshold: loadAnalysisThreshold("problem-discovery"),
+    };
+  }
+  if (steps.includes("relevance")) {
+    inputs.Relevance = { Entries: sets.relevance, Threshold: loadAnalysisThreshold("relevance") };
+  }
+  return inputs;
+}
+
 /** Runs a round and writes the report, summary, usage records, and raw responses to `Out`. */
 export async function runBenchmarkCommand(
   args: BenchmarkArgs,
@@ -320,10 +452,9 @@ export async function runBenchmarkCommand(
       }
     });
   } else {
-    const models: Record<BenchmarkStep, string[]> = {
-      triage: args.Steps.includes("triage") ? (args.Models ?? ROUND_TWO.triage) : [],
-      extraction: args.Steps.includes("extraction") ? (args.Models ?? ROUND_TWO.extraction) : [],
-    };
+    const models: Partial<Record<BenchmarkStep, string[]>> = Object.fromEntries(
+      args.Steps.map((step) => [step, args.Models ?? DEFAULT_CANDIDATES[step] ?? []]),
+    );
     stored = {
       Plan: {
         BenchmarkId: `bench-${now().toISOString().replace(/[:.]/gu, "-")}${args.DryRun ? "-dry" : ""}`,
@@ -341,12 +472,22 @@ export async function runBenchmarkCommand(
   const benchmarkId = plan.BenchmarkId;
   const models = plan.Models;
   const runs = plan.Runs;
-  const triage = loadTriageSet().slice(0, stored.Limit ?? undefined);
-  const extraction = loadExtractionSet().slice(0, stored.Limit ?? undefined);
+  const limit = stored.Limit ?? undefined;
+  const has = (step: BenchmarkStep): boolean => plan.Steps.includes(step);
+  const sets: GoldenSets = {
+    triage: has("triage") ? loadTriageSet().slice(0, limit) : [],
+    extraction: has("extraction") ? loadExtractionSet().slice(0, limit) : [],
+    researchAnalyst: has("research-analyst") ? loadResearchAnalystSet().slice(0, limit) : [],
+    problemDiscovery: has("problem-discovery") ? loadProblemDiscoverySet().slice(0, limit) : [],
+    relevance: has("relevance") ? loadRelevanceSet().slice(0, limit) : [],
+  };
 
   let ai;
+  let judge: ((context: JudgeContext) => FactJudge) | undefined;
   if (args.DryRun) {
-    ai = new FakeWorkersAi(labelReplies(plan.Steps, runs, models, triage, extraction));
+    ai = new FakeWorkersAi(labelReplies(plan.Steps, runs, models, sets));
+    // A dry run finds every labelled fact, like the labelled answers it scores.
+    judge = () => (input) => Promise.resolve({ Ok: true, Present: input.Facts.map(() => true) });
   } else {
     const accountId = env.CLOUDFLARE_ACCOUNT_ID?.trim() ?? "";
     const apiToken = env.CLOUDFLARE_API_TOKEN?.trim() ?? "";
@@ -358,6 +499,36 @@ export async function runBenchmarkCommand(
       Stream: args.Stream,
       ...(options.Fetch ? { Fetch: options.Fetch } : {}),
     });
+    if (has("problem-discovery")) {
+      const apiKey = env.EVAL_ANTHROPIC_API_KEY?.trim() ?? "";
+      if (accountId === "" || apiKey === "") {
+        throw new Error(
+          "problem-discovery needs CLOUDFLARE_ACCOUNT_ID and EVAL_ANTHROPIC_API_KEY for its fact judge",
+        );
+      }
+      const client = new Anthropic({
+        apiKey,
+        baseURL: judgeGatewayBaseUrl(accountId, args.Gateway),
+        ...(options.Fetch ? { fetch: options.Fetch } : {}),
+      });
+      const rubric = loadRubric();
+      let judgeId = 0;
+      judge = (context) =>
+        createClaudeJudge({
+          Client: client,
+          Rubric: rubric,
+          RunId: context.RunId,
+          UsdPerEur: prices.UsdPerEur,
+          Budget: context.Budget,
+          NewId: () => `${context.RunId}-jc${(judgeId += 1)}`,
+          Now: now,
+          OnRecord: context.OnRecord,
+          Headers: {
+            "cf-aig-skip-cache": "true",
+            "cf-aig-metadata": JSON.stringify({ RunId: context.RunId, Step: "judge" }),
+          },
+        });
+    }
   }
 
   // The round's folder is created only once the binding accepted the credentials, so a run
@@ -373,29 +544,23 @@ export async function runBenchmarkCommand(
     0,
     ...resume.flatMap((c) => c.Records.map((r) => Number(/-mc(\d+)$/u.exec(r.Id)?.[1] ?? 0))),
   );
-  const result = await runBenchmark(
-    plan,
-    {
-      Triage: { Entries: triage, Threshold: loadThreshold("triage") },
-      Extraction: { Entries: extraction, Threshold: loadThreshold("extraction") },
+  const result = await runBenchmark(plan, benchmarkInputs(plan.Steps, sets), {
+    Ai: ai,
+    GatewayId: args.Gateway,
+    Prices: prices,
+    MaxAttempts: 3,
+    NewId: () => `${benchmarkId}-mc${(id += 1)}`,
+    Now: now,
+    Sleep: args.DryRun
+      ? () => Promise.resolve()
+      : (ms) => new Promise((done) => setTimeout(done, ms)),
+    ...(options.Log ? { Log: options.Log } : {}),
+    Resume: resume,
+    OnRunComplete: (checkpoint) => {
+      appendFileSync(join(outDir, "checkpoint.jsonl"), `${JSON.stringify(checkpoint)}\n`);
     },
-    {
-      Ai: ai,
-      GatewayId: args.Gateway,
-      Prices: prices,
-      MaxAttempts: 3,
-      NewId: () => `${benchmarkId}-mc${(id += 1)}`,
-      Now: now,
-      Sleep: args.DryRun
-        ? () => Promise.resolve()
-        : (ms) => new Promise((done) => setTimeout(done, ms)),
-      ...(options.Log ? { Log: options.Log } : {}),
-      Resume: resume,
-      OnRunComplete: (checkpoint) => {
-        appendFileSync(join(outDir, "checkpoint.jsonl"), `${JSON.stringify(checkpoint)}\n`);
-      },
-    },
-  );
+    ...(judge === undefined ? {} : { Judge: judge }),
+  });
 
   const rawLines = result.Raw.map((call) => JSON.stringify(call)).join("\n");
   writeFileSync(join(outDir, "report.md"), formatBenchmarkMarkdown(result, plan));
@@ -419,6 +584,12 @@ export async function runBenchmarkCommand(
     result.Records.map((r) => JSON.stringify(r)).join("\n"),
   );
   writeFileSync(join(outDir, "raw-responses.jsonl"), rawLines);
+  if (result.JudgeRecords.length > 0) {
+    writeFileSync(
+      join(outDir, "judge-calls.jsonl"),
+      result.JudgeRecords.map((r) => JSON.stringify(r)).join("\n"),
+    );
+  }
 
   if (args.R2Bucket !== null && !args.DryRun) {
     // Raw responses go to R2 under a benchmark prefix, so a round can be graded again

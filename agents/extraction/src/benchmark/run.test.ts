@@ -6,14 +6,17 @@ import { fileURLToPath } from "node:url";
 import { FakeWorkersAi, type FakeReply, type PriceTable } from "@roi/models";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { type FactJudge } from "../analysis/eval.js";
+import { loadAnalysisThreshold, loadProblemDiscoverySet } from "../analysis/golden-set.js";
 import { loadThreshold, loadTriageSet } from "../golden-set.js";
-import { parseBenchmarkArgs, runBenchmarkCommand } from "./cli.js";
+import { ANALYSIS_ROUND, parseBenchmarkArgs, runBenchmarkCommand } from "./cli.js";
 import {
   formatBenchmarkMarkdown,
   parseCandidate,
   percentile,
   runBenchmark,
   type BenchmarkPlan,
+  type JudgeContext,
   type RunCheckpoint,
 } from "./run.js";
 
@@ -460,5 +463,124 @@ describe("REQ-TEST-006: the benchmark command", () => {
   it("REQ-NFR-003: a live run without credentials stops before any request", async () => {
     const args = parseBenchmarkArgs(["--runs", "1", "--limit", "1"])!;
     await expect(runBenchmarkCommand(args, {})).rejects.toThrow(/CLOUDFLARE_ACCOUNT_ID/);
+  });
+});
+
+describe("REQ-TEST-005: analysis steps in the benchmark round (ADR 0093)", () => {
+  const pdEntries = loadProblemDiscoverySet().slice(0, 2);
+  const pdOutput = (i: number) => ({
+    Problem: pdEntries[i]!.expected.requiredFacts.join("; ").slice(0, 280),
+    Customer: {
+      Segment: "segment",
+      Role: "role",
+      Industry: pdEntries[i]!.expected.customerIndustry,
+    },
+    PainLevel: pdEntries[i]!.expected.painLevelRange[0],
+    PainRationale: "As labelled.",
+    Confidence: 0.6,
+    Notes: null,
+  });
+  const pdPlan = plan({
+    Steps: ["problem-discovery"],
+    Models: { "problem-discovery": [MODEL] },
+    Runs: 1,
+  });
+  const pdInputs = {
+    ProblemDiscovery: { Entries: pdEntries, Threshold: loadAnalysisThreshold("problem-discovery") },
+  };
+  /** A judge that finds every fact and costs EUR 0.5 a call. */
+  const judge: (context: JudgeContext) => FactJudge = (context) => (input) => {
+    context.Budget.add(0.5);
+    context.OnRecord({
+      Id: "jc",
+      RunId: context.RunId,
+      EntryId: input.EntryId,
+      Model: "claude-haiku-5-5",
+      RubricVersion: "pd-facts@1",
+      InputTokens: 1,
+      OutputTokens: 1,
+      CostEur: 0.5,
+      LatencyMs: 1,
+      Outcome: "ok",
+      GatewayLogId: null,
+      CreatedAt: "2026-11-11T12:00:00.000Z",
+    });
+    return Promise.resolve({ Ok: true, Present: input.Facts.map(() => true) });
+  };
+
+  it("REQ-TEST-005: judge calls count against the round's budget and are kept in the checkpoint", async () => {
+    const full = await runBenchmark(pdPlan, pdInputs, {
+      ...deps([0, 1].map((i) => ({ Kind: "output" as const, Output: pdOutput(i) }))),
+      Judge: judge,
+    });
+    const modelCost = full.Records.reduce((sum, r) => sum + r.Cost.Amount, 0);
+    expect(full.JudgeRecords).toHaveLength(2);
+    expect(full.TotalCostEur).toBeCloseTo(modelCost + 1, 9);
+    expect(full.Summaries[0]?.Runs[0]).toMatchObject({
+      PassRate: 1,
+      FactsPresent: 4,
+      FactsJudged: 4,
+      JudgeErrors: 0,
+    });
+    expect(formatBenchmarkMarkdown(full, pdPlan)).toContain(
+      "Judge calls: 2, EUR 1.0000, rubric pd-facts@1.",
+    );
+  });
+
+  it("REQ-TEST-005: a resumed round counts the judge cost of its finished runs without new calls", async () => {
+    const checkpoints: RunCheckpoint[] = [];
+    const full = await runBenchmark(pdPlan, pdInputs, {
+      ...deps([0, 1].map((i) => ({ Kind: "output" as const, Output: pdOutput(i) }))),
+      Judge: judge,
+      OnRunComplete: (c) => {
+        checkpoints.push(c);
+      },
+    });
+    expect(checkpoints[0]?.JudgeRecords).toHaveLength(2);
+    const ai = deps([]);
+    const resumed = await runBenchmark(pdPlan, pdInputs, {
+      ...ai,
+      Judge: judge,
+      Resume: checkpoints,
+    });
+    expect(ai.Ai.Calls).toHaveLength(0);
+    expect(resumed.TotalCostEur).toBeCloseTo(full.TotalCostEur, 9);
+    expect(resumed.JudgeRecords).toHaveLength(2);
+  });
+
+  it("REQ-NFR-005: the judge is refused once the budget is spent", async () => {
+    let allowed: boolean | undefined;
+    const spy: (context: JudgeContext) => FactJudge = (context) => (input) => {
+      allowed = context.Budget.allows();
+      return Promise.resolve({ Ok: true, Present: input.Facts.map(() => true) });
+    };
+    await runBenchmark({ ...pdPlan, BudgetEur: 0.0000001 }, pdInputs, {
+      ...deps([0, 1].map((i) => ({ Kind: "output" as const, Output: pdOutput(i) }))),
+      Judge: spy,
+    });
+    expect(allowed).toBe(false);
+  });
+
+  it("REQ-TEST-005: a plan step without its golden set, or Problem Discovery without a judge, is refused", async () => {
+    await expect(runBenchmark(pdPlan, {}, { ...deps([]), Judge: judge })).rejects.toThrow(
+      /no golden set/,
+    );
+    await expect(
+      runBenchmark(pdPlan, pdInputs, deps([{ Kind: "output", Output: pdOutput(0) }])),
+    ).rejects.toThrow(/needs a fact judge/);
+  });
+
+  it("REQ-TEST-005: --step analysis selects the three analysis agents with the analysis round's candidates", () => {
+    expect(parseBenchmarkArgs(["--step", "analysis"])?.Steps).toEqual([
+      "research-analyst",
+      "problem-discovery",
+      "relevance",
+    ]);
+    expect(parseBenchmarkArgs(["--step", "relevance"])?.Steps).toEqual(["relevance"]);
+    expect(parseBenchmarkArgs(["--step", "market-analysis"])).toBeNull();
+    expect(ANALYSIS_ROUND["relevance"]).toEqual([
+      "@cf/google/gemma-4-26b-a4b-it+reasoning=off",
+      "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
+    ]);
   });
 });

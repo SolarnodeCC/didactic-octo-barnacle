@@ -27,7 +27,7 @@ const TriageEntrySchema = z.object({
   expected: z.object({ signals: SignalsSchema, accepted: z.boolean(), reason: z.string() }),
 });
 
-const CandidateSchema = z.object({
+export const CandidateSchema = z.object({
   finding: z.string(),
   evidenceQuote: z.string(),
   customer: z.string(),
@@ -68,7 +68,7 @@ export const ThresholdSchema = z.discriminatedUnion("metric", [
 ]);
 export type Threshold = z.infer<typeof ThresholdSchema>;
 
-function loadPublication(dir: string, fixture: string): Publication {
+export function loadPublication(dir: string, fixture: string): Publication {
   const data = FixtureSchema.parse(JSON.parse(readFileSync(join(dir, fixture), "utf8")));
   // The same text the golden-set check quotes against (scripts/check-golden-sets.py).
   return {
@@ -79,7 +79,7 @@ function loadPublication(dir: string, fixture: string): Publication {
   };
 }
 
-function loadEntries<T>(dir: string, set: string, schema: z.ZodType<T>): T[] {
+export function loadEntries<T>(dir: string, set: string, schema: z.ZodType<T>): T[] {
   return readdirSync(join(dir, set))
     .filter((name) => name.endsWith(".yaml"))
     .sort()

@@ -181,3 +181,22 @@ export {
   type ModelPrompt,
   type ModelUsageStore,
 } from "./call-model.js";
+export {
+  FocusMatchSchema,
+  ImplementationEffortSchema,
+  MaturitySchema,
+  ProblemDiscoveryOutputSchema,
+  RelevanceModelOutputSchema,
+  ResearchAnalystOutputSchema,
+  TARGET_INDUSTRY_KEYS,
+  TargetIndustrySchema,
+  bestIndustries,
+  strategicRelevanceScore,
+  type FocusMatch,
+  type ImplementationEffort,
+  type Maturity,
+  type ProblemDiscoveryOutput,
+  type RelevanceModelOutput,
+  type ResearchAnalystOutput,
+  type TargetIndustry,
+} from "./analysis.js";

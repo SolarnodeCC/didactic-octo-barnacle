@@ -18,6 +18,23 @@ import {
 } from "../eval.js";
 import { type ExtractionEntry, type Threshold, type TriageEntry } from "../golden-set.js";
 import { extractionModelFn, triageModelFn } from "../model-fn.js";
+import {
+  runProblemDiscoveryEval,
+  runRelevanceEval,
+  runResearchAnalystEval,
+  type FactJudge,
+} from "../analysis/eval.js";
+import {
+  type ProblemDiscoveryEntry,
+  type RelevanceEntry,
+  type ResearchAnalystEntry,
+} from "../analysis/golden-set.js";
+import { type JudgeBudget, type JudgeCallRecord } from "../analysis/judge.js";
+import {
+  problemDiscoveryModelFn,
+  relevanceModelFn,
+  researchAnalystModelFn,
+} from "../analysis/model-fn.js";
 
 /**
  * One benchmark round (docs/kt/test/model-benchmark-plan.md): every candidate of a step runs
@@ -26,7 +43,11 @@ import { extractionModelFn, triageModelFn } from "../model-fn.js";
  * response, and stops starting new steps once the model cost reaches the budget.
  */
 
-export type BenchmarkStep = "triage" | "extraction";
+export type BenchmarkStep =
+  "triage" | "extraction" | "research-analyst" | "problem-discovery" | "relevance";
+
+/** The analysis agents benchmarked before phase 3 (ADR 0093). */
+export const ANALYSIS_STEPS = ["research-analyst", "problem-discovery", "relevance"] as const;
 
 /** A candidate of a round: a pinned model, with a reasoning setting when not its default. */
 export type Candidate = { Label: string; Model: string; Reasoning?: ReasoningSetting };
@@ -64,16 +85,27 @@ export type BenchmarkPlan = {
    * Candidates per step: exact, pinned model IDs (REQ-AGENT-014), each optionally with a
    * reasoning setting as `<model>+reasoning=<level>` (see `parseCandidate`).
    */
-  Models: Record<BenchmarkStep, string[]>;
+  Models: Partial<Record<BenchmarkStep, string[]>>;
   Runs: number;
   OutputMode: CallOutputMode;
   /** Total model cost allowed for the round, in euro (the plan's budget is 50). */
   BudgetEur: number;
 };
 
+/** The golden set and threshold of each step in the plan; a step without them is refused. */
 export type BenchmarkInputs = {
-  Triage: { Entries: TriageEntry[]; Threshold: Threshold };
-  Extraction: { Entries: ExtractionEntry[]; Threshold: Threshold };
+  Triage?: { Entries: TriageEntry[]; Threshold: Threshold };
+  Extraction?: { Entries: ExtractionEntry[]; Threshold: Threshold };
+  ResearchAnalyst?: { Entries: ResearchAnalystEntry[]; Threshold: Threshold };
+  ProblemDiscovery?: { Entries: ProblemDiscoveryEntry[]; Threshold: Threshold };
+  Relevance?: { Entries: RelevanceEntry[]; Threshold: Threshold };
+};
+
+/** What a judge of one run needs from the round: its run ID, the shared budget, a record sink. */
+export type JudgeContext = {
+  RunId: string;
+  Budget: JudgeBudget;
+  OnRecord: (record: JudgeCallRecord) => void;
 };
 
 export type BenchmarkDeps = {
@@ -90,6 +122,8 @@ export type BenchmarkDeps = {
   Resume?: readonly RunCheckpoint[];
   /** Called after every finished run, so the caller can store it before the next one starts. */
   OnRunComplete?: (checkpoint: RunCheckpoint) => void | Promise<void>;
+  /** The fact judge of Problem Discovery (ADR 0093); its calls share the round's budget. */
+  Judge?: (context: JudgeContext) => FactJudge;
 };
 
 /** One raw provider response, with the publication and attempt it belongs to. */
@@ -112,6 +146,10 @@ export type RunSummary = {
   SignalAgreement?: TriageEvalReport["SignalAgreement"];
   Precision?: number;
   Recall?: number;
+  /** Problem Discovery: required facts the judge found present, of those it judged. */
+  FactsPresent?: number;
+  FactsJudged?: number;
+  JudgeErrors?: number;
 };
 
 /** How one item of a run ended in `callModel`, without its output. */
@@ -142,6 +180,8 @@ export type RunCheckpoint = {
   BudgetRefused: number;
   Records: ModelCallRecord[];
   Raw: RawCall[];
+  /** Judge calls of the run, so a resumed round counts their cost (ADR 0093). */
+  JudgeRecords?: JudgeCallRecord[];
 };
 
 export type ModelSummary = {
@@ -172,6 +212,8 @@ export type BenchmarkResult = {
   Summaries: ModelSummary[];
   Records: ModelCallRecord[];
   Raw: RawCall[];
+  JudgeRecords: JudgeCallRecord[];
+  /** Model and judge cost together, the amount the budget counts. */
   TotalCostEur: number;
   /** True when the budget stopped steps from starting; the round is then incomplete. */
   BudgetReached: boolean;
@@ -230,17 +272,39 @@ class RecordingBinding implements WorkersAiBinding {
 
 class BudgetUsage implements ModelUsageStore {
   readonly Records: ModelCallRecord[] = [];
+  readonly JudgeRecords: JudgeCallRecord[] = [];
   SpentEur = 0;
   Refused = 0;
   constructor(private readonly limitEur: number) {}
   /** Counts the records of a resumed run as if its calls had just been made. */
-  replay(records: readonly ModelCallRecord[], refused: number): void {
+  replay(
+    records: readonly ModelCallRecord[],
+    refused: number,
+    judgeRecords: readonly JudgeCallRecord[] = [],
+  ): void {
     for (const record of records) {
       this.Records.push(record);
       this.SpentEur += record.Cost.Amount;
     }
+    for (const record of judgeRecords) {
+      this.JudgeRecords.push(record);
+      this.SpentEur += record.CostEur;
+    }
     this.Refused += refused;
   }
+  /** The judge's view of the same budget: model and judge calls share one limit. */
+  readonly Judge: JudgeBudget = {
+    allows: () => {
+      const allowed = this.SpentEur < this.limitEur;
+      if (!allowed) {
+        this.Refused += 1;
+      }
+      return allowed;
+    },
+    add: (eur) => {
+      this.SpentEur += eur;
+    },
+  };
   budgetAllows(): Promise<boolean> {
     const allowed = this.SpentEur < this.limitEur;
     if (!allowed) {
@@ -309,6 +373,13 @@ export function summarizeRuns(
   };
 }
 
+function need<T>(input: T | undefined, step: BenchmarkStep): T {
+  if (input === undefined) {
+    throw new Error(`the plan runs ${step} but has no golden set for it`);
+  }
+  return input;
+}
+
 function checkpointKey(step: BenchmarkStep, model: string, run: number): string {
   return `${step}|${model}|${run}`;
 }
@@ -327,7 +398,7 @@ export async function runBenchmark(
     }
     if (
       !plan.Steps.includes(checkpoint.Step) ||
-      !plan.Models[checkpoint.Step].includes(checkpoint.Model) ||
+      !(plan.Models[checkpoint.Step] ?? []).includes(checkpoint.Model) ||
       checkpoint.Run < 1 ||
       checkpoint.Run > plan.Runs
     ) {
@@ -354,7 +425,7 @@ export async function runBenchmark(
   const summaries: ModelSummary[] = [];
 
   for (const step of plan.Steps) {
-    for (const model of plan.Models[step]) {
+    for (const model of plan.Models[step] ?? []) {
       const candidate = parseCandidate(model);
       if (candidate === null) {
         throw new Error(
@@ -370,7 +441,7 @@ export async function runBenchmark(
       for (let run = 1; run <= plan.Runs; run += 1) {
         const done = resumed.get(checkpointKey(step, model, run));
         if (done !== undefined) {
-          usage.replay(done.Records, done.BudgetRefused);
+          usage.replay(done.Records, done.BudgetRefused, done.JudgeRecords ?? []);
           raw.push(...done.Raw);
           checkpoints.push(done);
           deps.Log?.(
@@ -380,6 +451,7 @@ export async function runBenchmark(
         }
         const runId = `${plan.BenchmarkId}:${step}:${model}:r${run}`;
         const recordsBefore = usage.Records.length;
+        const judgeBefore = usage.JudgeRecords.length;
         const rawBefore = raw.length;
         const refusedBefore = usage.Refused;
         const outcomes: ItemOutcome[] = [];
@@ -404,13 +476,13 @@ export async function runBenchmark(
           OnResult: onResult,
           ...(candidate.Reasoning === undefined ? {} : { Reasoning: candidate.Reasoning }),
         };
-        let report: EvalReport | TriageEvalReport;
+        let report: EvalReport;
         let summary: RunSummary;
         if (step === "triage") {
           const triage = await runTriageEval(
-            inputs.Triage.Entries,
+            need(inputs.Triage, step).Entries,
             triageModelFn(options),
-            inputs.Triage.Threshold,
+            need(inputs.Triage, step).Threshold,
           );
           report = triage;
           summary = {
@@ -421,12 +493,50 @@ export async function runBenchmark(
             Precision: triage.Precision,
             Recall: triage.Recall,
           };
-        } else {
-          report = await runExtractionEval(
-            inputs.Extraction.Entries,
-            extractionModelFn(options),
-            inputs.Extraction.Threshold,
+        } else if (step === "problem-discovery") {
+          if (deps.Judge === undefined) {
+            throw new Error("problem-discovery needs a fact judge");
+          }
+          const judge = deps.Judge({
+            RunId: runId,
+            Budget: usage.Judge,
+            OnRecord: (record) => usage.JudgeRecords.push(record),
+          });
+          const set = need(inputs.ProblemDiscovery, step);
+          const pd = await runProblemDiscoveryEval(
+            set.Entries,
+            problemDiscoveryModelFn(options),
+            judge,
+            set.Threshold,
           );
+          report = pd;
+          summary = {
+            Run: run,
+            PassRate: pd.PassRate,
+            ThresholdPassed: pd.Passed,
+            FactsPresent: pd.FactsPresent,
+            FactsJudged: pd.FactsJudged,
+            JudgeErrors: pd.JudgeErrors,
+          };
+        } else {
+          if (step === "extraction") {
+            const set = need(inputs.Extraction, step);
+            report = await runExtractionEval(
+              set.Entries,
+              extractionModelFn(options),
+              set.Threshold,
+            );
+          } else if (step === "research-analyst") {
+            const set = need(inputs.ResearchAnalyst, step);
+            report = await runResearchAnalystEval(
+              set.Entries,
+              researchAnalystModelFn(options),
+              set.Threshold,
+            );
+          } else {
+            const set = need(inputs.Relevance, step);
+            report = await runRelevanceEval(set.Entries, relevanceModelFn(options), set.Threshold);
+          }
           summary = { Run: run, PassRate: report.PassRate, ThresholdPassed: report.Passed };
         }
         const checkpoint: RunCheckpoint = {
@@ -440,6 +550,7 @@ export async function runBenchmark(
           BudgetRefused: usage.Refused - refusedBefore,
           Records: usage.Records.slice(recordsBefore),
           Raw: raw.slice(rawBefore),
+          JudgeRecords: usage.JudgeRecords.slice(judgeBefore),
         };
         checkpoints.push(checkpoint);
         await deps.OnRunComplete?.(checkpoint);
@@ -457,6 +568,7 @@ export async function runBenchmark(
     Summaries: summaries,
     Records: usage.Records,
     Raw: raw,
+    JudgeRecords: usage.JudgeRecords,
     TotalCostEur: usage.SpentEur,
     BudgetReached: usage.Refused > 0,
   };
@@ -498,10 +610,29 @@ export function formatBenchmarkMarkdown(result: BenchmarkResult, plan: Benchmark
       }),
     );
   }
-  lines.push(
-    "",
-    "Extraction scores the deterministic checks only (schema, verbatim quotes, candidate count). The model judge for `Finding` and `Customer` (OQ-020) is not part of this round.",
-    "",
-  );
+  const pd = result.Summaries.filter((s) => s.Step === "problem-discovery");
+  if (pd.length > 0) {
+    const judgeCost = result.JudgeRecords.reduce((sum, r) => sum + r.CostEur, 0);
+    lines.push(
+      "",
+      "## Problem Discovery required facts (judge)",
+      "",
+      `Judge calls: ${result.JudgeRecords.length}, EUR ${judgeCost.toFixed(4)}, rubric ${result.JudgeRecords[0]?.RubricVersion ?? "none"}.`,
+      "",
+      "| Model | Facts present per run | Judge errors |",
+      "|---|---|---|",
+      ...pd.map(
+        (s) =>
+          `| \`${s.Model}\` | ${s.Runs.map((r) => `${r.FactsPresent ?? 0}/${r.FactsJudged ?? 0}`).join(", ")} | ${s.Runs.reduce((sum, r) => sum + (r.JudgeErrors ?? 0), 0)} |`,
+      ),
+    );
+  }
+  if (result.Summaries.some((s) => s.Step === "extraction")) {
+    lines.push(
+      "",
+      "Extraction scores the deterministic checks only (schema, verbatim quotes, candidate count). The model judge for `Finding` and `Customer` (OQ-020) is not part of this round.",
+    );
+  }
+  lines.push("");
   return lines.join("\n");
 }

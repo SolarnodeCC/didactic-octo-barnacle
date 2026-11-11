@@ -7,32 +7,33 @@ research-analyst/gs-research-analyst-NNN.yaml    expected Novelty range, Maturit
 problem-discovery/gs-problem-discovery-NNN.yaml  required facts of the problem, customer industry, and PainLevel range
 relevance/gs-relevance-NNN.yaml                  expected best industry, strategic relevance and feasibility ranges, and implementation effort
 fixtures/neighbors/<arXiv id>.json               the nearest publications that stand in for semantic search (REQ-PROC-003)
+problem-discovery.rubric.md                      the versioned rubric of the fact judge, with its calibration record (ADR 0093)
 ```
 
 Publications are read from `agents/extraction/evals/fixtures/arxiv/`. Candidates are read from the expected candidates of the extraction golden set, through `candidateRef`.
 
-## State after round 3
+## State after the round-two label review
 
 | Agent | Entries | Minimum (REQ-TEST-005) |
 |---|---|---|
-| Research Analyst | 35 | 20 |
-| Problem Discovery | 35 | 20 |
-| Relevance | 35 | 20 |
+| Research Analyst | 33 | 20 |
+| Problem Discovery | 33 | 20 |
+| Relevance | 33 | 20 |
 
-- The 35 candidates are the 34 publications of the extraction set that yield a candidate (`gs-extraction-001` to `-038`, without the four that yield none), plus a second candidate of `2610.40071` (`gs-extraction-003`, index 1). The two entries of that publication share its fixtures. Entries 001 to 020 are the pilot and Relevance rounds; entries 021 to 035 are round 3 (draft labels, confirmed when the pull request is merged).
+- Round 3 left 35 candidates per set: the 34 publications of the extraction set that yield a candidate, plus a second candidate of `2610.40071` (`gs-extraction-003`, index 1). The round-two label review removed two of them with their entries in all three sets: the candidate of `gs-extraction-004`, which yields none after the review (ADR 0084), and the second candidate of `gs-extraction-003` (ADR 0085). Entry numbers are not reused.
 - Industries use the eight target industries of ADR 0037 plus `other`. Entries per value:
 
 | Value | Research Analyst (industries that must appear) | Problem Discovery (customer industry) | Relevance (best industry) |
 |---|---|---|---|
 | `automotive` | 2 | 2 | 2 |
-| `aerospace-defense` | 5 | 3 | 3 |
+| `aerospace-defense` | 4 | 3 | 3 |
 | `consumer-retail` | 3 | 3 | 3 |
 | `energy-utilities` | 3 | 3 | 3 |
-| `banking` | 6 | 4 | 7 |
-| `insurance` | 6 | 2 | 3 |
+| `banking` | 5 | 4 | 6 |
+| `insurance` | 5 | 2 | 3 |
 | `public-sector` | 5 | 5 | 5 |
-| `life-sciences` | 5 | 3 | 9 |
-| `other` | 7 | 10 | not allowed |
+| `life-sciences` | 4 | 3 | 8 |
+| `other` | 6 | 8 | not allowed |
 
 - Every one of the eight industries now has entries in all three sets. Care providers (nurses, emergency departments, psychiatric intake, telephone triage) and cross-industry software stay `other` for Research Analyst and Problem Discovery; Relevance scores them against `life-sciences` or `banking` with lower strategic relevance ranges.
 - Relevance reads the frozen `handoff` blocks and the Problem Discovery facts of the same entries. Its ranges are at most 30 points wide.

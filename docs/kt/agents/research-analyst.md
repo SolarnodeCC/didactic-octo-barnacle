@@ -2,7 +2,7 @@
 title: Research Analyst Agent
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-11
 related: [REQ-AGENT-001]
 ---
 
@@ -49,6 +49,18 @@ Notes: string(max 400)?
 
 - Novelty evidence cites at least one related publication, or is a `none-found` item stating that none were found.
 - Industry uses `other` only when none of the eight target industries applies.
+- `RelatedPublicationIds` lists the related publications the agent compared against, each one of those it received; the pipeline turns them into `related-publication` evidence for `Novelty`, or a `none-found` item when the list is empty.
+
+| Maturity | Meaning |
+|---|---|
+| theoretical | Analysis, a model, a framework, or a proposal with nothing built or run. |
+| lab-result | Experiments on datasets, benchmarks, or simulations. |
+| prototype | A working system built and demonstrated, or piloted on realistic data or with a few users. |
+| field-tested | Used in real operation, or evaluated with its intended users in their own setting. |
+
+## Prompt
+
+`research-analyst@1` in `packages/prompts/src/research-analyst.ts` carries the rules above, the eight industries with their focus areas, and the candidate. It sends the title, the abstract, and each related publication with its ID, date, title, and abstract, without LaTeX markup, inside the `<publication>` delimiters ([ADR 0093](../decisions/0093-analysis-agents-benchmark.md)).
 
 ## Evals
 

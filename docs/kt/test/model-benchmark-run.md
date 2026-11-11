@@ -53,6 +53,7 @@ A live run reads two environment variables and never writes them anywhere:
 |---|---|
 | `CLOUDFLARE_ACCOUNT_ID` | The 32-character account ID of the project's Cloudflare account |
 | `CLOUDFLARE_API_TOKEN` | A token with **Workers AI: Read** for that account, and **Workers R2 Storage: Edit** when `--r2-bucket` is used |
+| `EVAL_ANTHROPIC_API_KEY` | Only for `problem-discovery`: the Anthropic key of the fact judge, sent through the Anthropic route of the gateway (ADR 0049, ADR 0093). In a cloud session the key is a network secret for `gateway.ai.cloudflare.com`, so the variable holds a placeholder |
 
 Node's built-in `fetch` ignores `HTTPS_PROXY`. Behind an HTTPS proxy, as in a cloud agent session, run the command with `NODE_USE_ENV_PROXY=1` (Node 24); without it the calls bypass the proxy, and a token that the proxy injects is never sent (every call then fails with "Authentication error").
 
@@ -68,6 +69,8 @@ pnpm --filter @roi/agent-extraction benchmark --dry-run --runs 1 --out "$PWD/ben
 pnpm --filter @roi/agent-extraction benchmark --limit 3 --runs 1 --out "$PWD/benchmark-out"
 # Round one, three runs per item, raw responses also kept in R2.
 pnpm --filter @roi/agent-extraction benchmark --r2-bucket roi-documents-staging --out "$PWD/benchmark-out"
+# The analysis round (ADR 0093): Research Analyst, Problem Discovery, and Relevance.
+pnpm --filter @roi/agent-extraction benchmark --step analysis --budget-eur 5 --out "$PWD/benchmark-out"
 # One step with other candidates.
 pnpm --filter @roi/agent-extraction benchmark --step triage --models @cf/zai-org/glm-4.7-flash,@cf/qwen/qwen3.8-27b
 ```
@@ -86,6 +89,7 @@ Each round writes a directory `<out>/<benchmark id>/` with these files:
 | `summary.json` | The same figures, with the plan, the item limit, the price table version, and the total cost |
 | `model-calls.jsonl` | One usage record per attempt, with no prompt or publication text |
 | `raw-responses.jsonl` | Every provider response or error, with its step, model, run, and publication, so a round can be graded again without new calls |
+| `judge-calls.jsonl` | Problem Discovery only: one record per judge call, with its entry, rubric version, tokens, cost, outcome, and gateway log ID; no text. The report adds the facts present per run and the judge cost |
 
 With `--r2-bucket`, `raw-responses.jsonl` and `model-calls.jsonl` are also stored under `benchmark/<benchmark id>/` in that bucket. Use a staging bucket: the items are public abstracts (CC0), and nothing from production is involved.
 
