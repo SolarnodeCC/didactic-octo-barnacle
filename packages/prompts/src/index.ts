@@ -15,7 +15,6 @@ export {
   DEFAULT_FULL_TEXT_MAX_CHARS,
   EXTRACTION_PROMPT_VERSION,
   EXTRACTION_SAMPLING,
-  TARGET_INDUSTRIES,
   buildExtractionPrompt,
   extractionContract,
   extractionSystem,

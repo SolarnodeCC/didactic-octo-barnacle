@@ -73,7 +73,7 @@ describe("REQ-TEST-006: the eval runner scores a model through callModel and the
     expect(ai.Calls[0]?.Inputs.temperature).toBe(0);
   });
 
-  it("REQ-TEST-006: extraction@3 with labelled replies passes, so every labelled quote is in the text sent", async () => {
+  it("REQ-TEST-006: extraction@4 with labelled replies passes, so every labelled quote is in the text sent", async () => {
     const set = loadExtractionSet();
     const replies: FakeReply[] = set.map((entry) => ({
       Kind: "output",

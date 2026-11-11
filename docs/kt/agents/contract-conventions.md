@@ -2,7 +2,7 @@
 title: Agent contract conventions
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-11
 related: [REQ-AGENT-008, REQ-AGENT-009, REQ-AGENT-010, REQ-AGENT-011, REQ-NFR-006, REQ-TEST-002]
 ---
 
@@ -66,6 +66,7 @@ A publication quote must occur in the text the agent received. The pipeline chec
 
 - Before the substring test, the quote and the text are both normalised: Unicode NFKC; curly quotes and primes to straight; hyphens, dashes, and the minus sign to `-`; soft hyphens and zero-width characters removed; whitespace runs to one space, ends trimmed.
 - Letter case, ellipses, and words split by a line-break hyphen are not normalised.
+- The extraction step receives the title and abstract without LaTeX markup: a formatting command keeps its argument (`\textit{x}` becomes `x`), an escaped character loses its backslash (`\%` becomes `%`), inline math keeps its content (`$p < 0.001$` becomes `p < 0.001`), and a few symbol commands become characters (`\times` becomes `×`). The quote check runs on that cleaned text, so a quote never carries markup ([ADR 0089](../decisions/0089-extraction-reads-text-without-latex-markup.md)).
 - The stored quote is the exact span of the source text that matched, so stored quotes are verbatim.
 - In a list of independent items (extraction candidates), an item that still fails on the last attempt is dropped and recorded in `Dropped`; the rest of the output is kept.
 

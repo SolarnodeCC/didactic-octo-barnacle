@@ -9,6 +9,7 @@ the eight target industries. It reads files only and never calls a model.
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -50,6 +51,31 @@ def fixture_text(path: Path, fixture: Path) -> str | None:
         return None
     data = json.loads(fixture.read_text(encoding="utf-8"))
     return f"{data.get('title', '')} {data.get('summary', '')}"
+
+
+# The same rules as cleanLatexMarkup in packages/models/src/latex.ts (ADR 0089): the extraction
+# step reads and quotes the title and abstract without LaTeX markup, so its labels do too.
+LATEX_FORMATTING = re.compile(
+    r"\\(?:text(?:it|bf|tt|sc|rm|sf|up|sl)?|emph|math(?:rm|bf|it|tt|sf)|underline|url)\{([^{}]*)\}"
+)
+LATEX_INLINE_MATH = re.compile(r"(?<!\\)\$([^$\n]{1,80})(?<!\\)\$")
+LATEX_PROSE_WORD = re.compile(r"(?<![\\A-Za-z])[A-Za-z]{3,}(?![A-Za-z])")
+LATEX_SYMBOLS = {
+    "times": "×", "approx": "≈", "sim": "~", "leq": "≤", "le": "≤", "geq": "≥", "ge": "≥",
+    "neq": "≠", "pm": "±", "cdot": "·", "ldots": "...", "dots": "...",
+}
+
+
+def clean_latex(text: str) -> str:
+    previous = None
+    while previous != text:
+        previous, text = text, LATEX_FORMATTING.sub(r"\1", text)
+    text = LATEX_INLINE_MATH.sub(
+        lambda m: m.group(0) if LATEX_PROSE_WORD.search(m.group(1)) else m.group(1), text
+    )
+    text = re.sub(r"\\([A-Za-z]+)(?![A-Za-z])", lambda m: LATEX_SYMBOLS.get(m.group(1), m.group(0)), text)
+    text = re.sub(r"([\^_])\{([^{}]*)\}", r"\1\2", text)
+    return re.sub(r"\\([%&$#_{}])", r"\1", text)
 
 
 def check_id(path: Path, entry: dict) -> None:
@@ -114,7 +140,8 @@ def extraction(accepted: dict[str, dict]) -> dict[str, tuple[Path, list]]:
             continue
         check_id(path, entry)
         fixture = (EXT / entry["publicationFixture"]).resolve()
-        text = fixture_text(path, fixture)
+        raw = fixture_text(path, fixture)
+        text = clean_latex(raw) if raw is not None else None
         seen_fixtures.add(fixture.name)
         if fixture.name not in accepted:
             err(path, "its publication has no accepted triage entry")
@@ -131,7 +158,7 @@ def extraction(accepted: dict[str, dict]) -> dict[str, tuple[Path, list]]:
             for key in ("evidenceQuote", "customerQuote", "whyNowQuote", "alternativeQuote"):
                 quote = cand.get(key)
                 if quote is not None and text is not None and quote not in text:
-                    err(path, f"candidate {i}: {key} is not verbatim in the fixture")
+                    err(path, f"candidate {i}: {key} is not verbatim in the fixture without LaTeX markup")
             for key in ("finding", "evidenceQuote", "customer", "customerQuote"):
                 if not cand.get(key):
                     err(path, f"candidate {i}: {key} is missing")

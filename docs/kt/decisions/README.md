@@ -97,6 +97,8 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0086](0086-benchmark-round-two-candidates.md) | Benchmark round two candidates, a reasoning variant, and price table 2026-11-11 | Accepted |
 | [0087](0087-triage-passes-on-the-decision-with-a-signal-floor.md) | The triage eval passes on the accept decision, with a floor on every signal | Accepted |
 | [0088](0088-benchmark-round-two-selects-the-triage-model.md) | Benchmark round two selects Gemma with thinking off for triage; extraction stays open | Accepted |
+| [0089](0089-extraction-reads-text-without-latex-markup.md) | Extraction reads the title and abstract without LaTeX markup | Accepted |
+| [0090](0090-extraction-prompt-four-and-benchmark-round-three.md) | Extraction prompt four and benchmark round three | Accepted |
 
 ## When an ADR is needed
 

@@ -111,6 +111,7 @@ export {
   type ExtractionCandidate,
   type ExtractionOutput,
 } from "./extraction.js";
+export { cleanLatexMarkup } from "./latex.js";
 
 export { CurrencyCodeSchema, MoneySchema, type Money } from "./money.js";
 
