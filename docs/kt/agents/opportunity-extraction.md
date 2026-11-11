@@ -2,7 +2,7 @@
 title: Opportunity extraction
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-10
+last_reviewed: 2026-11-11
 related: [REQ-PROC-004, REQ-PROC-009]
 ---
 
@@ -53,12 +53,12 @@ The pipeline assigns each candidate an Id and links it to the publication before
 - A burden that belongs to a population or a sector as a whole, with no named customer that could adopt a product against it, yields no candidate (ADR 0050). A named party that can act, such as a hospital or a bank's risk team, still yields one when both quotes exist.
 - `WhyNow` and `CurrentAlternative` stay empty when the text does not name them. They are never inferred. Every later agent receives them with their quotes when they are set, and Competition may find further alternatives with the search tool (ADR 0013, ADR 0070).
 - An empty `Candidates` list is a valid result. `Notes` must say why none were found, for example: no quotable problem, no named customer, no party that can act on the burden, or out of industry scope. It can follow an accepted triage decision, because triage reads signals and extraction reads quotes.
-- One finding becomes one candidate. Several distinct problems in one publication yield several candidates, up to the configured maximum.
+- A publication yields one primary candidate: the strongest problem with the customer who has it. A further candidate is added only when the text names a separate customer with a separate problem, each with its own quotes, up to the configured maximum. Variants of one problem, further consequences of it, and further problems of the same customer stay in the one candidate ([ADR 0085](../decisions/0085-one-primary-extraction-candidate.md)).
 - Extraction does not score, size markets, name competitors, or invent a product concept. Those belong to later agents.
 
 ## Prompt
 
-`extraction@2` in `packages/prompts/src/extraction.ts` (the text of `extraction@1` with an output budget of 8192 tokens, [ADR 0076](../decisions/0076-stream-benchmark-calls-and-larger-output-budget.md)) carries the rules above and the configured maximum. It sends the full text, cut at `extraction.full_text_max_chars`, when the document has extracted text, and the abstract otherwise. The quote check runs on exactly the text inside the `<publication>` delimiters; a delimiter tag inside the publication is defused first (REQ-NFR-006).
+`extraction@3` in `packages/prompts/src/extraction.ts` (the rule of one primary candidate, [ADR 0085](../decisions/0085-one-primary-extraction-candidate.md), with the output budget of 8192 tokens of [ADR 0076](../decisions/0076-stream-benchmark-calls-and-larger-output-budget.md)) carries the rules above and the configured maximum. It sends the full text, cut at `extraction.full_text_max_chars`, when the document has extracted text, and the abstract otherwise. The quote check runs on exactly the text inside the `<publication>` delimiters; a delimiter tag inside the publication is defused first (REQ-NFR-006).
 
 ## Evals
 

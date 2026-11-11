@@ -8,15 +8,16 @@ import { DATA_NOT_INSTRUCTIONS, defuseTags, delimit } from "./delimiters.js";
 import { type BuiltPrompt, type Sampling } from "./prompt.js";
 
 /**
- * `extraction@2`: one triaged publication in, zero or more candidate opportunities out, each
+ * `extraction@3`: one triaged publication in, zero or more candidate opportunities out, each
  * with a quoted problem and a quoted customer (docs/kt/agents/opportunity-extraction.md,
  * REQ-PROC-004, REQ-PROC-009, ADR 0036, ADR 0050).
  *
- * `extraction@2` has the text of `extraction@1` and a larger output budget, for the reasoning
- * that comes before the answer (ADR 0076).
+ * `extraction@2` had the text of `extraction@1` and a larger output budget, for the reasoning
+ * that comes before the answer (ADR 0076). `extraction@3` asks for one primary candidate and
+ * allows another only for a separate customer with a separate problem (ADR 0085).
  */
 
-export const EXTRACTION_PROMPT_VERSION = "extraction@2";
+export const EXTRACTION_PROMPT_VERSION = "extraction@3";
 
 export const EXTRACTION_SAMPLING: Sampling = { Temperature: 0, MaxTokens: 8192 };
 
@@ -53,7 +54,8 @@ export function extractionSystem(maxCandidates: number): string {
     "You find candidate software opportunities in one research publication. A candidate is a problem that a named customer has, stated and quotable from the publication text.",
     "",
     "Rules:",
-    `- Return at most ${maxCandidates} candidates. One distinct problem is one candidate.`,
+    "- Return one primary candidate: the strongest problem with the customer who has it.",
+    `- Add another candidate only when the text names a separate customer with a separate problem, each with its own quotes; at most ${maxCandidates} candidates in total. Variants of one problem, further consequences of it, or the same customer with a further problem stay in the one candidate.`,
     "- Finding: the problem in one sentence (at most 280 characters).",
     "- EvidenceQuote: a verbatim quote from the publication that states the problem (at most 500 characters).",
     '- Customer: the role or organization type that has the problem (at most 120 characters). A generic or implied party such as "users", "people", or the researchers themselves does not count.',

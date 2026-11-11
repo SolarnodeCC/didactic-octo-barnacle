@@ -51,7 +51,7 @@ function run(output: unknown, input: ExtractionInput = publication) {
 describe("REQ-TEST-002: extraction contract test", () => {
   it("REQ-TEST-002: AC1 a valid output with all quotes in the text passes", async () => {
     const { Result } = await run(valid);
-    expect(Result).toMatchObject({ Ok: true, Attempts: 1, PromptVersion: "extraction@2" });
+    expect(Result).toMatchObject({ Ok: true, Attempts: 1, PromptVersion: "extraction@3" });
   });
 
   it("REQ-TEST-002: AC1 a missing field, a wrong type, and an out-of-range value each fail", async () => {
@@ -150,7 +150,13 @@ describe("REQ-PROC-009: a quotable problem and customer", () => {
 describe("REQ-PROC-004: candidate count and input", () => {
   it("REQ-PROC-004: the prompt and the contract use the configured maximum", async () => {
     const input = { ...publication, MaxCandidates: 1 };
-    expect(buildExtractionPrompt(input).Prompt.System).toContain("Return at most 1 candidates.");
+    const system = buildExtractionPrompt(input).Prompt.System;
+    expect(system).toContain("at most 1 candidates in total");
+    // One primary candidate, another only for a separate customer (ADR 0085).
+    expect(system).toContain("Return one primary candidate");
+    expect(system).toContain(
+      "only when the text names a separate customer with a separate problem",
+    );
     const { Result } = await run({ ...valid, Candidates: [candidate, candidate] }, input);
     expect(Result).toMatchObject({ Ok: false, Reason: "invalid-output" });
   });

@@ -14,7 +14,7 @@ How to run a round of the [model benchmark plan](model-benchmark-plan.md) (OQ-03
 
 For each step and each candidate model, the command runs every golden-set item `--runs` times (three by default):
 
-- It runs the prompt version of the step (`triage@2` or `extraction@2`, [ADR 0076](../decisions/0076-stream-benchmark-calls-and-larger-output-budget.md)) through `callModel`, with the same sampling settings for every model.
+- It runs the prompt version of the step (`triage@2` or `extraction@3`, [ADR 0076](../decisions/0076-stream-benchmark-calls-and-larger-output-budget.md), [ADR 0085](../decisions/0085-one-primary-extraction-candidate.md)) through `callModel`, with the same sampling settings for every model.
 - It scores the accepted output with the eval runner and its thresholds.
 - It records one usage record per attempt (REQ-NFR-011) and keeps every raw response and provider error.
 
