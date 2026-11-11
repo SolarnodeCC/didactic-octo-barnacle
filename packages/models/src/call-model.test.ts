@@ -121,6 +121,33 @@ describe("REQ-AGENT-010: structured model output", () => {
   });
 });
 
+describe("REQ-AGENT-014: the model configuration includes its reasoning setting", () => {
+  it("REQ-AGENT-014: thinking off and an effort level are sent with the model's own parameter", async () => {
+    const off = setup([{ Kind: "output", Output: triage }]);
+    await callModel(off.deps, {
+      ...request,
+      Config: { ...request.Config, Reasoning: { Thinking: false } },
+    });
+    expect(off.ai.Calls[0]?.Inputs.chat_template_kwargs).toEqual({ enable_thinking: false });
+    expect(off.ai.Calls[0]?.Inputs.reasoning).toBeUndefined();
+
+    const low = setup([{ Kind: "output", Output: triage }]);
+    await callModel(low.deps, {
+      ...request,
+      Config: { ...request.Config, Reasoning: { Effort: "low" } },
+    });
+    expect(low.ai.Calls[0]?.Inputs.reasoning).toEqual({ effort: "low" });
+    expect(low.ai.Calls[0]?.Inputs.chat_template_kwargs).toBeUndefined();
+  });
+
+  it("REQ-AGENT-014: without a reasoning setting the model keeps its default", async () => {
+    const { ai, deps } = setup([{ Kind: "output", Output: triage }]);
+    await callModel(deps, request);
+    expect(ai.Calls[0]?.Inputs).not.toHaveProperty("reasoning");
+    expect(ai.Calls[0]?.Inputs).not.toHaveProperty("chat_template_kwargs");
+  });
+});
+
 describe("REQ-AGENT-009: invalid output is retried with the validation errors", () => {
   it("REQ-AGENT-009: AC1 a retry carries the validation errors of the failed attempt", async () => {
     const { ai, usage, deps } = setup([

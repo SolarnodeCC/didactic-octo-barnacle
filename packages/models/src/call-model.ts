@@ -20,6 +20,13 @@ import {
 export type CallOutputMode = "json-schema" | "prompt-only";
 
 /** Model, prompt version, and sampling settings of a step (`model.triage`, `model.extraction`). */
+/**
+ * The reasoning setting of a reasoning model, when not its default: thinking off, for a model
+ * with an on/off switch (`chat_template_kwargs.enable_thinking`), or an effort level, for a
+ * model with effort levels (`reasoning.effort`). Absent means the model's default (ADR 0086).
+ */
+export type ReasoningSetting = { Thinking: false } | { Effort: "low" | "medium" | "high" };
+
 export type ModelConfig = {
   /** Exact, pinned model ID (REQ-AGENT-014), for example `@cf/zai-org/glm-4.7-flash`. */
   Model: string;
@@ -27,6 +34,7 @@ export type ModelConfig = {
   OutputMode: CallOutputMode;
   Temperature?: number;
   MaxTokens?: number;
+  Reasoning?: ReasoningSetting;
 };
 
 export type ModelPrompt = {
@@ -170,6 +178,13 @@ export async function callModel<S extends z.ZodObject>(
     }
     if (config.MaxTokens !== undefined) {
       inputs.max_tokens = config.MaxTokens;
+    }
+    if (config.Reasoning !== undefined) {
+      if ("Effort" in config.Reasoning) {
+        inputs.reasoning = { effort: config.Reasoning.Effort };
+      } else {
+        inputs.chat_template_kwargs = { enable_thinking: false };
+      }
     }
 
     const started = Date.now();

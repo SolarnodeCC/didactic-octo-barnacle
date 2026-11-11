@@ -10,6 +10,7 @@ import { loadThreshold, loadTriageSet } from "../golden-set.js";
 import { parseBenchmarkArgs, runBenchmarkCommand } from "./cli.js";
 import {
   formatBenchmarkMarkdown,
+  parseCandidate,
   percentile,
   runBenchmark,
   type BenchmarkPlan,
@@ -226,6 +227,39 @@ describe("REQ-TEST-006: the benchmark round", () => {
     ).rejects.toThrow(/not in the plan/);
   });
 
+  it("REQ-AGENT-014: a candidate is a pinned model with an optional reasoning setting", () => {
+    expect(parseCandidate("@cf/openai/gpt-oss-120b")).toEqual({
+      Label: "@cf/openai/gpt-oss-120b",
+      Model: "@cf/openai/gpt-oss-120b",
+    });
+    expect(parseCandidate("@cf/google/gemma-4-26b-a4b-it+reasoning=off")).toEqual({
+      Label: "@cf/google/gemma-4-26b-a4b-it+reasoning=off",
+      Model: "@cf/google/gemma-4-26b-a4b-it",
+      Reasoning: { Thinking: false },
+    });
+    expect(parseCandidate("@cf/openai/gpt-oss-120b+reasoning=low")?.Reasoning).toEqual({
+      Effort: "low",
+    });
+    expect(parseCandidate("@cf/openai/gpt-oss-120b+reasoning=max")).toBeNull();
+    expect(parseCandidate("@cf/openai/gpt-oss-120b+temperature=1")).toBeNull();
+    expect(parseCandidate("gpt-4")).toBeNull();
+  });
+
+  it("REQ-AGENT-014: a reasoning variant sends its setting, records the bare model, and reports its label", async () => {
+    const variant = `${MODEL}+reasoning=off`;
+    const replies: FakeReply[] = [0, 1, 2, 3].map((i) => ({ Kind: "output", Output: signals(i) }));
+    const d = deps(replies);
+    const result = await runBenchmark(
+      plan({ Runs: 1, Models: { triage: [variant], extraction: [] } }),
+      inputs,
+      d,
+    );
+    expect(d.Ai.Calls[0]?.Inputs.chat_template_kwargs).toEqual({ enable_thinking: false });
+    expect(new Set(result.Records.map((r) => r.Model))).toEqual(new Set([MODEL]));
+    expect(result.Summaries[0]?.Model).toBe(variant);
+    expect(result.Raw[0]?.Model).toBe(variant);
+  });
+
   it("REQ-TEST-006: percentiles use the nearest rank", () => {
     expect(percentile([5, 1, 3, 2, 4], 50)).toBe(3);
     expect(percentile([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 95)).toBe(10);
@@ -254,7 +288,7 @@ describe("REQ-TEST-006: the benchmark command", () => {
     });
     // The price table of `model.price_table_version` (REQ-NFR-011, ADR 0078).
     expect(parseBenchmarkArgs([])?.Prices).toMatch(
-      /infrastructure\/cloudflare\/prices\/2026-11-10\.json$/u,
+      /infrastructure\/cloudflare\/prices\/2026-11-11\.json$/u,
     );
     expect(parseBenchmarkArgs(["--no-stream", "--timeout-ms", "90000"])).toMatchObject({
       Stream: false,
@@ -272,10 +306,21 @@ describe("REQ-TEST-006: the benchmark command", () => {
     expect(parseBenchmarkArgs(["--runs", "0"])).toBeNull();
     expect(parseBenchmarkArgs(["--step", "market"])).toBeNull();
     expect(parseBenchmarkArgs(["--models", "gpt-4"])).toBeNull();
+    expect(
+      parseBenchmarkArgs([
+        "--step",
+        "triage",
+        "--models",
+        "@cf/google/gemma-4-26b-a4b-it+reasoning=off",
+      ])?.Models,
+    ).toEqual(["@cf/google/gemma-4-26b-a4b-it+reasoning=off"]);
+    expect(
+      parseBenchmarkArgs(["--step", "triage", "--models", "@cf/a/b+reasoning=max"]),
+    ).toBeNull();
     expect(parseBenchmarkArgs(["--unknown", "x"])).toBeNull();
   });
 
-  it("REQ-TEST-006: a dry run of round one passes every item and writes the report files", async () => {
+  it("REQ-TEST-006: a dry run of round two passes every item and writes the report files", async () => {
     const out = mkdtempSync(join(tmpdir(), "roi-bench-"));
     dirs.push(out);
     const args = parseBenchmarkArgs(["--dry-run", "--runs", "1", "--out", out])!;
@@ -285,16 +330,17 @@ describe("REQ-TEST-006: the benchmark command", () => {
       { Now: () => new Date("2026-11-07T12:00:00Z") },
     );
     expect(result.Summaries.map((s) => [s.Step, s.Model, s.MeanPassRate])).toEqual([
-      ["triage", "@cf/zai-org/glm-4.7-flash", 1],
       ["triage", "@cf/google/gemma-4-26b-a4b-it", 1],
+      ["triage", "@cf/google/gemma-4-26b-a4b-it+reasoning=off", 1],
+      ["triage", "@cf/openai/gpt-oss-120b", 1],
       ["extraction", "@cf/deepseek-ai/deepseek-v4.1-flash-1017", 1],
-      ["extraction", "@cf/google/gemma-4-26b-a4b-it", 1],
+      ["extraction", "@cf/openai/gpt-oss-120b", 1],
     ]);
     const dir = join(out, result.BenchmarkId);
     const summary = JSON.parse(readFileSync(join(dir, "summary.json"), "utf8")) as {
       PriceTableVersion: string;
     };
-    expect(summary.PriceTableVersion).toBe("2026-11-10");
+    expect(summary.PriceTableVersion).toBe("2026-11-11");
     expect(readFileSync(join(dir, "report.md"), "utf8")).toContain("# Model benchmark");
     const records = readFileSync(join(dir, "model-calls.jsonl"), "utf8").split("\n");
     expect(records).toHaveLength(result.Records.length);
@@ -339,10 +385,10 @@ describe("REQ-TEST-006: the benchmark command", () => {
       Limit: number;
       PriceTableVersion: string;
     };
-    expect(stored).toMatchObject({ Limit: 3, PriceTableVersion: "2026-11-10" });
+    expect(stored).toMatchObject({ Limit: 3, PriceTableVersion: "2026-11-11" });
     const lines = readFileSync(join(dir, "checkpoint.jsonl"), "utf8").trim().split("\n");
-    // Two models, two runs each.
-    expect(lines).toHaveLength(4);
+    // Three triage candidates of round two, two runs each.
+    expect(lines).toHaveLength(6);
 
     // Keep the first run and a line cut off mid-write, as after a stop.
     writeFileSync(join(dir, "checkpoint.jsonl"), `${lines[0]}\n${lines[1]!.slice(0, 40)}`);
@@ -359,7 +405,7 @@ describe("REQ-TEST-006: the benchmark command", () => {
       readFileSync(join(dir, "checkpoint.jsonl"), "utf8")
         .split("\n")
         .filter((l) => l.startsWith("{") && l.endsWith("}")),
-    ).toHaveLength(4);
+    ).toHaveLength(6);
   });
 
   it("REQ-NFR-011: a round resumes only with the price table it started with", async () => {
@@ -393,7 +439,7 @@ describe("REQ-TEST-006: the benchmark command", () => {
         ])!,
         {},
       ),
-    ).rejects.toThrow(/price table 2026-11-10, not 2026-11-06/);
+    ).rejects.toThrow(/price table 2026-11-11, not 2026-11-06/);
     await expect(
       runBenchmarkCommand(
         parseBenchmarkArgs(["--dry-run", "--resume", "bench-none", "--out", out])!,

@@ -1,4 +1,5 @@
 import {
+  type ReasoningSetting,
   type CallModelDeps,
   type CallModelResult,
   type CallOutputMode,
@@ -27,11 +28,42 @@ import { extractionModelFn, triageModelFn } from "../model-fn.js";
 
 export type BenchmarkStep = "triage" | "extraction";
 
+/** A candidate of a round: a pinned model, with a reasoning setting when not its default. */
+export type Candidate = { Label: string; Model: string; Reasoning?: ReasoningSetting };
+
+const REASONING: Record<string, ReasoningSetting> = {
+  off: { Thinking: false },
+  low: { Effort: "low" },
+  medium: { Effort: "medium" },
+  high: { Effort: "high" },
+};
+
+/**
+ * Reads a candidate written as `<model>` or `<model>+reasoning=<off|low|medium|high>`
+ * (ADR 0086). The label is the whole string, so a model and its variant are reported apart;
+ * usage records keep the bare model ID (REQ-AGENT-014). Null when the string is not valid.
+ */
+export function parseCandidate(spec: string): Candidate | null {
+  const [model, ...options] = spec.split("+");
+  if (model === undefined || !/^@cf\/[\w.-]+\/[\w.-]+$/u.test(model) || options.length > 1) {
+    return null;
+  }
+  if (options.length === 0) {
+    return { Label: spec, Model: model };
+  }
+  const match = /^reasoning=(\w+)$/u.exec(options[0] ?? "");
+  const reasoning = match ? REASONING[match[1] ?? ""] : undefined;
+  return reasoning === undefined ? null : { Label: spec, Model: model, Reasoning: reasoning };
+}
+
 export type BenchmarkPlan = {
   /** Identifies the round in records, gateway logs, and the raw-response keys. */
   BenchmarkId: string;
   Steps: BenchmarkStep[];
-  /** Exact, pinned model IDs per step (REQ-AGENT-014). */
+  /**
+   * Candidates per step: exact, pinned model IDs (REQ-AGENT-014), each optionally with a
+   * reasoning setting as `<model>+reasoning=<level>` (see `parseCandidate`).
+   */
   Models: Record<BenchmarkStep, string[]>;
   Runs: number;
   OutputMode: CallOutputMode;
@@ -323,9 +355,15 @@ export async function runBenchmark(
 
   for (const step of plan.Steps) {
     for (const model of plan.Models[step]) {
+      const candidate = parseCandidate(model);
+      if (candidate === null) {
+        throw new Error(
+          `candidate ${model} is not a pinned model with an optional reasoning setting`,
+        );
+      }
       // Refuse an unpriced model before any call, like callModel does per step.
-      if (deps.Prices.Models[model] === undefined) {
-        throw new Error(`model ${model} has no price in table ${deps.Prices.Version}`);
+      if (deps.Prices.Models[candidate.Model] === undefined) {
+        throw new Error(`model ${candidate.Model} has no price in table ${deps.Prices.Version}`);
       }
       const checkpoints: RunCheckpoint[] = [];
 
@@ -360,10 +398,11 @@ export async function runBenchmark(
         };
         const options = {
           Deps: callDeps,
-          Model: model,
+          Model: candidate.Model,
           RunId: runId,
           OutputMode: plan.OutputMode,
           OnResult: onResult,
+          ...(candidate.Reasoning === undefined ? {} : { Reasoning: candidate.Reasoning }),
         };
         let report: EvalReport | TriageEvalReport;
         let summary: RunSummary;

@@ -7,8 +7,8 @@ import { describe, expect, it } from "vitest";
 
 const pricesDir = join(dirname(fileURLToPath(import.meta.url)), "../prices");
 
-/** `model.price_table_version` in docs/kt/architecture/defaults.md (ADR 0078). */
-const CONFIGURED_VERSION = "2026-11-10";
+/** `model.price_table_version` in docs/kt/architecture/defaults.md (ADR 0078, ADR 0086). */
+const CONFIGURED_VERSION = "2026-11-11";
 
 /** Benchmark candidates of docs/kt/test/model-benchmark-plan.md and the embedding model. */
 const PRICED_MODELS = [
@@ -16,6 +16,7 @@ const PRICED_MODELS = [
   "@cf/google/gemma-4-26b-a4b-it",
   "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
   "@cf/zai-org/glm-5.3",
+  "@cf/openai/gpt-oss-120b",
   "@cf/baai/bge-base-en-v1.5",
 ];
 
@@ -50,8 +51,12 @@ describe("REQ-NFR-011: versioned price tables", () => {
       OutputUsdPerMillionTokens: 1.2,
     });
     expect(table.Models["@cf/zai-org/glm-5.3"]?.CachedInputUsdPerMillionTokens).toBe(0.26);
+    // Listed on 2026-11-11 (ADR 0086).
+    expect(table.Models["@cf/google/gemma-4-26b-a4b-it"]?.CachedInputUsdPerMillionTokens).toBe(
+      0.05,
+    );
     // Models the price list gives no cached price keep none.
-    for (const model of ["@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it"]) {
+    for (const model of ["@cf/zai-org/glm-4.7-flash", "@cf/openai/gpt-oss-120b"]) {
       expect(table.Models[model]?.CachedInputUsdPerMillionTokens, model).toBeUndefined();
     }
   });

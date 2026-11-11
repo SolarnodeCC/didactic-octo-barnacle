@@ -26,7 +26,7 @@ describe("REQ-NFR-005: processing configuration", () => {
       FullTextMaxChars: 24_000,
       EmbeddingBatchSize: 50,
       RetractionLookbackDays: 30,
-      PriceTableVersion: "2026-11-10",
+      PriceTableVersion: "2026-11-11",
       ModelMaxAttempts: 3,
     });
   });

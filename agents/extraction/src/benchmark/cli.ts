@@ -15,6 +15,7 @@ import {
 import { GatewayRestBinding, putR2Object } from "./gateway-binding.js";
 import {
   formatBenchmarkMarkdown,
+  parseCandidate,
   runBenchmark,
   type BenchmarkPlan,
   type BenchmarkResult,
@@ -29,6 +30,19 @@ const REPO_ROOT = resolve(here, "../../../..");
 export const ROUND_ONE: Record<BenchmarkStep, string[]> = {
   triage: ["@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it"],
   extraction: ["@cf/deepseek-ai/deepseek-v4.1-flash-1017", "@cf/google/gemma-4-26b-a4b-it"],
+};
+
+/**
+ * Round two, the default (ADR 0086): the best candidate of round one per step, gpt-oss-120b,
+ * and for triage Gemma with thinking off.
+ */
+export const ROUND_TWO: Record<BenchmarkStep, string[]> = {
+  triage: [
+    "@cf/google/gemma-4-26b-a4b-it",
+    "@cf/google/gemma-4-26b-a4b-it+reasoning=off",
+    "@cf/openai/gpt-oss-120b",
+  ],
+  extraction: ["@cf/deepseek-ai/deepseek-v4.1-flash-1017", "@cf/openai/gpt-oss-120b"],
 };
 
 export const BENCHMARK_USAGE = [
@@ -107,7 +121,7 @@ export function parseBenchmarkArgs(args: readonly string[]): BenchmarkArgs | nul
     Out: "benchmark-out",
     Limit: null,
     OutputMode: "json-schema",
-    Prices: join(REPO_ROOT, "infrastructure/cloudflare/prices/2026-11-10.json"),
+    Prices: join(REPO_ROOT, "infrastructure/cloudflare/prices/2026-11-11.json"),
     R2Bucket: null,
     MinIntervalMs: 3000,
     TimeoutMs: 600_000,
@@ -150,7 +164,7 @@ export function parseBenchmarkArgs(args: readonly string[]): BenchmarkArgs | nul
         break;
       case "--models": {
         const models = value.split(",").map((m) => m.trim());
-        if (models.some((m) => !m.startsWith("@cf/"))) {
+        if (models.some((m) => parseCandidate(m) === null)) {
           return null;
         }
         parsed.Models = models;
@@ -307,8 +321,8 @@ export async function runBenchmarkCommand(
     });
   } else {
     const models: Record<BenchmarkStep, string[]> = {
-      triage: args.Steps.includes("triage") ? (args.Models ?? ROUND_ONE.triage) : [],
-      extraction: args.Steps.includes("extraction") ? (args.Models ?? ROUND_ONE.extraction) : [],
+      triage: args.Steps.includes("triage") ? (args.Models ?? ROUND_TWO.triage) : [],
+      extraction: args.Steps.includes("extraction") ? (args.Models ?? ROUND_TWO.extraction) : [],
     };
     stored = {
       Plan: {
