@@ -1,0 +1,14 @@
+id: gs-extraction-039
+publicationFixture: fixtures/arxiv/2602.02964.json
+industry: other
+expected:
+  candidates:
+    - finding: "Python developers migrate existing test suites from unittest to Pytest by hand, a manual and time-consuming process."
+      evidenceQuote: 'migrating existing suites from \texttt{unittest} remains a manual and time-consuming process'
+      customer: "Python developers"
+      customerQuote: "Python developers rely on two major testing frameworks"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Manual migration of the test suites."
+      alternativeQuote: "a manual and time-consuming process"
+notes: "One primary candidate. Added because gs-triage-057 is accepted after the round-two label review (2026-11-11, ADR 0084), confirmed by the owner."

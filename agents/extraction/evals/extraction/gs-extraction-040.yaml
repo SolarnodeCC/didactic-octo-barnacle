@@ -1,0 +1,14 @@
+id: gs-extraction-040
+publicationFixture: fixtures/arxiv/2610.03932.json
+industry: public-sector
+expected:
+  candidates:
+    - finding: "Public sector agencies document community participation in AI deployments in a way that filters out the input that would most constrain them, so systems are deployed largely unchanged."
+      evidenceQuote: "institutional mechanisms for documenting participation systematically select for forms of community input that fit institutional categories and filter out the forms that would most constrain state power"
+      customer: "public sector agencies"
+      customerQuote: "Public sector agencies have adopted participatory design as a prominent procedural safeguard"
+      whyNow: null
+      whyNowQuote: null
+      currentAlternative: "Participatory design, with documented community input."
+      alternativeQuote: "participatory design"
+notes: "One primary candidate. Added because gs-triage-040 is accepted after the round-two label review (2026-11-11, ADR 0084), confirmed by the owner."

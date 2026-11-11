@@ -3,7 +3,7 @@ publicationFixture: fixtures/arxiv/2610.41085.json
 expected:
   signals:
     namedParty: false
-    statedHarm: true
+    statedHarm: false
     trigger: false
     existingAlternative: true
     adoptable: false
@@ -11,8 +11,8 @@ expected:
   reason: low-score
 basis:
   namedParty: "none: only analyst rules"
-  statedHarm: "payroll fraud"
+  statedHarm: "none: fraud screening is named as a task; no cost, delay, loss, or risk is stated"
   trigger: "none"
   existingAlternative: "analyst rules"
   adoptable: "none: a synthetic study"
-notes: "Fraud screening method on synthetic data; no named party. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."
+notes: "Fraud screening method on synthetic data; no named party. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036. Round-two label review (2026-11-11, ADR 0084), confirmed by the owner: statedHarm set to false."

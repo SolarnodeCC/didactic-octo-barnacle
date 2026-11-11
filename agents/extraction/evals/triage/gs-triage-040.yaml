@@ -3,16 +3,16 @@ publicationFixture: fixtures/arxiv/2610.03932.json
 expected:
   signals:
     namedParty: true
-    statedHarm: false
+    statedHarm: true
     trigger: false
     existingAlternative: true
     adoptable: false
-  accepted: false
-  reason: low-score
+  accepted: true
+  reason: accepted
 basis:
   namedParty: "public sector agencies"
-  statedHarm: "none: the harm falls on communities"
+  statedHarm: "repeated non-response constitutes a harm to community subjectivity"
   trigger: "none"
   existingAlternative: "participatory design"
   adoptable: "none: a critical analysis"
-notes: "Named agencies, but the harm is carried by communities. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."
+notes: "Named agencies, a stated harm, and participatory design in use; accepted at 0.6. The harm is read on its own, whoever carries it. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Round-two label review (2026-11-11, ADR 0084), confirmed by the owner."

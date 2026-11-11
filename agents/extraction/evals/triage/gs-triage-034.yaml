@@ -14,5 +14,5 @@ basis:
   statedHarm: "malicious clients poison updates and degrade the model"
   trigger: "none"
   existingAlternative: "federated learning without a defense"
-  adoptable: "none: an aggregation method"
-notes: "Named institutions and a stated risk; accepted at the cut. A method paper that passes the rule (a, b, d); kept as a boundary case where the rule is permissive. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."
+  adoptable: "none: an aggregation method evaluated on a dataset, not offered as a system, protocol, or tool"
+notes: "Named institutions and a stated risk; accepted at the cut. A method paper that passes the rule (a, b, d); kept as a boundary case where the rule is permissive. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036. Round-two label review (2026-11-11, ADR 0084), confirmed by the owner: basis made explicit, label kept."

@@ -14,5 +14,5 @@ basis:
   statedHarm: "none"
   trigger: "none"
   existingAlternative: "none"
-  adoptable: "none"
-notes: "Graph-learning method for fraud detection. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."
+  adoptable: "none: a detection method evaluated on benchmark datasets; released code is a research artifact"
+notes: "Graph-learning method for fraud detection. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036. Round-two label review (2026-11-11, ADR 0084), confirmed by the owner: basis made explicit, label kept."

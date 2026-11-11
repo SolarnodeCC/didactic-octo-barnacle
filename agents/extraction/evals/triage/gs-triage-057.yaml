@@ -5,14 +5,14 @@ expected:
     namedParty: true
     statedHarm: true
     trigger: false
-    existingAlternative: false
+    existingAlternative: true
     adoptable: false
-  accepted: false
-  reason: low-score
+  accepted: true
+  reason: accepted
 basis:
   namedParty: "Python developers"
   statedHarm: "migration is manual and time-consuming; 51.5% of LLM migrations fail"
   trigger: "none"
-  existingAlternative: "none: manual migration is the baseline, not a tool in use"
+  existingAlternative: "migrating suites from unittest remains a manual and time-consuming process"
   adoptable: "none: an empirical study"
-notes: "Owner changed existingAlternative to false: an empirical study with no artifact and no named alternative; score 0.4, so rejected (compare gs-triage-001 of round 1 for the same study type). Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."
+notes: "Named developers, a stated harm, and a manual process they use today; accepted at 0.6. The round 2 review had set existingAlternative to false; the signal table counts a manual process. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Round-two label review (2026-11-11, ADR 0084), confirmed by the owner."

@@ -3,16 +3,16 @@ publicationFixture: fixtures/arxiv/2610.41437.json
 expected:
   signals:
     namedParty: true
-    statedHarm: true
+    statedHarm: false
     trigger: true
     existingAlternative: true
     adoptable: true
-  accepted: true
-  reason: accepted
+  accepted: false
+  reason: low-score
 basis:
   namedParty: "patients and clinicians"
-  statedHarm: "brief, time-constrained clinical visits"
+  statedHarm: "none: patients being unsure what to ask is not a stated cost, delay, loss, or risk"
   trigger: "millions of adults now turn to general-purpose AI chatbots"
   existingAlternative: "general-purpose AI chatbots"
   adoptable: "an LLM visit-preparation agent"
-notes: "All five signals; the party is the patient. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."
+notes: "Patients are the party and the agent is adoptable, but no harm is stated, so the rule rejects it. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Round-two label review (2026-11-11, ADR 0084), confirmed by the owner."

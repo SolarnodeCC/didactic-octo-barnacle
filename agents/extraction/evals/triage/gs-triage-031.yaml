@@ -14,5 +14,5 @@ basis:
   statedHarm: "none"
   trigger: "none"
   existingAlternative: "none"
-  adoptable: "none"
-notes: "Pretraining method for transaction models. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."
+  adoptable: "none: a pretraining method evaluated on datasets, not offered as a system, protocol, or tool"
+notes: "Pretraining method for transaction models. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036. Round-two label review (2026-11-11, ADR 0084), confirmed by the owner: basis made explicit, label kept."

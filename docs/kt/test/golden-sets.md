@@ -2,7 +2,7 @@
 title: Golden sets and reviewers
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-10
+last_reviewed: 2026-11-11
 related: [REQ-TEST-004, REQ-TEST-005, REQ-SCORE-006, REQ-AGENT-001]
 ---
 
@@ -104,6 +104,15 @@ expected:
   candidates: []
   reason: "A population-level burden with no named party that acts on it."
 ```
+
+### Reading the triage signals
+
+Labels follow the [signal table](../agents/triage.md#signals). The owner settled two readings in the round-two review ([ADR 0084](../decisions/0084-triage-label-review-round-two.md)):
+
+- `statedHarm` is read on its own: a stated cost, delay, loss, or risk counts whoever carries it. Whether a party is named is the question of `namedParty`.
+- `adoptable` is false for a method, framework, or model evaluated on benchmarks, with or without released code, unless the text offers it as a system, protocol, or tool for an organization to use.
+
+The extraction set holds exactly the publications that the triage set accepts, so a label change that flips an accept decision adds or removes an extraction entry, and any analysis entry built on its candidates (`scripts/check-golden-sets.py`).
 
 ## Analysis agent items
 
