@@ -1,5 +1,6 @@
 {
-  "metric": "entry-pass-rate",
+  "metric": "decision-pass-rate",
   "minimum": 0.85,
-  "tolerance": 0.05
+  "tolerance": 0.05,
+  "signalFloor": 0.8
 }

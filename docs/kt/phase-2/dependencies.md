@@ -2,7 +2,7 @@
 title: Phase 2 dependencies
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-10
+last_reviewed: 2026-11-11
 related: [REQ-NFR-005, REQ-NFR-002, REQ-NFR-020]
 ---
 
@@ -16,7 +16,7 @@ Phase 2 starts only when every gate below is closed ([Definition of Ready](../ro
 |---|---|---|---|
 | Phase 1 exit | Met: the data criterion of ADR 0051 is confirmed on the runs of 7 Nov (arXiv 14,035 and OpenAlex 16,134 publications with an abstract; the first `succeeded` arXiv run) | Lead engineer | The 7 November result in [ingestion scope](../data-sources/ingestion-scope.md) |
 | Legal phase-2 gate questions | Answered: questions 1 to 5 approved on 2026-11-06 with no conditions; the contact is `info@solarnode.cc`. Launch questions 6 to 12 are a launch checklist item | `@SolarnodeCC` and legal | The [review brief](../legal/review-brief.md). Workers AI processing falls under the Cloudflare agreement of launch question 8 (ADR 0049) |
-| OQ-036: models for triage and extraction | Open; round one (2026-11-10) qualified no candidate for either step ([ADR 0082](../decisions/0082-benchmark-round-one-selects-no-model.md)), round two waits for the owner's choice of changes | AI engineering lead | Benchmark ADR on the golden sets ([benchmark plan](../test/model-benchmark-plan.md)); needs WP1 to WP3 |
+| OQ-036: models for triage and extraction | Triage closed: round two (2026-11-11) chose `gemma-4-26b-a4b-it` with thinking off ([ADR 0088](../decisions/0088-benchmark-round-two-selects-the-triage-model.md)). Extraction open: no candidate qualified in rounds one and two ([ADR 0082](../decisions/0082-benchmark-round-one-selects-no-model.md), ADR 0088); round three waits for the owner's choice of changes | AI engineering lead | Benchmark ADR on the golden sets ([benchmark plan](../test/model-benchmark-plan.md)); needs WP1 to WP3 |
 | OQ-040: providers | Answered by ADR 0049: Workers AI for the pipeline, Anthropic as the eval judge only | `@SolarnodeCC` | ADR 0049 |
 | OQ-038: population-level burden | Answered by ADR 0050 (REQ-PROC-009 AC6) | Product owner | ADR 0050; the first extraction eval run reviews the rule |
 | OQ-005 benchmark run (ADR 0010) | Reference model fixed; benchmark not run. Candidate `embeddinggemma-300m` is deprecated on 2026-11-20 and replaced by `embeddinggemma-2` once available (ADR 0062) | AI engineering lead | Recall report on the corpus of ADR 0057 and an ADR if the model changes from `bge-base-en-v1.5` |

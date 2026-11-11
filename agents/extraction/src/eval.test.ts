@@ -1,3 +1,4 @@
+import { decideTriage, type TriageSignals } from "@roi/models";
 import { describe, expect, it } from "vitest";
 
 import { runExtractionEval, runTriageEval, type ModelFn } from "./eval.js";
@@ -104,6 +105,71 @@ describe("REQ-PROC-008: the triage eval scores signals and the code decision", (
     const prose: ModelFn = () => Promise.resolve("This paper is promising.");
     const report = await runTriageEval(triageSet.slice(0, 2), prose, loadThreshold("triage"));
     expect(report.Entries.map((entry) => entry.Failures)).toEqual([["schema"], ["schema"]]);
+  });
+});
+
+/**
+ * The oracle with `signal` flipped on every entry where the flip leaves the code decision
+ * unchanged, so only signal agreement moves.
+ */
+function flipKeepingDecision(
+  entries: readonly TriageEntry[],
+  signal: keyof TriageSignals,
+): ModelFn {
+  const oracle = triageOracle(entries);
+  return async (publication) => {
+    const output = (await oracle(publication)) as { Signals: TriageSignals; Notes: null };
+    const flipped = { ...output.Signals, [signal]: !output.Signals[signal] };
+    if (decideTriage(flipped).Accepted === decideTriage(output.Signals).Accepted) {
+      output.Signals = flipped;
+    }
+    return output;
+  };
+}
+
+describe("REQ-TEST-006: the triage threshold passes on the decision with a signal floor", () => {
+  const threshold = loadThreshold("triage");
+
+  it("REQ-TEST-006: the triage threshold file uses decision-pass-rate with a signal floor of 0.8", () => {
+    expect(threshold).toEqual({
+      metric: "decision-pass-rate",
+      minimum: 0.85,
+      tolerance: 0.05,
+      signalFloor: 0.8,
+    });
+  });
+
+  it("REQ-TEST-006: an entry with a wrong signal and the right decision passes and lists the signal", async () => {
+    const report = await runTriageEval(
+      triageSet,
+      flipKeepingDecision(triageSet, "Adoptable"),
+      threshold,
+    );
+    const flipped = report.Entries.filter((entry) => entry.Failures.includes("signal:Adoptable"));
+    expect(flipped.length).toBeGreaterThan(0);
+    expect(flipped.every((entry) => entry.Passed)).toBe(true);
+    expect(report.PassRate).toBe(1);
+  });
+
+  it("REQ-TEST-006: a signal below the floor fails the run even when every decision is right", async () => {
+    const report = await runTriageEval(
+      triageSet,
+      flipKeepingDecision(triageSet, "Adoptable"),
+      threshold,
+    );
+    expect(report.SignalAgreement.Adoptable).toBeLessThan(0.8);
+    expect(report.SignalsBelowFloor).toEqual(["Adoptable"]);
+    expect(report.Passed).toBe(false);
+  });
+
+  it("REQ-TEST-006: under entry-pass-rate a wrong signal still fails the entry", async () => {
+    const report = await runTriageEval(triageSet, flipKeepingDecision(triageSet, "Adoptable"), {
+      metric: "entry-pass-rate",
+      minimum: 0.85,
+      tolerance: 0.05,
+    });
+    expect(report.PassRate).toBeLessThan(1);
+    expect(report.SignalsBelowFloor).toEqual([]);
   });
 });
 

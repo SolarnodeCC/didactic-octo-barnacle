@@ -36,13 +36,14 @@ The owner confirms the labels of every slot; agents draft and cross-check them (
 | Each phase-3 agent | 20 candidates | `agents/<area>/evals/<agent>.threshold.json` |
 | Calibration (phase 4) | 60 scored opportunities | `packages/scoring/evals/calibration/` |
 
-Threshold files hold `{ "metric": "...", "minimum": number, "tolerance": number }` and are written before the first eval run for that step (REQ-TEST-005). Until written, the agent's REQ-AGENT-* "meets its eval threshold" AC is not runnable.
+Threshold files hold `{ "metric": "...", "minimum": number, "tolerance": number }`, and the triage file also `"signalFloor": number`, and are written before the first eval run for that step (REQ-TEST-005). Until written, the agent's REQ-AGENT-* "meets its eval threshold" AC is not runnable.
 
 ## Threshold values
 
 The first values are the owner's decision of 2026-11-01 and count as approved when the pull request that adds the files is merged (REQ-TEST-005, criterion 4). They apply to every model tested for a step, so a model change is judged against the same bar (REQ-TEST-004, [model benchmark plan](model-benchmark-plan.md)).
 
-- `metric` is `entry-pass-rate`: the share of golden-set entries on which all checks of [AI evals](ai-evals.md) pass.
+- `metric` is `entry-pass-rate`: the share of golden-set entries on which all checks of [AI evals](ai-evals.md) pass. Triage uses `decision-pass-rate`: the share of entries whose output matches the schema and whose derived accept decision is the labelled one ([ADR 0087](../decisions/0087-triage-passes-on-the-decision-with-a-signal-floor.md)).
+- `signalFloor` (triage only, 0.8): the lowest agreement with the labels that each of the five signals must reach in a run.
 - `minimum` is the required share.
 - `tolerance` is the allowed shortfall. A run fails when the share is below `minimum` minus `tolerance`. At 20 entries, 0.05 is exactly one entry.
 

@@ -59,13 +59,19 @@ const SIGNALS: ReadonlyArray<[keyof TriageSignals, keyof TriageEntry["expected"]
 export type TriageEvalReport = EvalReport & {
   /** Share of entries on which the model read each signal as labelled. */
   SignalAgreement: Record<keyof TriageSignals, number>;
+  /** Signals whose agreement is below the threshold's `signalFloor`; these fail the run (ADR 0087). */
+  SignalsBelowFloor: Array<keyof TriageSignals>;
   Precision: number;
   Recall: number;
 };
 
 /**
- * Triage eval (REQ-PROC-008, docs/kt/agents/triage.md): an entry passes when the output
- * matches the schema, every signal agrees with the label, and the code decision follows.
+ * Triage eval (REQ-PROC-008, docs/kt/agents/triage.md). Under `decision-pass-rate`
+ * (ADR 0087) an entry passes when the output matches the schema and the decision that code
+ * derives from its signals is the labelled one; the run passes when that share meets the
+ * threshold and every signal agrees with the labels on at least `signalFloor` of the entries.
+ * Under `entry-pass-rate` an entry also needs every signal to agree. Signal mismatches are
+ * listed as failures either way.
  */
 export async function runTriageEval(
   entries: readonly TriageEntry[],
@@ -106,19 +112,33 @@ export async function runTriageEval(
         failures.push("decision");
       }
     }
+    const blocking =
+      threshold.metric === "decision-pass-rate"
+        ? failures.filter((failure) => !failure.startsWith("signal:"))
+        : failures;
     results.push({
       Id: entry.id,
-      Passed: failures.length === 0,
+      Passed: blocking.length === 0,
       Failures: failures,
       Repairs: repaired.Repairs,
     });
   }
   const n = Math.max(entries.length, 1);
+  const signalAgreement = Object.fromEntries(
+    Object.entries(agree).map(([name, count]) => [name, count / n]),
+  ) as Record<keyof TriageSignals, number>;
+  const belowFloor =
+    threshold.metric === "decision-pass-rate"
+      ? SIGNALS.map(([name]) => name).filter(
+          (name) => signalAgreement[name] < threshold.signalFloor,
+        )
+      : [];
+  const base = report(results, threshold);
   return {
-    ...report(results, threshold),
-    SignalAgreement: Object.fromEntries(
-      Object.entries(agree).map(([name, count]) => [name, count / n]),
-    ) as Record<keyof TriageSignals, number>,
+    ...base,
+    Passed: base.Passed && belowFloor.length === 0,
+    SignalAgreement: signalAgreement,
+    SignalsBelowFloor: belowFloor,
     Precision: predicted === 0 ? 0 : truePositive / predicted,
     Recall: actual === 0 ? 0 : truePositive / actual,
   };

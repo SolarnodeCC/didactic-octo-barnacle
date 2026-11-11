@@ -19,7 +19,6 @@ import {
 /** How the contract is enforced (REQ-AGENT-010): the provider's JSON-schema mode, or prompt only. */
 export type CallOutputMode = "json-schema" | "prompt-only";
 
-/** Model, prompt version, and sampling settings of a step (`model.triage`, `model.extraction`). */
 /**
  * The reasoning setting of a reasoning model, when not its default: thinking off, for a model
  * with an on/off switch (`chat_template_kwargs.enable_thinking`), or an effort level, for a
@@ -27,6 +26,7 @@ export type CallOutputMode = "json-schema" | "prompt-only";
  */
 export type ReasoningSetting = { Thinking: false } | { Effort: "low" | "medium" | "high" };
 
+/** Model, prompt version, and sampling settings of a step (`model.triage`, `model.extraction`). */
 export type ModelConfig = {
   /** Exact, pinned model ID (REQ-AGENT-014), for example `@cf/zai-org/glm-4.7-flash`. */
   Model: string;
