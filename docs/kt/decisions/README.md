@@ -2,7 +2,7 @@
 title: Decisions index
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-10
+last_reviewed: 2026-11-11
 ---
 
 # Architecture decision records
@@ -91,6 +91,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0080](0080-no-outside-expert-review-and-no-claim-of-independent-validation.md) | No outside expert review, and no claim of independent validation | Accepted |
 | [0081](0081-workers-ai-judge-for-a-daily-sample-of-live-output.md) | A Workers AI judge grades a small daily sample of live output | Accepted |
 | [0082](0082-benchmark-round-one-selects-no-model.md) | Benchmark round one selects no model for triage or extraction | Accepted |
+| [0083](0083-benchmark-checkpoint-and-resume.md) | The benchmark command checkpoints each run and can resume a round | Accepted |
 
 ## When an ADR is needed
 

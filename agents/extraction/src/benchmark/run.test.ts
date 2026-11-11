@@ -1,15 +1,23 @@
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { FakeWorkersAi, type FakeReply, type PriceTable } from "@roi/models";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { loadThreshold, loadTriageSet } from "../golden-set.js";
 import { parseBenchmarkArgs, runBenchmarkCommand } from "./cli.js";
-import { formatBenchmarkMarkdown, percentile, runBenchmark, type BenchmarkPlan } from "./run.js";
+import {
+  formatBenchmarkMarkdown,
+  percentile,
+  runBenchmark,
+  type BenchmarkPlan,
+  type RunCheckpoint,
+} from "./run.js";
 
 const MODEL = "@cf/google/gemma-4-26b-a4b-it";
+const REPO_ROOT_FOR_TEST = join(dirname(fileURLToPath(import.meta.url)), "../../../..");
 
 const prices: PriceTable = {
   Version: "2026-11-06",
@@ -129,6 +137,95 @@ describe("REQ-TEST-006: the benchmark round", () => {
     ).rejects.toThrow(/no price/);
   });
 
+  it("REQ-TEST-006: a round resumed after its first run gives the same result without repeating calls", async () => {
+    const wrong = {
+      ...signals(2),
+      Signals: { ...signals(2).Signals, NamedParty: !signals(2).Signals.NamedParty },
+    };
+    const run1: FakeReply[] = [0, 1, 2, 3].map((i) => ({ Kind: "output", Output: signals(i) }));
+    const run2: FakeReply[] = [
+      { Kind: "output", Output: signals(0) },
+      { Kind: "error", Status: 503 },
+      { Kind: "output", Output: signals(1) },
+      // Valid against the schema, so accepted at once; the eval fails it on a signal.
+      { Kind: "output", Output: wrong },
+      { Kind: "output", Output: signals(3) },
+    ];
+    const checkpoints: RunCheckpoint[] = [];
+    const full = await runBenchmark(plan(), inputs, {
+      ...deps([...run1, ...run2]),
+      OnRunComplete: (c) => {
+        checkpoints.push(c);
+      },
+    });
+    expect(checkpoints.map((c) => c.Run)).toEqual([1, 2]);
+    expect(checkpoints[0]?.Records).toHaveLength(4);
+    expect(checkpoints[1]?.Raw).toHaveLength(5);
+
+    // Stopped after run 1: only run 2's replies are left, so a repeated call would fail.
+    const ai = deps(run2);
+    const resumed = await runBenchmark(plan(), inputs, { ...ai, Resume: [checkpoints[0]!] });
+    expect(ai.Ai.Remaining).toBe(0);
+    expect(ai.Ai.Calls).toHaveLength(5);
+    const pick = (r: typeof full) =>
+      r.Summaries.map((s) => ({
+        Runs: s.Runs,
+        Mean: s.MeanPassRate,
+        Stability: s.Stability,
+        Steps: s.Steps,
+        FirstAttemptValid: s.FirstAttemptValid,
+        Failed: s.FailedAfterMaxAttempts,
+        ProviderErrors: s.ProviderErrors,
+        CostEur: s.CostEur,
+      }));
+    expect(pick(resumed)).toEqual(pick(full));
+    expect(resumed.Summaries[0]?.Stability).toBe(0.75);
+    expect(resumed.Records).toHaveLength(full.Records.length);
+    expect(resumed.Raw.map((r) => r.Call)).toEqual(full.Raw.map((r) => r.Call));
+    expect(resumed.TotalCostEur).toBeCloseTo(full.TotalCostEur, 12);
+  });
+
+  it("REQ-NFR-005: the cost of resumed runs counts against the budget", async () => {
+    const big: FakeReply = { Kind: "output", Output: signals(0), InputTokens: 10_000_000 };
+    const checkpoints: RunCheckpoint[] = [];
+    await runBenchmark(plan({ Runs: 1 }), inputs, {
+      ...deps([big, big, big, big]),
+      OnRunComplete: (c) => {
+        checkpoints.push(c);
+      },
+    });
+    // Run 1 spent about EUR 3.6, so with a budget of EUR 0.5 run 2 starts no step.
+    const result = await runBenchmark(plan({ Runs: 2, BudgetEur: 0.5 }), inputs, {
+      ...deps([]),
+      Resume: checkpoints,
+    });
+    expect(result.BudgetReached).toBe(true);
+    expect(result.Summaries[0]?.BudgetRefused).toBe(4);
+    expect(result.Records).toHaveLength(4);
+  });
+
+  it("REQ-TEST-006: a checkpoint of another round or outside the plan is refused", async () => {
+    const checkpoints: RunCheckpoint[] = [];
+    await runBenchmark(plan({ Runs: 1 }), inputs, {
+      ...deps([0, 1, 2, 3].map((i) => ({ Kind: "output" as const, Output: signals(i) }))),
+      OnRunComplete: (c) => {
+        checkpoints.push(c);
+      },
+    });
+    await expect(
+      runBenchmark(plan({ BenchmarkId: "bench-other" }), inputs, {
+        ...deps([]),
+        Resume: checkpoints,
+      }),
+    ).rejects.toThrow(/does not belong/);
+    await expect(
+      runBenchmark(plan(), inputs, {
+        ...deps([]),
+        Resume: [{ ...checkpoints[0]!, Run: 3 }],
+      }),
+    ).rejects.toThrow(/not in the plan/);
+  });
+
   it("REQ-TEST-006: percentiles use the nearest rank", () => {
     expect(percentile([5, 1, 3, 2, 4], 50)).toBe(3);
     expect(percentile([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 95)).toBe(10);
@@ -204,6 +301,105 @@ describe("REQ-TEST-006: the benchmark command", () => {
     expect(readFileSync(join(dir, "raw-responses.jsonl"), "utf8").split("\n")).toHaveLength(
       result.Raw.length,
     );
+  });
+
+  it("REQ-TEST-006: --resume takes a benchmark ID and no plan flags", () => {
+    expect(parseBenchmarkArgs(["--resume", "bench-2026-11-10T12-21-14-407Z"])).toMatchObject({
+      Resume: "bench-2026-11-10T12-21-14-407Z",
+    });
+    expect(parseBenchmarkArgs(["--resume", "bench-1", "--runs", "1"])).toBeNull();
+    expect(parseBenchmarkArgs(["--resume", "bench-1", "--models", "@cf/a/b"])).toBeNull();
+    expect(parseBenchmarkArgs(["--resume", "../bench-1"])).toBeNull();
+    expect(parseBenchmarkArgs(["--resume", "bench-1", "--timeout-ms", "1000"])).toMatchObject({
+      Resume: "bench-1",
+      TimeoutMs: 1000,
+    });
+  });
+
+  it("REQ-TEST-006: a stopped round resumes from its checkpoint file with the stored plan", async () => {
+    const out = mkdtempSync(join(tmpdir(), "roi-bench-"));
+    dirs.push(out);
+    const first = await runBenchmarkCommand(
+      parseBenchmarkArgs([
+        "--dry-run",
+        "--step",
+        "triage",
+        "--runs",
+        "2",
+        "--limit",
+        "3",
+        "--out",
+        out,
+      ])!,
+      {},
+      { Now: () => new Date("2026-11-11T09:00:00Z") },
+    );
+    const dir = join(out, first.BenchmarkId);
+    const stored = JSON.parse(readFileSync(join(dir, "run.json"), "utf8")) as {
+      Limit: number;
+      PriceTableVersion: string;
+    };
+    expect(stored).toMatchObject({ Limit: 3, PriceTableVersion: "2026-11-10" });
+    const lines = readFileSync(join(dir, "checkpoint.jsonl"), "utf8").trim().split("\n");
+    // Two models, two runs each.
+    expect(lines).toHaveLength(4);
+
+    // Keep the first run and a line cut off mid-write, as after a stop.
+    writeFileSync(join(dir, "checkpoint.jsonl"), `${lines[0]}\n${lines[1]!.slice(0, 40)}`);
+    const resumed = await runBenchmarkCommand(
+      parseBenchmarkArgs(["--dry-run", "--resume", first.BenchmarkId, "--out", out])!,
+      {},
+    );
+    expect(resumed.BenchmarkId).toBe(first.BenchmarkId);
+    expect(resumed.Summaries.map((s) => [s.Model, s.Runs.length, s.MeanPassRate])).toEqual(
+      first.Summaries.map((s) => [s.Model, s.Runs.length, s.MeanPassRate]),
+    );
+    expect(resumed.Records.map((r) => r.Id)).toEqual(first.Records.map((r) => r.Id));
+    expect(
+      readFileSync(join(dir, "checkpoint.jsonl"), "utf8")
+        .split("\n")
+        .filter((l) => l.startsWith("{") && l.endsWith("}")),
+    ).toHaveLength(4);
+  });
+
+  it("REQ-NFR-011: a round resumes only with the price table it started with", async () => {
+    const out = mkdtempSync(join(tmpdir(), "roi-bench-"));
+    dirs.push(out);
+    const first = await runBenchmarkCommand(
+      parseBenchmarkArgs([
+        "--dry-run",
+        "--step",
+        "triage",
+        "--runs",
+        "1",
+        "--limit",
+        "1",
+        "--out",
+        out,
+      ])!,
+      {},
+    );
+    const older = join(REPO_ROOT_FOR_TEST, "infrastructure/cloudflare/prices/2026-11-06.json");
+    await expect(
+      runBenchmarkCommand(
+        parseBenchmarkArgs([
+          "--dry-run",
+          "--resume",
+          first.BenchmarkId,
+          "--out",
+          out,
+          "--prices",
+          older,
+        ])!,
+        {},
+      ),
+    ).rejects.toThrow(/price table 2026-11-10, not 2026-11-06/);
+    await expect(
+      runBenchmarkCommand(
+        parseBenchmarkArgs(["--dry-run", "--resume", "bench-none", "--out", out])!,
+        {},
+      ),
+    ).rejects.toThrow(/no round bench-none/);
   });
 
   it("REQ-NFR-003: a live run without credentials stops before any request", async () => {

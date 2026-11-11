@@ -54,6 +54,10 @@ export type BenchmarkDeps = {
   Sleep: (ms: number) => Promise<void>;
   /** Progress lines, for example to stderr. */
   Log?: (line: string) => void;
+  /** Runs that a stopped round already finished: they make no calls and count as they were. */
+  Resume?: readonly RunCheckpoint[];
+  /** Called after every finished run, so the caller can store it before the next one starts. */
+  OnRunComplete?: (checkpoint: RunCheckpoint) => void | Promise<void>;
 };
 
 /** One raw provider response, with the publication and attempt it belongs to. */
@@ -76,6 +80,36 @@ export type RunSummary = {
   SignalAgreement?: TriageEvalReport["SignalAgreement"];
   Precision?: number;
   Recall?: number;
+};
+
+/** How one item of a run ended in `callModel`, without its output. */
+export type ItemOutcome = {
+  Ok: boolean;
+  /** Accepted on the first attempt. */
+  FirstAttempt: boolean;
+  /** Accepted after a repair (REQ-AGENT-011). */
+  Repaired: boolean;
+  /** Refused before any call because the budget was spent; not counted as attempted. */
+  BudgetExhausted: boolean;
+};
+
+/**
+ * Everything one finished run of one step and model leaves behind: enough to resume a round
+ * after it without new calls, and to compute the summary, stability included, as if the round
+ * had not stopped.
+ */
+export type RunCheckpoint = {
+  BenchmarkId: string;
+  Step: BenchmarkStep;
+  Model: string;
+  Run: number;
+  Summary: RunSummary;
+  /** Pass or fail per golden-set entry ID. */
+  EntryPassed: Record<string, boolean>;
+  Outcomes: ItemOutcome[];
+  BudgetRefused: number;
+  Records: ModelCallRecord[];
+  Raw: RawCall[];
 };
 
 export type ModelSummary = {
@@ -125,9 +159,11 @@ class RecordingBinding implements WorkersAiBinding {
   readonly Pending: Array<
     Omit<RawCall, "BenchmarkId" | "Step" | "Model" | "Run" | "PublicationId">
   > = [];
-  private calls = 0;
-
-  constructor(private readonly inner: WorkersAiBinding) {}
+  constructor(
+    private readonly inner: WorkersAiBinding,
+    /** Calls numbered before this binding started, when a round resumes. */
+    private calls = 0,
+  ) {}
 
   get aiGatewayLogId(): string | null {
     return this.inner.aiGatewayLogId ?? null;
@@ -165,6 +201,14 @@ class BudgetUsage implements ModelUsageStore {
   SpentEur = 0;
   Refused = 0;
   constructor(private readonly limitEur: number) {}
+  /** Counts the records of a resumed run as if its calls had just been made. */
+  replay(records: readonly ModelCallRecord[], refused: number): void {
+    for (const record of records) {
+      this.Records.push(record);
+      this.SpentEur += record.Cost.Amount;
+    }
+    this.Refused += refused;
+  }
   budgetAllows(): Promise<boolean> {
     const allowed = this.SpentEur < this.limitEur;
     if (!allowed) {
@@ -179,12 +223,90 @@ class BudgetUsage implements ModelUsageStore {
   }
 }
 
+function outcomeOf(result: CallModelResult<unknown>): ItemOutcome {
+  return {
+    Ok: result.Ok,
+    FirstAttempt: result.Ok && result.Attempts === 1,
+    Repaired: result.Ok && result.Repairs.length > 0,
+    BudgetExhausted: !result.Ok && result.Reason === "budget-exhausted",
+  };
+}
+
+/** The plan's metrics for one step and model, from its finished runs. */
+export function summarizeRuns(
+  step: BenchmarkStep,
+  model: string,
+  checkpoints: readonly RunCheckpoint[],
+): ModelSummary {
+  const runs = checkpoints.map((c) => c.Summary);
+  const passedByEntry = new Map<string, boolean[]>();
+  for (const checkpoint of checkpoints) {
+    for (const [id, passed] of Object.entries(checkpoint.EntryPassed)) {
+      passedByEntry.set(id, [...(passedByEntry.get(id) ?? []), passed]);
+    }
+  }
+  const outcomes = checkpoints.flatMap((c) => c.Outcomes);
+  const attempted = outcomes.filter((o) => !o.BudgetExhausted);
+  const ok = attempted.filter((o) => o.Ok);
+  const records = checkpoints.flatMap((c) => c.Records);
+  const latencies = records.filter((r) => r.Outcome === "ok").map((r) => r.LatencyMs);
+  const cost = records.reduce((sum, r) => sum + r.Cost.Amount, 0);
+  const passRates = runs.map((r) => r.PassRate);
+  const stableEntries = [...passedByEntry.values()].filter(
+    (passes) => passes.every((p) => p) || passes.every((p) => !p),
+  ).length;
+  return {
+    Step: step,
+    Model: model,
+    Runs: runs,
+    MeanPassRate: passRates.reduce((a, b) => a + b, 0) / Math.max(passRates.length, 1),
+    MinPassRate: passRates.length === 0 ? 0 : Math.min(...passRates),
+    Stability: passedByEntry.size === 0 ? 0 : stableEntries / passedByEntry.size,
+    Steps: attempted.length,
+    FirstAttemptValid:
+      attempted.length === 0 ? 0 : ok.filter((o) => o.FirstAttempt).length / attempted.length,
+    RepairRate: ok.length === 0 ? 0 : ok.filter((o) => o.Repaired).length / ok.length,
+    FailedAfterMaxAttempts:
+      attempted.length === 0 ? 0 : (attempted.length - ok.length) / attempted.length,
+    BudgetRefused: checkpoints.reduce((sum, c) => sum + c.BudgetRefused, 0),
+    ProviderErrors: records.filter((r) => r.Outcome === "provider-error").length,
+    LatencyMsP50: percentile(latencies, 50),
+    LatencyMsP95: percentile(latencies, 95),
+    CostEur: cost,
+    CostPerStepEur: attempted.length === 0 ? 0 : cost / attempted.length,
+  };
+}
+
+function checkpointKey(step: BenchmarkStep, model: string, run: number): string {
+  return `${step}|${model}|${run}`;
+}
+
 export async function runBenchmark(
   plan: BenchmarkPlan,
   inputs: BenchmarkInputs,
   deps: BenchmarkDeps,
 ): Promise<BenchmarkResult> {
-  const binding = new RecordingBinding(deps.Ai);
+  const resumed = new Map<string, RunCheckpoint>();
+  for (const checkpoint of deps.Resume ?? []) {
+    if (checkpoint.BenchmarkId !== plan.BenchmarkId) {
+      throw new Error(
+        `checkpoint of ${checkpoint.BenchmarkId} does not belong to ${plan.BenchmarkId}`,
+      );
+    }
+    if (
+      !plan.Steps.includes(checkpoint.Step) ||
+      !plan.Models[checkpoint.Step].includes(checkpoint.Model) ||
+      checkpoint.Run < 1 ||
+      checkpoint.Run > plan.Runs
+    ) {
+      throw new Error(
+        `checkpoint ${checkpoint.Step} ${checkpoint.Model} run ${checkpoint.Run} is not in the plan`,
+      );
+    }
+    resumed.set(checkpointKey(checkpoint.Step, checkpoint.Model, checkpoint.Run), checkpoint);
+  }
+  const lastCall = Math.max(0, ...[...resumed.values()].flatMap((c) => c.Raw.map((r) => r.Call)));
+  const binding = new RecordingBinding(deps.Ai, lastCall);
   const usage = new BudgetUsage(plan.BudgetEur);
   const callDeps: CallModelDeps = {
     Ai: binding,
@@ -205,16 +327,26 @@ export async function runBenchmark(
       if (deps.Prices.Models[model] === undefined) {
         throw new Error(`model ${model} has no price in table ${deps.Prices.Version}`);
       }
-      const results: Array<{ Run: number; Result: CallModelResult<unknown> }> = [];
-      const runs: RunSummary[] = [];
-      const passedByEntry = new Map<string, boolean[]>();
-      const recordsBefore = usage.Records.length;
-      const refusedBefore = usage.Refused;
+      const checkpoints: RunCheckpoint[] = [];
 
       for (let run = 1; run <= plan.Runs; run += 1) {
+        const done = resumed.get(checkpointKey(step, model, run));
+        if (done !== undefined) {
+          usage.replay(done.Records, done.BudgetRefused);
+          raw.push(...done.Raw);
+          checkpoints.push(done);
+          deps.Log?.(
+            `${step} ${model} run ${run}/${plan.Runs}: resumed, pass rate ${done.Summary.PassRate.toFixed(3)}, spent EUR ${usage.SpentEur.toFixed(4)}`,
+          );
+          continue;
+        }
         const runId = `${plan.BenchmarkId}:${step}:${model}:r${run}`;
+        const recordsBefore = usage.Records.length;
+        const rawBefore = raw.length;
+        const refusedBefore = usage.Refused;
+        const outcomes: ItemOutcome[] = [];
         const onResult = (publicationId: string, result: CallModelResult<unknown>): void => {
-          results.push({ Run: run, Result: result });
+          outcomes.push(outcomeOf(result));
           for (const call of binding.Pending.splice(0)) {
             raw.push({
               BenchmarkId: plan.BenchmarkId,
@@ -234,73 +366,50 @@ export async function runBenchmark(
           OnResult: onResult,
         };
         let report: EvalReport | TriageEvalReport;
+        let summary: RunSummary;
         if (step === "triage") {
-          report = await runTriageEval(
+          const triage = await runTriageEval(
             inputs.Triage.Entries,
             triageModelFn(options),
             inputs.Triage.Threshold,
           );
-          const triage = report as TriageEvalReport;
-          runs.push({
+          report = triage;
+          summary = {
             Run: run,
             PassRate: triage.PassRate,
             ThresholdPassed: triage.Passed,
             SignalAgreement: triage.SignalAgreement,
             Precision: triage.Precision,
             Recall: triage.Recall,
-          });
+          };
         } else {
           report = await runExtractionEval(
             inputs.Extraction.Entries,
             extractionModelFn(options),
             inputs.Extraction.Threshold,
           );
-          runs.push({ Run: run, PassRate: report.PassRate, ThresholdPassed: report.Passed });
+          summary = { Run: run, PassRate: report.PassRate, ThresholdPassed: report.Passed };
         }
-        for (const entry of report.Entries) {
-          passedByEntry.set(entry.Id, [...(passedByEntry.get(entry.Id) ?? []), entry.Passed]);
-        }
+        const checkpoint: RunCheckpoint = {
+          BenchmarkId: plan.BenchmarkId,
+          Step: step,
+          Model: model,
+          Run: run,
+          Summary: summary,
+          EntryPassed: Object.fromEntries(report.Entries.map((e) => [e.Id, e.Passed])),
+          Outcomes: outcomes,
+          BudgetRefused: usage.Refused - refusedBefore,
+          Records: usage.Records.slice(recordsBefore),
+          Raw: raw.slice(rawBefore),
+        };
+        checkpoints.push(checkpoint);
+        await deps.OnRunComplete?.(checkpoint);
         deps.Log?.(
           `${step} ${model} run ${run}/${plan.Runs}: pass rate ${report.PassRate.toFixed(3)}, spent EUR ${usage.SpentEur.toFixed(4)}`,
         );
       }
 
-      const records = usage.Records.slice(recordsBefore);
-      const attempted = results.filter(
-        (r) => r.Result.Ok || r.Result.Reason !== "budget-exhausted",
-      );
-      const ok = attempted.filter((r) => r.Result.Ok);
-      const latencies = records.filter((r) => r.Outcome === "ok").map((r) => r.LatencyMs);
-      const cost = records.reduce((sum, r) => sum + r.Cost.Amount, 0);
-      const passRates = runs.map((r) => r.PassRate);
-      const stableEntries = [...passedByEntry.values()].filter(
-        (passes) => passes.every((p) => p) || passes.every((p) => !p),
-      ).length;
-      summaries.push({
-        Step: step,
-        Model: model,
-        Runs: runs,
-        MeanPassRate: passRates.reduce((a, b) => a + b, 0) / Math.max(passRates.length, 1),
-        MinPassRate: passRates.length === 0 ? 0 : Math.min(...passRates),
-        Stability: passedByEntry.size === 0 ? 0 : stableEntries / passedByEntry.size,
-        Steps: attempted.length,
-        FirstAttemptValid:
-          attempted.length === 0
-            ? 0
-            : ok.filter((r) => r.Result.Ok && r.Result.Attempts === 1).length / attempted.length,
-        RepairRate:
-          ok.length === 0
-            ? 0
-            : ok.filter((r) => r.Result.Ok && r.Result.Repairs.length > 0).length / ok.length,
-        FailedAfterMaxAttempts:
-          attempted.length === 0 ? 0 : (attempted.length - ok.length) / attempted.length,
-        BudgetRefused: usage.Refused - refusedBefore,
-        ProviderErrors: records.filter((r) => r.Outcome === "provider-error").length,
-        LatencyMsP50: percentile(latencies, 50),
-        LatencyMsP95: percentile(latencies, 95),
-        CostEur: cost,
-        CostPerStepEur: attempted.length === 0 ? 0 : cost / attempted.length,
-      });
+      summaries.push(summarizeRuns(step, model, checkpoints));
     }
   }
 
