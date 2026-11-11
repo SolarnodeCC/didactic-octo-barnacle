@@ -4,7 +4,7 @@ industry: other
 expected:
   candidates:
     - finding: "Python developers migrate existing test suites from unittest to Pytest by hand, a manual and time-consuming process."
-      evidenceQuote: 'migrating existing suites from \texttt{unittest} remains a manual and time-consuming process'
+      evidenceQuote: "migrating existing suites from unittest remains a manual and time-consuming process"
       customer: "Python developers"
       customerQuote: "Python developers rely on two major testing frameworks"
       whyNow: null

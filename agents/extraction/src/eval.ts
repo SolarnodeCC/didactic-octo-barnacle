@@ -1,4 +1,5 @@
 import {
+  cleanLatexMarkup,
   decideTriage,
   extractionMissingQuotes,
   extractionOutputSchema,
@@ -165,7 +166,10 @@ export async function runExtractionEval(
       failures.push("schema");
     } else {
       failures.push(
-        ...extractionMissingQuotes(parsed.data, entry.Publication.Text).map((f) => `quote:${f}`),
+        // The step reads the text without LaTeX markup and quotes from it (ADR 0089).
+        ...extractionMissingQuotes(parsed.data, cleanLatexMarkup(entry.Publication.Text)).map(
+          (f) => `quote:${f}`,
+        ),
       );
       if (parsed.data.Candidates.length !== entry.expected.candidates.length) {
         failures.push("candidate-count");

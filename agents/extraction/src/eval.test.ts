@@ -184,6 +184,21 @@ describe("REQ-PROC-009: the extraction eval checks schema, quotes, and candidate
     expect(report.Passed).toBe(true);
   });
 
+  it("REQ-AGENT-008: a quote of the text without LaTeX markup passes (ADR 0089)", async () => {
+    const entry = extractionSet.find((e) => e.Publication.Abstract.includes("\\texttt{Pytest}"));
+    expect(entry).toBeDefined();
+    const oracle = extractionOracle([entry!]);
+    const cleaned: ModelFn = async (publication) => {
+      const output = (await oracle(publication)) as {
+        Candidates: Array<{ EvidenceQuote: string }>;
+      };
+      output.Candidates[0]!.EvidenceQuote = "While Pytest offers simpler assertions";
+      return output;
+    };
+    const report = await runExtractionEval([entry!], cleaned, loadThreshold("extraction"));
+    expect(report.Entries[0]?.Failures).toEqual([]);
+  });
+
   it("REQ-AGENT-008: a paraphrased quote fails the entry", async () => {
     const oracle = extractionOracle(extractionSet);
     const paraphrase: ModelFn = async (publication) => {

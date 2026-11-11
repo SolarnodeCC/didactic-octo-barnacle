@@ -51,7 +51,7 @@ function run(output: unknown, input: ExtractionInput = publication) {
 describe("REQ-TEST-002: extraction contract test", () => {
   it("REQ-TEST-002: AC1 a valid output with all quotes in the text passes", async () => {
     const { Result } = await run(valid);
-    expect(Result).toMatchObject({ Ok: true, Attempts: 1, PromptVersion: "extraction@3" });
+    expect(Result).toMatchObject({ Ok: true, Attempts: 1, PromptVersion: "extraction@4" });
   });
 
   it("REQ-TEST-002: AC1 a missing field, a wrong type, and an out-of-range value each fail", async () => {
@@ -144,6 +144,58 @@ describe("REQ-PROC-009: a quotable problem and customer", () => {
     expect(extractionSystem(3)).toContain(
       "A burden that belongs to a population or a sector as a whole",
     );
+    // The reasons of the labels without a candidate (ADR 0090).
+    expect(extractionSystem(3)).toContain("A system, tool, or model is never the customer");
+    expect(extractionSystem(3)).toContain("models a risk for observers such as supervisors");
+  });
+
+  it("REQ-PROC-009: AC4 a qualified organization type counts and a bare one does not", () => {
+    const system = extractionSystem(3);
+    expect(system).toContain(
+      "An organization type or role qualified by what it does, runs, or works with counts as a customer",
+    );
+    expect(system).toContain('A bare "organizations", "companies", or "developers" does not.');
+  });
+
+  it("REQ-PROC-009: extraction does not filter by industry; Relevance judges industry fit", () => {
+    const system = extractionSystem(3);
+    expect(system).toContain("Find candidates in any industry");
+    expect(system).not.toContain("out of industry scope");
+    expect(system).not.toContain("Target industries:");
+  });
+});
+
+describe("REQ-AGENT-008: the step reads and quotes the title and abstract without LaTeX markup", () => {
+  it("REQ-AGENT-008: the text sent and the quote text are the cleaned text", async () => {
+    const input: ExtractionInput = {
+      ...publication,
+      Title: "Migrating \\texttt{unittest} suites",
+      Abstract:
+        "Grid operators say migration remains manual for 74\\% of \\textit{regular} suites ($p < 0.001$).",
+    };
+    const built = buildExtractionPrompt(input);
+    expect(built.QuoteText).toContain("Title: Migrating unittest suites");
+    expect(built.QuoteText).toContain(
+      "Grid operators say migration remains manual for 74% of regular suites (p < 0.001).",
+    );
+    expect(built.Prompt.User).not.toContain("\\");
+    const { Result } = await run(
+      {
+        ...valid,
+        Candidates: [
+          {
+            ...candidate,
+            EvidenceQuote: "migration remains manual for 74% of regular suites",
+            WhyNow: null,
+            WhyNowQuote: null,
+            CurrentAlternative: null,
+            AlternativeQuote: null,
+          },
+        ],
+      },
+      input,
+    );
+    expect(Result).toMatchObject({ Ok: true });
   });
 });
 
