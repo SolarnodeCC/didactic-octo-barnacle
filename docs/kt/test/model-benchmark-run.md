@@ -2,7 +2,7 @@
 title: Running a model benchmark round
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-10
+last_reviewed: 2026-11-11
 related: [REQ-NFR-003, REQ-NFR-005, REQ-NFR-011, REQ-AGENT-012, REQ-TEST-006]
 ---
 
@@ -78,14 +78,31 @@ Each round writes a directory `<out>/<benchmark id>/` with these files:
 
 | File | Content |
 |---|---|
+| `run.json` | The plan, the item limit, and the price table version, written when the round starts |
+| `checkpoint.jsonl` | One line per finished run of a step and model: its summary, pass or fail per item, call outcomes, usage records, and raw responses. Written as each run ends, so a stopped round can resume |
 | `report.md` | The table per step and model, plus signal agreement, precision, and recall for triage. The table columns are mean and minimum pass rate, whether the threshold was met in every run, stability, first-attempt validity, repair rate, share failed after the last attempt, provider errors, p50 and p95 latency, and cost per step |
-| `summary.json` | The same figures, with the plan, the price table version, and the total cost |
+| `summary.json` | The same figures, with the plan, the item limit, the price table version, and the total cost |
 | `model-calls.jsonl` | One usage record per attempt, with no prompt or publication text |
 | `raw-responses.jsonl` | Every provider response or error, with its step, model, run, and publication, so a round can be graded again without new calls |
 
 With `--r2-bucket`, `raw-responses.jsonl` and `model-calls.jsonl` are also stored under `benchmark/<benchmark id>/` in that bucket. Use a staging bucket: the items are public abstracts (CC0), and nothing from production is involved.
 
+`report.md`, `summary.json`, `model-calls.jsonl`, and `raw-responses.jsonl` are written when the round ends.
+
 Stability is the share of items whose pass or fail is the same in all runs. Extraction is scored on the deterministic checks only: schema, verbatim quotes, and candidate count. The model judge for `Finding` and `Customer` (OQ-020) is not part of a round yet.
+
+## Stopping and resuming
+
+A round of several hours can stop part-way, for example when the machine that runs it is replaced ([ADR 0083](../decisions/0083-benchmark-checkpoint-and-resume.md)). Continue it with its benchmark ID:
+
+```bash
+pnpm --filter @roi/agent-extraction benchmark --resume bench-2026-11-10T12-21-14-407Z --out "$PWD/benchmark-out"
+```
+
+- The plan, the item limit, and the budget come from `run.json`, so `--resume` takes no `--step`, `--models`, `--runs`, `--limit`, `--budget-eur`, or `--output-mode`. Transport flags such as `--gateway`, `--timeout-ms`, and `--min-interval-ms` may be given again.
+- Runs in `checkpoint.jsonl` make no new calls. Their records, raw responses, and cost count as before, so the budget, stability, and the report are those of an uninterrupted round, and record IDs and call numbers continue where they stopped.
+- A run that was cut off is run again from its first item. A last line cut off mid-write is ignored.
+- The round must resume with the price table it started with; a different version is refused.
 
 ## After a round
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -19,6 +19,7 @@ import {
   type BenchmarkPlan,
   type BenchmarkResult,
   type BenchmarkStep,
+  type RunCheckpoint,
 } from "./run.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -36,6 +37,11 @@ export const BENCHMARK_USAGE = [
   "                     [--output-mode json-schema|prompt-only] [--prices <file>]",
   "                     [--r2-bucket <name>] [--min-interval-ms <n>] [--timeout-ms <n>]",
   "                     [--no-stream] [--dry-run]",
+  "       roi-benchmark --resume <benchmark id> [--out <dir>] [--gateway <id>] [--prices <file>] ...",
+  "",
+  "Every finished run is appended to <out>/<benchmark id>/checkpoint.jsonl. --resume continues",
+  "that round with its stored plan and skips the runs already finished; it takes no plan flags",
+  "(--step, --models, --runs, --limit, --budget-eur, --output-mode).",
   "",
   "Live runs read CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN (Workers AI Read) from the",
   "environment. --dry-run answers with the golden-set labels and needs no credentials.",
@@ -58,7 +64,26 @@ export type BenchmarkArgs = {
   /** Stream responses, so a slow reasoning model is not cut off by a proxy (ADR 0076). */
   Stream: boolean;
   DryRun: boolean;
+  /** The benchmark ID of a stopped round to continue, or null for a new round. */
+  Resume: string | null;
 };
+
+/** The plan of a round as stored next to its checkpoints, so `--resume` can continue it. */
+export type StoredRun = {
+  Plan: BenchmarkPlan;
+  Limit: number | null;
+  PriceTableVersion: string;
+};
+
+const PLAN_FLAGS = new Set([
+  "--step",
+  "--models",
+  "--runs",
+  "--limit",
+  "--budget-eur",
+  "--output-mode",
+]);
+const BENCHMARK_ID = /^bench-[0-9A-Za-z-]+$/u;
 
 function positive(value: string | undefined, integer: boolean): number | null {
   if (value === undefined) {
@@ -88,7 +113,9 @@ export function parseBenchmarkArgs(args: readonly string[]): BenchmarkArgs | nul
     TimeoutMs: 600_000,
     Stream: true,
     DryRun: false,
+    Resume: null,
   };
+  let planFlags = false;
   for (let i = 0; i < args.length; i += 1) {
     const flag = args[i];
     if (flag === "--dry-run") {
@@ -104,7 +131,14 @@ export function parseBenchmarkArgs(args: readonly string[]): BenchmarkArgs | nul
     if (value === undefined) {
       return null;
     }
+    if (flag !== undefined && PLAN_FLAGS.has(flag)) {
+      planFlags = true;
+    }
     switch (flag) {
+      case "--resume":
+        if (!BENCHMARK_ID.test(value)) return null;
+        parsed.Resume = value;
+        break;
       case "--step":
         if (value === "all") {
           parsed.Steps = ["triage", "extraction"];
@@ -171,6 +205,10 @@ export function parseBenchmarkArgs(args: readonly string[]): BenchmarkArgs | nul
       default:
         return null;
     }
+  }
+  if (parsed.Resume !== null && planFlags) {
+    // A resumed round keeps the plan it started with.
+    return null;
   }
   if (parsed.Models !== null && parsed.Steps.length !== 1) {
     // Models are named per step; with --models choose one step.
@@ -241,25 +279,60 @@ export async function runBenchmarkCommand(
 ): Promise<BenchmarkResult> {
   const now = options.Now ?? (() => new Date());
   const prices = PriceTableSchema.parse(JSON.parse(readFileSync(args.Prices, "utf8")));
-  const triage = loadTriageSet().slice(0, args.Limit ?? undefined);
-  const extraction = loadExtractionSet().slice(0, args.Limit ?? undefined);
-  const models: Record<BenchmarkStep, string[]> = {
-    triage: args.Steps.includes("triage") ? (args.Models ?? ROUND_ONE.triage) : [],
-    extraction: args.Steps.includes("extraction") ? (args.Models ?? ROUND_ONE.extraction) : [],
-  };
-  const benchmarkId = `bench-${now().toISOString().replace(/[:.]/gu, "-")}${args.DryRun ? "-dry" : ""}`;
-  const plan: BenchmarkPlan = {
-    BenchmarkId: benchmarkId,
-    Steps: args.Steps,
-    Models: models,
-    Runs: args.Runs,
-    OutputMode: args.OutputMode,
-    BudgetEur: args.BudgetEur,
-  };
+
+  let stored: StoredRun;
+  let resume: RunCheckpoint[] = [];
+  if (args.Resume !== null) {
+    const dir = join(args.Out, args.Resume);
+    if (!existsSync(join(dir, "run.json"))) {
+      throw new Error(`no round ${args.Resume} to resume in ${args.Out}`);
+    }
+    stored = JSON.parse(readFileSync(join(dir, "run.json"), "utf8")) as StoredRun;
+    if (stored.PriceTableVersion !== prices.Version) {
+      throw new Error(
+        `round ${args.Resume} uses price table ${stored.PriceTableVersion}, not ${prices.Version}`,
+      );
+    }
+    const lines = existsSync(join(dir, "checkpoint.jsonl"))
+      ? readFileSync(join(dir, "checkpoint.jsonl"), "utf8").split("\n")
+      : [];
+    // A line cut off by a stop mid-write is ignored; that run is simply run again.
+    resume = lines.flatMap((line) => {
+      if (line.trim() === "") return [];
+      try {
+        return [JSON.parse(line) as RunCheckpoint];
+      } catch {
+        return [];
+      }
+    });
+  } else {
+    const models: Record<BenchmarkStep, string[]> = {
+      triage: args.Steps.includes("triage") ? (args.Models ?? ROUND_ONE.triage) : [],
+      extraction: args.Steps.includes("extraction") ? (args.Models ?? ROUND_ONE.extraction) : [],
+    };
+    stored = {
+      Plan: {
+        BenchmarkId: `bench-${now().toISOString().replace(/[:.]/gu, "-")}${args.DryRun ? "-dry" : ""}`,
+        Steps: args.Steps,
+        Models: models,
+        Runs: args.Runs,
+        OutputMode: args.OutputMode,
+        BudgetEur: args.BudgetEur,
+      },
+      Limit: args.Limit,
+      PriceTableVersion: prices.Version,
+    };
+  }
+  const plan = stored.Plan;
+  const benchmarkId = plan.BenchmarkId;
+  const models = plan.Models;
+  const runs = plan.Runs;
+  const triage = loadTriageSet().slice(0, stored.Limit ?? undefined);
+  const extraction = loadExtractionSet().slice(0, stored.Limit ?? undefined);
 
   let ai;
   if (args.DryRun) {
-    ai = new FakeWorkersAi(labelReplies(args.Steps, args.Runs, models, triage, extraction));
+    ai = new FakeWorkersAi(labelReplies(plan.Steps, runs, models, triage, extraction));
   } else {
     const accountId = env.CLOUDFLARE_ACCOUNT_ID?.trim() ?? "";
     const apiToken = env.CLOUDFLARE_API_TOKEN?.trim() ?? "";
@@ -273,7 +346,19 @@ export async function runBenchmarkCommand(
     });
   }
 
-  let id = 0;
+  // The round's folder is created only once the binding accepted the credentials, so a run
+  // that cannot start leaves nothing behind.
+  const outDir = join(args.Out, benchmarkId);
+  mkdirSync(outDir, { recursive: true });
+  if (args.Resume === null) {
+    writeFileSync(join(outDir, "run.json"), `${JSON.stringify(stored, null, 2)}\n`);
+  }
+
+  // Record IDs continue after those of the resumed runs.
+  let id = Math.max(
+    0,
+    ...resume.flatMap((c) => c.Records.map((r) => Number(/-mc(\d+)$/u.exec(r.Id)?.[1] ?? 0))),
+  );
   const result = await runBenchmark(
     plan,
     {
@@ -291,11 +376,13 @@ export async function runBenchmarkCommand(
         ? () => Promise.resolve()
         : (ms) => new Promise((done) => setTimeout(done, ms)),
       ...(options.Log ? { Log: options.Log } : {}),
+      Resume: resume,
+      OnRunComplete: (checkpoint) => {
+        appendFileSync(join(outDir, "checkpoint.jsonl"), `${JSON.stringify(checkpoint)}\n`);
+      },
     },
   );
 
-  const outDir = join(args.Out, benchmarkId);
-  mkdirSync(outDir, { recursive: true });
   const rawLines = result.Raw.map((call) => JSON.stringify(call)).join("\n");
   writeFileSync(join(outDir, "report.md"), formatBenchmarkMarkdown(result, plan));
   writeFileSync(
@@ -304,6 +391,7 @@ export async function runBenchmarkCommand(
       {
         Plan: plan,
         PriceTableVersion: prices.Version,
+        Limit: stored.Limit,
         TotalCostEur: result.TotalCostEur,
         BudgetReached: result.BudgetReached,
         Summaries: result.Summaries,
