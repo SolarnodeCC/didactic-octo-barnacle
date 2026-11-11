@@ -2,7 +2,7 @@
 title: Phase 2 design
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-10
+last_reviewed: 2026-11-11
 related: [REQ-DATA-006, REQ-DATA-008, REQ-PROC-001, REQ-PROC-002, REQ-PROC-003, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-PROC-007, REQ-PROC-008, REQ-PROC-009, REQ-NFR-003, REQ-NFR-005, REQ-NFR-010, REQ-NFR-011]
 ---
 
@@ -15,7 +15,7 @@ Tables, configuration keys, and bindings are in [schema](schema.md). Behavior th
 | Package | Phase 2 additions |
 |---|---|
 | `packages/models` | `MoneySchema`; schemas for the model-call record, processing run, triage decision row, extraction result, and candidate row; the new queue message types and `CandidateId` in the message IDs; the `callModel` helper (ADR 0003) and its Workers AI and budget interfaces |
-| `packages/prompts` (new) | One versioned prompt per step (`triage@2`, `extraction@2`, ADR 0076), the sampling settings that go with it, and the delimiters that mark publication text as data |
+| `packages/prompts` (new) | One versioned prompt per step (`triage@2`, `extraction@3`, ADR 0076, ADR 0085), the sampling settings that go with it, and the delimiters that mark publication text as data |
 | `packages/vector-store` (new) | `embedTexts`, `upsertPublicationVectors`, `deletePublicationVectors`, `searchPublications`, the index registry, and the recall-at-10 corpus and evaluator (ADR 0056, ADR 0057) |
 | `agents/extraction` | `runTriageStep` and `runExtractionStep`: pure functions from input to validated output through `callModel`; an eval command that runs the existing eval runner on `callModel` for the benchmark |
 | `apps/pipeline` | Consumers for embedding, triage, extraction, and text extraction; the admission cron; the retraction check; budget handling; the thin-slice Workflow with stub steps; run-report fields for processing |

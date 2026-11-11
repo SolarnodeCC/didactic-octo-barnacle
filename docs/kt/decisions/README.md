@@ -93,6 +93,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0082](0082-benchmark-round-one-selects-no-model.md) | Benchmark round one selects no model for triage or extraction | Accepted |
 | [0083](0083-benchmark-checkpoint-and-resume.md) | The benchmark command checkpoints each run and can resume a round | Accepted |
 | [0084](0084-triage-label-review-round-two.md) | Round-two review of the triage golden-set labels | Accepted |
+| [0085](0085-one-primary-extraction-candidate.md) | Extraction returns one primary candidate | Accepted |
 
 ## When an ADR is needed
 
