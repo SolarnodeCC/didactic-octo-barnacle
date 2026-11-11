@@ -34,6 +34,11 @@ describe("REQ-NFR-005: processing configuration", () => {
         OutputMode: "json-schema",
         Reasoning: { Thinking: false },
       },
+      ExtractionModel: {
+        Model: "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
+        PromptVersion: "extraction@4",
+        OutputMode: "json-schema",
+      },
     });
   });
 
@@ -41,5 +46,12 @@ describe("REQ-NFR-005: processing configuration", () => {
     const { TriageModel } = DEFAULT_PROCESSING_CONFIG;
     expect(TriageModel.Model).toMatch(/^@cf\/[a-z0-9-]+\/[a-z0-9.-]+$/);
     expect(TriageModel.Reasoning).toEqual({ Thinking: false });
+  });
+
+  it("REQ-AGENT-014: model.extraction pins the model of benchmark round three at its default reasoning", () => {
+    const { ExtractionModel } = DEFAULT_PROCESSING_CONFIG;
+    expect(ExtractionModel.Model).toMatch(/^@cf\/[a-z0-9-]+\/[a-z0-9.-]+$/);
+    expect(ExtractionModel.PromptVersion).toBe("extraction@4");
+    expect(ExtractionModel.Reasoning).toBeUndefined();
   });
 });

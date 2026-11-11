@@ -25,6 +25,12 @@ export type ProcessingConfig = {
    * OQ-036). Temperature and output budget come with the prompt version (`TRIAGE_SAMPLING`).
    */
   TriageModel: ModelConfig;
+  /**
+   * `model.extraction`: the model of the extraction step, chosen by benchmark round three
+   * (ADR 0091, OQ-036), at its default reasoning. Temperature and output budget come with the
+   * prompt version (`EXTRACTION_SAMPLING`).
+   */
+  ExtractionModel: ModelConfig;
 };
 
 export const DEFAULT_PROCESSING_CONFIG: ProcessingConfig = {
@@ -40,6 +46,11 @@ export const DEFAULT_PROCESSING_CONFIG: ProcessingConfig = {
     PromptVersion: "triage@2",
     OutputMode: "json-schema",
     Reasoning: { Thinking: false },
+  },
+  ExtractionModel: {
+    Model: "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
+    PromptVersion: "extraction@4",
+    OutputMode: "json-schema",
   },
 };
 

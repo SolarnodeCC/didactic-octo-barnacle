@@ -90,7 +90,8 @@ Read by `loadProcessingConfig` in `apps/pipeline/src/processing-config.ts`. Only
 | `extraction.full_text_max_chars` | `24000` | Cut before the call; the quote check uses the cut text |
 | `retraction.lookback_days` | `30` | How far back the weekly retraction check looks (ADR 0061) |
 | `model.price_table_version` | `2026-11-11` | Price table used when the gateway gives no cost (REQ-NFR-011 AC2); it has cached-input prices (ADR 0078) |
-| `model.triage` | `@cf/google/gemma-4-26b-a4b-it`, thinking off, prompt `triage@2`, `json-schema` output | Chosen by benchmark round two (ADR 0088); temperature 0 and at most 8192 output tokens come with the prompt version. `model.extraction` is not set yet (OQ-036) |
+| `model.triage` | `@cf/google/gemma-4-26b-a4b-it`, thinking off, prompt `triage@2`, `json-schema` output | Chosen by benchmark round two (ADR 0088); temperature 0 and at most 8192 output tokens come with the prompt version |
+| `model.extraction` | `@cf/deepseek-ai/deepseek-v4.1-flash-1017` at its default reasoning, prompt `extraction@4`, `json-schema` output | Chosen by benchmark round three (ADR 0091); temperature 0 and at most 8192 output tokens come with the prompt version |
 
 ## Budgets
 
