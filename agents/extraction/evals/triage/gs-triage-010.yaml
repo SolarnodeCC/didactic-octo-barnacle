@@ -5,7 +5,7 @@ expected:
     namedParty: false
     statedHarm: true
     trigger: false
-    existingAlternative: true
+    existingAlternative: false
     adoptable: true
   accepted: false
   reason: low-score
@@ -13,6 +13,6 @@ basis:
   namedParty: "none: no role named"
   statedHarm: "session hijacking and behavioral anomalies"
   trigger: "none"
-  existingAlternative: "fixed-text password authentication"
+  existingAlternative: "none: fixed-text password authentication is part of the proposed system"
   adoptable: "a two-level keystroke authentication system"
-notes: "Stated harm and an adoptable system, but no named party; rejected because NamedParty is required. Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request."
+notes: "Stated harm and an adoptable system, but no named party; rejected because NamedParty is required. Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request. Round-two label review (2026-11-11, ADR 0084), confirmed by the owner: existingAlternative set to false."

@@ -5,7 +5,7 @@ expected:
     namedParty: false
     statedHarm: true
     trigger: false
-    existingAlternative: false
+    existingAlternative: true
     adoptable: false
   accepted: false
   reason: low-score
@@ -13,6 +13,6 @@ basis:
   namedParty: "none: no role named"
   statedHarm: "data colonisation and loss of oversight"
   trigger: "none"
-  existingAlternative: "none"
+  existingAlternative: "the current legal framework, including POPIA"
   adoptable: "none"
-notes: "Legal policy analysis. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."
+notes: "Legal policy analysis. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036. Round-two label review (2026-11-11, ADR 0084), confirmed by the owner: existingAlternative set to true; still rejected because NamedParty is false."

@@ -14,5 +14,5 @@ basis:
   statedHarm: "none"
   trigger: "none"
   existingAlternative: "none: only other language technologies"
-  adoptable: "none: benchmarking and adaptation resources for research"
-notes: "Benchmark and model adaptation for research; no party. Industry: aerospace-defense. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request."
+  adoptable: "none: benchmarking and adaptation resources and a research model, not offered for an organization to use"
+notes: "Benchmark and model adaptation for research; no party. Industry: aerospace-defense. Reviewer: Remco Oostelaar (round 3 review). Signals read under ADR 0036 and confirmed by merging this pull request. Round-two label review (2026-11-11, ADR 0084), confirmed by the owner: basis made explicit, label kept."

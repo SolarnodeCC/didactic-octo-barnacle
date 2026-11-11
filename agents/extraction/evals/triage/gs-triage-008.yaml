@@ -3,7 +3,7 @@ publicationFixture: fixtures/arxiv/2610.40586.json
 expected:
   signals:
     namedParty: false
-    statedHarm: false
+    statedHarm: true
     trigger: false
     existingAlternative: true
     adoptable: false
@@ -11,8 +11,8 @@ expected:
   reason: low-score
 basis:
   namedParty: "none: no role named"
-  statedHarm: "none"
+  statedHarm: "clutter degrades range and Doppler estimation, leading to errors in target localization"
   trigger: "none"
   existingAlternative: "conventional signal-processing baselines"
-  adoptable: "none"
-notes: "Wireless signal-processing method; no party or harm. Passes the scope rules through its cs.AI cross-list, so the model must reject it. Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request."
+  adoptable: "none: a signal-processing framework evaluated in simulation, not offered as a system, protocol, or tool"
+notes: "Wireless signal-processing method; no party or harm. Passes the scope rules through its cs.AI cross-list, so the model must reject it. Reviewer: Remco Oostelaar (round 1 review, 2026-11-02). Signals read under ADR 0036 and confirmed by merging this pull request. Round-two label review (2026-11-11, ADR 0084), confirmed by the owner: statedHarm set to true: the harm is read on its own; still rejected because NamedParty is false."

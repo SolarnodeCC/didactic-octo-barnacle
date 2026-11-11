@@ -11,8 +11,8 @@ expected:
   reason: low-score
 basis:
   namedParty: "psychiatrists"
-  statedHarm: "none stated"
+  statedHarm: "none: under-triage is the evaluated agent's failure mode, not a harm stated for practice today"
   trigger: "none"
   existingAlternative: "none"
   adoptable: "an RL-trained intake agent"
-notes: "Party and an agent, but no stated harm. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036."
+notes: "Party and an agent, but no stated harm. Reviewer: Remco Oostelaar (round 2 review, 2026-11-02). Signals read under ADR 0036. Round-two label review (2026-11-11, ADR 0084), confirmed by the owner: basis made explicit, label kept."
