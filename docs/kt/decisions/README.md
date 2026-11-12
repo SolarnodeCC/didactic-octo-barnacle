@@ -104,6 +104,8 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0093](0093-analysis-agents-benchmark.md) | Benchmark of the analysis agents with a calibrated fact judge | Accepted |
 | [0094](0094-judge-calls-paid-through-unified-billing.md) | Judge calls are paid through AI Gateway Unified Billing | Accepted |
 | [0095](0095-fact-judge-not-calibrated.md) | The fact judge is not calibrated; its verdicts are reported only | Accepted |
+| [0096](0096-analysis-round-one-results.md) | Analysis round one: Gemma for Problem Discovery, provisionally; Research Analyst and Relevance open | Accepted |
+| [0097](0097-relevance-industry-fit-against-focus-areas.md) | Relevance scores IndustryFit against each industry's focus areas | Accepted |
 
 ## When an ADR is needed
 

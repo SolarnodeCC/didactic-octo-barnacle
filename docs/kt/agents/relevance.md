@@ -2,7 +2,7 @@
 title: Relevance Agent
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-11-11
+last_reviewed: 2026-11-12
 related: [REQ-AGENT-006]
 ---
 
@@ -39,7 +39,7 @@ Notes: string(max 400)?
 ## Rules
 
 - `StrategicRelevanceScore` is computed by plain code, not by the model: the highest `IndustryFit` value, raised by 5 points when that industry's `FocusMatch` is `partial` or by 10 points when it is `clear`, capped at 100. When several industries share the highest fit, the larger raise of them counts (ADR 0093). The model supplies `IndustryFit` and `FocusMatch`.
-- `IndustryFit` is 0 when the problem has no link to the industry, around 50 when an organization in it plausibly has the problem, and 80 or more when the industry itself carries the problem (ADR 0093).
+- `IndustryFit` is scored against each industry's focus areas: 0-20 no link, 20-45 the industry may have the problem but outside its focus areas, 45-70 a focus area is touched indirectly, 70-90 within a focus area, 90-100 central to a focus area and carried by the industry itself ([ADR 0097](../decisions/0097-relevance-industry-fit-against-focus-areas.md)).
 - TechnicalFeasibility is a model estimate; it has no evidence requirement because the agent does not receive publication text. It may cite the candidate's quotes as `publication-quote` evidence (ADR 0070). It starts from the research maturity: theoretical 0-29, lab result 30-59, prototype 60-79, field-tested 80-100. It is lowered for constraints such as missing data, regulation, or required hardware.
 
 | ImplementationEffort | Meaning |
@@ -55,4 +55,4 @@ Golden set entries hold the expected best-fitting industry, acceptable ranges fo
 
 ## Prompt
 
-`relevance@1` in `packages/prompts/src/relevance.ts` carries the rules above and the eight industries with their focus areas. It sends the candidate (`Finding`, `Customer`, and `WhyNow` and `CurrentAlternative` with their quotes when set), the Research Analyst maturity, industries, and technologies, and the Problem Discovery output, inside the `<publication>` delimiters; no publication text ([ADR 0093](../decisions/0093-analysis-agents-benchmark.md)).
+`relevance@2` in `packages/prompts/src/relevance.ts` carries the rules above and the eight industries with their focus areas. It sends the candidate (`Finding`, `Customer`, and `WhyNow` and `CurrentAlternative` with their quotes when set), the Research Analyst maturity, industries, and technologies, and the Problem Discovery output, inside the `<publication>` delimiters; no publication text ([ADR 0093](../decisions/0093-analysis-agents-benchmark.md)).
