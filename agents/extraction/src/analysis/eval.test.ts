@@ -2,6 +2,7 @@ import { TARGET_INDUSTRY_KEYS } from "@roi/models";
 import { describe, expect, it } from "vitest";
 
 import {
+  FACTS_GATE,
   runProblemDiscoveryEval,
   runRelevanceEval,
   runResearchAnalystEval,
@@ -138,7 +139,7 @@ describe("REQ-AGENT-002: the Problem Discovery eval", () => {
   const threshold = loadAnalysisThreshold("problem-discovery");
 
   it("REQ-AGENT-002: a labelled answer with every fact present passes every entry", async () => {
-    const report = await runProblemDiscoveryEval(pd, pdOracle, allPresent, threshold);
+    const report = await runProblemDiscoveryEval(pd, pdOracle, allPresent, threshold, true);
     expect(report.Entries.filter((e) => !e.Passed)).toEqual([]);
     expect(report.FactsPresent).toBe(report.FactsJudged);
     expect(report.JudgeErrors).toBe(0);
@@ -150,11 +151,37 @@ describe("REQ-AGENT-002: the Problem Discovery eval", () => {
     const broken: FactJudge = () => Promise.resolve({ Ok: false, Error: "refusal" });
     const one = pd.slice(0, 1);
     expect(
-      (await runProblemDiscoveryEval(one, pdOracle, firstAbsent, threshold)).Entries[0]?.Failures,
+      (await runProblemDiscoveryEval(one, pdOracle, firstAbsent, threshold, true)).Entries[0]
+        ?.Failures,
     ).toEqual(["fact:0"]);
-    const errored = await runProblemDiscoveryEval(one, pdOracle, broken, threshold);
+    const errored = await runProblemDiscoveryEval(one, pdOracle, broken, threshold, true);
     expect(errored.Entries[0]?.Failures).toEqual(["judge-error"]);
     expect(errored.JudgeErrors).toBe(1);
+  });
+
+  it("REQ-TEST-005: until the judge is calibrated, absent facts and judge errors are listed but do not fail the entry (ADR 0095)", async () => {
+    expect(FACTS_GATE).toBe(false);
+    const firstAbsent: FactJudge = ({ Facts }) =>
+      Promise.resolve({ Ok: true, Present: Facts.map((_, i) => i !== 0) });
+    const broken: FactJudge = () => Promise.resolve({ Ok: false, Error: "refusal" });
+    const one = pd.slice(0, 1);
+    const absent = await runProblemDiscoveryEval(one, pdOracle, firstAbsent, threshold);
+    expect(absent.Entries[0]).toMatchObject({ Passed: true, Failures: ["fact:0"] });
+    expect(absent.FactsPresent).toBe(absent.FactsJudged - 1);
+    const errored = await runProblemDiscoveryEval(one, pdOracle, broken, threshold);
+    expect(errored.Entries[0]).toMatchObject({ Passed: true, Failures: ["judge-error"] });
+    const wrongIndustry: EntryModelFn<ProblemDiscoveryEntry> = async (e) => {
+      const out = (await pdOracle(e)) as { Customer: Record<string, string> };
+      return {
+        ...out,
+        Customer: {
+          ...out.Customer,
+          Industry: e.expected.customerIndustry === "banking" ? "insurance" : "banking",
+        },
+      };
+    };
+    const coded = await runProblemDiscoveryEval(one, wrongIndustry, allPresent, threshold);
+    expect(coded.Entries[0]).toMatchObject({ Passed: false, Failures: ["customer-industry"] });
   });
 
   it("REQ-AGENT-002: the judge is not called for an output that fails the schema", async () => {

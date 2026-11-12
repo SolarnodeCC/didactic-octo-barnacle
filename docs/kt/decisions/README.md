@@ -2,7 +2,7 @@
 title: Decisions index
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-11
+last_reviewed: 2026-11-12
 ---
 
 # Architecture decision records
@@ -103,6 +103,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0092](0092-label-review-after-benchmark-round-three.md) | Label review after benchmark round three | Accepted |
 | [0093](0093-analysis-agents-benchmark.md) | Benchmark of the analysis agents with a calibrated fact judge | Accepted |
 | [0094](0094-judge-calls-paid-through-unified-billing.md) | Judge calls are paid through AI Gateway Unified Billing | Accepted |
+| [0095](0095-fact-judge-not-calibrated.md) | The fact judge is not calibrated; its verdicts are reported only | Accepted |
 
 ## When an ADR is needed
 

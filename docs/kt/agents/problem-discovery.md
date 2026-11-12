@@ -2,7 +2,7 @@
 title: Problem Discovery Agent
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-11-11
+last_reviewed: 2026-11-12
 related: [REQ-AGENT-002]
 ---
 
@@ -57,4 +57,4 @@ Notes: string(max 400)?
 
 ## Evals
 
-Golden set entries hold the required facts of the problem, the expected customer industry, and an acceptable PainLevel range. A model judge decides whether each required fact is present, following the rubric `agents/analysis/evals/problem-discovery.rubric.md` (ADR 0093).
+Golden set entries hold the required facts of the problem, the expected customer industry, and an acceptable PainLevel range. A model judge decides whether each required fact is present, following the rubric `agents/analysis/evals/problem-discovery.rubric.md` (ADR 0093): a fact counts only when the output states it as the customer's pain, never as its cause. Until the judge agrees with the owner on at least 90 % of the facts, its verdicts are reported only and an entry passes on the customer industry and the PainLevel range ([ADR 0095](../decisions/0095-fact-judge-not-calibrated.md)).

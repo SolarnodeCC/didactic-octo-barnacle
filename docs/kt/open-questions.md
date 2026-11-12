@@ -2,7 +2,7 @@
 title: Open questions
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-11
+last_reviewed: 2026-11-12
 ---
 
 # Open questions
@@ -36,7 +36,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 | OQ-013 | Provisional phase 2 budget = daily limit × cost per publication × 1.5 (formula replaced by OQ-043), where phase 1 estimates the cost per publication from real data (ADR 0032) and the first model calls of phase 2 replace the estimate; phase 2 does not start without the estimate | REQ-NFR-005 |
 | OQ-016 | Thin end-to-end slice first: one publication through every layer with stubbed agents by the end of phase 2 | REQ-PROC-007, [roadmap](roadmap.md) |
 | OQ-019 | Single owner `@SolarnodeCC` for the MVP; splitting by role is OQ-034 | [KT README](README.md#ownership) |
-| OQ-020 | Benchmark two or three models per agent on the golden set in phase 3; the eval judge uses a different provider than the agent it grades. The judge of the Problem Discovery facts is `claude-haiku-5-5`, calibrated against the owner ([ADR 0093](decisions/0093-analysis-agents-benchmark.md)); the judges of Market Analysis, Competition, and Startup Generator are still open | [AI evals](test/ai-evals.md) |
+| OQ-020 | Benchmark two or three models per agent on the golden set in phase 3; the eval judge uses a different provider than the agent it grades. The judge of the Problem Discovery facts is `claude-haiku-5-5` ([ADR 0093](decisions/0093-analysis-agents-benchmark.md)); its first calibration against the owner reached 68 %, so it does not decide yet ([ADR 0095](decisions/0095-fact-judge-not-calibrated.md)); the judges of Market Analysis, Competition, and Startup Generator are still open | [AI evals](test/ai-evals.md) |
 | OQ-029 | Build the invitation and magic-link flow directly, no authentication library | ADR 0011 |
 | OQ-031 | Superseded by OQ-033, which names the benchmark | ADR 0013 |
 | OQ-032 | Provisional success targets accepted for phase 1; Precision/Explainability/Time saved/Cost reviewed at end of phase 3; Agreement in phase 4 | [Overview](overview.md) |

@@ -90,14 +90,23 @@ export type ProblemDiscoveryEvalReport = EvalReport & {
 };
 
 /**
- * Problem Discovery: the expected customer industry, a PainLevel in the expected range, and
- * every required fact present according to the judge. A judge error fails the entry.
+ * Whether the judge's fact verdicts decide an entry. A judge decides only once it agrees with
+ * the owner on at least 90 % of the facts of at least 20 outputs (ADR 0093). The calibration of
+ * 2026-11-12 reached 68 % at best, so the verdicts are reported and do not gate (ADR 0095).
+ */
+export const FACTS_GATE = false;
+
+/**
+ * Problem Discovery: the expected customer industry, a PainLevel in the expected range, and,
+ * when `factsGate` is on, every required fact present according to the judge (a judge error
+ * then fails the entry). With it off, fact and judge failures are listed but do not fail.
  */
 export async function runProblemDiscoveryEval(
   entries: readonly ProblemDiscoveryEntry[],
   model: EntryModelFn<ProblemDiscoveryEntry>,
   judge: FactJudge,
   threshold: Threshold,
+  factsGate: boolean = FACTS_GATE,
 ): Promise<ProblemDiscoveryEvalReport> {
   const results: EntryResult[] = [];
   let factsPresent = 0;
@@ -136,9 +145,12 @@ export async function runProblemDiscoveryEval(
         });
       }
     }
+    const blocking = factsGate
+      ? failures
+      : failures.filter((f) => !f.startsWith("fact:") && f !== "judge-error");
     results.push({
       Id: entry.id,
-      Passed: failures.length === 0,
+      Passed: blocking.length === 0,
       Failures: failures,
       Repairs: repaired.Repairs,
     });

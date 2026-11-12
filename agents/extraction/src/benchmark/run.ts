@@ -19,6 +19,7 @@ import {
 import { type ExtractionEntry, type Threshold, type TriageEntry } from "../golden-set.js";
 import { extractionModelFn, triageModelFn } from "../model-fn.js";
 import {
+  FACTS_GATE,
   runProblemDiscoveryEval,
   runRelevanceEval,
   runResearchAnalystEval,
@@ -618,6 +619,9 @@ export function formatBenchmarkMarkdown(result: BenchmarkResult, plan: Benchmark
       "## Problem Discovery required facts (judge)",
       "",
       `Judge calls: ${result.JudgeRecords.length}, EUR ${judgeCost.toFixed(4)}, rubric ${result.JudgeRecords[0]?.RubricVersion ?? "none"}.`,
+      FACTS_GATE
+        ? "The judge's verdicts decide pass or fail."
+        : "The judge is not calibrated, so its verdicts are reported only and do not decide pass or fail (ADR 0095).",
       "",
       "| Model | Facts present per run | Judge errors |",
       "|---|---|---|",
