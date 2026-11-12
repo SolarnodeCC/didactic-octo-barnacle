@@ -2,7 +2,7 @@
 title: AI evals
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-11
+last_reviewed: 2026-11-12
 related: [REQ-TEST-004, REQ-TEST-005, REQ-NFR-003, REQ-AGENT-008, REQ-SCORE-006]
 ---
 
@@ -38,7 +38,7 @@ For triage and extraction the report also gives metrics that do not change the p
 - A model judge uses a different model or provider than the agent it grades (OQ-020).
 - Its rubric is versioned next to the golden set and gives a pass or fail per criterion, not a free score.
 - Before a judge is used to block merges, it is checked against human labels on at least 20 outputs; its agreement with the humans is stored with the rubric.
-- The judge of the Problem Discovery facts is `claude-haiku-5-5` through the Anthropic route of AI Gateway, with the rubric `agents/analysis/evals/problem-discovery.rubric.md`, paid through the gateway's Unified Billing ([ADR 0094](../decisions/0094-judge-calls-paid-through-unified-billing.md)). It decides a benchmark round only after it agrees with the owner on at least 90 % of the facts of at least 20 outputs ([ADR 0093](../decisions/0093-analysis-agents-benchmark.md)).
+- The judge of the Problem Discovery facts is `claude-haiku-5-5` through the Anthropic route of AI Gateway, with the rubric `agents/analysis/evals/problem-discovery.rubric.md`, paid through the gateway's Unified Billing ([ADR 0094](../decisions/0094-judge-calls-paid-through-unified-billing.md)). Its first calibration reached 68 % at best, so its verdicts are reported only and do not decide pass or fail ([ADR 0095](../decisions/0095-fact-judge-not-calibrated.md)). It decides a benchmark round only after it agrees with the owner on at least 90 % of the facts of at least 20 outputs ([ADR 0093](../decisions/0093-analysis-agents-benchmark.md)).
 
 ## Thresholds
 

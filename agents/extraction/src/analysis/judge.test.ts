@@ -95,7 +95,7 @@ const reply = (present: boolean[], stop = "end_turn"): Reply => ({
 describe("REQ-TEST-005: the Problem Discovery fact judge", () => {
   it("REQ-TEST-005: the rubric is versioned next to the golden set and asks for one verdict per fact", () => {
     const rubric = loadRubric();
-    expect(rubric.Version).toBe("pd-facts@1");
+    expect(rubric.Version).toBe("pd-facts@3");
     expect(rubric.Text).toContain("one verdict per fact");
     expect(rubric.Text).not.toContain("## Calibration");
   });
@@ -115,7 +115,7 @@ describe("REQ-TEST-005: the Problem Discovery fact judge", () => {
     expect(records[0]).toMatchObject({
       Outcome: "ok",
       GatewayLogId: "log_1",
-      RubricVersion: "pd-facts@1",
+      RubricVersion: "pd-facts@3",
     });
     expect(spent()).toBeCloseTo(judgeCostEur(1000, 200, 1.1193), 12);
   });
