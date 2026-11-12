@@ -9,9 +9,12 @@ import { type BuiltPrompt, type Sampling } from "./prompt.js";
  * effort, from the earlier agents' outputs and the candidate; no publication text
  * (docs/kt/agents/relevance.md, REQ-AGENT-006, ADR 0070, ADR 0093). Code computes
  * `StrategicRelevanceScore` from `IndustryFit` and `FocusMatch`.
+ *
+ * `relevance@2` scores `IndustryFit` against each industry's focus areas instead of against
+ * whether an organization of the industry has the problem (ADR 0097).
  */
 
-export const RELEVANCE_PROMPT_VERSION = "relevance@1";
+export const RELEVANCE_PROMPT_VERSION = "relevance@2";
 
 export const RELEVANCE_SAMPLING: Sampling = { Temperature: 0, MaxTokens: 8192 };
 
@@ -37,7 +40,12 @@ export const RELEVANCE_SYSTEM = [
   "Target industries and their focus areas:",
   ...industryLines(),
   "",
-  "IndustryFit: an integer from 0 to 100 for every one of the eight industries: 0 when the problem has no link to the industry, around 50 when an organization in it plausibly has the problem, 80 or more when the problem is one the industry itself carries.",
+  "IndustryFit: an integer from 0 to 100 for every one of the eight industries: how well the opportunity serves that industry's priorities, as its focus areas above state them.",
+  "- 0-20: no link to the industry.",
+  "- 20-45: organizations in the industry may have the problem, but it lies outside the industry's focus areas.",
+  "- 45-70: the problem touches one of the industry's focus areas indirectly.",
+  "- 70-90: the problem lies within one of the industry's focus areas.",
+  "- 90-100: the problem is central to a focus area and the industry itself carries it.",
   "FocusMatch: for every one of the eight industries, none, partial, or clear: how well the opportunity matches that industry's focus areas above.",
   "",
   "TechnicalFeasibility: an integer from 0 to 100. Start from the research maturity (theoretical 0-29, lab-result 30-59, prototype 60-79, field-tested 80-100) and lower it for constraints such as missing data, regulation, or required hardware.",

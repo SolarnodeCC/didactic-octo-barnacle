@@ -180,6 +180,14 @@ describe("REQ-AGENT-002: the problem-discovery@1 prompt", () => {
 });
 
 describe("REQ-AGENT-006: the relevance@1 prompt", () => {
+  it("REQ-AGENT-006: IndustryFit is scored against each industry's focus areas (relevance@2, ADR 0097)", () => {
+    expect(RELEVANCE_PROMPT_VERSION).toBe("relevance@2");
+    expect(RELEVANCE_SYSTEM).toContain("as its focus areas above state them");
+    expect(RELEVANCE_SYSTEM).toContain(
+      "- 20-45: organizations in the industry may have the problem, but it lies outside the industry's focus areas.",
+    );
+  });
+
   it("REQ-AGENT-006: AC1 the prompt asks for all eight industries and leaves the score to code", () => {
     for (const key of TARGET_INDUSTRY_KEYS) {
       expect(RELEVANCE_SYSTEM).toContain(`"${key}": integer`);
