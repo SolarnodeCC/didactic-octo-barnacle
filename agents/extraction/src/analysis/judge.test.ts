@@ -28,17 +28,20 @@ const facts = ["forecasts do not say which crops suffer", "governments need to r
 
 type Reply = {
   stop_reason: string;
-  parsed_output: { Verdicts: Array<{ Fact: number; Present: boolean; Reason: string }> } | null;
+  content: Array<{ type: "text"; text: string }>;
   usage: { input_tokens: number; output_tokens: number };
 };
 
-/** A client whose `messages.parse` returns scripted replies; no network (REQ-TEST-002 AC2). */
+/**
+ * A client whose `messages.create` returns scripted replies; no network (REQ-TEST-002 AC2).
+ * Like the SDK, only `create` returns a promise with `withResponse`; `parse` does not.
+ */
 function fakeClient(replies: Array<Reply | Error>): {
   client: Pick<Anthropic, "messages">;
   requests: unknown[];
 } {
   const requests: unknown[] = [];
-  const parse = (body: unknown) => {
+  const create = (body: unknown) => {
     requests.push(body);
     const next = replies.shift();
     return {
@@ -51,7 +54,12 @@ function fakeClient(replies: Array<Reply | Error>): {
             }),
     };
   };
-  return { client: { messages: { parse } } as unknown as Pick<Anthropic, "messages">, requests };
+  // Like the SDK's: a plain promise, without `withResponse`.
+  const parse = (body: unknown) => Promise.resolve(create(body));
+  return {
+    client: { messages: { create, parse } } as unknown as Pick<Anthropic, "messages">,
+    requests,
+  };
 }
 
 function judgeWith(replies: Array<Reply | Error>, allows = true) {
@@ -73,7 +81,14 @@ function judgeWith(replies: Array<Reply | Error>, allows = true) {
 
 const reply = (present: boolean[], stop = "end_turn"): Reply => ({
   stop_reason: stop,
-  parsed_output: { Verdicts: present.map((p, i) => ({ Fact: i + 1, Present: p, Reason: "r" })) },
+  content: [
+    {
+      type: "text",
+      text: JSON.stringify({
+        Verdicts: present.map((p, i) => ({ Fact: i + 1, Present: p, Reason: "r" })),
+      }),
+    },
+  ],
   usage: { input_tokens: 1000, output_tokens: 200 },
 });
 
@@ -93,7 +108,10 @@ describe("REQ-TEST-005: the Problem Discovery fact judge", () => {
       Ok: true,
       Present: [true, false],
     });
-    expect(requests[0]).toMatchObject({ model: JUDGE_MODEL, output_config: { effort: "medium" } });
+    expect(requests[0]).toMatchObject({
+      model: JUDGE_MODEL,
+      output_config: { effort: "medium", format: { type: "json_schema" } },
+    });
     expect(records[0]).toMatchObject({
       Outcome: "ok",
       GatewayLogId: "log_1",
@@ -102,19 +120,25 @@ describe("REQ-TEST-005: the Problem Discovery fact judge", () => {
     expect(spent()).toBeCloseTo(judgeCostEur(1000, 200, 1.1193), 12);
   });
 
-  it("REQ-TEST-005: a refusal, a wrong number of verdicts, a cut-off answer, and a provider error are errors, not verdicts", async () => {
+  it("REQ-TEST-005: a refusal, a wrong number of verdicts, a cut-off answer, text that is not the schema, and a provider error are errors, not verdicts", async () => {
     const cases: Array<Reply | Error> = [
       reply([true, true], "refusal"),
       reply([true]),
       reply([true, true], "max_tokens"),
-      new Error("connection reset"),
+      {
+        stop_reason: "end_turn",
+        content: [{ type: "text", text: "Both facts are present." }],
+        usage: { input_tokens: 1, output_tokens: 1 },
+      },
+      new Error("402 Insufficient unified billing credits"),
     ];
     const { judge, records } = judgeWith(cases);
-    for (let i = 0; i < 4; i += 1) {
+    for (let i = 0; i < 5; i += 1) {
       expect((await judge({ EntryId: "e", Facts: facts, Output: output })).Ok).toBe(false);
     }
     expect(records.map((r) => r.Outcome)).toEqual([
       "refusal",
+      "invalid-output",
       "invalid-output",
       "invalid-output",
       "provider-error",

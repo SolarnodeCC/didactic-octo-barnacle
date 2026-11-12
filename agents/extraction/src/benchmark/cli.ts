@@ -105,8 +105,9 @@ export const BENCHMARK_USAGE = [
   "(--step, --models, --runs, --limit, --budget-eur, --output-mode).",
   "",
   "Live runs read CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN (Workers AI Read) from the",
-  "environment. problem-discovery also needs EVAL_ANTHROPIC_API_KEY for its fact judge, reached",
-  "through the Anthropic route of the same gateway. --dry-run answers with the golden-set labels",
+  "environment. The fact judge of problem-discovery goes through the Anthropic route of the same",
+  "gateway, paid by its Unified Billing (EVAL_ANTHROPIC_API_KEY only for a gateway without it).",
+  "--dry-run answers with the golden-set labels",
   "and needs no credentials. `all` is triage and extraction; `analysis` is the three analysis steps.",
 ].join("\n");
 
@@ -500,12 +501,13 @@ export async function runBenchmarkCommand(
       ...(options.Fetch ? { Fetch: options.Fetch } : {}),
     });
     if (has("problem-discovery")) {
-      const apiKey = env.EVAL_ANTHROPIC_API_KEY?.trim() ?? "";
-      if (accountId === "" || apiKey === "") {
-        throw new Error(
-          "problem-discovery needs CLOUDFLARE_ACCOUNT_ID and EVAL_ANTHROPIC_API_KEY for its fact judge",
-        );
+      if (accountId === "") {
+        throw new Error("problem-discovery needs CLOUDFLARE_ACCOUNT_ID for its fact judge");
       }
+      // With Unified Billing the gateway pays Anthropic and ignores this key (ADR 0094); the SDK
+      // still needs a value. A gateway without Unified Billing uses EVAL_ANTHROPIC_API_KEY.
+      const apiKey = env.EVAL_ANTHROPIC_API_KEY?.trim() || "unified-billing";
+      const gatewayToken = env.EVAL_AI_GATEWAY_TOKEN?.trim() ?? "";
       const client = new Anthropic({
         apiKey,
         baseURL: judgeGatewayBaseUrl(accountId, args.Gateway),
@@ -526,6 +528,8 @@ export async function runBenchmarkCommand(
           Headers: {
             "cf-aig-skip-cache": "true",
             "cf-aig-metadata": JSON.stringify({ RunId: context.RunId, Step: "judge" }),
+            // An authenticated gateway wants its token (operations: EVAL_AI_GATEWAY_TOKEN).
+            ...(gatewayToken === "" ? {} : { "cf-aig-authorization": `Bearer ${gatewayToken}` }),
           },
         });
     }

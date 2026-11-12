@@ -53,7 +53,7 @@ A live run reads two environment variables and never writes them anywhere:
 |---|---|
 | `CLOUDFLARE_ACCOUNT_ID` | The 32-character account ID of the project's Cloudflare account |
 | `CLOUDFLARE_API_TOKEN` | A token with **Workers AI: Read** for that account, and **Workers R2 Storage: Edit** when `--r2-bucket` is used |
-| `EVAL_ANTHROPIC_API_KEY` | Only for `problem-discovery`: the Anthropic key of the fact judge, sent through the Anthropic route of the gateway (ADR 0049, ADR 0093). In a cloud session the key is a network secret for `gateway.ai.cloudflare.com`, so the variable holds a placeholder |
+| `EVAL_ANTHROPIC_API_KEY`, `EVAL_AI_GATEWAY_TOKEN` | Optional, for `problem-discovery` only. The fact judge goes through the Anthropic route of the gateway and is paid by its Unified Billing, which ignores a provider key ([ADR 0094](../decisions/0094-judge-calls-paid-through-unified-billing.md)); the key is sent when set, for a gateway without Unified Billing, and the gateway token is sent as `cf-aig-authorization` |
 
 Node's built-in `fetch` ignores `HTTPS_PROXY`. Behind an HTTPS proxy, as in a cloud agent session, run the command with `NODE_USE_ENV_PROXY=1` (Node 24); without it the calls bypass the proxy, and a token that the proxy injects is never sent (every call then fails with "Authentication error").
 

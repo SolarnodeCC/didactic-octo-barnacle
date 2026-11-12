@@ -38,7 +38,7 @@ For triage and extraction the report also gives metrics that do not change the p
 - A model judge uses a different model or provider than the agent it grades (OQ-020).
 - Its rubric is versioned next to the golden set and gives a pass or fail per criterion, not a free score.
 - Before a judge is used to block merges, it is checked against human labels on at least 20 outputs; its agreement with the humans is stored with the rubric.
-- The judge of the Problem Discovery facts is `claude-haiku-5-5` through the Anthropic route of AI Gateway, with the rubric `agents/analysis/evals/problem-discovery.rubric.md`. It decides a benchmark round only after it agrees with the owner on at least 90 % of the facts of at least 20 outputs ([ADR 0093](../decisions/0093-analysis-agents-benchmark.md)).
+- The judge of the Problem Discovery facts is `claude-haiku-5-5` through the Anthropic route of AI Gateway, with the rubric `agents/analysis/evals/problem-discovery.rubric.md`, paid through the gateway's Unified Billing ([ADR 0094](../decisions/0094-judge-calls-paid-through-unified-billing.md)). It decides a benchmark round only after it agrees with the owner on at least 90 % of the facts of at least 20 outputs ([ADR 0093](../decisions/0093-analysis-agents-benchmark.md)).
 
 ## Thresholds
 

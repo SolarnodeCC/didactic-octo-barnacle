@@ -102,6 +102,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0091](0091-benchmark-round-three-selects-the-extraction-model.md) | Benchmark round three selects DeepSeek for extraction | Accepted |
 | [0092](0092-label-review-after-benchmark-round-three.md) | Label review after benchmark round three | Accepted |
 | [0093](0093-analysis-agents-benchmark.md) | Benchmark of the analysis agents with a calibrated fact judge | Accepted |
+| [0094](0094-judge-calls-paid-through-unified-billing.md) | Judge calls are paid through AI Gateway Unified Billing | Accepted |
 
 ## When an ADR is needed
 

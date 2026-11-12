@@ -50,6 +50,25 @@ const VerdictsSchema = z.object({
   ),
 });
 
+/** The JSON schema the judge must answer in (structured output). */
+const VERDICTS_FORMAT = zodOutputFormat(VerdictsSchema);
+
+/** The verdicts in the text blocks of a response, or null when they are not valid. */
+function parseVerdicts(
+  content: ReadonlyArray<{ type: string; text?: string }>,
+): z.infer<typeof VerdictsSchema> | null {
+  const text = content
+    .filter((block) => block.type === "text")
+    .map((block) => block.text ?? "")
+    .join("");
+  try {
+    const result = VerdictsSchema.safeParse(JSON.parse(text));
+    return result.success ? result.data : null;
+  } catch {
+    return null;
+  }
+}
+
 /** One judge call, for the budget and the cost check against the gateway logs. */
 export type JudgeCallRecord = {
   Id: string;
@@ -144,14 +163,19 @@ export function createClaudeJudge(options: JudgeOptions): FactJudge {
       });
     };
     try {
+      // `create`, not `parse`: only the request's own promise has `withResponse`, which gives the
+      // gateway log ID. The text is validated here against the same schema the model was given.
       const { data: response, response: raw } = await options.Client.messages
-        .parse(
+        .create(
           {
             model,
             max_tokens: 8000,
             system,
             messages: [{ role: "user", content: judgeUserText(Facts, Output) }],
-            output_config: { effort: "medium", format: zodOutputFormat(VerdictsSchema) },
+            output_config: {
+              effort: "medium",
+              format: { type: "json_schema", schema: VERDICTS_FORMAT.schema },
+            },
           },
           options.Headers === undefined ? undefined : { headers: options.Headers },
         )
@@ -162,7 +186,7 @@ export function createClaudeJudge(options: JudgeOptions): FactJudge {
         record("refusal", inputTokens, outputTokens, logId);
         return { Ok: false, Error: "refusal" };
       }
-      const parsed = response.parsed_output;
+      const parsed = parseVerdicts(response.content);
       const verdicts = parsed?.Verdicts ?? [];
       const ordered =
         verdicts.length === Facts.length && verdicts.every((v, i) => v.Fact === i + 1);
