@@ -50,6 +50,10 @@ Failures over the three runs (an entry can fail several checks):
 - **Relevance** gives the best industry an `IndustryFit` of 85 to 100 where the labels expect a strategic relevance of 25 to 65 for problems outside the industry's focus areas. The scale in `relevance@1` (80 or more when the industry itself carries the problem) reads every carried problem as a near-perfect fit; `relevance@2` scores fit against the focus areas instead ([ADR 0097](../decisions/0097-relevance-industry-fit-against-focus-areas.md)).
 - **Problem Discovery**, on the code checks: the judge found 35, 35, and 34 of 66 required facts present for Gemma, and 34, 37, and 38 for DeepSeek, with no judge errors. These figures do not decide (ADR 0095).
 
+## Relevance rerun with relevance@2
+
+Relevance ran again at 15:23 UTC with `relevance@2` ([ADR 0097](../decisions/0097-relevance-industry-fit-against-focus-areas.md)): `bench-2026-11-12T15-23-09-199Z` (Gemma) passed 12.1 / 12.1 / 12.1 % and `bench-2026-11-12T15-23-11-452Z` (DeepSeek) 12.1 / 9.1 / 15.2 %. Both read nearly every problem as within a focus area (Gemma: `clear` on 32 of 33 entries); [ADR 0098](../decisions/0098-relevance-rerun-label-review.md) keeps Relevance open for a label review. The rerun cost EUR 0.19 (200 calls), the same as the gateway logs.
+
 ## Cost
 
 AI Gateway logged 598 model calls and 198 judge calls, USD 0.6724, the same as the usage and judge records, call for call. In euro the round cost EUR 0.60 of its EUR 4.50 of budgets: EUR 0.53 for the models and EUR 0.07 for the judge.
