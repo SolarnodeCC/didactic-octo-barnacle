@@ -89,7 +89,14 @@ const relInput: RelevanceInput = {
   },
 };
 
-describe("REQ-AGENT-001: the research-analyst@1 prompt", () => {
+describe("REQ-AGENT-001: the research-analyst@2 prompt", () => {
+  it("REQ-AGENT-001: care providers and cross-industry software are other (research-analyst@2, ADR 0100)", () => {
+    expect(RESEARCH_ANALYST_PROMPT_VERSION).toBe("research-analyst@2");
+    expect(RESEARCH_ANALYST_SYSTEM).toContain(
+      "Care providers (hospitals, clinics, nurses, health systems) and software that serves organizations of every industry alike are other.",
+    );
+  });
+
   it("REQ-AGENT-001: the text holds the candidate and each related publication with its ID, without LaTeX markup", () => {
     const built = buildResearchAnalystPrompt(raInput);
     expect(built.QuoteText).toContain("Title: Early warning of transformer failures");
@@ -136,7 +143,7 @@ describe("REQ-AGENT-001: the research-analyst@1 prompt", () => {
       Contract: RESEARCH_ANALYST_CONTRACT,
       StepName: "research-analyst",
     });
-    expect(ok.Result).toMatchObject({ Ok: true, PromptVersion: "research-analyst@1" });
+    expect(ok.Result).toMatchObject({ Ok: true, PromptVersion: "research-analyst@2" });
     const bad = await runStep({
       Replies: always({ ...output, Score: 3 }),
       Config: config,
@@ -179,13 +186,18 @@ describe("REQ-AGENT-002: the problem-discovery@1 prompt", () => {
   });
 });
 
-describe("REQ-AGENT-006: the relevance@1 prompt", () => {
+describe("REQ-AGENT-006: the relevance@3 prompt", () => {
   it("REQ-AGENT-006: IndustryFit is scored against each industry's focus areas (relevance@2, ADR 0097)", () => {
-    expect(RELEVANCE_PROMPT_VERSION).toBe("relevance@2");
     expect(RELEVANCE_SYSTEM).toContain("as its focus areas above state them");
     expect(RELEVANCE_SYSTEM).toContain(
       "- 20-45: organizations in the industry may have the problem, but it lies outside the industry's focus areas.",
     );
+  });
+
+  it("REQ-AGENT-006: focus areas are read literally and care providers stay at most indirect (relevance@3, ADR 0100)", () => {
+    expect(RELEVANCE_PROMPT_VERSION).toBe("relevance@3");
+    expect(RELEVANCE_SYSTEM).toContain("the customer is an organization of that industry");
+    expect(RELEVANCE_SYSTEM).toContain("IndustryFit is at most 70 and FocusMatch at most partial");
   });
 
   it("REQ-AGENT-006: AC1 the prompt asks for all eight industries and leaves the score to code", () => {

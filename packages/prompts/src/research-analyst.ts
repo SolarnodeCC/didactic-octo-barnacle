@@ -9,9 +9,12 @@ import { type BuiltPrompt, type Sampling } from "./prompt.js";
  * the nearest publications of the corpus, and which industries and technologies it involves
  * (docs/kt/agents/research-analyst.md, REQ-AGENT-001, ADR 0093). The output budget leaves room
  * for the reasoning of reasoning models (ADR 0076).
+ *
+ * `research-analyst@2` adds the owner's rule that care providers and cross-industry software are
+ * `other` (ADR 0100).
  */
 
-export const RESEARCH_ANALYST_PROMPT_VERSION = "research-analyst@1";
+export const RESEARCH_ANALYST_PROMPT_VERSION = "research-analyst@2";
 
 export const RESEARCH_ANALYST_SAMPLING: Sampling = { Temperature: 0, MaxTokens: 8192 };
 
@@ -47,6 +50,7 @@ export const RESEARCH_ANALYST_SYSTEM = [
   "- field-tested: used in real operation, or evaluated with its intended users in their own setting.",
   "",
   "Industry: one to four values, most relevant first, from this list. Use other only when none of the eight applies.",
+  "Care providers (hospitals, clinics, nurses, health systems) and software that serves organizations of every industry alike are other.",
   ...industryLines(),
   "- other: none of the eight industries above.",
   "Technology: one to five short names (at most 60 characters each) of the technologies the work uses or builds.",
