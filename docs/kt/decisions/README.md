@@ -113,6 +113,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0102](0102-effort-counts-three-blockers.md) | Implementation effort counts three blockers | Accepted |
 | [0103](0103-effort-passes-within-one-level.md) | Implementation effort passes within one level | Accepted |
 | [0104](0104-care-provider-limit-is-a-ceiling.md) | Strategic-relevance review; the care-provider limit is a ceiling | Accepted |
+| [0105](0105-relevance-threshold-aligned-with-the-analysis-agents.md) | Relevance threshold aligned with the other analysis agents | Accepted |
 
 ## When an ADR is needed
 
