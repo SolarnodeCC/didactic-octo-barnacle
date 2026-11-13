@@ -83,7 +83,7 @@ describe("REQ-TEST-005: the analysis golden sets load with their frozen inputs",
     expect(rel.every((e) => e.ProblemDiscovery.requiredFacts.length > 0)).toBe(true);
   });
 
-  it("REQ-TEST-005: the thresholds are entry pass rates of 0.75, 0.75, and 0.85 with a tolerance of 0.05", () => {
+  it("REQ-TEST-005: the thresholds are entry pass rates of 0.75 for all three agents with a tolerance of 0.05 (ADR 0105)", () => {
     expect(loadAnalysisThreshold("research-analyst")).toEqual({
       metric: "entry-pass-rate",
       minimum: 0.75,
@@ -96,7 +96,7 @@ describe("REQ-TEST-005: the analysis golden sets load with their frozen inputs",
     });
     expect(loadAnalysisThreshold("relevance")).toEqual({
       metric: "entry-pass-rate",
-      minimum: 0.85,
+      minimum: 0.75,
       tolerance: 0.05,
     });
   });
