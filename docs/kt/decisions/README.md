@@ -114,6 +114,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0103](0103-effort-passes-within-one-level.md) | Implementation effort passes within one level | Accepted |
 | [0104](0104-care-provider-limit-is-a-ceiling.md) | Strategic-relevance review; the care-provider limit is a ceiling | Accepted |
 | [0105](0105-relevance-threshold-aligned-with-the-analysis-agents.md) | Relevance threshold aligned with the other analysis agents | Accepted |
+| [0106](0106-analysis-round-five-selects-the-relevance-model.md) | Analysis round five selects the Relevance model | Accepted |
 
 ## When an ADR is needed
 
