@@ -43,12 +43,20 @@ Notes: string(max 400)?
 - Focus areas are read literally, as written. A problem lies within a focus area only when the focus area's words cover it and the customer is an organization of that industry. When the customer is a care provider (hospital, clinic, nurses, health system) or organizations of every industry alike, `IndustryFit` is at most 70 and `FocusMatch` at most `partial` for every industry ([ADR 0099](../decisions/0099-research-analyst-and-relevance-label-review.md), [ADR 0100](../decisions/0100-analysis-rerun-and-industry-rules-in-the-prompts.md)).
 - TechnicalFeasibility is a model estimate; it has no evidence requirement because the agent does not receive publication text. It may cite the candidate's quotes as `publication-quote` evidence (ADR 0070). It starts from the research maturity: theoretical 0-29, lab result 30-59, prototype 60-79, field-tested 80-100. It is lowered for constraints such as missing data, regulation, or required hardware.
 
+ImplementationEffort counts three blockers that an MVP for the named customer cannot ship without ([ADR 0102](../decisions/0102-effort-counts-three-blockers.md)):
+
+- **Live integration**: reading live from or writing into the customer's operational systems, such as SCADA, an EHR, core banking, an underwriting or pricing system, or a CI/CD pipeline. Reading public data, files the customer exports, or the research's released data is not live integration.
+- **Regulated personal data**: patient health records, payment data, or customer financial records.
+- **Domain experts**: only clinical, legal, actuarial, or regulatory specialists. Other domain or engineering expertise, machine learning, data science, and optimization do not count.
+
 | ImplementationEffort | Meaning |
 |---|---|
-| S | A small team builds an MVP in under three months with existing tools. |
-| M | An MVP takes three to six months or needs one specialist capability. |
-| L | An MVP takes six to twelve months or needs regulated data or integrations. |
-| XL | More than a year, new research, or certification is needed. |
+| S | None of the three blockers; existing tools; about under three months. |
+| M | Exactly one blocker; about three to six months. |
+| L | Two or more blockers; about six to twelve months. |
+| XL | New research, or the product itself needs certification by law before first use, such as medical-device clearance, airworthiness, or security accreditation; software that supports regulated work does not. More than a year. |
+
+The blocker count decides the level; the months only describe it.
 
 ## Evals
 
@@ -56,4 +64,4 @@ Golden set entries hold the expected best-fitting industry, acceptable ranges fo
 
 ## Prompt
 
-`relevance@3` in `packages/prompts/src/relevance.ts` carries the rules above and the eight industries with their focus areas. It sends the candidate (`Finding`, `Customer`, and `WhyNow` and `CurrentAlternative` with their quotes when set), the Research Analyst maturity, industries, and technologies, and the Problem Discovery output, inside the `<publication>` delimiters; no publication text ([ADR 0093](../decisions/0093-analysis-agents-benchmark.md)).
+`relevance@4` in `packages/prompts/src/relevance.ts` carries the rules above and the eight industries with their focus areas. It sends the candidate (`Finding`, `Customer`, and `WhyNow` and `CurrentAlternative` with their quotes when set), the Research Analyst maturity, industries, and technologies, and the Problem Discovery output, inside the `<publication>` delimiters; no publication text ([ADR 0093](../decisions/0093-analysis-agents-benchmark.md)).

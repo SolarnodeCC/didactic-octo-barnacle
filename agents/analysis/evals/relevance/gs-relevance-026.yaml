@@ -7,5 +7,5 @@ expected:
   bestIndustry: energy-utilities
   strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [40, 70]
-  implementationEffort: L
-notes: "Predictive maintenance is a clear focus area; grid and market data integrations make effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [55, 85] to [75, 100] (within)."
+  implementationEffort: M
+notes: "Predictive maintenance is a clear focus area; grid and market data integrations make effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [55, 85] to [75, 100] (within). Effort review (ADR 0102), confirmed by Remco Oostelaar, 2026-11-13: implementationEffort L to M; blockers: live integration (SCADA and maintenance planning; market data are public; optimization does not count)."

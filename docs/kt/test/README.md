@@ -34,6 +34,7 @@ related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-TEST-005, 
 - [Benchmark round three results](benchmark-round-three-results.md): pass rates, failure patterns, and cost of round three (ADR 0091).
 - [Analysis benchmark round one results](analysis-benchmark-round-one-results.md): Research Analyst, Problem Discovery, and Relevance on two candidates (ADR 0096).
 - [Analysis benchmark round two results](analysis-benchmark-round-two-results.md): Research Analyst and Relevance after the label review (ADR 0100).
+- [Analysis benchmark round three results](analysis-benchmark-round-three-results.md): Research Analyst and Relevance on `research-analyst@2` and `relevance@3` (ADR 0101).
 - [Running a model benchmark round](model-benchmark-run.md): the `roi-benchmark` command, its credentials, budget, and output.
 - [Test data](test-data.md): fixtures, golden sets, and privacy rules.
 - [CI gates](ci-gates.md): which checks block a merge in each roadmap phase.

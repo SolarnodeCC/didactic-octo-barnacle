@@ -15,9 +15,11 @@ import { type BuiltPrompt, type Sampling } from "./prompt.js";
  *
  * `relevance@3` reads the focus areas literally and caps the fit of care providers and
  * cross-industry customers at the indirect band (ADR 0099, ADR 0100).
+ *
+ * `relevance@4` decides ImplementationEffort by counting three blockers (ADR 0102).
  */
 
-export const RELEVANCE_PROMPT_VERSION = "relevance@3";
+export const RELEVANCE_PROMPT_VERSION = "relevance@4";
 
 export const RELEVANCE_SAMPLING: Sampling = { Temperature: 0, MaxTokens: 8192 };
 
@@ -54,11 +56,16 @@ export const RELEVANCE_SYSTEM = [
   "When the customer is a care provider (hospital, clinic, nurses, health system) or organizations of every industry alike, IndustryFit is at most 70 and FocusMatch at most partial for every industry.",
   "",
   "TechnicalFeasibility: an integer from 0 to 100. Start from the research maturity (theoretical 0-29, lab-result 30-59, prototype 60-79, field-tested 80-100) and lower it for constraints such as missing data, regulation, or required hardware.",
-  "ImplementationEffort:",
-  "- S: a small team builds an MVP in under three months with existing tools.",
-  "- M: an MVP takes three to six months or needs one specialist capability.",
-  "- L: an MVP takes six to twelve months or needs regulated data or integrations.",
-  "- XL: more than a year, new research, or certification is needed.",
+  "ImplementationEffort: count which of three blockers an MVP for the named customer cannot ship without.",
+  "- Live integration: reading live from or writing into the customer's operational systems (for example SCADA, an EHR, core banking, an underwriting or pricing system, a CI/CD pipeline). Reading public data, files the customer exports, or the research's released data is not live integration.",
+  "- Regulated personal data: patient health records, payment data, or customer financial records.",
+  "- Domain experts: only clinical, legal, actuarial, or regulatory specialists count; other domain or engineering expertise, machine learning, data science, and optimization do not.",
+  "Then:",
+  "- S: none of the three blockers; existing tools; about under three months.",
+  "- M: exactly one blocker; about three to six months.",
+  "- L: two or more blockers; about six to twelve months.",
+  "- XL: new research, or the product itself needs certification by law before first use, such as medical-device clearance, airworthiness, or security accreditation; software that supports regulated work does not. More than a year.",
+  "The blocker count decides the level; the months only describe it.",
   "Constraints: up to five short items (at most 200 characters each), for example regulation or data access.",
   "",
   "Do not compute a strategic relevance score; code does that from IndustryFit and FocusMatch. Confidence: a number from 0 to 1. Notes: at most 400 characters, or null; give the basis of TechnicalFeasibility there.",

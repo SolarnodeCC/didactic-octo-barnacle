@@ -195,9 +195,18 @@ describe("REQ-AGENT-006: the relevance@3 prompt", () => {
   });
 
   it("REQ-AGENT-006: focus areas are read literally and care providers stay at most indirect (relevance@3, ADR 0100)", () => {
-    expect(RELEVANCE_PROMPT_VERSION).toBe("relevance@3");
+    expect(RELEVANCE_PROMPT_VERSION).toBe("relevance@4");
     expect(RELEVANCE_SYSTEM).toContain("the customer is an organization of that industry");
     expect(RELEVANCE_SYSTEM).toContain("IndustryFit is at most 70 and FocusMatch at most partial");
+  });
+
+  it("REQ-AGENT-006: ImplementationEffort counts three blockers (relevance@4, ADR 0102)", () => {
+    expect(RELEVANCE_SYSTEM).toContain(
+      "count which of three blockers an MVP for the named customer cannot ship without",
+    );
+    expect(RELEVANCE_SYSTEM).toContain("- M: exactly one blocker; about three to six months.");
+    expect(RELEVANCE_SYSTEM).toContain("software that supports regulated work does not");
+    expect(RELEVANCE_SYSTEM).toContain("The blocker count decides the level");
   });
 
   it("REQ-AGENT-006: AC1 the prompt asks for all eight industries and leaves the score to code", () => {

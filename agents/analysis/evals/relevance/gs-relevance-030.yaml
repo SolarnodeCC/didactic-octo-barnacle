@@ -7,5 +7,5 @@ expected:
   bestIndustry: aerospace-defense
   strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [35, 65]
-  implementationEffort: L
-notes: "Maintenance planning fits aerospace-defense; airline operations are a partial fit; effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [50, 80] to [75, 100] (within)."
+  implementationEffort: M
+notes: "Maintenance planning fits aerospace-defense; airline operations are a partial fit; effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [50, 80] to [75, 100] (within). Effort review (ADR 0102), confirmed by Remco Oostelaar, 2026-11-13: implementationEffort L to M; blockers: live integration (live airline operations and maintenance systems; optimization does not count)."

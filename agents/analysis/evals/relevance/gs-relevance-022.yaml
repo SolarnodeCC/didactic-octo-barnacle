@@ -7,5 +7,5 @@ expected:
   bestIndustry: automotive
   strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [50, 80]
-  implementationEffort: L
-notes: "Dealer and customer service is a clear focus area; hardware integration makes effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [55, 85] to [75, 100] (within). None of the neighbors is comparable, so the range rises to a boundary case."
+  implementationEffort: M
+notes: "Dealer and customer service is a clear focus area; hardware integration makes effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [55, 85] to [75, 100] (within). None of the neighbors is comparable, so the range rises to a boundary case. Effort review (ADR 0102), confirmed by Remco Oostelaar, 2026-11-13: implementationEffort L to M; blockers: live integration (live vehicle measurement hardware and data hub; diagnostic technicians are not clinical, legal, actuarial, or regulatory experts)."
