@@ -17,9 +17,11 @@ import { type BuiltPrompt, type Sampling } from "./prompt.js";
  * cross-industry customers at the indirect band (ADR 0099, ADR 0100).
  *
  * `relevance@4` decides ImplementationEffort by counting three blockers (ADR 0102).
+ *
+ * `relevance@5` states that the care-provider limit is a ceiling, not a default (ADR 0104).
  */
 
-export const RELEVANCE_PROMPT_VERSION = "relevance@4";
+export const RELEVANCE_PROMPT_VERSION = "relevance@5";
 
 export const RELEVANCE_SAMPLING: Sampling = { Temperature: 0, MaxTokens: 8192 };
 
@@ -54,6 +56,7 @@ export const RELEVANCE_SYSTEM = [
   "FocusMatch: for every one of the eight industries, none, partial, or clear: how well the opportunity matches that industry's focus areas above.",
   "Read the focus areas literally, as written. A problem lies within a focus area only when the focus area's words cover it and the customer is an organization of that industry.",
   "When the customer is a care provider (hospital, clinic, nurses, health system) or organizations of every industry alike, IndustryFit is at most 70 and FocusMatch at most partial for every industry.",
+  "That limit is a ceiling, not a default. For such a customer, score the closest industry 45-70 when the problem touches one of its focus areas indirectly and 20-45 when it touches none; never below 20 for the closest industry.",
   "",
   "TechnicalFeasibility: an integer from 0 to 100. Start from the research maturity (theoretical 0-29, lab-result 30-59, prototype 60-79, field-tested 80-100) and lower it for constraints such as missing data, regulation, or required hardware.",
   "ImplementationEffort: count which of three blockers an MVP for the named customer cannot ship without.",

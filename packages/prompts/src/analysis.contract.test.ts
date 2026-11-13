@@ -195,9 +195,14 @@ describe("REQ-AGENT-006: the relevance@3 prompt", () => {
   });
 
   it("REQ-AGENT-006: focus areas are read literally and care providers stay at most indirect (relevance@3, ADR 0100)", () => {
-    expect(RELEVANCE_PROMPT_VERSION).toBe("relevance@4");
+    expect(RELEVANCE_PROMPT_VERSION).toBe("relevance@5");
     expect(RELEVANCE_SYSTEM).toContain("the customer is an organization of that industry");
     expect(RELEVANCE_SYSTEM).toContain("IndustryFit is at most 70 and FocusMatch at most partial");
+  });
+
+  it("REQ-AGENT-006: the care-provider limit is a ceiling, not a default (relevance@5, ADR 0104)", () => {
+    expect(RELEVANCE_SYSTEM).toContain("That limit is a ceiling, not a default.");
+    expect(RELEVANCE_SYSTEM).toContain("never below 20 for the closest industry");
   });
 
   it("REQ-AGENT-006: ImplementationEffort counts three blockers (relevance@4, ADR 0102)", () => {
