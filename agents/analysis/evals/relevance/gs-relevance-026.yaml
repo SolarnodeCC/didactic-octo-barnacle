@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-026.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-026.yaml
 expected:
   bestIndustry: energy-utilities
-  strategicRelevanceRange: [55, 85]
+  strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [40, 70]
   implementationEffort: L
-notes: "Predictive maintenance is a clear focus area; grid and market data integrations make effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Predictive maintenance is a clear focus area; grid and market data integrations make effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [55, 85] to [75, 100] (within)."

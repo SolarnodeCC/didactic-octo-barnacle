@@ -3,12 +3,12 @@ publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.40641.json
 candidateRef: ../../extraction/evals/extraction/gs-extraction-001.yaml#0
 neighborsFixture: fixtures/neighbors/2610.40641.json
 expected:
-  noveltyRange: [40, 70]
+  noveltyRange: [50, 80]
   maturity: prototype
   industriesInclude:
     - public-sector
 handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
-  novelty: 55
+  novelty: 65
   maturity: prototype
   industry:
     - public-sector
@@ -16,4 +16,4 @@ handoff: # the frozen Research Analyst output that Problem Discovery and later a
     - "agentic AI"
     - "causal analysis of weather indices"
     - "crop loss prediction"
-notes: "Maturity judged from the abstract. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Agricultural disasters are not a listed focus area; the sector stays public-sector because governments handle the disaster. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+notes: "Maturity judged from the abstract. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Agricultural disasters are not a listed focus area; the sector stays public-sector because governments handle the disaster. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: noveltyRange [40, 70] to [50, 80]. WxCrop is the first agent to link causal weather indices to insurance-calibrated crop-loss shares, which no neighbor does: a new method."

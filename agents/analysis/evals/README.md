@@ -12,7 +12,7 @@ problem-discovery.rubric.md                      the versioned rubric of the fac
 
 Publications are read from `agents/extraction/evals/fixtures/arxiv/`. Candidates are read from the expected candidates of the extraction golden set, through `candidateRef`.
 
-## State after the round-two label review
+## State after the label review of ADR 0099
 
 | Agent | Entries | Minimum (REQ-TEST-005) |
 |---|---|---|
@@ -26,17 +26,17 @@ Publications are read from `agents/extraction/evals/fixtures/arxiv/`. Candidates
 | Value | Research Analyst (industries that must appear) | Problem Discovery (customer industry) | Relevance (best industry) |
 |---|---|---|---|
 | `automotive` | 2 | 2 | 2 |
-| `aerospace-defense` | 4 | 3 | 3 |
+| `aerospace-defense` | 3 | 3 | 4 |
 | `consumer-retail` | 3 | 3 | 3 |
 | `energy-utilities` | 3 | 3 | 3 |
-| `banking` | 5 | 4 | 6 |
-| `insurance` | 5 | 2 | 3 |
+| `banking` | 4 | 4 | 5 |
+| `insurance` | 2 | 2 | 3 |
 | `public-sector` | 5 | 5 | 5 |
-| `life-sciences` | 4 | 3 | 8 |
-| `other` | 6 | 8 | not allowed |
+| `life-sciences` | 3 | 3 | 8 |
+| `other` | 8 | 8 | not allowed |
 
-- Every one of the eight industries now has entries in all three sets. Care providers (nurses, emergency departments, psychiatric intake, telephone triage) and cross-industry software stay `other` for Research Analyst and Problem Discovery; Relevance scores them against `life-sciences` or `banking` with lower strategic relevance ranges.
-- Relevance reads the frozen `handoff` blocks and the Problem Discovery facts of the same entries. Its ranges are at most 30 points wide.
+- Every one of the eight industries now has entries in all three sets. Care providers (nurses, emergency departments, psychiatric intake, telephone triage) and cross-industry software stay `other` for Research Analyst and Problem Discovery; Relevance scores them against the closest industry, at most in the indirect band (ADR 0099).
+- Relevance reads the frozen `handoff` blocks and the Problem Discovery facts of the same entries. Its ranges are at most 30 points wide. The strategic relevance range follows one band against the best industry's focus areas, read literally: outside [20, 50], indirect [45, 75], within [75, 100] (ADR 0099).
 - The other three agents (Market Analysis, Competition, Startup Generator) have no entries yet. Market Analysis and Competition need recorded search results first (REQ-AGENT-013).
 
 ## How the neighbor fixtures were made
@@ -46,3 +46,5 @@ The platform's corpus does not exist yet, so the ten nearest publications were t
 ## How the labels were made
 
 Remco Oostelaar reviewed the pilot round and the Relevance round on 2026-11-02; round 3 is drafted for his review in the pull request. Claude drafted the ranges and the required facts and is not a candidate model in the benchmark. Ranges are the allowed margin: a model output inside the range passes. A Novelty range is at most 30 points wide and a PainLevel range at most 2 wide. `handoff` holds the Novelty at the middle of the range plus the Maturity, industries, and technologies of the expected entry.
+
+The label review of 2026-11-13 ([ADR 0099](../../../docs/kt/decisions/0099-research-analyst-and-relevance-label-review.md)) changed 16 Research Analyst and 29 Relevance entries: Claude drafted, `llama-3.3-70b-instruct-fp8-fast` cross-checked blind, and Remco Oostelaar confirmed each change.

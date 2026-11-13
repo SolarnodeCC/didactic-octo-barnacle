@@ -2,7 +2,7 @@
 title: Decisions index
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-12
+last_reviewed: 2026-11-13
 ---
 
 # Architecture decision records
@@ -107,6 +107,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0096](0096-analysis-round-one-results.md) | Analysis round one: Gemma for Problem Discovery, provisionally; Research Analyst and Relevance open | Accepted |
 | [0097](0097-relevance-industry-fit-against-focus-areas.md) | Relevance scores IndustryFit against each industry's focus areas | Accepted |
 | [0098](0098-relevance-rerun-label-review.md) | Relevance stays open after the relevance@2 rerun; its labels are reviewed | Accepted |
+| [0099](0099-research-analyst-and-relevance-label-review.md) | Research Analyst and Relevance label review | Accepted |
 
 ## When an ADR is needed
 

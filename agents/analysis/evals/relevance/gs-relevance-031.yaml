@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-031.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-031.yaml
 expected:
   bestIndustry: aerospace-defense
-  strategicRelevanceRange: [60, 90]
+  strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [10, 40]
   implementationEffort: XL
-notes: "Mission planning and decision support is a clear focus area; security accreditation makes effort XL. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Mission planning and decision support is a clear focus area; security accreditation makes effort XL. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [60, 90] to [75, 100] (within)."

@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-032.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-032.yaml
 expected:
   bestIndustry: insurance
-  strategicRelevanceRange: [65, 95]
+  strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [50, 80]
   implementationEffort: L
-notes: "Underwriting is a clear focus area; data residency and integrations make effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Underwriting is a clear focus area; data residency and integrations make effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [65, 95] to [75, 100] (within). None of the ten neighbors is comparable; a new method for underwriting."

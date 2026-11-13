@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-007.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-007.yaml
 expected:
   bestIndustry: public-sector
-  strategicRelevanceRange: [30, 60]
-  technicalFeasibilityRange: [50, 80]
-  implementationEffort: M
-notes: "A way of working, not a product; feasibility and relevance are uncertain. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+  strategicRelevanceRange: [20, 50]
+  technicalFeasibilityRange: [70, 95]
+  implementationEffort: S
+notes: "A way of working, not a product; feasibility and relevance are uncertain. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [30, 60] to [20, 50] (outside); technicalFeasibilityRange [50, 80] to [70, 95]; implementationEffort M to S. No public-sector focus area covers internal software reuse, so outside; field-tested starts at 80; an InnerSource portal on existing tools is effort S."

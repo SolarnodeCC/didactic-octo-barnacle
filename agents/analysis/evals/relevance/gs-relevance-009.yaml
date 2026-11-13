@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-009.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-009.yaml
 expected:
   bestIndustry: life-sciences
-  strategicRelevanceRange: [40, 70]
-  technicalFeasibilityRange: [55, 80]
+  strategicRelevanceRange: [45, 75]
+  technicalFeasibilityRange: [65, 90]
   implementationEffort: L
-notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Nurses are care providers (other); life-sciences is a weak Relevance match through clinical triage. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Nurses are care providers (other); life-sciences is a weak Relevance match through clinical triage. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [40, 70] to [45, 75] (indirect); technicalFeasibilityRange [55, 80] to [65, 90]. Deployed and used on 152,421 queries, so field-tested; a care provider, so the band is at most indirect."

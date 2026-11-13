@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-033.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-033.yaml
 expected:
   bestIndustry: insurance
-  strategicRelevanceRange: [60, 90]
+  strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [55, 85]
   implementationEffort: L
-notes: "Claims automation and risk assessment are clear focus areas; health data in claims makes effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Claims automation and risk assessment are clear focus areas; health data in claims makes effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [60, 90] to [75, 100] (within)."

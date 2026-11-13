@@ -3,12 +3,12 @@ publicationFixture: ../../extraction/evals/fixtures/arxiv/2610.40164.json
 candidateRef: ../../extraction/evals/extraction/gs-extraction-002.yaml#0
 neighborsFixture: fixtures/neighbors/2610.40164.json
 expected:
-  noveltyRange: [30, 60]
+  noveltyRange: [40, 70]
   maturity: lab-result
   industriesInclude:
     - public-sector
 handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
-  novelty: 45
+  novelty: 55
   maturity: lab-result
   industry:
     - public-sector
@@ -16,4 +16,4 @@ handoff: # the frozen Research Analyst output that Problem Discovery and later a
     - "media ownership dataset"
     - "traffic-weighted concentration indices"
     - "generative AI search"
-notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: noveltyRange [30, 60] to [40, 70]. The AI-citation concentration is a new finding; regulatory monitoring touches public services indirectly."

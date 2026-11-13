@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-002.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-002.yaml
 expected:
   bestIndustry: public-sector
-  strategicRelevanceRange: [35, 65]
+  strategicRelevanceRange: [45, 75]
   technicalFeasibilityRange: [40, 70]
   implementationEffort: M
-notes: "Media concentration is not among the government focus areas. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+notes: "Media concentration is not among the government focus areas. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [35, 65] to [45, 75] (indirect). The AI-citation concentration is a new finding; regulatory monitoring touches public services indirectly."

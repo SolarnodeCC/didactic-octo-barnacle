@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-008.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-008.yaml
 expected:
   bestIndustry: public-sector
-  strategicRelevanceRange: [50, 80]
+  strategicRelevanceRange: [45, 75]
   technicalFeasibilityRange: [55, 80]
   implementationEffort: M
-notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [50, 80] to [45, 75] (indirect). Evidence consolidation is a new angle beside the FRIA ontologies among the neighbors; public-sector lists no compliance area, so the band is indirect."
