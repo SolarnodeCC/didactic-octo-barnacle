@@ -7,5 +7,5 @@ expected:
   bestIndustry: public-sector
   strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [35, 65]
-  implementationEffort: M
-notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: technicalFeasibilityRange [50, 80] to [35, 65]. Lab-result starts at 30-59 on the feasibility scale."
+  implementationEffort: S
+notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: technicalFeasibilityRange [50, 80] to [35, 65]. Lab-result starts at 30-59 on the feasibility scale. Effort review (ADR 0102), confirmed by Remco Oostelaar, 2026-11-13: implementationEffort M to S; blockers: none (a staffing model from exported call-centre data; operations research does not count as a domain expert)."
