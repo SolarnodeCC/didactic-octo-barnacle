@@ -4,8 +4,8 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-003.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-003.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-003.yaml
 expected:
-  bestIndustry: banking
+  bestIndustry: aerospace-defense
   strategicRelevanceRange: [45, 75]
-  technicalFeasibilityRange: [55, 80]
+  technicalFeasibilityRange: [10, 40]
   implementationEffort: M
-notes: "Fits compliance and process automation but is not a listed focus. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Cross-industry (AI coding agents); the owner notes this applies to all regulated businesses, so four regulated industries are required. Banking is the Relevance sector (compliance automation). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+notes: "Fits compliance and process automation but is not a listed focus. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Cross-industry (AI coding agents); the owner notes this applies to all regulated businesses, so four regulated industries are required. Banking is the Relevance sector (compliance automation). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: bestIndustry banking to aerospace-defense; technicalFeasibilityRange [55, 80] to [10, 40]. The abstract reports a protocol, nothing run, so theoretical; NovaFabric among the neighbors already gives tamper-evident agent evidence. Cross-industry software is other, as Problem Discovery has it, which replaces the four-industry note; the customer is any organization, so the band is at most indirect, and secure engineering (aerospace-defense) is the literal focus area."

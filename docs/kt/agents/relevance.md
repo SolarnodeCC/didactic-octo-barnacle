@@ -2,7 +2,7 @@
 title: Relevance Agent
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-11-12
+last_reviewed: 2026-11-13
 related: [REQ-AGENT-006]
 ---
 
@@ -51,7 +51,7 @@ Notes: string(max 400)?
 
 ## Evals
 
-Golden set entries hold the expected best-fitting industry, acceptable ranges for StrategicRelevanceScore and TechnicalFeasibility, and the expected effort. The expected industry passes when it is among those with the highest `IndustryFit`.
+Golden set entries hold the expected best-fitting industry, acceptable ranges for StrategicRelevanceScore and TechnicalFeasibility, and the expected effort. The expected industry passes when it is among those with the highest `IndustryFit`. The StrategicRelevanceScore range follows one band against the best industry's focus areas, read literally: outside [20, 50], indirect [45, 75], within [75, 100]; within needs the customer to be an organization of that industry, so a care provider or a customer of every industry alike is at most indirect ([ADR 0099](../decisions/0099-research-analyst-and-relevance-label-review.md)).
 
 ## Prompt
 

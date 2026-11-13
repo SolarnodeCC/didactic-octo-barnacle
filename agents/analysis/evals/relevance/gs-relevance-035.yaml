@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-035.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-035.yaml
 expected:
   bestIndustry: life-sciences
-  strategicRelevanceRange: [65, 95]
+  strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [45, 75]
   implementationEffort: L
-notes: "Pharmacovigilance is a clear focus area; GxP validation makes effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Pharmacovigilance is a clear focus area; GxP validation makes effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [65, 95] to [75, 100] (within)."

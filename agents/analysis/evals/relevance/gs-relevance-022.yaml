@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-022.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-022.yaml
 expected:
   bestIndustry: automotive
-  strategicRelevanceRange: [55, 85]
+  strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [50, 80]
   implementationEffort: L
-notes: "Dealer and customer service is a clear focus area; hardware integration makes effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Dealer and customer service is a clear focus area; hardware integration makes effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [55, 85] to [75, 100] (within). None of the neighbors is comparable, so the range rises to a boundary case."

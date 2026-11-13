@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-005.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-005.yaml
 expected:
   bestIndustry: banking
-  strategicRelevanceRange: [60, 90]
-  technicalFeasibilityRange: [55, 80]
-  implementationEffort: M
-notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+  strategicRelevanceRange: [75, 100]
+  technicalFeasibilityRange: [10, 40]
+  implementationEffort: L
+notes: "Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [60, 90] to [75, 100] (within); technicalFeasibilityRange [55, 80] to [10, 40]; implementationEffort M to L. An architecture, schema, and implementation programme with nothing run, so theoretical; agent assurance for banks is risk management; the validator runs inside the institution, so effort L."

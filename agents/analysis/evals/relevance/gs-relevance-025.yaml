@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-025.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-025.yaml
 expected:
   bestIndustry: consumer-retail
-  strategicRelevanceRange: [55, 85]
+  strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [70, 95]
-  implementationEffort: L
-notes: "Merchandising and pricing fit consumer-retail; scale across markets makes effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+  implementationEffort: M
+notes: "Merchandising and pricing fit consumer-retail; scale across markets makes effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [55, 85] to [75, 100] (within); implementationEffort L to M. An MVP for one market is a forecaster and an optimizer, effort M; this replaces the effort note."

@@ -4,16 +4,16 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-014.yaml#0
 neighborsFixture: fixtures/neighbors/2609.21149.json
 expected:
   noveltyRange: [40, 70]
-  maturity: lab-result
+  maturity: prototype
   industriesInclude:
     - other
 handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
   novelty: 55
-  maturity: lab-result
+  maturity: prototype
   industry:
     - other
   technology:
     - "patient simulator"
     - "LLM intake interviewer"
     - "clinical evaluation platform"
-notes: "Pain level is a boundary case between 3 and 4. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+notes: "Pain level is a boundary case between 3 and 4. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: maturity lab-result to prototype. A platform built and piloted with six clinicians, so prototype; a care provider, so the band is indirect."

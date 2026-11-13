@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-027.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-027.yaml
 expected:
   bestIndustry: energy-utilities
-  strategicRelevanceRange: [60, 90]
+  strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [55, 85]
   implementationEffort: M
-notes: "Grid and asset monitoring is a clear focus area; effort M with existing geospatial data. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Grid and asset monitoring is a clear focus area; effort M with existing geospatial data. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [60, 90] to [75, 100] (within). The neighbors are unrelated; a modular asset-level architecture with known predictors, a boundary case."

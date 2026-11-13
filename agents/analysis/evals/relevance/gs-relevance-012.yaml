@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-012.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-012.yaml
 expected:
   bestIndustry: life-sciences
-  strategicRelevanceRange: [30, 60]
+  strategicRelevanceRange: [20, 50]
   technicalFeasibilityRange: [40, 70]
   implementationEffort: L
-notes: "Effort L because of patient-record integration; M is also defensible. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Quality review in an emergency department is a care-provider case (other); weak Relevance match. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+notes: "Effort L because of patient-record integration; M is also defensible. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Quality review in an emergency department is a care-provider case (other); weak Relevance match. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [30, 60] to [20, 50] (outside). Four neighbors, none on revisit screening; hospital quality review lies outside the life-sciences focus areas."

@@ -2,7 +2,7 @@
 title: Golden sets and reviewers
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-11
+last_reviewed: 2026-11-13
 related: [REQ-TEST-004, REQ-TEST-005, REQ-SCORE-006, REQ-AGENT-001]
 ---
 
@@ -146,7 +146,7 @@ expected:
   painLevelRange: [3, 4]      # at most 2 wide
 ```
 
-A Relevance item reads the frozen outputs of the two agents before it and lists acceptable ranges, because the strategic relevance score is computed by code from the model's industry fit and focus match:
+A Relevance item reads the frozen outputs of the two agents before it and lists acceptable ranges, because the strategic relevance score is computed by code from the model's industry fit and focus match. The strategic relevance range follows one band against the best industry's focus areas, read literally: outside [20, 50], indirect [45, 75], within [75, 100]; a care provider or a customer of every industry alike is at most indirect (ADR 0099):
 
 ```yaml
 id: gs-relevance-001
@@ -156,7 +156,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-001.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-001.yaml
 expected:
   bestIndustry: public-sector
-  strategicRelevanceRange: [35, 65]    # at most 30 wide
+  strategicRelevanceRange: [75, 100]   # the band: outside, indirect, or within
   technicalFeasibilityRange: [50, 75]  # at most 30 wide
   implementationEffort: L              # S, M, L, or XL
 ```

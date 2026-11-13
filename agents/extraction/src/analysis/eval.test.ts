@@ -227,7 +227,8 @@ describe("REQ-AGENT-006: the Relevance eval", () => {
   });
 
   it("REQ-AGENT-006: another best industry, feasibility out of range, and another effort each fail", async () => {
-    const entry = rel[0]!;
+    // An entry whose range stops below 100, so a fit of 100 for another industry falls outside it.
+    const entry = rel.find((e) => e.expected.strategicRelevanceRange[1] < 100)!;
     const other = TARGET_INDUSTRY_KEYS.find((k) => k !== entry.expected.bestIndustry)!;
     const wrong: EntryModelFn<RelevanceEntry> = async (e) => {
       const out = (await relOracle(e)) as { IndustryFit: Record<string, number> };

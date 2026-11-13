@@ -6,6 +6,6 @@ problemDiscoveryRef: problem-discovery/gs-problem-discovery-014.yaml
 expected:
   bestIndustry: life-sciences
   strategicRelevanceRange: [45, 75]
-  technicalFeasibilityRange: [55, 85]
+  technicalFeasibilityRange: [30, 60]
   implementationEffort: L
-notes: "Effort: licensed guidelines and safety validation make L likely, M is also defensible. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Telephone triage is a care-provider case (other); clinical decision support is close to life-sciences. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+notes: "Effort: licensed guidelines and safety validation make L likely, M is also defensible. Reviewer: Remco Oostelaar (Relevance review, 2026-11-02). Telephone triage is a care-provider case (other); clinical decision support is close to life-sciences. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: technicalFeasibilityRange [55, 85] to [30, 60]. Evaluated on 566 synthetic scenarios, so lab-result; a care provider, so the band is indirect."

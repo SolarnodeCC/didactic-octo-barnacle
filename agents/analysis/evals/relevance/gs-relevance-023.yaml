@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-023.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-023.yaml
 expected:
   bestIndustry: consumer-retail
-  strategicRelevanceRange: [60, 90]
+  strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [55, 85]
   implementationEffort: L
-notes: "Inventory and supply chain is a clear focus area; integrations with outlets and suppliers make effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Inventory and supply chain is a clear focus area; integrations with outlets and suppliers make effort L. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [60, 90] to [75, 100] (within)."

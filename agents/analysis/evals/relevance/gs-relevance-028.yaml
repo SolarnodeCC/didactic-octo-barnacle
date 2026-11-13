@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-028.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-028.yaml
 expected:
   bestIndustry: energy-utilities
-  strategicRelevanceRange: [55, 85]
+  strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [30, 60]
   implementationEffort: L
-notes: "Safety and regulatory constraints on grid operations; XL is defensible. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Safety and regulatory constraints on grid operations; XL is defensible. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [55, 85] to [75, 100] (within)."

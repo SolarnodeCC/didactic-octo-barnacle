@@ -3,19 +3,17 @@ publicationFixture: ../../extraction/evals/fixtures/arxiv/2606.17555.json
 candidateRef: ../../extraction/evals/extraction/gs-extraction-018.yaml#0
 neighborsFixture: fixtures/neighbors/2606.17555.json
 expected:
-  noveltyRange: [20, 50]
+  noveltyRange: [30, 60]
   maturity: lab-result
   industriesInclude:
     - banking
-    - insurance
 handoff: # the frozen Research Analyst output that Problem Discovery and later agents receive as input
-  novelty: 35
+  novelty: 45
   maturity: lab-result
   industry:
     - banking
-    - insurance
   technology:
     - "LSTM sequence model"
     - "graph module"
     - "autonomous AI agent"
-notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). The owner added insurance: fraud and money-laundering detection applies to insurers as well. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). The owner added insurance: fraud and money-laundering detection applies to insurers as well. Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: noveltyRange [20, 50] to [30, 60]; industries banking, insurance to banking. The abstract is about banks only, so insurance is no longer required; known components fused into a new two-stream agent, a boundary case."

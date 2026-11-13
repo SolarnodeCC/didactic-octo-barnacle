@@ -51,8 +51,8 @@ class GoldenSetsTest(ScriptTestCase):
         self.assert_fails_with("industry 'farming' is not one of the eight industries or 'other'")
 
     def test_req_test_005_fails_on_a_range_that_is_too_wide(self) -> None:
-        self.replace(ANALYST, "noveltyRange: [40, 70]", "noveltyRange: [10, 70]")
-        self.assert_fails_with("noveltyRange [10, 70] is wider than 30")
+        self.replace(ANALYST, "noveltyRange: [50, 80]", "noveltyRange: [10, 80]")
+        self.assert_fails_with("noveltyRange [10, 80] is wider than 30")
 
     def test_req_test_005_fails_on_an_unknown_maturity(self) -> None:
         self.replace(ANALYST, "  maturity: prototype\n  industriesInclude", "  maturity: alpha\n  industriesInclude")

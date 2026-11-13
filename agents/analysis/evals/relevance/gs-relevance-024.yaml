@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-024.yaml
 problemDiscoveryRef: problem-discovery/gs-problem-discovery-024.yaml
 expected:
   bestIndustry: consumer-retail
-  strategicRelevanceRange: [55, 85]
+  strategicRelevanceRange: [75, 100]
   technicalFeasibilityRange: [45, 75]
   implementationEffort: M
-notes: "Demand forecasting is a clear focus area; a correction inside an existing forecast pipeline is effort M. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Demand forecasting is a clear focus area; a correction inside an existing forecast pipeline is effort M. Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Label review (ADR 0099), confirmed by Remco Oostelaar, 2026-11-13: strategicRelevanceRange [55, 85] to [75, 100] (within). Two neighbors; the underestimation is a new empirical finding, a boundary case."
