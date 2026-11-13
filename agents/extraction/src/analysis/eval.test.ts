@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   FACTS_GATE,
   runProblemDiscoveryEval,
+  effortWithinOneLevel,
   runRelevanceEval,
   runResearchAnalystEval,
   type EntryModelFn,
@@ -226,6 +227,14 @@ describe("REQ-AGENT-006: the Relevance eval", () => {
     );
   });
 
+  it("REQ-AGENT-006: effort passes one level from the label and fails two levels away (ADR 0103)", () => {
+    expect(effortWithinOneLevel("M", "L")).toBe(true);
+    expect(effortWithinOneLevel("XL", "L")).toBe(true);
+    expect(effortWithinOneLevel("S", "S")).toBe(true);
+    expect(effortWithinOneLevel("S", "L")).toBe(false);
+    expect(effortWithinOneLevel("XL", "M")).toBe(false);
+  });
+
   it("REQ-AGENT-006: another best industry, feasibility out of range, and another effort each fail", async () => {
     // An entry whose range stops below 100, so a fit of 100 for another industry falls outside it.
     const entry = rel.find((e) => e.expected.strategicRelevanceRange[1] < 100)!;
@@ -236,7 +245,8 @@ describe("REQ-AGENT-006: the Relevance eval", () => {
         ...out,
         IndustryFit: { ...out.IndustryFit, [other]: 100 },
         TechnicalFeasibility: e.expected.technicalFeasibilityRange[1] + 1,
-        ImplementationEffort: e.expected.implementationEffort === "XL" ? "S" : "XL",
+        // Two or more levels away, so the one-level tolerance of ADR 0103 does not apply.
+        ImplementationEffort: ["S", "M"].includes(e.expected.implementationEffort) ? "XL" : "S",
       };
     };
     const report = await runRelevanceEval([entry], wrong, threshold);

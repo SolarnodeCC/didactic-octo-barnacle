@@ -60,7 +60,7 @@ The blocker count decides the level; the months only describe it.
 
 ## Evals
 
-Golden set entries hold the expected best-fitting industry, acceptable ranges for StrategicRelevanceScore and TechnicalFeasibility, and the expected effort. The expected industry passes when it is among those with the highest `IndustryFit`. The StrategicRelevanceScore range follows one band against the best industry's focus areas, read literally: outside [20, 50], indirect [45, 75], within [75, 100]; within needs the customer to be an organization of that industry, so a care provider or a customer of every industry alike is at most indirect ([ADR 0099](../decisions/0099-research-analyst-and-relevance-label-review.md)).
+Golden set entries hold the expected best-fitting industry, acceptable ranges for StrategicRelevanceScore and TechnicalFeasibility, and the expected effort. The expected industry passes when it is among those with the highest `IndustryFit`. ImplementationEffort passes within one level of the label (S, M, L, XL), as a range does for the numeric checks ([ADR 0103](../decisions/0103-effort-passes-within-one-level.md)). The StrategicRelevanceScore range follows one band against the best industry's focus areas, read literally: outside [20, 50], indirect [45, 75], within [75, 100]; within needs the customer to be an organization of that industry, so a care provider or a customer of every industry alike is at most indirect ([ADR 0099](../decisions/0099-research-analyst-and-relevance-label-review.md)).
 
 ## Prompt
 

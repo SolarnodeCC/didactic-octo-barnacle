@@ -158,7 +158,7 @@ expected:
   bestIndustry: public-sector
   strategicRelevanceRange: [75, 100]   # the band: outside, indirect, or within
   technicalFeasibilityRange: [50, 75]  # at most 30 wide
-  implementationEffort: L              # S, M, L, or XL
+  implementationEffort: L              # S, M, L, or XL; one level either way passes
 ```
 
 Evidence envelopes are required on agent expected outputs (unlike the short product examples). Injection fixtures live under `fixtures/injection/` (REQ-NFR-006).

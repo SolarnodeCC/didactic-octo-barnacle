@@ -5,6 +5,7 @@ import {
   bestIndustries,
   repairModelOutput,
   strategicRelevanceScore,
+  type ImplementationEffort,
   type ProblemDiscoveryOutput,
 } from "@roi/models";
 
@@ -163,10 +164,23 @@ export async function runProblemDiscoveryEval(
   };
 }
 
+const EFFORT_ORDER: readonly ImplementationEffort[] = ["S", "M", "L", "XL"];
+
+/**
+ * ImplementationEffort is an ordered scale, so an answer one level from the label passes, as a
+ * range does for the numeric checks (ADR 0103).
+ */
+export function effortWithinOneLevel(
+  answer: ImplementationEffort,
+  expected: ImplementationEffort,
+): boolean {
+  return Math.abs(EFFORT_ORDER.indexOf(answer) - EFFORT_ORDER.indexOf(expected)) <= 1;
+}
+
 /**
  * Relevance: the expected industry among the best-fitting ones (a tie counts for each), the
- * computed StrategicRelevanceScore and TechnicalFeasibility in their ranges, and the expected
- * ImplementationEffort.
+ * computed StrategicRelevanceScore and TechnicalFeasibility in their ranges, and
+ * ImplementationEffort within one level of the label.
  */
 export async function runRelevanceEval(
   entries: readonly RelevanceEntry[],
@@ -191,7 +205,7 @@ export async function runRelevanceEval(
       if (!inRange(out.TechnicalFeasibility, entry.expected.technicalFeasibilityRange)) {
         failures.push("technical-feasibility");
       }
-      if (out.ImplementationEffort !== entry.expected.implementationEffort) {
+      if (!effortWithinOneLevel(out.ImplementationEffort, entry.expected.implementationEffort)) {
         failures.push("implementation-effort");
       }
     }
