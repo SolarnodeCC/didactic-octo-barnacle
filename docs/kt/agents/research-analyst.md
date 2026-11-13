@@ -2,7 +2,7 @@
 title: Research Analyst Agent
 owner: "@SolarnodeCC"
 status: draft
-last_reviewed: 2026-11-11
+last_reviewed: 2026-11-13
 related: [REQ-AGENT-001]
 ---
 
@@ -48,7 +48,7 @@ Notes: string(max 400)?
 | 80-100 | A new direction with few or no comparable publications. |
 
 - Novelty evidence cites at least one related publication, or is a `none-found` item stating that none were found.
-- Industry uses `other` only when none of the eight target industries applies.
+- Industry uses `other` only when none of the eight target industries applies. Care providers (hospitals, clinics, nurses, health systems) and software that serves organizations of every industry alike are `other` ([ADR 0100](../decisions/0100-analysis-rerun-and-industry-rules-in-the-prompts.md)).
 - `RelatedPublicationIds` lists the related publications the agent compared against, each one of those it received; the pipeline turns them into `related-publication` evidence for `Novelty`, or a `none-found` item when the list is empty.
 
 | Maturity | Meaning |
@@ -60,7 +60,7 @@ Notes: string(max 400)?
 
 ## Prompt
 
-`research-analyst@1` in `packages/prompts/src/research-analyst.ts` carries the rules above, the eight industries with their focus areas, and the candidate. It sends the title, the abstract, and each related publication with its ID, date, title, and abstract, without LaTeX markup, inside the `<publication>` delimiters ([ADR 0093](../decisions/0093-analysis-agents-benchmark.md)).
+`research-analyst@2` in `packages/prompts/src/research-analyst.ts` carries the rules above, the eight industries with their focus areas, and the candidate. It sends the title, the abstract, and each related publication with its ID, date, title, and abstract, without LaTeX markup, inside the `<publication>` delimiters ([ADR 0093](../decisions/0093-analysis-agents-benchmark.md)).
 
 ## Evals
 
