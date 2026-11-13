@@ -12,7 +12,7 @@ problem-discovery.rubric.md                      the versioned rubric of the fac
 
 Publications are read from `agents/extraction/evals/fixtures/arxiv/`. Candidates are read from the expected candidates of the extraction golden set, through `candidateRef`.
 
-## State after the label review of ADR 0099
+## State after the label review of ADR 0099 and the relabel of ADR 0101
 
 | Agent | Entries | Minimum (REQ-TEST-005) |
 |---|---|---|
@@ -32,8 +32,8 @@ Publications are read from `agents/extraction/evals/fixtures/arxiv/`. Candidates
 | `banking` | 4 | 4 | 5 |
 | `insurance` | 2 | 2 | 3 |
 | `public-sector` | 5 | 5 | 5 |
-| `life-sciences` | 3 | 3 | 8 |
-| `other` | 8 | 8 | not allowed |
+| `life-sciences` | 2 | 3 | 8 |
+| `other` | 9 | 8 | not allowed |
 
 - Every one of the eight industries now has entries in all three sets. Care providers (nurses, emergency departments, psychiatric intake, telephone triage) and cross-industry software stay `other` for Research Analyst and Problem Discovery; Relevance scores them against the closest industry, at most in the indirect band (ADR 0099).
 - Relevance reads the frozen `handoff` blocks and the Problem Discovery facts of the same entries. Its ranges are at most 30 points wide. The strategic relevance range follows one band against the best industry's focus areas, read literally: outside [20, 50], indirect [45, 75], within [75, 100] (ADR 0099).
