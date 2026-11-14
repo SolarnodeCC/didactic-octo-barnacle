@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-022.yaml
 expected:
   requiredFacts:
     - "independent workshops cannot use diagnostic capabilities that were limited to manufacturer tools"
-    - "workshops need trusted data exchange and technician upskilling to compete"
+    - "independent workshops lose competitiveness against manufacturer-linked service"
   customerIndustry: automotive
   painLevelRange: [3, 4]
-notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Fact review (ADR 0108), confirmed by Remco Oostelaar, 2026-11-14: 1 fact reworded as the customer's pain."

@@ -5,7 +5,6 @@ researchAnalystRef: research-analyst/gs-research-analyst-023.yaml
 expected:
   requiredFacts:
     - "supermarket supply chain workflows such as forecasting, procurement, supplier coordination, and replenishment are manual, reactive, and hard to scale"
-    - "supply chain managers must supervise and be able to intervene in automated steps"
   customerIndustry: consumer-retail
   painLevelRange: [3, 4]
-notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Fact review (ADR 0108), confirmed by Remco Oostelaar, 2026-11-14: 1 cause or result fact dropped."

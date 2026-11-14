@@ -4,8 +4,7 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-029.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-026.yaml
 expected:
   requiredFacts:
-    - "power producers plan wind turbine maintenance from farm-level signals only"
-    - "using curtailment and market price signals can cut annual maintenance costs by up to 10% on a 600-MW offshore farm"
+    - "producers pay up to 10% more for turbine maintenance than they need to"
   customerIndustry: energy-utilities
   painLevelRange: [3, 4]
-notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Fact review (ADR 0108), confirmed by Remco Oostelaar, 2026-11-14: 1 fact reworded as the customer's pain; 1 cause or result fact dropped."

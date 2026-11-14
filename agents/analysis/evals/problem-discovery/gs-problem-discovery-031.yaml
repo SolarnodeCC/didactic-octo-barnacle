@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-031.yaml
 expected:
   requiredFacts:
     - "data volume and velocity reaching command-and-control centers strain the observe-orient-decide-act cycle"
-    - "AI systems in defense today are reactive and isolated tools that rely on human operators to integrate information"
+    - "operators must integrate information by hand, which slows decisions"
   customerIndustry: aerospace-defense
   painLevelRange: [3, 4]
-notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Fact review (ADR 0108), confirmed by Remco Oostelaar, 2026-11-14: 1 fact reworded as the customer's pain."

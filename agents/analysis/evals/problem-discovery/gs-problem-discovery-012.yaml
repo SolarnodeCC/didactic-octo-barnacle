@@ -4,8 +4,8 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-013.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-012.yaml
 expected:
   requiredFacts:
-    - "hospitals review only emergency revisits within 48-72 hours"
-    - "this may miss quality improvement opportunities and manual review is burdensome"
+    - "reviewing only revisits within 48-72 hours misses quality improvement opportunities"
+    - "manual chart review of revisits is a heavy burden on reviewers"
   customerIndustry: other
   painLevelRange: [3, 4]
-notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Fact review (ADR 0108), confirmed by Remco Oostelaar, 2026-11-14: 2 facts reworded as the customer's pain."

@@ -4,8 +4,8 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-016.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-014.yaml
 expected:
   requiredFacts:
-    - "telephone triage is safety critical and nurses decide from a brief intake note"
+    - "a wrong disposition from a brief intake note puts the caller's safety at risk"
     - "direct LLMs over-escalate and cannot justify against an auditable clinical standard"
   customerIndustry: other
   painLevelRange: [4, 5]
-notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Fact review (ADR 0108), confirmed by Remco Oostelaar, 2026-11-14: 1 fact reworded as the customer's pain."

@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-029.yaml
 expected:
   requiredFacts:
     - "technicians avoid the aircraft maintenance manual because it is hard to navigate and slow to use under strict schedules"
-    - "existing retrieval models cover text only and miss diagrams"
+    - "technicians spend scarce time searching the manual for procedures, diagrams, and cautions"
   customerIndustry: aerospace-defense
   painLevelRange: [3, 4]
-notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Fact review (ADR 0108), confirmed by Remco Oostelaar, 2026-11-14: 1 fact reworded as the customer's pain."
