@@ -2,7 +2,7 @@
 title: Decisions index
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-13
+last_reviewed: 2026-11-14
 ---
 
 # Architecture decision records
@@ -115,6 +115,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0104](0104-care-provider-limit-is-a-ceiling.md) | Strategic-relevance review; the care-provider limit is a ceiling | Accepted |
 | [0105](0105-relevance-threshold-aligned-with-the-analysis-agents.md) | Relevance threshold aligned with the other analysis agents | Accepted |
 | [0106](0106-analysis-round-five-selects-the-relevance-model.md) | Analysis round five selects the Relevance model | Accepted |
+| [0107](0107-analysis-round-six-research-analyst-provisional.md) | Analysis round six: DeepSeek for Research Analyst, provisionally | Accepted |
 
 ## When an ADR is needed
 

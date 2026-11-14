@@ -2,7 +2,7 @@
 title: Runtime defaults
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-13
+last_reviewed: 2026-11-14
 related: [REQ-PROC-005, REQ-PROC-006, REQ-AGENT-007, REQ-AGENT-012, REQ-AGENT-013, REQ-DATA-011, REQ-NFR-005]
 ---
 
@@ -91,6 +91,7 @@ Read by `loadProcessingConfig` in `apps/pipeline/src/processing-config.ts`. Only
 | `retraction.lookback_days` | `30` | How far back the weekly retraction check looks (ADR 0061) |
 | `model.price_table_version` | `2026-11-11` | Price table used when the gateway gives no cost (REQ-NFR-011 AC2); it has cached-input prices (ADR 0078) |
 | `model.triage` | `@cf/google/gemma-4-26b-a4b-it`, thinking off, prompt `triage@2`, `json-schema` output | Chosen by benchmark round two (ADR 0088); temperature 0 and at most 8192 output tokens come with the prompt version |
+| `model.research_analyst` | `@cf/deepseek-ai/deepseek-v4.1-flash-1017` at its default reasoning, prompt `research-analyst@2`, `json-schema` output | Provisional: one of three runs missed the floor by two entries; reviewed after the first live sample (ADR 0107) |
 | `model.problem_discovery` | `@cf/google/gemma-4-26b-a4b-it`, thinking off, prompt `problem-discovery@1`, `json-schema` output | Provisional: chosen on the code checks only, reviewed once the fact judge decides (ADR 0096, ADR 0095) |
 | `model.extraction` | `@cf/deepseek-ai/deepseek-v4.1-flash-1017` at its default reasoning, prompt `extraction@4`, `json-schema` output | Chosen by benchmark round three (ADR 0091); temperature 0 and at most 8192 output tokens come with the prompt version |
 | `model.relevance` | `@cf/deepseek-ai/deepseek-v4.1-flash-1017` at its default reasoning, prompt `relevance@5`, `json-schema` output | Chosen by analysis round five (ADR 0106); temperature 0 and at most 8192 output tokens come with the prompt version |
