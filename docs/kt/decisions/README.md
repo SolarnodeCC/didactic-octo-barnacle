@@ -117,6 +117,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0106](0106-analysis-round-five-selects-the-relevance-model.md) | Analysis round five selects the Relevance model | Accepted |
 | [0107](0107-analysis-round-six-research-analyst-provisional.md) | Analysis round six: DeepSeek for Research Analyst, provisionally | Accepted |
 | [0108](0108-problem-discovery-facts-state-the-pain.md) | Problem Discovery facts state the customer's pain | Accepted |
+| [0109](0109-fact-judge-rubric-pd-facts-4.md) | Fact judge rubric pd-facts@4; the judge stays report-only | Accepted |
 
 ## When an ADR is needed
 
