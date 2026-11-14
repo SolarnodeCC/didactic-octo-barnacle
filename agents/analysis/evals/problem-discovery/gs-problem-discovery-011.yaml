@@ -4,8 +4,8 @@ candidateRef: ../../extraction/evals/extraction/gs-extraction-012.yaml#0
 researchAnalystRef: research-analyst/gs-research-analyst-011.yaml
 expected:
   requiredFacts:
-    - "healthcare professionals misinterpret AI staffing forecasts"
+    - "misread forecast uncertainty lowers professionals' confidence in staffing decisions"
     - "uncertainty and explanation of AI advice are not communicated well"
   customerIndustry: other
   painLevelRange: [2, 3]
-notes: "A study of uncertainty communication; boundary case. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+notes: "A study of uncertainty communication; boundary case. Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Fact review (ADR 0108), confirmed by Remco Oostelaar, 2026-11-14: 1 fact reworded as the customer's pain."

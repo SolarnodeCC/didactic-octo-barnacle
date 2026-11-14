@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-019.yaml
 expected:
   requiredFacts:
     - "congested SNAP call centers caused nearly half of application denials to be procedural"
-    - "applicants could not complete required interviews"
+    - "the agency is found to violate applicants' procedural due process"
   customerIndustry: public-sector
   painLevelRange: [4, 5]
-notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Fact review (ADR 0108), confirmed by Remco Oostelaar, 2026-11-14: 1 fact reworded as the customer's pain."

@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-028.yaml
 expected:
   requiredFacts:
     - "utilities de-energize parts of the grid to prevent wildfire ignitions and the shutoffs impose costs on communities"
-    - "current mixed integer programming methods need restrictive assumptions about line-failure probability models"
+    - "current shutoff planning methods incur higher operational costs"
   customerIndustry: energy-utilities
   painLevelRange: [4, 5]
-notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Fact review (ADR 0108), confirmed by Remco Oostelaar, 2026-11-14: 1 fact reworded as the customer's pain."

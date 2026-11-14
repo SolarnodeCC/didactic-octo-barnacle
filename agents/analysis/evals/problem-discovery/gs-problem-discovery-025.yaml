@@ -5,7 +5,7 @@ researchAnalystRef: research-analyst/gs-research-analyst-025.yaml
 expected:
   requiredFacts:
     - "sales-campaign pricing at weekly granularity or by a manual-algorithmic hybrid took hours per decision"
-    - "a daily forecast-then-optimize tool raised profit by about 6% in A/B tests and runs in production"
+    - "the previous pricing approach earned about 6% less profit on sales campaigns"
   customerIndustry: consumer-retail
   painLevelRange: [3, 4]
-notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Fact review (ADR 0108), confirmed by Remco Oostelaar, 2026-11-14: 1 fact reworded as the customer's pain."

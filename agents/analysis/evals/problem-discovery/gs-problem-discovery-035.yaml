@@ -5,7 +5,6 @@ researchAnalystRef: research-analyst/gs-research-analyst-035.yaml
 expected:
   requiredFacts:
     - "rising volumes of individual case safety reports challenge expert-led causality assessment in pharmacovigilance"
-    - "agreement with experts is 79.4% on the final classification and lower on alternative causes"
   customerIndustry: life-sciences
   painLevelRange: [3, 4]
-notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request."
+notes: "Reviewer: Remco Oostelaar (round 3 review). Confirmed by merging this pull request. Fact review (ADR 0108), confirmed by Remco Oostelaar, 2026-11-14: 1 cause or result fact dropped."

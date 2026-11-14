@@ -5,7 +5,6 @@ researchAnalystRef: research-analyst/gs-research-analyst-018.yaml
 expected:
   requiredFacts:
     - "enterprise modernization programs fail at a documented and costly rate"
-    - "the cause is a governance deficit, not engineering capability"
   customerIndustry: other
   painLevelRange: [3, 4]
-notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03."
+notes: "Reviewer: Remco Oostelaar (agent pilot review, 2026-11-02). Industry values relabeled for the eight target industries (ADR 0037), reviewed by Remco Oostelaar, 2026-11-03. Fact review (ADR 0108), confirmed by Remco Oostelaar, 2026-11-14: 1 cause or result fact dropped."
