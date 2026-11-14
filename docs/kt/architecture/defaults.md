@@ -2,7 +2,7 @@
 title: Runtime defaults
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-12
+last_reviewed: 2026-11-13
 related: [REQ-PROC-005, REQ-PROC-006, REQ-AGENT-007, REQ-AGENT-012, REQ-AGENT-013, REQ-DATA-011, REQ-NFR-005]
 ---
 
@@ -93,6 +93,7 @@ Read by `loadProcessingConfig` in `apps/pipeline/src/processing-config.ts`. Only
 | `model.triage` | `@cf/google/gemma-4-26b-a4b-it`, thinking off, prompt `triage@2`, `json-schema` output | Chosen by benchmark round two (ADR 0088); temperature 0 and at most 8192 output tokens come with the prompt version |
 | `model.problem_discovery` | `@cf/google/gemma-4-26b-a4b-it`, thinking off, prompt `problem-discovery@1`, `json-schema` output | Provisional: chosen on the code checks only, reviewed once the fact judge decides (ADR 0096, ADR 0095) |
 | `model.extraction` | `@cf/deepseek-ai/deepseek-v4.1-flash-1017` at its default reasoning, prompt `extraction@4`, `json-schema` output | Chosen by benchmark round three (ADR 0091); temperature 0 and at most 8192 output tokens come with the prompt version |
+| `model.relevance` | `@cf/deepseek-ai/deepseek-v4.1-flash-1017` at its default reasoning, prompt `relevance@5`, `json-schema` output | Chosen by analysis round five (ADR 0106); temperature 0 and at most 8192 output tokens come with the prompt version |
 
 ## Budgets
 
