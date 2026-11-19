@@ -33,3 +33,14 @@ Recorded 2026-11-14 (ADR 0108, ADR 0109). The required facts were reworded as th
 | `pd-facts@4` (a fact counts as pain, cause, or context) | 32 of 38 (84 %) | 1 | 5 |
 
 `pd-facts@4` was written after the owner's grades of these outputs, so its agreement is an upper estimate. With 37 of 38 facts present, a judge that always answered present would agree on 37; this sample cannot show that the judge catches a missing fact. Neither version reaches 90 %, so the judge still does not decide an eval.
+
+### Round three
+
+Recorded 2026-11-19 (ADR 0110). Twenty fresh outputs from 14 November 2026, one of `gemma-4-26b-a4b-it` with thinking off and one of `deepseek-v4.1-flash-1017` for each of ten entries the owner had not graded (012, 014, 016, 019, 028, 029, 030, 031, 032, 034, drawn with seed 20261114; benchmarks `bench-2026-11-14T13-58-59-023Z` and `bench-2026-11-14T13-59-01-957Z`), 38 facts. The judge's verdicts were produced with `pd-facts@4` before the owner graded, blind to the judge and to the model, and the rubric was not changed afterwards, so this is not an upper estimate. The owner graded 11 of the 38 facts absent.
+
+| Rubric | Agreement with the owner | Judge present, owner absent | Owner present, judge absent |
+|---|---|---|---|
+| `pd-facts@4` | 26 of 38 (68 %) | 8 | 4 |
+
+The judge does not reach 90 %, so it does not decide an eval.
+
