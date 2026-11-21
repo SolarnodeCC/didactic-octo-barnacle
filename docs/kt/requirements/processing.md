@@ -174,7 +174,7 @@ A passing publication is admitted to extraction only when its full text is store
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: ADR 0065
 - Depends on: REQ-PROC-008, REQ-DATA-006
 - Acceptance criteria:
