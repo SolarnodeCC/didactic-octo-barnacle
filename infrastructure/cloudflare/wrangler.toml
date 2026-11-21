@@ -65,6 +65,24 @@ queue = "roi-documents-dlq-local"
 max_batch_size = 1
 max_retries = 1
 
+# Text extraction of stored PDFs: one file per invocation, because unpdf holds the whole
+# file in memory (ADR 0009, ADR 0053). Messages are sent only where processing is enabled.
+[[queues.producers]]
+binding = "TEXT_QUEUE"
+queue = "roi-texts-local"
+
+[[queues.consumers]]
+queue = "roi-texts-local"
+max_batch_size = 1
+max_concurrency = 3
+max_retries = 3
+dead_letter_queue = "roi-texts-dlq-local"
+
+[[queues.consumers]]
+queue = "roi-texts-dlq-local"
+max_batch_size = 1
+max_retries = 1
+
 [env.preview]
 name = "roi-pipeline-preview"
 vars = { ENVIRONMENT = "preview" }
@@ -116,6 +134,24 @@ dead_letter_queue = "roi-documents-dlq-preview"
 
 [[env.preview.queues.consumers]]
 queue = "roi-documents-dlq-preview"
+max_batch_size = 1
+max_retries = 1
+
+# Text extraction of stored PDFs: one file per invocation, because unpdf holds the whole
+# file in memory (ADR 0009, ADR 0053). Messages are sent only where processing is enabled.
+[[env.preview.queues.producers]]
+binding = "TEXT_QUEUE"
+queue = "roi-texts-preview"
+
+[[env.preview.queues.consumers]]
+queue = "roi-texts-preview"
+max_batch_size = 1
+max_concurrency = 3
+max_retries = 3
+dead_letter_queue = "roi-texts-dlq-preview"
+
+[[env.preview.queues.consumers]]
+queue = "roi-texts-dlq-preview"
 max_batch_size = 1
 max_retries = 1
 
@@ -198,6 +234,24 @@ queue = "roi-documents-dlq-staging"
 max_batch_size = 1
 max_retries = 1
 
+# Text extraction of stored PDFs: one file per invocation, because unpdf holds the whole
+# file in memory (ADR 0009, ADR 0053). Messages are sent only where processing is enabled.
+[[env.staging.queues.producers]]
+binding = "TEXT_QUEUE"
+queue = "roi-texts-staging"
+
+[[env.staging.queues.consumers]]
+queue = "roi-texts-staging"
+max_batch_size = 1
+max_concurrency = 3
+max_retries = 3
+dead_letter_queue = "roi-texts-dlq-staging"
+
+[[env.staging.queues.consumers]]
+queue = "roi-texts-dlq-staging"
+max_batch_size = 1
+max_retries = 1
+
 [env.production]
 name = "roi-pipeline-production"
 vars = { ENVIRONMENT = "production", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo-barnacle" }
@@ -274,5 +328,23 @@ dead_letter_queue = "roi-documents-dlq-production"
 
 [[env.production.queues.consumers]]
 queue = "roi-documents-dlq-production"
+max_batch_size = 1
+max_retries = 1
+
+# Text extraction of stored PDFs: one file per invocation, because unpdf holds the whole
+# file in memory (ADR 0009, ADR 0053). Messages are sent only where processing is enabled.
+[[env.production.queues.producers]]
+binding = "TEXT_QUEUE"
+queue = "roi-texts-production"
+
+[[env.production.queues.consumers]]
+queue = "roi-texts-production"
+max_batch_size = 1
+max_concurrency = 3
+max_retries = 3
+dead_letter_queue = "roi-texts-dlq-production"
+
+[[env.production.queues.consumers]]
+queue = "roi-texts-dlq-production"
 max_batch_size = 1
 max_retries = 1

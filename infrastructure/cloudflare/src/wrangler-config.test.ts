@@ -61,3 +61,18 @@ describe("REQ-NFR-008: deployed Workers keep every log line and trace", () => {
     },
   );
 });
+
+describe("REQ-DATA-006: text extraction has its own queue in every environment", () => {
+  const environments = ["local", "preview", "staging", "production"];
+
+  it.each(environments)(
+    "REQ-DATA-006: %s binds TEXT_QUEUE and reads one PDF per invocation, with its own dead-letter queue",
+    (environment) => {
+      expect(wrangler).toContain(`binding = "TEXT_QUEUE"\nqueue = "roi-texts-${environment}"`);
+      expect(wrangler).toContain(
+        `queue = "roi-texts-${environment}"\nmax_batch_size = 1\nmax_concurrency = 3\nmax_retries = 3\ndead_letter_queue = "roi-texts-dlq-${environment}"`,
+      );
+      expect(wrangler).toContain(`queue = "roi-texts-dlq-${environment}"\nmax_batch_size = 1`);
+    },
+  );
+});

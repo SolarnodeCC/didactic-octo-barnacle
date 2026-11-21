@@ -50,8 +50,16 @@ export async function replayDeadLetter(
   await deps.Db.batch(statements);
 
   try {
-    // A message goes back to the queue it came from (ADR 0047).
-    const queue = envelope.Type === "document.ingest" ? documentQueue(deps) : deps.Queue;
+    // A message goes back to the queue it came from (ADR 0047, ADR 0053).
+    const queue =
+      envelope.Type === "document.ingest"
+        ? documentQueue(deps)
+        : envelope.Type === "document.extract_text"
+          ? deps.Text?.Queue
+          : deps.Queue;
+    if (!queue) {
+      throw new Error(`no queue for ${envelope.Type} in this Worker`);
+    }
     await queue.send(envelope);
   } catch (error) {
     // Put the message back in the dead-letter state so it can be replayed again.

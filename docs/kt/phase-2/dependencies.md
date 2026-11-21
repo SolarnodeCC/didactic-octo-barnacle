@@ -68,7 +68,7 @@ No new service outside the stack is added (REQ-NFR-002). The Cloudflare-hosted P
 
 | Library | Package | Why | Check |
 |---|---|---|---|
-| `unpdf` | `apps/pipeline` | PDF text extraction (ADR 0009) | Licence (MIT), Workers build, `pnpm audit:ci` |
+| `unpdf` | `apps/pipeline` | PDF text extraction (ADR 0009) | Added in WP4 at 2.2.1: MIT, no runtime dependencies, bundles and runs in `workerd`, `pnpm audit:ci` |
 | none for IDs | `apps/pipeline` | Candidate IDs come from `deps.NewId` | It gives UUIDs today while [schema migration 0001](../architecture/schema-migration-0001.md) names ULIDs; keep UUIDs unless an ordered key is needed |
 | `@cloudflare/workers-types` | dev only, where hand-written binding interfaces stop being enough | Types for AI, Vectorize, Workflows | Keep the structural interfaces if they suffice |
 

@@ -27,6 +27,10 @@ describe("REQ-NFR-005: processing configuration", () => {
       EmbeddingBatchSize: 50,
       RetractionLookbackDays: 30,
       PriceTableVersion: "2026-11-11",
+      TextMaxPdfBytes: 20 * 1024 * 1024,
+      TextMaxPages: 100,
+      TextMinChars: 200,
+      TextBackfillPerRun: 500,
       ModelMaxAttempts: 3,
       TriageModel: {
         Model: "@cf/google/gemma-4-26b-a4b-it",

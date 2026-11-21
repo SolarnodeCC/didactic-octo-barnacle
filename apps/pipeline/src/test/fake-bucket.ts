@@ -8,14 +8,28 @@ export class FakeBucket implements ObjectStore {
   >();
   puts = 0;
 
-  head(key: string): Promise<unknown | null> {
-    return Promise.resolve(this.objects.get(key) ?? null);
+  /** Keys whose `get` fails, as a storage outage would. */
+  readonly failingGets = new Set<string>();
+
+  head(key: string): Promise<{ size: number } | null> {
+    const found = this.objects.get(key);
+    return Promise.resolve(found ? { size: found.bytes.byteLength } : null);
   }
 
-  get(key: string): Promise<{ text(): Promise<string> } | null> {
+  get(
+    key: string,
+  ): Promise<{ text(): Promise<string>; arrayBuffer(): Promise<ArrayBuffer> } | null> {
+    if (this.failingGets.has(key)) {
+      return Promise.reject(new Error(`storage unavailable for ${key}`));
+    }
     const found = this.objects.get(key);
     return Promise.resolve(
-      found ? { text: () => Promise.resolve(new TextDecoder().decode(found.bytes)) } : null,
+      found
+        ? {
+            text: () => Promise.resolve(new TextDecoder().decode(found.bytes)),
+            arrayBuffer: () => Promise.resolve(found.bytes.slice().buffer as ArrayBuffer),
+          }
+        : null,
     );
   }
 

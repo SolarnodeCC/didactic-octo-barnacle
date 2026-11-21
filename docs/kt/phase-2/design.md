@@ -90,15 +90,25 @@ In phase 2 the model queue's concurrency (8, equal to `model.semaphore_max`) is 
 
 ## Full text
 
-- The document consumer queues `document.extract_text` after it stores a PDF.
-- The text consumer:
-  - checks the object size in R2 against `text.max_pdf_bytes` before it loads the file;
-  - opens the file with unpdf;
-  - refuses files over `text.max_pages`;
-  - extracts the text in page batches and writes it to R2 under `texts/<documentId>.txt`;
-  - sets `extracted_text_r2_key`, `extractor_version` (`unpdf@<version>`), and status `text-extracted`.
-- Any error, a limit, or empty text sets `text-failed` with a short `failure_reason`. The publication keeps using its abstract (REQ-DATA-006 AC1, AC2; ADR 0009).
-- The caps are set from the measured peak memory on the four fixture PDFs of ADR 0009, in WP4.
+- The document consumer queues `document.extract_text` (message ID `text:<documentId>`) after it stores a PDF, where `processing.enabled` is on. Each ingestion start also queues up to `text.backfill_per_run` stored PDFs that have no text yet, so PDFs stored before the switch, or whose message was lost, get their text too.
+- The text consumer (`apps/pipeline/src/queue/text-extract.ts`) reads one file per invocation from `roi-texts-<env>`:
+  - it checks the object size in R2 against `text.max_pdf_bytes` before it loads the file;
+  - it opens the file with unpdf and refuses files over `text.max_pages` before it reads a page;
+  - it reads the pages one at a time, releasing each, and writes the text to R2 under `texts/<documentId>.txt` with the PDF's license;
+  - it sets `extracted_text_r2_key`, `extractor_version` (`unpdf@<version>`), and status `text-extracted`.
+- A limit, a file that does not parse, or fewer than `text.min_chars` characters of text (a scan) sets `text-failed` with a short `failure_reason` (`too-large`, `too-many-pages`, `unreadable`, `no-text`, `missing`) and completes the message, because a retry cannot change it. The publication keeps using its abstract (REQ-DATA-006 AC1, AC2; ADR 0009). A storage or database error is retried.
+- **Limits from the WP4 measurement.** `pnpm --filter @roi/pipeline measure:pdf-text` extracts generated fixture PDFs (two columns with equations, a scan, a corrupt file, long files, and large files whose size is an image), each in its own Node process, and reports the peak resident memory above a baseline process that only loads unpdf. On Node 24 (21 November 2026), with run-to-run noise of about 10 MiB:
+
+| Fixture | File | Pages | Peak above baseline |
+|---|---|---|---|
+| Two columns with equations, scan, corrupt | under 0.1 MiB | 1 to 2 | 14 to 28 MiB |
+| 100 text-dense pages (400,000 characters) | 0.45 MiB | 100 | 55 MiB |
+| 300 text-dense pages (1.2 million characters) | 1.35 MiB | 300 | 107 to 117 MiB |
+| One large image | 25 MiB | 3 | 56 to 66 MiB |
+| One large image | 50 MiB | 3 | 91 to 101 MiB |
+| 20 MiB image and 100 text-dense pages | 20.45 MiB | 101 | 74 MiB |
+
+Memory grows with about twice the file size and with the amount of text. `text.max_pdf_bytes` of 20 MiB and `text.max_pages` of 100 keep the worst accepted file near 75 MiB above the runtime, inside the 128 MB isolate. A research paper has 10 to 40 pages, so the page limit rarely bites. The same five fixtures extract correctly in local `workerd`; staging confirms the memory under the real isolate limit (WP4 exit).
 
 ## Budget
 

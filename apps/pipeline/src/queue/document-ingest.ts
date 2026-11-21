@@ -1,7 +1,7 @@
 import { QueueMessageEnvelopeSchema } from "@roi/models";
 
 import { claimMessage, completeStatement, markFailed } from "./log.js";
-import { type PipelineDeps } from "./deps.js";
+import { textExtractEnvelope, type PipelineDeps } from "./deps.js";
 import { pdfKey, sha256Hex } from "../documents/object-store.js";
 import { PdfFetchError } from "../documents/safe-fetch.js";
 import {
@@ -117,13 +117,17 @@ async function ingest(
   }
 
   const now = deps.Now();
+  const documentId = `doc_${deps.NewId()}`;
   await deps.Db.batch([
     deps.Db.prepare(
       "INSERT INTO document (id, publication_id, pdf_r2_key, content_hash, license, status, stored_at) VALUES (?, ?, ?, ?, ?, 'stored', ?) ON CONFLICT DO NOTHING",
-    ).bind(`doc_${deps.NewId()}`, publicationId, key, contentHash, source.License, now),
+    ).bind(documentId, publicationId, key, contentHash, source.License, now),
     completeStatement(deps.Db, messageId, now),
   ]);
   deps.Log?.("document.stored", { publicationId, contentHash, bytes: pdf.Bytes.byteLength });
+  // Queued after the document row exists, so the text consumer always finds it. A lost send
+  // is picked up by the backfill of the next ingestion start (REQ-DATA-006).
+  await deps.Text?.Queue?.send(textExtractEnvelope(publicationId, documentId));
   return "stored";
 }
 
