@@ -128,6 +128,8 @@ export function createHarness(
       Send?: boolean;
       /** The day's budget in euro; the configured default when left out. */
       BudgetEur?: number;
+      /** `ingestion.daily_extraction_limit`; the configured default when left out. */
+      DailyLimit?: number;
     };
   } = {},
 ): Harness {
@@ -210,6 +212,12 @@ export function createHarness(
             },
             Model: DEFAULT_PROCESSING_CONFIG.TriageModel,
             AcceptScoreCut: DEFAULT_PROCESSING_CONFIG.AcceptScoreCut,
+            Admission: {
+              DailyLimit:
+                overrides.Triage.DailyLimit ?? DEFAULT_PROCESSING_CONFIG.DailyExtractionLimit,
+              PoolDays: DEFAULT_PROCESSING_CONFIG.AdmissionPoolDays,
+              FullTextWaitHours: DEFAULT_PROCESSING_CONFIG.FullTextWaitHours,
+            },
           },
         }
       : {}),

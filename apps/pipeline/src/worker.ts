@@ -126,6 +126,11 @@ function buildDeps(env: Env): PipelineDeps {
             },
             Model: processing.TriageModel,
             AcceptScoreCut: processing.AcceptScoreCut,
+            Admission: {
+              DailyLimit: processing.DailyExtractionLimit,
+              PoolDays: processing.AdmissionPoolDays,
+              FullTextWaitHours: processing.FullTextWaitHours,
+            },
           },
         }
       : {}),

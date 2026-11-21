@@ -33,6 +33,7 @@ describe("REQ-NFR-005: processing configuration", () => {
       TextBackfillPerRun: 500,
       AcceptScoreCut: 0.55,
       DailyExtractionLimit: 100,
+      FullTextWaitHours: 24,
       BudgetDailyEur: 1.0,
       ModelMaxAttempts: 3,
       TriageModel: {

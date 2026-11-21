@@ -1,4 +1,5 @@
-import { CRON_SOURCES } from "../config.js";
+import { ADMISSION_CRON, CRON_SOURCES } from "../config.js";
+import { admitDay } from "../triage/admission.js";
 import { notify } from "../alerts/notify.js";
 import { textExtractEnvelope, type PipelineDeps } from "../queue/deps.js";
 import { documentsAwaitingText } from "../store/document-repo.js";
@@ -10,6 +11,11 @@ export async function runScheduled(
   deps: PipelineDeps,
   cron: string,
 ): Promise<StartRunResult | null> {
+  if (cron === ADMISSION_CRON) {
+    // The admission of the UTC day of the trigger (REQ-PROC-005 AC2, ADR 0055).
+    await admitDay(deps, deps.Now().slice(0, 10));
+    return null;
+  }
   const source = CRON_SOURCES[cron];
   if (!source) {
     deps.Log?.("cron.unknown", { cron });

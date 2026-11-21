@@ -93,6 +93,7 @@ Read by `loadProcessingConfig` in `apps/pipeline/src/processing-config.ts`. Only
 | `text.max_pages` | `100` | A PDF with more pages is marked `text-failed` before any page is read (ADR 0009) |
 | `text.min_chars` | `200` | Less text than this, not counting white space, means no usable text layer, as in a scan (ADR 0009) |
 | `text.backfill_per_run` | `500` | Stored PDFs without text that each ingestion start queues for extraction |
+| `extraction.full_text_wait_hours` | `24` | How long the daily admission waits for a publication's full text before it admits it on the abstract (ADR 0065, REQ-PROC-011) |
 | `retraction.lookback_days` | `30` | How far back the weekly retraction check looks (ADR 0061) |
 | `model.price_table_version` | `2026-11-11` | Price table used when the gateway gives no cost (REQ-NFR-011 AC2); it has cached-input prices (ADR 0078) |
 | `model.triage` | `@cf/google/gemma-4-26b-a4b-it`, thinking off, prompt `triage@2`, `json-schema` output | Chosen by benchmark round two (ADR 0088); temperature 0 and at most 8192 output tokens come with the prompt version |
@@ -115,6 +116,7 @@ Read by `loadProcessingConfig` in `apps/pipeline/src/processing-config.ts`. Only
 |---|---|
 | OpenAlex ingestion | `0 6 * * *` |
 | arXiv ingestion | `30 7 * * *` |
+| Daily admission to extraction | `0 11 * * *` (ADR 0055) |
 | Retraction check | `0 8 * * 1` |
 | Retention job | `0 3 * * *` |
 | Nightly evals | `0 2 * * *` |

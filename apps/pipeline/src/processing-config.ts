@@ -37,6 +37,11 @@ export type ProcessingConfig = {
   /** `ingestion.daily_extraction_limit`: publications admitted to extraction a UTC day (REQ-PROC-005). */
   DailyExtractionLimit: number;
   /**
+   * `extraction.full_text_wait_hours`: how long the admission waits for a publication's full
+   * text before it admits it on the abstract (ADR 0065, REQ-PROC-011).
+   */
+  FullTextWaitHours: number;
+  /**
    * `budget.daily_eur`: the day's model budget in euro (REQ-NFR-005). Provisional: the ADR 0059
    * formula on the largest measured day (4,634 publications) and the benchmark costs
    * (triage EUR 0.00008, ADR 0088; extraction EUR 0.00177, ADR 0091; embeddings at
@@ -71,6 +76,7 @@ export const DEFAULT_PROCESSING_CONFIG: ProcessingConfig = {
   TextBackfillPerRun: 500,
   AcceptScoreCut: 0.55,
   DailyExtractionLimit: 100,
+  FullTextWaitHours: 24,
   BudgetDailyEur: 1.0,
   ModelMaxAttempts: 3,
   TriageModel: {

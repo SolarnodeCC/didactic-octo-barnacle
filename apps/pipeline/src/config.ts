@@ -82,5 +82,8 @@ export const CRON_SOURCES: Readonly<Record<string, "openalex" | "arxiv">> = {
   "30 7 * * *": "arxiv",
 };
 
+/** Cron expression (UTC) of the daily admission, after both ingestion crons (ADR 0055). */
+export const ADMISSION_CRON = "0 11 * * *";
+
 /** Version of the queue message schema (docs/kt/architecture/defaults.md). */
 export const QUEUE_SCHEMA_VERSION = "1";

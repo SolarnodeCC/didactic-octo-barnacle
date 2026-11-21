@@ -76,8 +76,9 @@ In phase 2 the model queue's concurrency (8, equal to `model.semaphore_max`) is 
    - It takes the decisions still `awaiting-admission` from the last `triage.admission_pool_days`.
    - It ranks them with `admitWithinDailyLimit`, using the limit minus the publications already admitted that UTC day (REQ-PROC-008 AC4).
    - It leaves out a publication dated after the day of the run. The 613 OpenAlex works with a future date that were stored before ADR 0068 stay in the database, and a date in the future is no sign that a work is recent.
-   - It admits a ranked publication only when it is ready: text stored or failed, no license-allowed PDF, or the document message finished without a document. After `extraction.full_text_wait_hours` every publication is ready. A publication that is not ready keeps its rank and waits (REQ-PROC-011, ADR 0065).
-   - It sets the admitted to `accepted` and queues `publication.extract`.
+   - It admits a ranked publication only when it is ready: text stored or failed, no license-allowed PDF, or the document message finished without a document (completed, failed after its retries as `unavailable`, or dead-lettered). After `extraction.full_text_wait_hours` every publication is ready. A publication that is not ready keeps its rank, its empty reason, and its place in the pool, and uses none of the limit (REQ-PROC-011, ADR 0065).
+   - It sets the admitted to `accepted` with `admitted_on`. The `publication.extract` message for them comes with WP7, together with its consumer; until then the admission only records them.
+   - With the day's budget used up it admits nobody (REQ-NFR-005 AC2). The counts (admitted, deferred for the limit, not ready, admitted on the abstract after the wait, left the pool, dated after the run day) go into the day's processing run. Code: `apps/pipeline/src/triage/admission.ts`.
    - The rest get `daily-limit`, stay in the pool, and are considered again the next day. A decision that leaves the pool keeps `daily-limit` as its final reason.
    - The run is keyed by its day, so a repeated trigger admits nothing twice.
 

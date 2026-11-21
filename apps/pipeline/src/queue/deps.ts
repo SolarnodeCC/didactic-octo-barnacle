@@ -74,6 +74,15 @@ export type PipelineDeps = {
     /** `model.triage`: model, prompt version, output mode, reasoning (ADR 0088). */
     Model: ModelConfig;
     AcceptScoreCut: number;
+    /** The daily admission (ADR 0055, ADR 0065). */
+    Admission: {
+      /** `ingestion.daily_extraction_limit`. */
+      DailyLimit: number;
+      /** `triage.admission_pool_days`. */
+      PoolDays: number;
+      /** `extraction.full_text_wait_hours`. */
+      FullTextWaitHours: number;
+    };
   };
   /** Structured log line; the worker writes JSON, tests can leave it out (REQ-NFR-008 AC1). */
   Log?: (event: string, fields: Record<string, unknown>) => void;
