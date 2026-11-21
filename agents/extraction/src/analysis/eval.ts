@@ -94,6 +94,7 @@ export type ProblemDiscoveryEvalReport = EvalReport & {
  * Whether the judge's fact verdicts decide an entry. A judge decides only once it agrees with
  * the owner on at least 90 % of the facts of at least 20 outputs (ADR 0093). The calibration of
  * 2026-11-12 reached 68 % at best, so the verdicts are reported and do not gate (ADR 0095).
+ * Three calibrations stayed below 90 %, and Problem Discovery is settled on the code checks (ADR 0111).
  */
 export const FACTS_GATE = false;
 
