@@ -1,5 +1,6 @@
 id: gs-triage-084
 publicationFixture: fixtures/arxiv/2609.37454.json
+industry: insurance
 expected:
   signals:
     namedParty: true
