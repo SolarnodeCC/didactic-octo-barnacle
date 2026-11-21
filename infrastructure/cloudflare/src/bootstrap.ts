@@ -42,6 +42,9 @@ export function desiredResources(environment: EnvironmentName): DesiredResource[
     // Text extraction of stored PDFs, one file at a time (ADR 0009, ADR 0053).
     { Kind: "queue", Name: `roi-texts-${suffix}` },
     { Kind: "queue-dlq", Name: `roi-texts-dlq-${suffix}` },
+    // Model steps, at most 8 in flight (ADR 0053).
+    { Kind: "queue", Name: `roi-models-${suffix}` },
+    { Kind: "queue-dlq", Name: `roi-models-dlq-${suffix}` },
     { Kind: "vectorize", Name: `roi-publications-${suffix}` },
     { Kind: "ai-gateway", Name: `roi-${suffix}` },
   ];

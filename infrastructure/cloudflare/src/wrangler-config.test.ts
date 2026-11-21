@@ -76,3 +76,23 @@ describe("REQ-DATA-006: text extraction has its own queue in every environment",
     },
   );
 });
+
+describe("REQ-PROC-005: model steps have their own queue and Workers AI in every environment", () => {
+  const environments = ["local", "preview", "staging", "production"];
+
+  it.each(environments)(
+    "REQ-PROC-005: %s binds MODEL_QUEUE with at most 8 messages in flight and its own dead-letter queue",
+    (environment) => {
+      expect(wrangler).toContain(`binding = "MODEL_QUEUE"\nqueue = "roi-models-${environment}"`);
+      expect(wrangler).toContain(
+        `queue = "roi-models-${environment}"\nmax_batch_size = 1\nmax_concurrency = 8\nmax_retries = 3\ndead_letter_queue = "roi-models-dlq-${environment}"`,
+      );
+      expect(wrangler).toContain(`queue = "roi-models-dlq-${environment}"\nmax_batch_size = 1`);
+    },
+  );
+
+  it.each(environments)("REQ-NFR-003: %s binds Workers AI as AI", (environment) => {
+    const table = environment === "local" ? "[ai]" : `[env.${environment}.ai]`;
+    expect(wrangler).toContain(`${table}\nbinding = "AI"`);
+  });
+});

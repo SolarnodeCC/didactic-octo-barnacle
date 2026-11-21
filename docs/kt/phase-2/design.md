@@ -17,7 +17,7 @@ Tables, configuration keys, and bindings are in [schema](schema.md). Behavior th
 | `packages/models` | `MoneySchema`; schemas for the model-call record, processing run, triage decision row, extraction result, and candidate row; the new queue message types and `CandidateId` in the message IDs; the `callModel` helper (ADR 0003) and its Workers AI and budget interfaces |
 | `packages/prompts` (new) | One versioned prompt per step (`triage@2`, `extraction@4`, ADR 0076, ADR 0085, ADR 0090), the sampling settings that go with it, and the delimiters that mark publication text as data |
 | `packages/vector-store` (new) | `embedTexts`, `upsertPublicationVectors`, `deletePublicationVectors`, `searchPublications`, the index registry, and the recall-at-10 corpus and evaluator (ADR 0056, ADR 0057) |
-| `agents/extraction` | `runTriageStep` and `runExtractionStep`: pure functions from input to validated output through `callModel`; an eval command that runs the existing eval runner on `callModel` for the benchmark |
+| `agents/extraction` | `runExtractionStep`: a pure function from input to validated output through `callModel`; an eval command that runs the existing eval runner on `callModel` for the benchmark. `runTriageStep` lives in `apps/pipeline/src/triage/step.ts` instead, on `@roi/prompts` and `@roi/models`, so the Worker bundle stays free of the benchmark command's dependencies (WP6) |
 | `apps/pipeline` | Consumers for embedding, triage, extraction, and text extraction; the admission cron; the retraction check; budget handling; the thin-slice Workflow with stub steps; run-report fields for processing |
 | `apps/api` (new, minimal) | One read-only route for the thin slice (ADR 0058) |
 | `infrastructure/cloudflare` | Migrations 0009, 0010, and 0011; Workers AI, Vectorize, Workflow, and queue bindings; new crons; bootstrap entries for the new queues and the Vectorize metadata indexes; the price table |
@@ -69,8 +69,8 @@ In phase 2 the model queue's concurrency (8, equal to `model.semaphore_max`) is 
 
 ## Triage
 
-1. **Rules, no model** (REQ-PROC-006 AC1): `incomplete` from `publication.completeness`, `retracted` from `publication.retracted`, `out-of-scope` when `industriesForTopics` (OpenAlex) or the arXiv category map finds no target industry. The decision row is written with that reason.
-2. **Model**: `runTriageStep` reads the title and abstract inside delimiters and returns the five signals and notes (REQ-PROC-008 AC1).
+1. **Rules, no model** (REQ-PROC-006 AC1): `retracted` from `publication.retracted`, `incomplete` from `publication.completeness`, and `out-of-scope` when none of the stored topics and categories is in the ingestion scope (`isArxivCategoryInScope`, `isOpenAlexTopicsInScope`). The cross-industry categories (`cs.AI`, `cs.SE`, `cs.HC`, `cs.CY` and their OpenAlex topics) are in scope, as in ingestion; the Relevance agent assigns the industry later (ADR 0038). The decision row is written with that reason. Code: `apps/pipeline/src/triage/`.
+2. **Model**: `runTriageStep` reads the title and abstract inside delimiters and returns the five signals and notes (REQ-PROC-008 AC1). It runs in the daily processing run of the UTC day it is handled. A step refused by the budget completes its message as `budget-deferred`, and one that fails every attempt completes it with the reason; neither writes a decision, and the daily re-drive picks them up (ADR 0063).
 3. **Code**: `decideTriage` sets the score. A publication that fails the signal rule is stored as `low-score`. One that passes is stored as `awaiting-admission` (REQ-PROC-008 AC2, AC3).
 4. **Admission cron** (ADR 0055), daily after ingestion:
    - It takes the decisions still `awaiting-admission` from the last `triage.admission_pool_days`.

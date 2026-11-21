@@ -31,6 +31,9 @@ describe("REQ-NFR-005: processing configuration", () => {
       TextMaxPages: 100,
       TextMinChars: 200,
       TextBackfillPerRun: 500,
+      AcceptScoreCut: 0.55,
+      DailyExtractionLimit: 100,
+      BudgetDailyEur: 1.0,
       ModelMaxAttempts: 3,
       TriageModel: {
         Model: "@cf/google/gemma-4-26b-a4b-it",

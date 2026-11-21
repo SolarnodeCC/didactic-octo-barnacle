@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@roi/models": "workspace:*",
+    "@roi/prompts": "workspace:*",
     "fast-xml-parser": "^5.12.0",
     "unpdf": "2.2.1",
     "zod": "^4.1.12"

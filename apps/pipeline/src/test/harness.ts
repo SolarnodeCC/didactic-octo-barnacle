@@ -1,4 +1,6 @@
 import { readFileSync } from "node:fs";
+
+import { type WorkersAiBinding } from "@roi/models";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -13,6 +15,8 @@ import { DEFAULT_INGEST_CONFIG, type IngestConfig } from "../config.js";
 import { type FetchedPdf } from "../documents/safe-fetch.js";
 import { extractPdfText, type PdfTextExtractor } from "../documents/pdf-text.js";
 import { DEFAULT_PROCESSING_CONFIG } from "../processing-config.js";
+import { PRICE_TABLE } from "../prices.js";
+import { createModelUsageStore } from "../store/model-usage.js";
 import { consumeBatch } from "../queue/consume.js";
 import { createAuthorGuard } from "../privacy/author-guard.js";
 import { createAuthorKeyHasher, type AuthorKeyHasher } from "../privacy/author-key.js";
@@ -114,6 +118,17 @@ export function createHarness(
       /** `false` consumes text messages but sends none, as with processing off. */
       Send?: boolean;
     };
+    /**
+     * Turns on triage (REQ-PROC-005): triage messages go to the same queue as the rest, and
+     * the model is the given fake Workers AI binding, through the real `callModel`.
+     */
+    Triage?: {
+      Ai: WorkersAiBinding;
+      /** `false` consumes triage messages but sends none, as with processing off. */
+      Send?: boolean;
+      /** The day's budget in euro; the configured default when left out. */
+      BudgetEur?: number;
+    };
   } = {},
 ): Harness {
   const database = createTestDatabase();
@@ -173,6 +188,28 @@ export function createHarness(
               BackfillPerRun: DEFAULT_PROCESSING_CONFIG.TextBackfillPerRun,
               ...overrides.Text.Limits,
             },
+          },
+        }
+      : {}),
+    ...(overrides.Triage
+      ? {
+          Triage: {
+            ...(overrides.Triage.Send === false ? {} : { Queue: queue }),
+            Call: {
+              Ai: overrides.Triage.Ai,
+              GatewayId: "roi-test",
+              Usage: createModelUsageStore(database.Db, {
+                Amount: overrides.Triage.BudgetEur ?? DEFAULT_PROCESSING_CONFIG.BudgetDailyEur,
+                Currency: "EUR",
+              }),
+              Prices: PRICE_TABLE,
+              MaxAttempts: DEFAULT_PROCESSING_CONFIG.ModelMaxAttempts,
+              NewId: counter("mc"),
+              Now: () => new Date(clock.Now),
+              Sleep: () => Promise.resolve(),
+            },
+            Model: DEFAULT_PROCESSING_CONFIG.TriageModel,
+            AcceptScoreCut: DEFAULT_PROCESSING_CONFIG.AcceptScoreCut,
           },
         }
       : {}),

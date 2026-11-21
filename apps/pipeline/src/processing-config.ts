@@ -32,6 +32,17 @@ export type ProcessingConfig = {
    * extraction, so PDFs stored before WP4 get their text too.
    */
   TextBackfillPerRun: number;
+  /** `triage.accept_score_cut`: the share of true signals a publication needs (REQ-PROC-008). */
+  AcceptScoreCut: number;
+  /** `ingestion.daily_extraction_limit`: publications admitted to extraction a UTC day (REQ-PROC-005). */
+  DailyExtractionLimit: number;
+  /**
+   * `budget.daily_eur`: the day's model budget in euro (REQ-NFR-005). Provisional: the ADR 0059
+   * formula on the largest measured day (4,634 publications) and the benchmark costs
+   * (triage EUR 0.00008, ADR 0088; extraction EUR 0.00177, ADR 0091; embeddings at
+   * USD 0.0666 per million tokens), (0.371 + 0.177 + 0.124) x 1.5 = EUR 1.01. WP9 computes it.
+   */
+  BudgetDailyEur: number;
   /** `model.max_attempts`: attempts per step, including retries (REQ-AGENT-009). */
   ModelMaxAttempts: number;
   /**
@@ -58,6 +69,9 @@ export const DEFAULT_PROCESSING_CONFIG: ProcessingConfig = {
   TextMaxPages: 100,
   TextMinChars: 200,
   TextBackfillPerRun: 500,
+  AcceptScoreCut: 0.55,
+  DailyExtractionLimit: 100,
+  BudgetDailyEur: 1.0,
   ModelMaxAttempts: 3,
   TriageModel: {
     Model: "@cf/google/gemma-4-26b-a4b-it",

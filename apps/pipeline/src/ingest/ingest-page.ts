@@ -26,6 +26,8 @@ export type IngestResult = {
   Failures: IngestionRunFailure[];
   /** Publications whose source record has a PDF URL and a license that allows storage. */
   PdfCandidates: string[];
+  /** Publications this page stored for the first time; each gets a triage message (REQ-PROC-005). */
+  CreatedIds: string[];
 };
 
 function emptyResult(): IngestResult {
@@ -33,6 +35,7 @@ function emptyResult(): IngestResult {
     Counts: { Fetched: 0, Created: 0, Updated: 0, Skipped: 0, Failed: 0, DeadLettered: 0 },
     Failures: [],
     PdfCandidates: [],
+    CreatedIds: [],
   };
 }
 
@@ -96,6 +99,7 @@ async function ingestItems(
       }
       if (outcome.Outcome === "created") {
         result.Counts.Created += 1;
+        result.CreatedIds.push(outcome.PublicationId);
       } else if (outcome.Outcome === "updated") {
         result.Counts.Updated += 1;
       } else {

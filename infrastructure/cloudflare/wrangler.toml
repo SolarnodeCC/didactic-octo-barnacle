@@ -83,6 +83,29 @@ queue = "roi-texts-dlq-local"
 max_batch_size = 1
 max_retries = 1
 
+# Model steps (triage now, extraction in WP7): one message per invocation, and at most 8 at
+# once, which bounds the model calls in flight in phase 2 (ADR 0053). Sent only where
+# processing is enabled.
+[[queues.producers]]
+binding = "MODEL_QUEUE"
+queue = "roi-models-local"
+
+[[queues.consumers]]
+queue = "roi-models-local"
+max_batch_size = 1
+max_concurrency = 8
+max_retries = 3
+dead_letter_queue = "roi-models-dlq-local"
+
+[[queues.consumers]]
+queue = "roi-models-dlq-local"
+max_batch_size = 1
+max_retries = 1
+
+# Workers AI, called only through the environment's AI Gateway `roi-local` (REQ-NFR-003).
+[ai]
+binding = "AI"
+
 [env.preview]
 name = "roi-pipeline-preview"
 vars = { ENVIRONMENT = "preview" }
@@ -154,6 +177,29 @@ dead_letter_queue = "roi-texts-dlq-preview"
 queue = "roi-texts-dlq-preview"
 max_batch_size = 1
 max_retries = 1
+
+# Model steps (triage now, extraction in WP7): one message per invocation, and at most 8 at
+# once, which bounds the model calls in flight in phase 2 (ADR 0053). Sent only where
+# processing is enabled.
+[[env.preview.queues.producers]]
+binding = "MODEL_QUEUE"
+queue = "roi-models-preview"
+
+[[env.preview.queues.consumers]]
+queue = "roi-models-preview"
+max_batch_size = 1
+max_concurrency = 8
+max_retries = 3
+dead_letter_queue = "roi-models-dlq-preview"
+
+[[env.preview.queues.consumers]]
+queue = "roi-models-dlq-preview"
+max_batch_size = 1
+max_retries = 1
+
+# Workers AI, called only through the environment's AI Gateway `roi-preview` (REQ-NFR-003).
+[env.preview.ai]
+binding = "AI"
 
 [env.staging]
 name = "roi-pipeline-staging"
@@ -252,6 +298,29 @@ queue = "roi-texts-dlq-staging"
 max_batch_size = 1
 max_retries = 1
 
+# Model steps (triage now, extraction in WP7): one message per invocation, and at most 8 at
+# once, which bounds the model calls in flight in phase 2 (ADR 0053). Sent only where
+# processing is enabled.
+[[env.staging.queues.producers]]
+binding = "MODEL_QUEUE"
+queue = "roi-models-staging"
+
+[[env.staging.queues.consumers]]
+queue = "roi-models-staging"
+max_batch_size = 1
+max_concurrency = 8
+max_retries = 3
+dead_letter_queue = "roi-models-dlq-staging"
+
+[[env.staging.queues.consumers]]
+queue = "roi-models-dlq-staging"
+max_batch_size = 1
+max_retries = 1
+
+# Workers AI, called only through the environment's AI Gateway `roi-staging` (REQ-NFR-003).
+[env.staging.ai]
+binding = "AI"
+
 [env.production]
 name = "roi-pipeline-production"
 vars = { ENVIRONMENT = "production", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo-barnacle" }
@@ -348,3 +417,26 @@ dead_letter_queue = "roi-texts-dlq-production"
 queue = "roi-texts-dlq-production"
 max_batch_size = 1
 max_retries = 1
+
+# Model steps (triage now, extraction in WP7): one message per invocation, and at most 8 at
+# once, which bounds the model calls in flight in phase 2 (ADR 0053). Sent only where
+# processing is enabled.
+[[env.production.queues.producers]]
+binding = "MODEL_QUEUE"
+queue = "roi-models-production"
+
+[[env.production.queues.consumers]]
+queue = "roi-models-production"
+max_batch_size = 1
+max_concurrency = 8
+max_retries = 3
+dead_letter_queue = "roi-models-dlq-production"
+
+[[env.production.queues.consumers]]
+queue = "roi-models-dlq-production"
+max_batch_size = 1
+max_retries = 1
+
+# Workers AI, called only through the environment's AI Gateway `roi-production` (REQ-NFR-003).
+[env.production.ai]
+binding = "AI"
