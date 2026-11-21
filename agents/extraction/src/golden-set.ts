@@ -24,6 +24,11 @@ const SignalsSchema = z.object({
 const TriageEntrySchema = z.object({
   id: z.string(),
   publicationFixture: z.string(),
+  /**
+   * One of the eight target industries or `other`, for the per-industry breakdown of the eval
+   * report (REQ-TEST-007 AC1, ADR 0067). Optional until the owner has confirmed every label.
+   */
+  industry: z.string().optional(),
   expected: z.object({ signals: SignalsSchema, accepted: z.boolean(), reason: z.string() }),
 });
 

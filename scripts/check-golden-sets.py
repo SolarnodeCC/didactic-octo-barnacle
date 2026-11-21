@@ -102,6 +102,9 @@ def triage() -> dict[str, dict]:
         if not isinstance(entry, dict):
             continue
         check_id(path, entry)
+        # `industry` is optional until the owner confirms every label (ADR 0067, ADR 0072).
+        if "industry" in entry and entry["industry"] not in EXTRACTION_INDUSTRIES:
+            err(path, f"industry {entry['industry']!r} is not one of the eight industries or 'other'")
         fixture = (EXT / entry["publicationFixture"]).resolve()
         text = fixture_text(path, fixture)
         signals = entry["expected"]["signals"]

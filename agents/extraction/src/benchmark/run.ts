@@ -13,8 +13,10 @@ import {
 import {
   runExtractionEval,
   runTriageEval,
+  triageStability,
   type EvalReport,
   type TriageEvalReport,
+  type TriagePrediction,
 } from "../eval.js";
 import { type ExtractionEntry, type Threshold, type TriageEntry } from "../golden-set.js";
 import { extractionModelFn, triageModelFn } from "../model-fn.js";
@@ -147,6 +149,14 @@ export type RunSummary = {
   SignalAgreement?: TriageEvalReport["SignalAgreement"];
   Precision?: number;
   Recall?: number;
+  /** Triage, report-only (REQ-TEST-007 AC1): accuracy, F1, and the confusion of the accept decision. */
+  Accuracy?: number;
+  F1?: number;
+  Confusion?: TriageEvalReport["Confusion"];
+  /** Triage figures per golden-set `industry` label (REQ-TEST-007 AC1). */
+  ByIndustry?: TriageEvalReport["ByIndustry"];
+  /** Triage: what each entry returned, for the stability over runs (REQ-TEST-007 AC5). */
+  TriagePredictions?: Array<{ Id: string; Predicted: TriagePrediction }>;
   /** Problem Discovery: required facts the judge found present, of those it judged. */
   FactsPresent?: number;
   FactsJudged?: number;
@@ -493,6 +503,14 @@ export async function runBenchmark(
             SignalAgreement: triage.SignalAgreement,
             Precision: triage.Precision,
             Recall: triage.Recall,
+            Accuracy: triage.Accuracy,
+            F1: triage.F1,
+            Confusion: triage.Confusion,
+            ByIndustry: triage.ByIndustry,
+            TriagePredictions: triage.Entries.map((entry) => ({
+              Id: entry.Id,
+              Predicted: entry.Predicted,
+            })),
           };
         } else if (step === "problem-discovery") {
           if (deps.Judge === undefined) {
@@ -602,14 +620,45 @@ export function formatBenchmarkMarkdown(result: BenchmarkResult, plan: Benchmark
       "",
       "## Triage signal agreement (mean over runs)",
       "",
-      "| Model | NamedParty | StatedHarm | Trigger | ExistingAlternative | Adoptable | Precision | Recall |",
-      "|---|---|---|---|---|---|---|---|",
+      "| Model | NamedParty | StatedHarm | Trigger | ExistingAlternative | Adoptable | Precision | Recall | Accuracy | F1 |",
+      "|---|---|---|---|---|---|---|---|---|---|",
       ...triage.map((s) => {
         const mean = (pick: (r: RunSummary) => number): string =>
           pct(s.Runs.reduce((sum, r) => sum + pick(r), 0) / Math.max(s.Runs.length, 1));
-        return `| \`${s.Model}\` | ${mean((r) => r.SignalAgreement?.NamedParty ?? 0)} | ${mean((r) => r.SignalAgreement?.StatedHarm ?? 0)} | ${mean((r) => r.SignalAgreement?.Trigger ?? 0)} | ${mean((r) => r.SignalAgreement?.ExistingAlternative ?? 0)} | ${mean((r) => r.SignalAgreement?.Adoptable ?? 0)} | ${mean((r) => r.Precision ?? 0)} | ${mean((r) => r.Recall ?? 0)} |`;
+        return `| \`${s.Model}\` | ${mean((r) => r.SignalAgreement?.NamedParty ?? 0)} | ${mean((r) => r.SignalAgreement?.StatedHarm ?? 0)} | ${mean((r) => r.SignalAgreement?.Trigger ?? 0)} | ${mean((r) => r.SignalAgreement?.ExistingAlternative ?? 0)} | ${mean((r) => r.SignalAgreement?.Adoptable ?? 0)} | ${mean((r) => r.Precision ?? 0)} | ${mean((r) => r.Recall ?? 0)} | ${mean((r) => r.Accuracy ?? 0)} | ${mean((r) => r.F1 ?? 0)} |`;
+      }),
+      "",
+      "## Triage report (report-only, ADR 0067)",
+      "",
+      "Confusion of the accept decision in the first run, and stability over all runs: the share of entries with the same decision, and the same value of every signal, in every run.",
+      "",
+      "| Model | TP | FP | FN | TN | Invalid | Decision stable | Signals stable (min) |",
+      "|---|---|---|---|---|---|---|---|",
+      ...triage.map((s) => {
+        const c = s.Runs[0]?.Confusion;
+        const stability = triageStability(s.Runs.map((r) => r.TriagePredictions ?? []));
+        const minSignal = Math.min(...Object.values(stability.Signals));
+        return `| \`${s.Model}\` | ${c?.TruePositive ?? 0} | ${c?.FalsePositive ?? 0} | ${c?.FalseNegative ?? 0} | ${c?.TrueNegative ?? 0} | ${c?.Invalid ?? 0} | ${pct(stability.Decision)} | ${pct(minSignal)} |`;
       }),
     );
+    const industries = [
+      ...new Set(triage.flatMap((s) => Object.keys(s.Runs[0]?.ByIndustry ?? {}))),
+    ].sort();
+    if (industries.some((industry) => industry !== "unlabelled")) {
+      lines.push(
+        "",
+        "### Triage per industry (first run)",
+        "",
+        "| Model | Industry | Entries | Accuracy | Precision | Recall | F1 |",
+        "|---|---|---|---|---|---|---|",
+        ...triage.flatMap((s) =>
+          industries.map((industry) => {
+            const m = s.Runs[0]?.ByIndustry?.[industry];
+            return `| \`${s.Model}\` | ${industry} | ${m?.Entries ?? 0} | ${pct(m?.Accuracy ?? 0)} | ${pct(m?.Precision ?? 0)} | ${pct(m?.Recall ?? 0)} | ${pct(m?.F1 ?? 0)} |`;
+          }),
+        ),
+      );
+    }
   }
   const pd = result.Summaries.filter((s) => s.Step === "problem-discovery");
   if (pd.length > 0) {
