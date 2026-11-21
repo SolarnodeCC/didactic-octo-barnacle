@@ -1,5 +1,6 @@
 id: gs-triage-055
 publicationFixture: fixtures/arxiv/2609.10350.json
+industry: banking
 expected:
   signals:
     namedParty: true

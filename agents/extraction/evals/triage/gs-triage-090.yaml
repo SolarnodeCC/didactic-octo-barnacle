@@ -1,5 +1,6 @@
 id: gs-triage-090
 publicationFixture: fixtures/arxiv/2606.27174.json
+industry: life-sciences
 expected:
   signals:
     namedParty: false

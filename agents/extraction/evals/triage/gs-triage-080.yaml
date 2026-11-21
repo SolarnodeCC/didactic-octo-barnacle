@@ -1,5 +1,6 @@
 id: gs-triage-080
 publicationFixture: fixtures/arxiv/2609.20080.json
+industry: aerospace-defense
 expected:
   signals:
     namedParty: true

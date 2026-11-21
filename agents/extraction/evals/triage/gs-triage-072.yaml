@@ -1,5 +1,6 @@
 id: gs-triage-072
 publicationFixture: fixtures/arxiv/2610.28167.json
+industry: energy-utilities
 expected:
   signals:
     namedParty: true

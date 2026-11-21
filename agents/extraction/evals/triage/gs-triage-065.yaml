@@ -1,5 +1,6 @@
 id: gs-triage-065
 publicationFixture: fixtures/arxiv/2609.20584.json
+industry: automotive
 expected:
   signals:
     namedParty: false
