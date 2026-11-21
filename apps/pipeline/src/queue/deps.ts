@@ -1,4 +1,9 @@
-import { type QueueMessageEnvelope, type SourceName } from "@roi/models";
+import {
+  type CallModelDeps,
+  type ModelConfig,
+  type QueueMessageEnvelope,
+  type SourceName,
+} from "@roi/models";
 
 import { type ArxivPage } from "../collectors/arxiv/client.js";
 import { type OpenAlexPage } from "../collectors/openalex/client.js";
@@ -56,6 +61,20 @@ export type PipelineDeps = {
     Extract: PdfTextExtractor;
     Limits: PdfTextLimits & { MaxPdfBytes: number; BackfillPerRun: number };
   };
+  /**
+   * Triage (REQ-PROC-005, REQ-PROC-006, REQ-PROC-008). The consumer needs `Call`, `Model`, and
+   * `AcceptScoreCut`; `Queue` is set only where `processing.enabled` is on, and only then does
+   * a new publication get a `publication.triage` message. Optional, so a test or environment
+   * without it ingests as before.
+   */
+  Triage?: {
+    Queue?: QueueSender;
+    /** `callModel` dependencies: Workers AI through AI Gateway, usage store, prices. */
+    Call: CallModelDeps;
+    /** `model.triage`: model, prompt version, output mode, reasoning (ADR 0088). */
+    Model: ModelConfig;
+    AcceptScoreCut: number;
+  };
   /** Structured log line; the worker writes JSON, tests can leave it out (REQ-NFR-008 AC1). */
   Log?: (event: string, fields: Record<string, unknown>) => void;
 };
@@ -103,6 +122,17 @@ export function textExtractEnvelope(
     Type: "document.extract_text",
     SchemaVersion: QUEUE_SCHEMA_VERSION,
     Ids: { PublicationId: publicationId, DocumentId: documentId },
+    Attempt: 0,
+  };
+}
+
+/** Deterministic ID: a publication is triaged once (REQ-PROC-008). */
+export function triageEnvelope(publicationId: string): QueueMessageEnvelope {
+  return {
+    MessageId: `triage:${publicationId}`,
+    Type: "publication.triage",
+    SchemaVersion: QUEUE_SCHEMA_VERSION,
+    Ids: { PublicationId: publicationId },
     Attempt: 0,
   };
 }

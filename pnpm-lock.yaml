@@ -72,6 +72,9 @@ importers:
       '@roi/models':
         specifier: workspace:*
         version: link:../../packages/models
+      '@roi/prompts':
+        specifier: workspace:*
+        version: link:../../packages/prompts
       fast-xml-parser:
         specifier: ^5.12.0
         version: 5.12.0

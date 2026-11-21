@@ -6,6 +6,7 @@ import {
   documentIngestEnvelope,
   documentQueue,
   fetchPageEnvelope,
+  triageEnvelope,
   type PipelineDeps,
 } from "./deps.js";
 import {
@@ -141,6 +142,21 @@ async function processPage(
         .slice(start, start + SEND_BATCH_LIMIT)
         .map((publicationId) => ({ body: documentIngestEnvelope(publicationId) })),
     );
+  }
+
+  // New publications get a triage message where processing is on (REQ-PROC-005). A
+  // publication that a later page or run stores again is not created again, so it is not
+  // triaged twice; the message ID is fixed anyway.
+  const triageQueue = deps.Triage?.Queue;
+  if (triageQueue) {
+    const created = [...new Set(fetched.Result.CreatedIds)];
+    for (let start = 0; start < created.length; start += SEND_BATCH_LIMIT) {
+      await triageQueue.sendBatch(
+        created
+          .slice(start, start + SEND_BATCH_LIMIT)
+          .map((publicationId) => ({ body: triageEnvelope(publicationId) })),
+      );
+    }
   }
 
   const statements = [

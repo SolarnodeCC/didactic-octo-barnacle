@@ -33,6 +33,8 @@ describe("REQ-NFR-020: environment bootstrap is idempotent", () => {
       "roi-documents-dlq-preview",
       "roi-texts-preview",
       "roi-texts-dlq-preview",
+      "roi-models-preview",
+      "roi-models-dlq-preview",
       "roi-publications-preview",
       "roi-preview",
     ]);

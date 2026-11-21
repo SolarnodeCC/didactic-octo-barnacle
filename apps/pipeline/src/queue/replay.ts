@@ -56,7 +56,9 @@ export async function replayDeadLetter(
         ? documentQueue(deps)
         : envelope.Type === "document.extract_text"
           ? deps.Text?.Queue
-          : deps.Queue;
+          : envelope.Type === "publication.triage"
+            ? deps.Triage?.Queue
+            : deps.Queue;
     if (!queue) {
       throw new Error(`no queue for ${envelope.Type} in this Worker`);
     }

@@ -145,6 +145,8 @@ describe("REQ-NFR-020: Cloudflare bootstrap client", () => {
     expect(account.store.queues.sort()).toEqual([
       "roi-documents-dlq-staging",
       "roi-documents-staging",
+      "roi-models-dlq-staging",
+      "roi-models-staging",
       "roi-publications-dlq-staging",
       "roi-publications-staging",
       "roi-texts-dlq-staging",

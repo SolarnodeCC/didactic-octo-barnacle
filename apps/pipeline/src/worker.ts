@@ -1,3 +1,5 @@
+import { type CallModelDeps } from "@roi/models";
+
 import { fetchArxivPage } from "./collectors/arxiv/client.js";
 import { fetchOpenAlexPage } from "./collectors/openalex/client.js";
 import { DEFAULT_INGEST_CONFIG } from "./config.js";
@@ -8,6 +10,8 @@ import { logLine } from "./log-line.js";
 import { createPdfFetcher } from "./documents/safe-fetch.js";
 import { extractPdfText } from "./documents/pdf-text.js";
 import { loadProcessingConfig } from "./processing-config.js";
+import { PRICE_TABLE } from "./prices.js";
+import { createModelUsageStore } from "./store/model-usage.js";
 import { type ObjectStore } from "./documents/object-store.js";
 import { ARXIV_MIN_REQUEST_INTERVAL_MS, createRateLimiter } from "./http/rate-limit.js";
 import { consumeBatch } from "./queue/consume.js";
@@ -26,6 +30,10 @@ export type Env = {
   DOCUMENT_QUEUE: QueueSender;
   /** Text extraction of stored PDFs, one file per invocation (ADR 0009, ADR 0053). */
   TEXT_QUEUE?: QueueSender;
+  /** Model steps: triage now, extraction in WP7; concurrency 8 bounds calls in flight (ADR 0053). */
+  MODEL_QUEUE?: QueueSender;
+  /** Workers AI, always called through the environment's AI Gateway (REQ-NFR-003). */
+  AI?: WorkersAiBinding;
   /** Worker secret; the name is listed in docs/kt/operations.md. */
   OPENALEX_API_KEY?: string;
   /**
@@ -44,6 +52,8 @@ export type Env = {
   /** `processing.enabled` (`"true"` or `"false"`); unset means off. See processing-config.ts. */
   PROCESSING_ENABLED?: string;
 };
+
+type WorkersAiBinding = CallModelDeps["Ai"];
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 // Not `fetch` itself: calling it detached from the global scope fails in Workers.
@@ -97,6 +107,28 @@ function buildDeps(env: Env): PipelineDeps {
         BackfillPerRun: processing.TextBackfillPerRun,
       },
     },
+    ...(env.AI
+      ? {
+          Triage: {
+            ...(processing.Enabled && env.MODEL_QUEUE ? { Queue: env.MODEL_QUEUE } : {}),
+            Call: {
+              Ai: env.AI,
+              GatewayId: `roi-${env.ENVIRONMENT}`,
+              Usage: createModelUsageStore(env.DB, {
+                Amount: processing.BudgetDailyEur,
+                Currency: "EUR",
+              }),
+              Prices: PRICE_TABLE,
+              MaxAttempts: processing.ModelMaxAttempts,
+              NewId: () => crypto.randomUUID(),
+              Now: () => new Date(),
+              Sleep: sleep,
+            },
+            Model: processing.TriageModel,
+            AcceptScoreCut: processing.AcceptScoreCut,
+          },
+        }
+      : {}),
     Alert: createAlertSink({
       Db: env.DB,
       Fetch: workerFetch,
@@ -157,8 +189,8 @@ function buildDeps(env: Env): PipelineDeps {
 
 /**
  * Collector Worker entry (REQ-NFR-002): a health check, the cron handler that starts a
- * run (REQ-DATA-009), and the queue handler for pages, PDFs, texts, and dead letters
- * (REQ-DATA-011, REQ-DATA-006).
+ * run (REQ-DATA-009), and the queue handler for pages, PDFs, texts, triage, and dead
+ * letters (REQ-DATA-011, REQ-DATA-006, REQ-PROC-005).
  */
 export default {
   async fetch(_request: Request, env: Env): Promise<Response> {

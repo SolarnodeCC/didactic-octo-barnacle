@@ -56,7 +56,7 @@ A cheap filter decides which publications go to opportunity extraction and, late
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: KT review of cost and volume (REQ-NFR-005)
 - Depends on: REQ-DATA-005
 - Acceptance criteria:
@@ -86,7 +86,7 @@ Triage has a documented scope rule, a typed decision, and a golden set.
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: Readiness assessment (triage was the only model-backed step without a contract)
 - Depends on: REQ-PROC-005
 - Acceptance criteria:
