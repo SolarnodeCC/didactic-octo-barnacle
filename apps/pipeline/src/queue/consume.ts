@@ -5,9 +5,10 @@ import { handleDeadLetter } from "./dead-letter.js";
 import { type PipelineDeps } from "./deps.js";
 import { handleDocumentIngest } from "./document-ingest.js";
 import { handleFetchPage } from "./fetch-page.js";
+import { handleTextExtract } from "./text-extract.js";
 import { type QueueBatchLike } from "./types.js";
 
-/** Dead-letter queues are named `roi-<queue>-dlq-<env>`, for pages and for PDFs (ADR 0047). */
+/** Dead-letter queues are named `roi-<queue>-dlq-<env>`, for pages, PDFs, and texts (ADR 0047, ADR 0053). */
 export function isDeadLetterQueue(queueName: string): boolean {
   return queueName.includes("-dlq-");
 }
@@ -69,12 +70,13 @@ export async function consumeBatch(
   const deadLetters = isDeadLetterQueue(batch.queue);
   for (const message of batch.messages) {
     try {
+      const type = QueueMessageEnvelopeSchema.safeParse(message.body).data?.Type;
       if (deadLetters) {
         await handleDeadLetter(deps, message.body);
-      } else if (
-        QueueMessageEnvelopeSchema.safeParse(message.body).data?.Type === "document.ingest"
-      ) {
+      } else if (type === "document.ingest") {
         await handleDocumentIngest(deps, message.body, { Attempts: message.attempts });
+      } else if (type === "document.extract_text") {
+        await handleTextExtract(deps, message.body);
       } else {
         await handleFetchPage(deps, message.body);
       }

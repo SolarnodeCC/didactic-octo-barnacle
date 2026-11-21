@@ -2,8 +2,8 @@ import { type ModelConfig } from "@roi/models";
 
 /**
  * Runtime configuration of phase 2 processing (docs/kt/phase-2/schema.md, defaults in
- * docs/kt/architecture/defaults.md). Nothing reads it yet: the consumers that use it arrive
- * in WP4 to WP7, and `Enabled` stays off until then.
+ * docs/kt/architecture/defaults.md). The text consumer of WP4 reads the `text.*` keys; the
+ * consumers of WP5 to WP7 read the others. `Enabled` stays off until an environment turns it on.
  */
 export type ProcessingConfig = {
   /** `processing.enabled`: turns the phase 2 consumers on per environment. */
@@ -18,6 +18,20 @@ export type ProcessingConfig = {
   RetractionLookbackDays: number;
   /** `model.price_table_version`: price table used when the gateway gives no cost (REQ-NFR-011 AC2). */
   PriceTableVersion: string;
+  /**
+   * `text.max_pdf_bytes`: a stored PDF larger than this is not opened for its text, so one
+   * file cannot exhaust the Worker's memory (ADR 0009, measured in WP4).
+   */
+  TextMaxPdfBytes: number;
+  /** `text.max_pages`: a PDF with more pages is not read (ADR 0009, measured in WP4). */
+  TextMaxPages: number;
+  /** `text.min_chars`: less text than this means no usable text layer, as in a scan. */
+  TextMinChars: number;
+  /**
+   * `text.backfill_per_run`: stored PDFs without text that each ingestion start queues for
+   * extraction, so PDFs stored before WP4 get their text too.
+   */
+  TextBackfillPerRun: number;
   /** `model.max_attempts`: attempts per step, including retries (REQ-AGENT-009). */
   ModelMaxAttempts: number;
   /**
@@ -40,6 +54,10 @@ export const DEFAULT_PROCESSING_CONFIG: ProcessingConfig = {
   EmbeddingBatchSize: 50,
   RetractionLookbackDays: 30,
   PriceTableVersion: "2026-11-11",
+  TextMaxPdfBytes: 20 * 1024 * 1024,
+  TextMaxPages: 100,
+  TextMinChars: 200,
+  TextBackfillPerRun: 500,
   ModelMaxAttempts: 3,
   TriageModel: {
     Model: "@cf/google/gemma-4-26b-a4b-it",

@@ -6,6 +6,8 @@ import { createAuthorGuard } from "./privacy/author-guard.js";
 import { createAuthorKeyHasher } from "./privacy/author-key.js";
 import { logLine } from "./log-line.js";
 import { createPdfFetcher } from "./documents/safe-fetch.js";
+import { extractPdfText } from "./documents/pdf-text.js";
+import { loadProcessingConfig } from "./processing-config.js";
 import { type ObjectStore } from "./documents/object-store.js";
 import { ARXIV_MIN_REQUEST_INTERVAL_MS, createRateLimiter } from "./http/rate-limit.js";
 import { consumeBatch } from "./queue/consume.js";
@@ -22,6 +24,8 @@ export type Env = {
   PUBLICATION_QUEUE: QueueSender;
   /** PDF downloads, consumed apart from the pages (ADR 0047). */
   DOCUMENT_QUEUE: QueueSender;
+  /** Text extraction of stored PDFs, one file per invocation (ADR 0009, ADR 0053). */
+  TEXT_QUEUE?: QueueSender;
   /** Worker secret; the name is listed in docs/kt/operations.md. */
   OPENALEX_API_KEY?: string;
   /**
@@ -61,6 +65,7 @@ function buildDeps(env: Env): PipelineDeps {
   };
   const log = (event: string, fields: Record<string, unknown>) =>
     console.log(logLine(env.ENVIRONMENT, event, fields));
+  const processing = loadProcessingConfig(env);
   return {
     Db: env.DB,
     Queue: env.PUBLICATION_QUEUE,
@@ -80,6 +85,18 @@ function buildDeps(env: Env): PipelineDeps {
       },
     }),
     Log: log,
+    // Text is consumed whenever a message arrives; new messages are sent only where
+    // `processing.enabled` is on (REQ-DATA-006).
+    Text: {
+      ...(processing.Enabled && env.TEXT_QUEUE ? { Queue: env.TEXT_QUEUE } : {}),
+      Extract: extractPdfText,
+      Limits: {
+        MaxPdfBytes: processing.TextMaxPdfBytes,
+        MaxPages: processing.TextMaxPages,
+        MinChars: processing.TextMinChars,
+        BackfillPerRun: processing.TextBackfillPerRun,
+      },
+    },
     Alert: createAlertSink({
       Db: env.DB,
       Fetch: workerFetch,
@@ -140,7 +157,8 @@ function buildDeps(env: Env): PipelineDeps {
 
 /**
  * Collector Worker entry (REQ-NFR-002): a health check, the cron handler that starts a
- * run (REQ-DATA-009), and the queue handler for pages and dead letters (REQ-DATA-011).
+ * run (REQ-DATA-009), and the queue handler for pages, PDFs, texts, and dead letters
+ * (REQ-DATA-011, REQ-DATA-006).
  */
 export default {
   async fetch(_request: Request, env: Env): Promise<Response> {

@@ -1,7 +1,10 @@
 /** The slice of the R2 bucket API the pipeline uses. `R2Bucket` satisfies it. */
 export interface ObjectStore {
-  head(key: string): Promise<unknown | null>;
-  get(key: string): Promise<{ text(): Promise<string> } | null>;
+  /** The object's size in bytes, or null when there is no object under the key. */
+  head(key: string): Promise<{ size: number } | null>;
+  get(
+    key: string,
+  ): Promise<{ text(): Promise<string>; arrayBuffer(): Promise<ArrayBuffer> } | null>;
   list(options: { prefix: string; cursor?: string }): Promise<{
     objects: Array<{ key: string }>;
     truncated: boolean;
@@ -22,4 +25,9 @@ export async function sha256Hex(bytes: Uint8Array<ArrayBuffer>): Promise<string>
 
 export function pdfKey(contentHash: string): string {
   return `pdfs/${contentHash}.pdf`;
+}
+
+/** Where the text extracted from a document is stored (REQ-DATA-006). */
+export function textKey(documentId: string): string {
+  return `texts/${documentId}.txt`;
 }

@@ -82,3 +82,49 @@ export async function findDocumentByHash(
     .bind(contentHash)
     .first<{ publication_id: string }>();
 }
+
+export type StoredDocument = {
+  id: string;
+  publication_id: string;
+  pdf_r2_key: string;
+  license: string;
+  status: string;
+};
+
+export async function findDocumentById(
+  db: SqlDatabase,
+  documentId: string,
+): Promise<StoredDocument | null> {
+  return db
+    .prepare("SELECT id, publication_id, pdf_r2_key, license, status FROM document WHERE id = ?")
+    .bind(documentId)
+    .first<StoredDocument>();
+}
+
+/** Document states after text extraction; neither changes again (REQ-DATA-006). */
+export const FINAL_TEXT_STATES = ["text-extracted", "text-failed"] as const;
+
+/**
+ * Stored PDFs that still need their text: status `stored`, and no text message that
+ * finished or was dead-lettered. The oldest come first, so a backfill works through them in
+ * order across runs.
+ */
+export async function documentsAwaitingText(
+  db: SqlDatabase,
+  limit: number,
+): Promise<Array<{ id: string; publication_id: string }>> {
+  const { results } = await db
+    .prepare(
+      `SELECT d.id AS id, d.publication_id AS publication_id FROM document d
+       WHERE d.status = 'stored'
+         AND NOT EXISTS (
+           SELECT 1 FROM queue_message_log q
+           WHERE q.message_id = 'text:' || d.id AND q.status IN ('completed', 'dead-lettered')
+         )
+       ORDER BY d.stored_at, d.id
+       LIMIT ?`,
+    )
+    .bind(limit)
+    .all<{ id: string; publication_id: string }>();
+  return results;
+}

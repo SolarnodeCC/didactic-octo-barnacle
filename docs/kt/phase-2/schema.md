@@ -57,15 +57,17 @@ It adds no organization-scoped table. Those arrive with phase 4 (ADR 0019).
 
 ## Configuration keys
 
-New keys for [defaults](../architecture/defaults.md). They are added there in the pull request that first reads them. WP1 added `processing.enabled`, `triage.admission_pool_days`, `extraction.full_text_max_chars`, `embedding.batch_size`, `retraction.lookback_days`, and `model.price_table_version`; ADR 0088 added `model.triage` and ADR 0091 `model.extraction`.
+New keys for [defaults](../architecture/defaults.md). They are added there in the pull request that first reads them. WP4 added the `text.*` keys. WP1 added `processing.enabled`, `triage.admission_pool_days`, `extraction.full_text_max_chars`, `embedding.batch_size`, `retraction.lookback_days`, and `model.price_table_version`; ADR 0088 added `model.triage` and ADR 0091 `model.extraction`.
 
 | Key | Default | Notes |
 |---|---|---|
 | `processing.enabled` | `false` | Turns the phase 2 consumers on per environment |
 | `triage.admission_pool_days` | `7` | How long a passing publication waits for admission (ADR 0055) |
 | `extraction.full_text_max_chars` | `24000` | Cut before the call; the quote check uses the cut text |
-| `text.max_pdf_bytes` | set in WP4 | From measured peak memory (ADR 0009) |
-| `text.max_pages` | set in WP4 | From measured peak memory and CPU (ADR 0009) |
+| `text.max_pdf_bytes` | `20971520` (20 MiB) | From measured peak memory, WP4 ([design](design.md#full-text), ADR 0009) |
+| `text.max_pages` | `100` | From measured peak memory and CPU, WP4 (ADR 0009) |
+| `text.min_chars` | `200` | Less text means no usable text layer, as in a scan (ADR 0009) |
+| `text.backfill_per_run` | `500` | Stored PDFs without text queued at each ingestion start, WP4 |
 | `embedding.batch_size` | `50` | Messages per embedding call |
 | `budget.expected_daily_triaged`, `budget.expected_daily_embeddings` | from the measured daily volume | Largest measured day until a steady state is known (ADR 0059) |
 | `retraction.lookback_days` | `30` | How far back the weekly retraction check looks (ADR 0061) |

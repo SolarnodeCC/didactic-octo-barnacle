@@ -125,7 +125,7 @@ Text is extracted from stored PDFs so agents can read more than the abstract.
 
 - Phase: 2
 - Priority: should
-- Status: planned
+- Status: in-progress
 - Source: KT review of agent inputs
 - Depends on: REQ-DATA-004
 - Acceptance criteria:

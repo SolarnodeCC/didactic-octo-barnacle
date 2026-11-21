@@ -41,13 +41,14 @@ Starter configuration values. Stored as versioned config in `infrastructure/clou
 |---|---|---|---|
 | `source.fetch_page` | `1` | Cron / collector Workflow | Collector Worker |
 | `document.ingest` | `1` | Page consumer after the license gate | Document-processing Queue consumer; message ID `document:<publicationId>` |
+| `document.extract_text` | `1` | Document consumer after a PDF is stored, and the text backfill at each ingestion start; only where `processing.enabled` is on (REQ-DATA-006) | Text consumer (`roi-texts-<env>`, binding `TEXT_QUEUE`); message ID `text:<documentId>` |
 | `publication.embed` | `1` | Page consumer, when a publication is stored (ADR 0053) | Embedding consumer (`roi-embeddings-<env>`) |
 | `publication.triage` | `1` | Page consumer, when a publication is stored; runs in parallel with embedding (ADR 0053) | Triage consumer (`roi-models-<env>`) |
 | `publication.extract` | `1` | Daily admission cron, for admitted and re-driven publications (ADR 0055, ADR 0063, ADR 0065) | Extraction consumer (`roi-models-<env>`) |
 | `candidate.run` | `1` | Extraction (0..N) | Starts one candidate Workflow |
 | `queue.dead_letter` | `1` | Any consumer after max attempts | Automatic replay after `recovery.dead_letter_replay_hours`, at most twice (REQ-DATA-012); admin replay (REQ-DATA-011) |
 
-Payload of every message: `{ schemaVersion, type, ids: { runId?, source?, page?, publicationId?, candidateId?, documentId? }, attempt }`. Large bodies stay in D1/R2; messages carry IDs only, and `packages/models` rejects any other key. A type is added to the `QueueMessageTypeSchema` enum when its producer and consumer exist; `source.fetch_page` is the first. Its message ID is `fetch:<runId>:<page>`, so a page sent twice is one message. The page queue (`roi-publications-<env>`) is consumed one message at a time (`max_batch_size = 1`, `max_concurrency = 1`), so pages are stored in order. `document.ingest` messages have their own queue (`roi-documents-<env>`, binding `DOCUMENT_QUEUE`), consumed in batches of 5 with up to 5 at once (ADR 0047). Both retry three times with a growing delay (ADR 0045) and then move the message to their own dead-letter queue, which the same Worker consumes.
+Payload of every message: `{ schemaVersion, type, ids: { runId?, source?, page?, publicationId?, candidateId?, documentId? }, attempt }`. Large bodies stay in D1/R2; messages carry IDs only, and `packages/models` rejects any other key. A type is added to the `QueueMessageTypeSchema` enum when its producer and consumer exist; `source.fetch_page` is the first. Its message ID is `fetch:<runId>:<page>`, so a page sent twice is one message. The page queue (`roi-publications-<env>`) is consumed one message at a time (`max_batch_size = 1`, `max_concurrency = 1`), so pages are stored in order. `document.ingest` messages have their own queue (`roi-documents-<env>`, binding `DOCUMENT_QUEUE`), consumed in batches of 5 with up to 5 at once (ADR 0047). `document.extract_text` messages have their own queue (`roi-texts-<env>`, binding `TEXT_QUEUE`), one file per invocation with up to 3 at once (ADR 0009, ADR 0053). All three retry three times with a growing delay (ADR 0045) and then move the message to their own dead-letter queue, which the same Worker consumes.
 
 ## PDF fetching
 
@@ -88,6 +89,10 @@ Read by `loadProcessingConfig` in `apps/pipeline/src/processing-config.ts`. Only
 | `processing.enabled` | `false` | Turns the phase 2 consumers on per environment; an unrecognized value fails the Worker instead of turning processing on |
 | `triage.admission_pool_days` | `7` | How long a passing publication waits for admission (ADR 0055) |
 | `extraction.full_text_max_chars` | `24000` | Cut before the call; the quote check uses the cut text |
+| `text.max_pdf_bytes` | `20971520` | 20 MiB; a larger stored PDF is not opened for its text and is marked `text-failed` (ADR 0009). Set from the WP4 measurement in [phase 2 design](../phase-2/design.md#full-text) |
+| `text.max_pages` | `100` | A PDF with more pages is marked `text-failed` before any page is read (ADR 0009) |
+| `text.min_chars` | `200` | Less text than this, not counting white space, means no usable text layer, as in a scan (ADR 0009) |
+| `text.backfill_per_run` | `500` | Stored PDFs without text that each ingestion start queues for extraction |
 | `retraction.lookback_days` | `30` | How far back the weekly retraction check looks (ADR 0061) |
 | `model.price_table_version` | `2026-11-11` | Price table used when the gateway gives no cost (REQ-NFR-011 AC2); it has cached-input prices (ADR 0078) |
 | `model.triage` | `@cf/google/gemma-4-26b-a4b-it`, thinking off, prompt `triage@2`, `json-schema` output | Chosen by benchmark round two (ADR 0088); temperature 0 and at most 8192 output tokens come with the prompt version |

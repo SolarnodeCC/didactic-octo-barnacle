@@ -11,6 +11,8 @@ import { type OpenAlexPage } from "../collectors/openalex/client.js";
 import { type OpenAlexWork } from "../collectors/openalex/types.js";
 import { DEFAULT_INGEST_CONFIG, type IngestConfig } from "../config.js";
 import { type FetchedPdf } from "../documents/safe-fetch.js";
+import { extractPdfText, type PdfTextExtractor } from "../documents/pdf-text.js";
+import { DEFAULT_PROCESSING_CONFIG } from "../processing-config.js";
 import { consumeBatch } from "../queue/consume.js";
 import { createAuthorGuard } from "../privacy/author-guard.js";
 import { createAuthorKeyHasher, type AuthorKeyHasher } from "../privacy/author-key.js";
@@ -102,6 +104,16 @@ export function createHarness(
     FetchPdf?: PipelineDeps["FetchPdf"];
     /** The erasure key; `null` leaves it unset, as in a misconfigured Worker. */
     AuthorKey?: string | null;
+    /**
+     * Turns on text extraction (REQ-DATA-006): text messages go to the same queue as the
+     * rest, with the real unpdf extractor unless `Extract` replaces it.
+     */
+    Text?: {
+      Extract?: PdfTextExtractor;
+      Limits?: Partial<NonNullable<PipelineDeps["Text"]>["Limits"]>;
+      /** `false` consumes text messages but sends none, as with processing off. */
+      Send?: boolean;
+    };
   } = {},
 ): Harness {
   const database = createTestDatabase();
@@ -149,6 +161,21 @@ export function createHarness(
           ? Promise.reject(next)
           : Promise.resolve({ Bytes: next, FinalUrl: url });
       }),
+    ...(overrides.Text
+      ? {
+          Text: {
+            ...(overrides.Text.Send === false ? {} : { Queue: queue }),
+            Extract: overrides.Text.Extract ?? extractPdfText,
+            Limits: {
+              MaxPdfBytes: DEFAULT_PROCESSING_CONFIG.TextMaxPdfBytes,
+              MaxPages: DEFAULT_PROCESSING_CONFIG.TextMaxPages,
+              MinChars: DEFAULT_PROCESSING_CONFIG.TextMinChars,
+              BackfillPerRun: DEFAULT_PROCESSING_CONFIG.TextBackfillPerRun,
+              ...overrides.Text.Limits,
+            },
+          },
+        }
+      : {}),
     Sources: {
       FetchOpenAlexPage: (request) => {
         openAlexRequests.push(request);

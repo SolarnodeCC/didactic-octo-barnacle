@@ -39,6 +39,9 @@ export function desiredResources(environment: EnvironmentName): DesiredResource[
     // PDF downloads, consumed apart from the pages (ADR 0047).
     { Kind: "queue", Name: `roi-documents-${suffix}` },
     { Kind: "queue-dlq", Name: `roi-documents-dlq-${suffix}` },
+    // Text extraction of stored PDFs, one file at a time (ADR 0009, ADR 0053).
+    { Kind: "queue", Name: `roi-texts-${suffix}` },
+    { Kind: "queue-dlq", Name: `roi-texts-dlq-${suffix}` },
     { Kind: "vectorize", Name: `roi-publications-${suffix}` },
     { Kind: "ai-gateway", Name: `roi-${suffix}` },
   ];

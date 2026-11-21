@@ -7,6 +7,7 @@ import { type AlertSink } from "../alerts/types.js";
 import { type ObjectStore } from "../documents/object-store.js";
 import { type AuthorGuard } from "../privacy/author-guard.js";
 import { type FetchedPdf } from "../documents/safe-fetch.js";
+import { type PdfTextExtractor, type PdfTextLimits } from "../documents/pdf-text.js";
 import { type SqlDatabase } from "../store/sql.js";
 import { type QueueSender } from "./types.js";
 
@@ -44,6 +45,17 @@ export type PipelineDeps = {
       SubmittedTo?: string;
     }) => Promise<ArxivPage>;
   };
+  /**
+   * Full-text extraction of stored PDFs (REQ-DATA-006, ADR 0009). The consumer needs
+   * `Extract` and `Limits`; `Queue` is set only where `processing.enabled` is on, and only
+   * then does a stored PDF get a `document.extract_text` message. Optional, so a test or
+   * environment without it stores PDFs as before.
+   */
+  Text?: {
+    Queue?: QueueSender;
+    Extract: PdfTextExtractor;
+    Limits: PdfTextLimits & { MaxPdfBytes: number; BackfillPerRun: number };
+  };
   /** Structured log line; the worker writes JSON, tests can leave it out (REQ-NFR-008 AC1). */
   Log?: (event: string, fields: Record<string, unknown>) => void;
 };
@@ -77,6 +89,20 @@ export function documentIngestEnvelope(publicationId: string): QueueMessageEnvel
     Type: "document.ingest",
     SchemaVersion: QUEUE_SCHEMA_VERSION,
     Ids: { PublicationId: publicationId },
+    Attempt: 0,
+  };
+}
+
+/** Deterministic ID: a stored document is queued for its text at most once. */
+export function textExtractEnvelope(
+  publicationId: string,
+  documentId: string,
+): QueueMessageEnvelope {
+  return {
+    MessageId: `text:${documentId}`,
+    Type: "document.extract_text",
+    SchemaVersion: QUEUE_SCHEMA_VERSION,
+    Ids: { PublicationId: publicationId, DocumentId: documentId },
     Attempt: 0,
   };
 }

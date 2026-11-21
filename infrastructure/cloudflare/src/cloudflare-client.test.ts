@@ -147,6 +147,8 @@ describe("REQ-NFR-020: Cloudflare bootstrap client", () => {
       "roi-documents-staging",
       "roi-publications-dlq-staging",
       "roi-publications-staging",
+      "roi-texts-dlq-staging",
+      "roi-texts-staging",
     ]);
     const vectorize = account.calls.find(
       (c) => c.method === "POST" && c.path === "/vectorize/v2/indexes",
