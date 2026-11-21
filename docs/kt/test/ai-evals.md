@@ -31,7 +31,7 @@ Agent output comes from language models and varies between runs. Exact assertion
 
 An entry passes when all checks pass. Triage is the exception: an entry passes on the schema and the accept decision that code derives from its signals, and a run also needs the agreement of every signal to reach a floor (REQ-TEST-006 AC5, [ADR 0087](../decisions/0087-triage-passes-on-the-decision-with-a-signal-floor.md)).
 
-For triage and extraction the report also gives metrics that do not change the pass rule (REQ-TEST-007, ADR 0067): the confusion matrix, F1, and a breakdown per industry for triage; candidate precision, recall, and F1 by normalised quote overlap for extraction; the first-attempt, normalised-only, and dropped quote rates; where accepted quotes fall in the input; the Brier score of `Confidence`; and stability over three runs.
+For triage and extraction the report also gives metrics that do not change the pass rule (REQ-TEST-007, ADR 0067): the confusion matrix, F1, and a breakdown per industry for triage; candidate precision, recall, and F1 by normalised quote overlap for extraction; the first-attempt, normalised-only, and dropped quote rates; where accepted quotes fall in the input; the Brier score of `Confidence`; and stability over three runs. The triage part is in `runTriageEval` and `triageStability` (`agents/extraction/src/eval.ts`) and in the benchmark report (WP6); the extraction part comes with WP7.
 
 ## Model judge
 

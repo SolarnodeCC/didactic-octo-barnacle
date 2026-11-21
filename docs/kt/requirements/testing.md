@@ -101,7 +101,7 @@ The eval report shows where triage and extraction go wrong, not only whether the
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: ADR 0067
 - Depends on: REQ-TEST-006, REQ-PROC-008, REQ-PROC-009
 - Acceptance criteria:

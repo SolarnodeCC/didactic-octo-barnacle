@@ -1,7 +1,7 @@
 import { decideTriage, type TriageSignals } from "@roi/models";
 import { describe, expect, it } from "vitest";
 
-import { runExtractionEval, runTriageEval, type ModelFn } from "./eval.js";
+import { runExtractionEval, runTriageEval, triageStability, type ModelFn } from "./eval.js";
 import {
   loadExtractionSet,
   loadThreshold,
@@ -218,5 +218,161 @@ describe("REQ-PROC-009: the extraction eval checks schema, quotes, and candidate
     );
     expect(report.PassRate).toBe(0);
     expect(report.Entries[0]?.Failures).toContain("quote:Candidates[0].EvidenceQuote");
+  });
+});
+
+/** A synthetic triage entry: its labels and industry; the publication ID is the entry ID. */
+function syntheticEntry(
+  id: string,
+  industry: string | undefined,
+  signals: Record<
+    "namedParty" | "statedHarm" | "trigger" | "existingAlternative" | "adoptable",
+    boolean
+  >,
+): TriageEntry {
+  const accepted = decideTriage({
+    NamedParty: signals.namedParty,
+    StatedHarm: signals.statedHarm,
+    Trigger: signals.trigger,
+    ExistingAlternative: signals.existingAlternative,
+    Adoptable: signals.adoptable,
+  }).Accepted;
+  return {
+    id,
+    publicationFixture: `fixtures/${id}.json`,
+    ...(industry === undefined ? {} : { industry }),
+    expected: { signals, accepted, reason: accepted ? "accepted" : "low-score" },
+    Publication: { Id: id, Title: id, Abstract: id, Text: id },
+  };
+}
+
+const PASS = {
+  namedParty: true,
+  statedHarm: true,
+  trigger: true,
+  existingAlternative: false,
+  adoptable: false,
+};
+const FAIL = {
+  namedParty: false,
+  statedHarm: false,
+  trigger: false,
+  existingAlternative: false,
+  adoptable: false,
+};
+
+function answer(s: typeof PASS): unknown {
+  return {
+    Signals: {
+      NamedParty: s.namedParty,
+      StatedHarm: s.statedHarm,
+      Trigger: s.trigger,
+      ExistingAlternative: s.existingAlternative,
+      Adoptable: s.adoptable,
+    },
+    Notes: null,
+  };
+}
+
+/** Four positives and four negatives across two industries and one entry without a label. */
+const synthetic = [
+  syntheticEntry("p1", "life-sciences", PASS),
+  syntheticEntry("p2", "life-sciences", PASS),
+  syntheticEntry("p3", "banking", PASS),
+  syntheticEntry("p4", undefined, PASS),
+  syntheticEntry("n1", "life-sciences", FAIL),
+  syntheticEntry("n2", "banking", FAIL),
+  syntheticEntry("n3", "banking", FAIL),
+  syntheticEntry("n4", undefined, FAIL),
+];
+
+/**
+ * Answers that give a known confusion: p1, p2 accepted (TP); p3 rejected (FN); p4 invalid
+ * output (FN, invalid); n1 accepted (FP); n2, n3, n4 rejected (TN).
+ */
+const scripted: Record<string, unknown> = {
+  p1: answer(PASS),
+  p2: answer(PASS),
+  p3: answer(FAIL),
+  p4: "not json at all",
+  n1: answer(PASS),
+  n2: answer(FAIL),
+  n3: answer(FAIL),
+  n4: answer(FAIL),
+};
+const scriptedModel: ModelFn = (publication) => Promise.resolve(scripted[publication.Id]);
+
+describe("REQ-TEST-007: the triage eval report", () => {
+  it("REQ-TEST-007: AC1 gives the confusion matrix, accuracy, precision, recall, and F1 of the accept decision", async () => {
+    const report = await runTriageEval(synthetic, scriptedModel, loadThreshold("triage"));
+    expect(report.Confusion).toEqual({
+      TruePositive: 2,
+      FalsePositive: 1,
+      FalseNegative: 2,
+      TrueNegative: 3,
+      Invalid: 1,
+    });
+    expect(report.Accuracy).toBeCloseTo(5 / 8);
+    // Precision 2/3 and recall 2/4, as the existing figures, and F1 their harmonic mean.
+    expect(report.Precision).toBeCloseTo(2 / 3);
+    expect(report.Recall).toBeCloseTo(1 / 2);
+    expect(report.F1).toBeCloseTo((2 * (2 / 3) * (1 / 2)) / (2 / 3 + 1 / 2));
+  });
+
+  it("REQ-TEST-007: AC1 breaks the figures down per industry, with unlabelled entries apart", async () => {
+    const report = await runTriageEval(synthetic, scriptedModel, loadThreshold("triage"));
+    expect(Object.keys(report.ByIndustry)).toEqual(["banking", "life-sciences", "unlabelled"]);
+    expect(report.ByIndustry["life-sciences"]).toMatchObject({
+      Entries: 3,
+      Confusion: { TruePositive: 2, FalsePositive: 1, FalseNegative: 0, TrueNegative: 0 },
+      Precision: 2 / 3,
+      Recall: 1,
+    });
+    expect(report.ByIndustry["banking"]).toMatchObject({
+      Entries: 3,
+      Accuracy: 2 / 3,
+      Confusion: { TruePositive: 0, FalseNegative: 1, TrueNegative: 2 },
+    });
+    // Signal agreement per industry: in life-sciences n1 was read as passing, so its named party disagrees.
+    expect(report.ByIndustry["life-sciences"]?.SignalAgreement.NamedParty).toBeCloseTo(2 / 3);
+    expect(report.ByIndustry["unlabelled"]?.Confusion.Invalid).toBe(1);
+  });
+
+  it("REQ-TEST-007: AC6 the report-only figures leave the pass rule and the pass rate unchanged", async () => {
+    const report = await runTriageEval(synthetic, scriptedModel, loadThreshold("triage"));
+    // p3, p4 (invalid), and n1 fail the decision; five of eight pass.
+    expect(report.PassRate).toBeCloseTo(5 / 8);
+    expect(report.Entries.map((entry) => entry.Passed)).toEqual([
+      true,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+    ]);
+  });
+
+  it("REQ-TEST-007: AC5 gives the agreement of the decision and each signal over three runs", async () => {
+    const first = await runTriageEval(synthetic, scriptedModel, loadThreshold("triage"));
+    const second = await runTriageEval(synthetic, scriptedModel, loadThreshold("triage"));
+    // The third run flips p1 to a rejection and reads n2 with a trigger.
+    const flipped: ModelFn = (publication) =>
+      Promise.resolve(
+        publication.Id === "p1"
+          ? answer(FAIL)
+          : publication.Id === "n2"
+            ? answer({ ...FAIL, trigger: true })
+            : scripted[publication.Id],
+      );
+    const third = await runTriageEval(synthetic, flipped, loadThreshold("triage"));
+
+    const stability = triageStability([first.Entries, second.Entries, third.Entries]);
+    expect(stability.Runs).toBe(3);
+    // p4 is invalid in every run, so it never agrees; p1 changes its decision.
+    expect(stability.Decision).toBeCloseTo(6 / 8);
+    expect(stability.Signals.Trigger).toBeCloseTo(5 / 8);
+    expect(stability.Signals.Adoptable).toBeCloseTo(7 / 8);
   });
 });
