@@ -129,7 +129,11 @@ Memory grows with about twice the file size and with the amount of text. `text.m
   - at most `recovery.max_redrives_per_day` items, and re-driven extractions count toward the daily limit.
 - A step that uses up its re-drives is marked `failed-final` in `redrive` and listed in the run report.
 - Dead letters are replayed after `recovery.dead_letter_replay_hours`, at most twice per message ID (REQ-DATA-012).
-- The breaker pauses a step when more than `recovery.breaker_failure_share` of its calls in the last hour end in `provider-error`. The consumer completes new messages as `budget-deferred` without a call, one `step-paused` alert is sent, and a probe every 30 minutes resumes the step.
+- The breaker pauses a step when more than `recovery.breaker_failure_share` of its calls in the last hour end in `provider-error`, once the hour holds at least `recovery.breaker_min_calls` calls. The consumer completes new messages as `budget-deferred` without a call, one `step-paused` alert is sent, and a probe every 30 minutes resumes the step.
+- **As built for triage (WP6, `apps/pipeline/src/recovery/`):**
+  - The triage consumer records each failure in `redrive` in the batch that completes its message: `provider-error`, `budget-exhausted`, and a paused step as transient, `invalid-output` as content, with the model and prompt version of the failed attempt.
+  - The admission cron re-drives a publication that still has no decision by reopening its `triage:` message and sending it again. Nothing is re-driven while the step is paused or the day's budget is used up, so waiting uses up no re-drive.
+  - Dead letters of every message type are replayed by the recovery cron (`*/30 * * * *`), not re-driven. It also runs the breaker probe: one triage call on a fixed probe text, with no stored publication.
 
 ## Retractions
 

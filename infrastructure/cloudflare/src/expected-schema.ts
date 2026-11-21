@@ -101,6 +101,8 @@ export const EXPECTED_PHASE1_TABLES: ExpectedTable[] = [
       "last_error",
       "created_at",
       "payload_json",
+      "replay_count",
+      "dead_lettered_at",
     ],
   },
   {
@@ -268,5 +270,27 @@ export const EXPECTED_PHASE2_TABLES: ExpectedTable[] = [
   {
     name: "admission_day",
     columns: ["day", "daily_limit", "admitted", "deferred", "ran_at"],
+  },
+  {
+    name: "redrive",
+    columns: [
+      "id",
+      "item_kind",
+      "item_id",
+      "step",
+      "failure_class",
+      "count",
+      "last_attempt_at",
+      "last_failed_at",
+      "last_model",
+      "last_prompt_version",
+      "final",
+      "created_at",
+      "updated_at",
+    ],
+  },
+  {
+    name: "step_pause",
+    columns: ["step", "paused_at", "last_probe_at", "resumed_at", "alerted_at"],
   },
 ];

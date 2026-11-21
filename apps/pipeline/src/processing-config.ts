@@ -48,6 +48,19 @@ export type ProcessingConfig = {
    * USD 0.0666 per million tokens), (0.371 + 0.177 + 0.124) x 1.5 = EUR 1.01. WP9 computes it.
    */
   BudgetDailyEur: number;
+  /** `recovery.max_redrives`: re-drives of an item's failed step before it is failed-final (ADR 0063). */
+  MaxRedrives: number;
+  /** `recovery.max_redrives_per_day`: items re-driven a UTC day (ADR 0063). */
+  MaxRedrivesPerDay: number;
+  /** `recovery.dead_letter_replay_hours`: delay before a dead letter is replayed, at most twice (REQ-DATA-012). */
+  DeadLetterReplayHours: number;
+  /** `recovery.breaker_failure_share`: share of `provider-error` calls in an hour that pauses a step. */
+  BreakerFailureShare: number;
+  /**
+   * `recovery.breaker_min_calls`: calls a step needs in the hour before the share is judged, so
+   * one failed call at the start of a day does not pause the step (WP6).
+   */
+  BreakerMinCalls: number;
   /** `model.max_attempts`: attempts per step, including retries (REQ-AGENT-009). */
   ModelMaxAttempts: number;
   /**
@@ -78,6 +91,11 @@ export const DEFAULT_PROCESSING_CONFIG: ProcessingConfig = {
   DailyExtractionLimit: 100,
   FullTextWaitHours: 24,
   BudgetDailyEur: 1.0,
+  MaxRedrives: 3,
+  MaxRedrivesPerDay: 20,
+  DeadLetterReplayHours: 6,
+  BreakerFailureShare: 0.5,
+  BreakerMinCalls: 10,
   ModelMaxAttempts: 3,
   TriageModel: {
     Model: "@cf/google/gemma-4-26b-a4b-it",

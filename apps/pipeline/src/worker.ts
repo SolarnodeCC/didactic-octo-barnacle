@@ -134,6 +134,13 @@ function buildDeps(env: Env): PipelineDeps {
           },
         }
       : {}),
+    Recovery: {
+      MaxRedrives: processing.MaxRedrives,
+      MaxRedrivesPerDay: processing.MaxRedrivesPerDay,
+      DeadLetterReplayHours: processing.DeadLetterReplayHours,
+      BreakerFailureShare: processing.BreakerFailureShare,
+      BreakerMinCalls: processing.BreakerMinCalls,
+    },
     Alert: createAlertSink({
       Db: env.DB,
       Fetch: workerFetch,

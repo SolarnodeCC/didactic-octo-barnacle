@@ -155,7 +155,7 @@ Triage, embedding, and extraction steps that end without a stored result are re-
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: ADR 0063
 - Depends on: REQ-PROC-008, REQ-AGENT-009, REQ-NFR-005
 - Acceptance criteria:

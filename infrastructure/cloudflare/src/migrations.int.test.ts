@@ -32,6 +32,7 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
       "0008_source_record_openalex_lower_idx.sql",
       "0009_processing.sql",
       "0010_model_call_cached_input_tokens.sql",
+      "0011_recovery.sql",
     ]);
   });
 
@@ -51,6 +52,7 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
       "0008_source_record_openalex_lower_idx.sql",
       "0009_processing.sql",
       "0010_model_call_cached_input_tokens.sql",
+      "0011_recovery.sql",
     ]);
 
     for (const table of [...EXPECTED_PHASE1_TABLES, ...EXPECTED_PHASE2_TABLES]) {

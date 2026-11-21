@@ -206,7 +206,7 @@ name = "roi-pipeline-staging"
 vars = { ENVIRONMENT = "staging", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo-barnacle", ALERT_EMAIL_FROM = "onboarding@resend.dev" }
 
 [env.staging.triggers]
-crons = ["0 6 * * *", "30 7 * * *", "0 11 * * *"]
+crons = ["0 6 * * *", "30 7 * * *", "0 11 * * *", "*/30 * * * *"]
 
 # Keep every log line and trace (REQ-NFR-008) so a run can be followed afterwards; the
 # same settings as the dashboard's Observability page (ADR 0077). Outbound query strings
@@ -326,7 +326,7 @@ name = "roi-pipeline-production"
 vars = { ENVIRONMENT = "production", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo-barnacle" }
 
 [env.production.triggers]
-crons = ["0 6 * * *", "30 7 * * *", "0 11 * * *"]
+crons = ["0 6 * * *", "30 7 * * *", "0 11 * * *", "*/30 * * * *"]
 
 # Keep every log line and trace (REQ-NFR-008) so a run can be followed afterwards; the
 # same settings as the dashboard's Observability page (ADR 0077). Outbound query strings

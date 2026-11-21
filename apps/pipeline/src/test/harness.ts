@@ -131,6 +131,8 @@ export function createHarness(
       /** `ingestion.daily_extraction_limit`; the configured default when left out. */
       DailyLimit?: number;
     };
+    /** Recovery settings (REQ-PROC-010, REQ-DATA-012); the configured defaults when left out. */
+    Recovery?: Partial<NonNullable<PipelineDeps["Recovery"]>>;
   } = {},
 ): Harness {
   const database = createTestDatabase();
@@ -221,6 +223,14 @@ export function createHarness(
           },
         }
       : {}),
+    Recovery: {
+      MaxRedrives: DEFAULT_PROCESSING_CONFIG.MaxRedrives,
+      MaxRedrivesPerDay: DEFAULT_PROCESSING_CONFIG.MaxRedrivesPerDay,
+      DeadLetterReplayHours: DEFAULT_PROCESSING_CONFIG.DeadLetterReplayHours,
+      BreakerFailureShare: DEFAULT_PROCESSING_CONFIG.BreakerFailureShare,
+      BreakerMinCalls: DEFAULT_PROCESSING_CONFIG.BreakerMinCalls,
+      ...overrides.Recovery,
+    },
     Sources: {
       FetchOpenAlexPage: (request) => {
         openAlexRequests.push(request);

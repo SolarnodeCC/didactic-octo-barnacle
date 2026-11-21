@@ -85,5 +85,11 @@ export const CRON_SOURCES: Readonly<Record<string, "openalex" | "arxiv">> = {
 /** Cron expression (UTC) of the daily admission, after both ingestion crons (ADR 0055). */
 export const ADMISSION_CRON = "0 11 * * *";
 
+/**
+ * Cron expression (UTC) of the recovery check every 30 minutes: dead-letter replay and the
+ * breaker probe (REQ-DATA-012, REQ-PROC-010 AC6, ADR 0063).
+ */
+export const RECOVERY_CRON = "*/30 * * * *";
+
 /** Version of the queue message schema (docs/kt/architecture/defaults.md). */
 export const QUEUE_SCHEMA_VERSION = "1";

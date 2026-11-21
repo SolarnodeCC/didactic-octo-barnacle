@@ -187,7 +187,7 @@ Dead-lettered messages are replayed without a person, a limited number of times 
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: ADR 0063
 - Depends on: REQ-DATA-011
 - Acceptance criteria:

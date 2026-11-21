@@ -1,4 +1,7 @@
-import { ADMISSION_CRON, CRON_SOURCES } from "../config.js";
+import { ADMISSION_CRON, CRON_SOURCES, RECOVERY_CRON } from "../config.js";
+import { probeTriage } from "../recovery/breaker.js";
+import { replayDueDeadLetters } from "../recovery/dead-letters.js";
+import { redriveTriage } from "../recovery/redrive.js";
 import { admitDay } from "../triage/admission.js";
 import { notify } from "../alerts/notify.js";
 import { textExtractEnvelope, type PipelineDeps } from "../queue/deps.js";
@@ -12,8 +15,16 @@ export async function runScheduled(
   cron: string,
 ): Promise<StartRunResult | null> {
   if (cron === ADMISSION_CRON) {
-    // The admission of the UTC day of the trigger (REQ-PROC-005 AC2, ADR 0055).
-    await admitDay(deps, deps.Now().slice(0, 10));
+    // Failed steps are re-driven first, then the day's admission (ADR 0063, ADR 0055).
+    const day = deps.Now().slice(0, 10);
+    await redriveTriage(deps, day);
+    await admitDay(deps, day);
+    return null;
+  }
+  if (cron === RECOVERY_CRON) {
+    // Dead-letter replay and the breaker probe (REQ-DATA-012, REQ-PROC-010 AC6).
+    await replayDueDeadLetters(deps);
+    await probeTriage(deps);
     return null;
   }
   const source = CRON_SOURCES[cron];

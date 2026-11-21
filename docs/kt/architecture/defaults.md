@@ -94,6 +94,11 @@ Read by `loadProcessingConfig` in `apps/pipeline/src/processing-config.ts`. Only
 | `text.min_chars` | `200` | Less text than this, not counting white space, means no usable text layer, as in a scan (ADR 0009) |
 | `text.backfill_per_run` | `500` | Stored PDFs without text that each ingestion start queues for extraction |
 | `extraction.full_text_wait_hours` | `24` | How long the daily admission waits for a publication's full text before it admits it on the abstract (ADR 0065, REQ-PROC-011) |
+| `recovery.max_redrives` | `3` | Re-drives of an item's failed step before it is `failed-final` (ADR 0063) |
+| `recovery.max_redrives_per_day` | `20` | Items re-driven a UTC day (ADR 0063) |
+| `recovery.dead_letter_replay_hours` | `6` | Delay before a dead letter is replayed, at most twice per message ID (REQ-DATA-012) |
+| `recovery.breaker_failure_share` | `0.5` | Share of `provider-error` calls in the last hour that pauses a step (REQ-PROC-010 AC6) |
+| `recovery.breaker_min_calls` | `10` | Calls a step needs in that hour before its share is judged (WP6) |
 | `retraction.lookback_days` | `30` | How far back the weekly retraction check looks (ADR 0061) |
 | `model.price_table_version` | `2026-11-11` | Price table used when the gateway gives no cost (REQ-NFR-011 AC2); it has cached-input prices (ADR 0078) |
 | `model.triage` | `@cf/google/gemma-4-26b-a4b-it`, thinking off, prompt `triage@2`, `json-schema` output | Chosen by benchmark round two (ADR 0088); temperature 0 and at most 8192 output tokens come with the prompt version |
@@ -116,7 +121,8 @@ Read by `loadProcessingConfig` in `apps/pipeline/src/processing-config.ts`. Only
 |---|---|
 | OpenAlex ingestion | `0 6 * * *` |
 | arXiv ingestion | `30 7 * * *` |
-| Daily admission to extraction | `0 11 * * *` (ADR 0055) |
+| Daily re-drive and admission to extraction | `0 11 * * *` (ADR 0063, ADR 0055) |
+| Recovery check: dead-letter replay and breaker probe | `*/30 * * * *` (REQ-DATA-012, REQ-PROC-010) |
 | Retraction check | `0 8 * * 1` |
 | Retention job | `0 3 * * *` |
 | Nightly evals | `0 2 * * *` |
