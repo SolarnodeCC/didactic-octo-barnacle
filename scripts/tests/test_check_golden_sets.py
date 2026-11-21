@@ -51,11 +51,11 @@ class GoldenSetsTest(ScriptTestCase):
         self.assert_fails_with("industry 'farming' is not one of the eight industries or 'other'")
 
     def test_req_test_007_passes_on_a_triage_entry_with_a_known_industry(self) -> None:
-        self.replace(TRIAGE_REJECTED, "id: gs-triage-001", "id: gs-triage-001\nindustry: life-sciences")
+        self.replace(TRIAGE_REJECTED, "industry: other", "industry: life-sciences")
         self.assert_passes()
 
     def test_req_test_007_fails_on_a_triage_entry_with_an_unknown_industry(self) -> None:
-        self.replace(TRIAGE_REJECTED, "id: gs-triage-001", "id: gs-triage-001\nindustry: farming")
+        self.replace(TRIAGE_REJECTED, "industry: other", "industry: farming")
         self.assert_fails_with("gs-triage-001.yaml: industry 'farming' is not one of the eight industries or 'other'")
 
     def test_req_test_005_fails_on_a_range_that_is_too_wide(self) -> None:
