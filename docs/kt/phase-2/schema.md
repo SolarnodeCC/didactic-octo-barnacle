@@ -35,7 +35,7 @@ Migration 0009 is `infrastructure/cloudflare/migrations/0009_processing.sql`. Th
 
 ## Re-drive state (ADR 0063)
 
-The `redrive` table (`item_kind` (`publication`, `candidate`), `item_id`, `step`, `failure_class` (`transient`, `content`), `count`, `last_attempt_at`, `last_model`, `last_prompt_version`, `final`), UNIQUE (`item_kind`, `item_id`, `step`), arrives in the migration of the first work package that re-drives. `processing_run.failures_json` lists the items marked `failed-final` that day.
+The `redrive` table (`item_kind` (`publication`, `candidate`), `item_id`, `step`, `failure_class` (`transient`, `content`), `count`, `last_attempt_at`, `last_model`, `last_prompt_version`, `final`), UNIQUE (`item_kind`, `item_id`, `step`), arrives with migration 0011 (WP6). `processing_run.failures_json` lists the items marked `failed-final` that day.
 
 Signals are nullable: a rule rejection has no signals, no model, and no prompt version (REQ-PROC-006 AC2). The signal columns carry a `signal_` prefix because `trigger` is an SQL keyword. A publication is triaged once; triaging again with a new prompt version is a backfill that replaces the row, and its model calls stay recorded.
 
@@ -43,9 +43,19 @@ Signals are nullable: a rule rejection has no signals, no model, and no prompt v
 
 `model_call.cached_input_tokens` (INTEGER, NOT NULL, default 0, between 0 and `input_tokens`): the input tokens the provider served from its prompt cache, as Workers AI reports them in `usage.prompt_tokens_details.cached_tokens`. They are a part of `input_tokens` and are billed at the cached-input price of the price table, so the stored cost can be recomputed from the row and its `price_table_version` ([ADR 0078](../decisions/0078-cached-input-tokens-in-the-cost-estimate.md)). The column is added with `ALTER TABLE ... ADD COLUMN`: rows written before it, and a Worker that does not write it, read 0. Migration 0010 is `infrastructure/cloudflare/migrations/0010_model_call_cached_input_tokens.sql`.
 
-## Migration 0011: thin slice
+## Migration 0011: recovery
 
-ADR 0054 planned this migration as 0010; it became 0011 when migration 0010 went to cached input tokens (ADR 0078).
+Migration 0011 is `infrastructure/cloudflare/migrations/0011_recovery.sql` (WP6; REQ-PROC-010, REQ-DATA-012, ADR 0063). It is expand-only.
+
+| Table or column | Columns | Notes |
+|---|---|---|
+| `redrive` | `id`, `item_kind`, `item_id`, `step`, `failure_class`, `count`, `last_attempt_at`, `last_failed_at`, `last_model`, `last_prompt_version`, `final`, `created_at`, `updated_at` | UNIQUE (`item_kind`, `item_id`, `step`); index (`step`, `final`). `count` is the number of re-drives made; `last_failed_at` dates the failure, so a content failure waits until the next day |
+| `queue_message_log.replay_count`, `queue_message_log.dead_lettered_at` | | Automatic dead-letter replays, at most two per message ID, each `recovery.dead_letter_replay_hours` after the dead letter |
+| `step_pause` | `step`, `paused_at`, `last_probe_at`, `resumed_at`, `alerted_at` | The breaker: a step is paused while `resumed_at` is empty |
+
+## Migration 0012: thin slice
+
+ADR 0054 planned this migration as 0010; it became 0011 when migration 0010 went to cached input tokens (ADR 0078), and 0012 when migration 0011 went to recovery (WP6).
 
 The tables of schema migration 0001 for the pipeline, with these changes:
 
@@ -57,7 +67,7 @@ It adds no organization-scoped table. Those arrive with phase 4 (ADR 0019).
 
 ## Configuration keys
 
-New keys for [defaults](../architecture/defaults.md). They are added there in the pull request that first reads them. WP4 added the `text.*` keys. WP6 reads `triage.accept_score_cut`, `ingestion.daily_extraction_limit`, `extraction.full_text_wait_hours`, and a provisional `budget.daily_eur` (see [defaults](../architecture/defaults.md)). WP1 added `processing.enabled`, `triage.admission_pool_days`, `extraction.full_text_max_chars`, `embedding.batch_size`, `retraction.lookback_days`, and `model.price_table_version`; ADR 0088 added `model.triage` and ADR 0091 `model.extraction`.
+New keys for [defaults](../architecture/defaults.md). They are added there in the pull request that first reads them. WP4 added the `text.*` keys. WP6 reads `triage.accept_score_cut`, `ingestion.daily_extraction_limit`, `extraction.full_text_wait_hours`, the `recovery.*` keys, and a provisional `budget.daily_eur` (see [defaults](../architecture/defaults.md)). WP1 added `processing.enabled`, `triage.admission_pool_days`, `extraction.full_text_max_chars`, `embedding.batch_size`, `retraction.lookback_days`, and `model.price_table_version`; ADR 0088 added `model.triage` and ADR 0091 `model.extraction`.
 
 | Key | Default | Notes |
 |---|---|---|
@@ -81,12 +91,13 @@ New keys for [defaults](../architecture/defaults.md). They are added there in th
 | `recovery.max_redrives_per_day` | `20` | Items re-driven a day; re-driven extractions also count toward the daily limit (ADR 0063) |
 | `recovery.dead_letter_replay_hours` | `6` | Delay before a dead letter is replayed, at most twice (ADR 0063) |
 | `recovery.breaker_failure_share` | `0.5` | Share of `provider-error` calls in an hour that pauses a step (ADR 0063) |
+| `recovery.breaker_min_calls` | `10` | Calls a step needs in the hour before its share is judged, so one failed call does not pause it (WP6) |
 | `monitor.baseline_days` | `14` | Days in the rolling median of each quality rate; no drift alert before that many days (ADR 0071) |
 | `monitor.drift_band` | `0.5` | Relative move from the median that counts as drift (ADR 0071) |
 | `monitor.min_daily_items` | `20` | Fewest items behind a rate before it can alert (ADR 0071) |
 | `monitor.near_duplicate_cosine` | `0.92` | Publication-vector cosine for counting possible near-duplicate opportunities (ADR 0071) |
 
-Schedules: admission at `0 11 * * *` UTC, after both ingestion crons. The retraction check stays `0 8 * * 1`. The slice trigger exists only in the local environment.
+Schedules: admission at `0 11 * * *` UTC, after both ingestion crons, with the re-drive before it; the recovery check (dead-letter replay and breaker probe) every 30 minutes, `*/30 * * * *`. The retraction check stays `0 8 * * 1`. The slice trigger exists only in the local environment.
 
 ## Bindings
 

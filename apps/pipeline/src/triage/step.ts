@@ -15,7 +15,8 @@ import {
 
 export type TriageStepInput = {
   RunId: string;
-  PublicationId: string;
+  /** Null only for the breaker's probe call, which reads no stored publication. */
+  PublicationId: string | null;
   Title: string;
   Abstract: string;
 };

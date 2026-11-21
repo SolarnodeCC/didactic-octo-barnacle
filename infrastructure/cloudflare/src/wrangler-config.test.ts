@@ -99,10 +99,12 @@ describe("REQ-PROC-005: model steps have their own queue and Workers AI in every
 
 describe("REQ-PROC-005: the daily admission runs in the deployed environments", () => {
   it.each(["staging", "production"])(
-    "REQ-PROC-005: %s triggers the admission at 11:00 UTC, after both ingestion crons",
+    "REQ-PROC-005: %s triggers the admission at 11:00 UTC, after both ingestion crons, and the recovery check every 30 minutes (REQ-DATA-012)",
     (environment) => {
       const section = wrangler.slice(wrangler.indexOf(`[env.${environment}.triggers]`));
-      expect(section).toMatch(/^crons = \["0 6 \* \* \*", "30 7 \* \* \*", "0 11 \* \* \*"\]$/m);
+      expect(section).toMatch(
+        /^crons = \["0 6 \* \* \*", "30 7 \* \* \*", "0 11 \* \* \*", "\*\/30 \* \* \* \*"\]$/m,
+      );
     },
   );
 });

@@ -7,6 +7,8 @@ import {
 
 import { ruleReason } from "./rules.js";
 import { runTriageStep } from "./step.js";
+import { checkBreaker, isPaused } from "../recovery/breaker.js";
+import { recordFailureStatement, type FailureClass } from "../recovery/redrive-repo.js";
 import { claimMessage, completeStatement, markFailed } from "../queue/log.js";
 import { type PipelineDeps } from "../queue/deps.js";
 import { dailyRunId } from "../store/processing-run-repo.js";
@@ -38,8 +40,9 @@ type PublicationRow = {
  * at or above it waits for the daily admission (ADR 0055). One decision per publication: a
  * repeated message, or one for a publication that already has a decision, changes nothing.
  *
- * A step refused by the budget, or failing all its attempts, completes the message with the
- * reason and writes no decision; the daily re-drive picks the publication up again (ADR 0063).
+ * A step refused by the budget, paused by the breaker, or failing all its attempts completes the
+ * message with the reason, writes no decision, and records the failure in `redrive`; the daily
+ * re-drive picks the publication up again (REQ-PROC-010, ADR 0063).
  */
 export async function handleTriage(deps: PipelineDeps, body: unknown): Promise<TriageOutcome> {
   const envelope = QueueMessageEnvelopeSchema.parse(body);
@@ -121,6 +124,33 @@ async function triage(
     return "rule-rejected";
   }
 
+  // Failures are recorded for the daily re-drive in the same batch that completes the
+  // message (REQ-PROC-010, ADR 0063).
+  const fail = (failureClass: FailureClass, note: string) =>
+    deps.Db.batch([
+      recordFailureStatement(
+        deps.Db,
+        {
+          ItemKind: "publication",
+          ItemId: publicationId,
+          Step: "triage",
+          Class: failureClass,
+          Model: config.Model.Model,
+          PromptVersion: config.Model.PromptVersion,
+        },
+        deps.Now(),
+        `rd_${deps.NewId()}`,
+      ),
+      completeStatement(deps.Db, messageId, deps.Now(), note),
+    ]);
+
+  // A paused step makes no call: the item waits as budget-deferred (REQ-PROC-010 AC6).
+  if (await isPaused(deps.Db, "triage")) {
+    await fail("transient", "budget-deferred: the triage step is paused");
+    deps.Log?.("triage.paused", { publicationId });
+    return "budget-deferred";
+  }
+
   const result = await runTriageStep(config.Call, config.Model, {
     RunId: runId,
     PublicationId: publicationId,
@@ -129,11 +159,17 @@ async function triage(
   });
   if (!result.Ok) {
     if (result.Reason === "budget-exhausted") {
-      await complete("budget-deferred");
+      await fail("transient", "budget-deferred");
       deps.Log?.("triage.budget_deferred", { publicationId });
       return "budget-deferred";
     }
-    await complete(`failed: ${result.Reason}: ${result.Errors.join("; ")}`);
+    await fail(
+      result.Reason === "invalid-output" ? "content" : "transient",
+      `failed: ${result.Reason}: ${result.Errors.join("; ")}`,
+    );
+    if (result.Reason === "provider-error") {
+      await checkBreaker(deps, "triage");
+    }
     deps.Log?.("triage.model_failed", {
       publicationId,
       reason: result.Reason,

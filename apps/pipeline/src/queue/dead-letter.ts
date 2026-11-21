@@ -54,10 +54,10 @@ export async function handleDeadLetter(
   const statements = [
     existing
       ? deps.Db.prepare(
-          "UPDATE queue_message_log SET status = 'dead-lettered', dead_letter = 1, last_error = ?, updated_at = ? WHERE message_id = ?",
-        ).bind(detail.slice(0, MAX_ERROR_LENGTH), now, envelope.MessageId)
+          "UPDATE queue_message_log SET status = 'dead-lettered', dead_letter = 1, last_error = ?, updated_at = ?, dead_lettered_at = ? WHERE message_id = ?",
+        ).bind(detail.slice(0, MAX_ERROR_LENGTH), now, now, envelope.MessageId)
       : deps.Db.prepare(
-          "INSERT INTO queue_message_log (id, message_id, type, schema_version, status, attempts, dead_letter, last_error, updated_at, created_at, payload_json) VALUES (?, ?, ?, ?, 'dead-lettered', 0, 1, ?, ?, ?, ?)",
+          "INSERT INTO queue_message_log (id, message_id, type, schema_version, status, attempts, dead_letter, last_error, updated_at, created_at, payload_json, dead_lettered_at) VALUES (?, ?, ?, ?, 'dead-lettered', 0, 1, ?, ?, ?, ?, ?)",
         ).bind(
           `qml_${envelope.MessageId}`,
           envelope.MessageId,
@@ -67,6 +67,7 @@ export async function handleDeadLetter(
           now,
           now,
           JSON.stringify(envelope),
+          now,
         ),
   ];
 

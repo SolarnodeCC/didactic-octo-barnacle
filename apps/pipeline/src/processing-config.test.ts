@@ -35,6 +35,11 @@ describe("REQ-NFR-005: processing configuration", () => {
       DailyExtractionLimit: 100,
       FullTextWaitHours: 24,
       BudgetDailyEur: 1.0,
+      MaxRedrives: 3,
+      MaxRedrivesPerDay: 20,
+      DeadLetterReplayHours: 6,
+      BreakerFailureShare: 0.5,
+      BreakerMinCalls: 10,
       ModelMaxAttempts: 3,
       TriageModel: {
         Model: "@cf/google/gemma-4-26b-a4b-it",

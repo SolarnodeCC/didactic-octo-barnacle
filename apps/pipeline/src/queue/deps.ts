@@ -84,6 +84,17 @@ export type PipelineDeps = {
       FullTextWaitHours: number;
     };
   };
+  /**
+   * Automatic recovery (REQ-PROC-010, REQ-DATA-012, ADR 0063): re-drive limits, dead-letter
+   * replay, and the circuit breaker. Optional; without it nothing is re-driven or replayed.
+   */
+  Recovery?: {
+    MaxRedrives: number;
+    MaxRedrivesPerDay: number;
+    DeadLetterReplayHours: number;
+    BreakerFailureShare: number;
+    BreakerMinCalls: number;
+  };
   /** Structured log line; the worker writes JSON, tests can leave it out (REQ-NFR-008 AC1). */
   Log?: (event: string, fields: Record<string, unknown>) => void;
 };

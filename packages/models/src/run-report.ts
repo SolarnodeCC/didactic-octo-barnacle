@@ -43,6 +43,7 @@ export const AlertTypeSchema = z.enum([
   "dead-letter",
   "budget-stop",
   "availability-breach",
+  "step-paused",
 ]);
 
 export type AlertType = z.infer<typeof AlertTypeSchema>;
