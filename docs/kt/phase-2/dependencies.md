@@ -38,7 +38,7 @@ flowchart TD
   G --> WP9[WP9 Budget]
   WP6 --> WP7[WP7 Extraction]
   WP4 -.full text input.-> WP7
-  WP5 --> WP8[WP8 Retractions]
+  WP5 -.vector deletion.-> WP8[WP8 Retractions]
   WP7 --> WP8
   WP7 --> WP10[WP10 Thin slice]
   WP8 --> WP11[WP11 Throughput and exit]
@@ -48,7 +48,7 @@ flowchart TD
 
 - WP4, WP5, WP6, and WP9 can run in parallel once the gates are closed.
 - WP7 does not wait for WP4. It reads full text only where WP4 has stored it, and the abstract otherwise.
-- WP8 needs the vector deletion of WP5 and the candidate rows of WP7. It hides opportunities once WP10 adds that table.
+- WP8 needs the candidate rows of WP7. It was built before WP5, so WP5 adds the vector deletion for retracted publications. WP8 hides opportunities once WP10 adds that table.
 
 ## Cloudflare services
 

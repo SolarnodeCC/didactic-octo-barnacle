@@ -141,6 +141,8 @@ async function redriveStep(
      FROM redrive r
      WHERE r.item_kind = 'publication' AND r.step = ? AND r.final = 0
        AND NOT EXISTS (SELECT 1 FROM ${spec.ResultTable} x WHERE x.publication_id = r.item_id)
+       -- A retracted publication goes no further (REQ-DATA-008).
+       AND NOT EXISTS (SELECT 1 FROM publication p WHERE p.id = r.item_id AND p.retracted = 1)
      ORDER BY r.last_failed_at, r.id`,
   )
     .bind(spec.Step)

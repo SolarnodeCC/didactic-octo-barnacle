@@ -79,12 +79,14 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 - **Pipeline:** the embedding queue and consumer, and the producer in the page consumer.
 - **Search and backfill:** `searchPublications`, and the backfill command and cut-over of ADR 0056.
 - **Recall corpus:** the corpus and its labelled neighbours (ADR 0057).
+- **Retractions:** WP8 was built first, so WP5 adds the vector part of REQ-DATA-008. The embedding consumer never embeds a retracted publication, and the retraction sweep deletes the vectors of flagged publications from every index (`deletePublicationVectors`).
 - **Tests:**
   - one current embedding with model name and version per publication, through `callModel` (REQ-PROC-001 AC1, AC3);
   - search stays on the old index until the backfill is complete (REQ-PROC-001 AC2);
   - metadata and filters (REQ-PROC-002 AC1, REQ-PROC-003 AC2);
   - ranking with scores (REQ-PROC-003 AC1);
-  - the recall evaluator on fake vectors with known neighbours (REQ-PROC-003 AC3).
+  - the recall evaluator on fake vectors with known neighbours (REQ-PROC-003 AC3);
+  - a retracted publication is not embedded, and the sweep removes its vector (REQ-DATA-008 AC3, REQ-PROC-002 AC2).
 - **Exit:** the recall report on the chosen embedding model is at or above the threshold stored with the corpus.
 
 ## WP6: Triage
@@ -126,8 +128,11 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 
 ## WP8: Retractions
 
-- The weekly check against OpenAlex and arXiv, the daily sweep, vector deletion, and hidden candidates and opportunities.
-- **Tests:** a retracted fixture record (`apps/pipeline/src/fixtures/openalex/work-retracted.json`) flagged on the next run (REQ-DATA-008 AC1); its candidates and opportunity hidden with the reason (AC2); its vector removed (AC3, REQ-PROC-002 AC2); a repeated sweep changes nothing.
+- The weekly check against OpenAlex and arXiv, the daily sweep, and hidden candidates and opportunities. Built before WP5, so vector deletion moves to WP5. Opportunities are hidden once WP10 adds their table.
+- **Tests:**
+  - a retracted fixture record (`apps/pipeline/src/fixtures/openalex/work-retracted.json`) flagged on the next run (REQ-DATA-008 AC1);
+  - its candidates hidden with the reason, and it is neither admitted nor extracted (AC2);
+  - a repeated sweep changes nothing.
 - **Exit:** the integration test passes, and the first weekly check in staging reports its counts.
 
 ## WP9: Budget and cost reporting

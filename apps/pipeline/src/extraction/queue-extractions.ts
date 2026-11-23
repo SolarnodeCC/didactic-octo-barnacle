@@ -23,7 +23,8 @@ export async function queueAdmittedExtractions(deps: PipelineDeps, day: string):
   }
   const { results } = await deps.Db.prepare(
     `SELECT td.publication_id FROM triage_decision td
-     WHERE td.accepted = 1
+     JOIN publication p ON p.id = td.publication_id
+     WHERE td.accepted = 1 AND p.retracted = 0
        AND NOT EXISTS (SELECT 1 FROM extraction_result er WHERE er.publication_id = td.publication_id)
        AND NOT EXISTS (
          SELECT 1 FROM queue_message_log q WHERE q.message_id = 'extract:' || td.publication_id

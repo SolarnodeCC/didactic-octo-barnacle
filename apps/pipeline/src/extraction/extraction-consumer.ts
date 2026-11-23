@@ -25,6 +25,7 @@ export type ExtractionOutcome =
   | "extracted"
   | "already-extracted"
   | "not-admitted"
+  | "retracted"
   | "no-publication"
   | "budget-deferred"
   | "model-failed"
@@ -95,12 +96,19 @@ async function extract(
     await complete("not admitted");
     return "not-admitted";
   }
-  const publication = await deps.Db.prepare("SELECT title, abstract FROM publication WHERE id = ?")
+  const publication = await deps.Db.prepare(
+    "SELECT title, abstract, retracted FROM publication WHERE id = ?",
+  )
     .bind(publicationId)
-    .first<{ title: string; abstract: string | null }>();
+    .first<{ title: string; abstract: string | null; retracted: number }>();
   if (!publication) {
     await complete("no such publication");
     return "no-publication";
+  }
+  // A publication retracted after its admission is not extracted (REQ-DATA-008).
+  if (publication.retracted === 1) {
+    await complete("retracted");
+    return "retracted";
   }
   const fullText = await readFullText(deps, publicationId);
 
