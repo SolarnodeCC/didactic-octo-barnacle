@@ -6,6 +6,7 @@ import { admitDay } from "../triage/admission.js";
 import { startRetractionCheck } from "../retraction/check.js";
 import { sweepRetractions } from "../retraction/sweep.js";
 import { queueAdmittedExtractions } from "../extraction/queue-extractions.js";
+import { continueEmbeddingBackfills } from "../embedding/backfill.js";
 import { notify } from "../alerts/notify.js";
 import { textExtractEnvelope, type PipelineDeps } from "../queue/deps.js";
 import { documentsAwaitingText } from "../store/document-repo.js";
@@ -29,6 +30,8 @@ export async function runScheduled(
     await redriveEmbedding(deps, day);
     await admitDay(deps, day);
     await queueAdmittedExtractions(deps, day);
+    // A new embedding index fills a little more each day until its backfill is done (ADR 0056).
+    await continueEmbeddingBackfills(deps, day);
     return null;
   }
   if (cron === RETRACTION_CRON) {

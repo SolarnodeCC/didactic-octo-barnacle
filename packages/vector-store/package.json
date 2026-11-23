@@ -7,6 +7,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./recall-corpus": {
+      "types": "./dist/recall-corpus.d.ts",
+      "import": "./dist/recall-corpus.js"
     }
   },
   "files": [

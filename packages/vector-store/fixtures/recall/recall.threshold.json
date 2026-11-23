@@ -1,0 +1,4 @@
+{
+  "metric": "recall-at-10",
+  "minimum": 0.8
+}
