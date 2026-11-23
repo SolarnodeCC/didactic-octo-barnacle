@@ -44,3 +44,7 @@ budget.daily_eur = ( budget.expected_daily_triaged x triage cost
 - With the prices of 6 November 2026 and without embeddings and full text, the figure is about EUR 0.76 a day on the largest measured day and about EUR 0.21 a day at the mean volume. The embedding price and the full-text input raise it, and both are priced in WP2.
 - The budget stop of REQ-NFR-005 AC2 and the daily admission of [0055](0055-daily-admission-and-budget-stop.md) work as before.
 - OQ-043 is answered and removed from [open questions](../open-questions.md).
+
+## Later changes
+
+- 2026-11-23: [ADR 0113](0113-phase-2-budget-from-benchmark-and-measured-cost.md) prices the step costs from the benchmarks and then from the measured cost, instead of `cost-assumptions.json`. It also corrects the formula's `extraction.daily_limit` to `ingestion.daily_extraction_limit`.

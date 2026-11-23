@@ -18,7 +18,9 @@ import { type FetchedPdf } from "../documents/safe-fetch.js";
 import { extractPdfText, type PdfTextExtractor } from "../documents/pdf-text.js";
 import { DEFAULT_PROCESSING_CONFIG } from "../processing-config.js";
 import { PRICE_TABLE } from "../prices.js";
-import { createModelUsageStore } from "../store/model-usage.js";
+import { createModelUsageStore, type ModelBudget } from "../store/model-usage.js";
+import { notify } from "../alerts/notify.js";
+import { budgetStopAlert } from "../budget/budget-stop.js";
 import { consumeBatch } from "../queue/consume.js";
 import { createAuthorGuard } from "../privacy/author-guard.js";
 import { createAuthorKeyHasher, type AuthorKeyHasher } from "../privacy/author-key.js";
@@ -192,6 +194,13 @@ export function createHarness(
       ? undefined
       : (overrides.AuthorKey ?? "test-erasure-key-0123456789abcdef0123"),
   );
+  // A fixed daily budget (EUR 1 unless a test sets one); as in the Worker, the first refusal of
+  // a day raises the day's budget-stop alert (REQ-NFR-005 AC2).
+  const budget = (amount: number | undefined): ModelBudget => ({
+    Limit: { Amount: amount ?? 1.0, Currency: "EUR" },
+    OnStop: (stop) => notify(deps, budgetStopAlert(stop)),
+    Now: () => clock.Now,
+  });
   const deps: PipelineDeps = {
     AuthorGuard: createAuthorGuard(database.Db, hashAuthorId),
     Db: database.Db,
@@ -234,10 +243,7 @@ export function createHarness(
             Call: {
               Ai: overrides.Triage.Ai,
               GatewayId: "roi-test",
-              Usage: createModelUsageStore(database.Db, {
-                Amount: overrides.Triage.BudgetEur ?? DEFAULT_PROCESSING_CONFIG.BudgetDailyEur,
-                Currency: "EUR",
-              }),
+              Usage: createModelUsageStore(database.Db, budget(overrides.Triage.BudgetEur)),
               Prices: PRICE_TABLE,
               MaxAttempts: DEFAULT_PROCESSING_CONFIG.ModelMaxAttempts,
               NewId: counter("mc"),
@@ -262,10 +268,7 @@ export function createHarness(
             Call: {
               Ai: overrides.Extraction.Ai,
               GatewayId: "roi-test",
-              Usage: createModelUsageStore(database.Db, {
-                Amount: overrides.Extraction.BudgetEur ?? DEFAULT_PROCESSING_CONFIG.BudgetDailyEur,
-                Currency: "EUR",
-              }),
+              Usage: createModelUsageStore(database.Db, budget(overrides.Extraction.BudgetEur)),
               Prices: PRICE_TABLE,
               MaxAttempts: DEFAULT_PROCESSING_CONFIG.ModelMaxAttempts,
               NewId: counter("mce"),
@@ -289,10 +292,7 @@ export function createHarness(
             Call: {
               Ai: overrides.Embedding.Ai,
               GatewayId: "roi-test",
-              Usage: createModelUsageStore(database.Db, {
-                Amount: overrides.Embedding.BudgetEur ?? DEFAULT_PROCESSING_CONFIG.BudgetDailyEur,
-                Currency: "EUR",
-              }),
+              Usage: createModelUsageStore(database.Db, budget(overrides.Embedding.BudgetEur)),
               Prices: PRICE_TABLE,
               MaxAttempts: DEFAULT_PROCESSING_CONFIG.ModelMaxAttempts,
               NewId: counter("mcm"),

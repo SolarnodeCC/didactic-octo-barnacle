@@ -112,6 +112,10 @@ Memory grows with about twice the file size and with the amount of text. `text.m
 ## Budget
 
 - `budget.daily_eur` per environment. Before calibration it is the sum of the expected daily triage calls × the triage cost, the daily extraction limit × the extraction cost, and the expected daily embeddings × the embedding cost, times `budget.phase2_multiplier` (REQ-NFR-005 AC1, ADR 0059). `budget.expected_daily_triaged` and `budget.expected_daily_embeddings` come from the measured daily volume.
+- As built (ADR 0113, `apps/pipeline/src/budget/`):
+  - Each step cost is the benchmark cost per item, with extraction priced at the full-text input. Once 20 items over the 7 complete days before are recorded, the measured cost per item replaces it.
+  - The limit is computed on the first use of a day, stored in `budget_day.limit_amount`, and logged as `budget.limit`.
+  - The call that reaches the limit sets `stopped_at`; the first refusal after it sets `alerted_at` and sends the alert.
 - When `budget_day.spent` reaches the limit, `callModel` refuses new steps:
   - The triage, embedding, and extraction consumers complete those messages as `budget-deferred`, and the admission cron queues them again the next day (ADR 0063).
   - The admission cron admits nothing.
