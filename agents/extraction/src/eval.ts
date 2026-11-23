@@ -3,6 +3,7 @@ import {
   decideTriage,
   extractionMissingQuotes,
   extractionOutputSchema,
+  normalizeForQuote,
   repairModelOutput,
   TriageModelOutputSchema,
   type RepairKind,
@@ -316,33 +317,217 @@ export async function runTriageEval(
 }
 
 /**
- * Extraction eval, deterministic checks only (REQ-PROC-009): schema, verbatim quotes
- * (REQ-AGENT-008), and the number of candidates. The reference check of `Finding` and
- * `Customer` needs a model judge with a rubric (OQ-020) and is not part of this runner yet.
+ * What `extractionModelFn` returns: the kept output with how it was reached, so the report can
+ * give the quote rates of ADR 0064 (REQ-TEST-007 AC3). A stub that returns a plain output
+ * still works; its entries count for the rates that need no trace.
+ */
+export type ExtractionTrace = {
+  Kind: "extraction-trace";
+  /** The output after the candidate checks: failing candidates dropped, quotes as source spans. */
+  Output: unknown;
+  /** Attempts the step used; 0 when the budget refused it. */
+  Attempts: number;
+  /** Candidates the accepted attempt returned, before any was dropped. */
+  Returned: number;
+  /** Candidates dropped on the last attempt (ADR 0064). */
+  Dropped: number;
+  /** Kept quotes that match only after normalisation, not as a plain substring. */
+  NormalisedOnly: number;
+};
+
+function isTrace(value: unknown): value is ExtractionTrace {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    (value as { Kind?: unknown }).Kind === "extraction-trace"
+  );
+}
+
+/** Two evidence quotes match when their normalised forms share at least this many characters. */
+export const QUOTE_OVERLAP_MIN_CHARS = 40;
+
+function longestCommonSubstring(a: string, b: string): number {
+  let best = 0;
+  let previous = new Array<number>(b.length + 1).fill(0);
+  for (let i = 1; i <= a.length; i += 1) {
+    const current = new Array<number>(b.length + 1).fill(0);
+    for (let j = 1; j <= b.length; j += 1) {
+      if (a[i - 1] === b[j - 1]) {
+        current[j] = (previous[j - 1] ?? 0) + 1;
+        best = Math.max(best, current[j] ?? 0);
+      }
+    }
+    previous = current;
+  }
+  return best;
+}
+
+/**
+ * Whether an expected and a returned evidence quote are the same evidence (ADR 0067): after
+ * normalisation one contains the other, or they share `QUOTE_OVERLAP_MIN_CHARS` characters.
+ */
+export function quotesOverlap(expected: string, returned: string): boolean {
+  const a = normalizeForQuote(expected);
+  const b = normalizeForQuote(returned);
+  if (a === "" || b === "") {
+    return false;
+  }
+  if (a.includes(b) || b.includes(a)) {
+    return true;
+  }
+  return longestCommonSubstring(a, b) >= QUOTE_OVERLAP_MIN_CHARS;
+}
+
+export type ExtractionEntryResult = EntryResult & {
+  /** Candidates in the valid output, or null for invalid output. */
+  CandidateCount: number | null;
+  Confidence: number | null;
+};
+
+/** Candidate matching over all entries (REQ-TEST-007 AC2). */
+export type ExtractionMatching = {
+  /** Returned candidates matched to an expected candidate that is not `optional`. */
+  TruePositive: number;
+  /** Returned candidates, those matched to an `optional` one left out. */
+  Returned: number;
+  /** Expected candidates that are not `optional`. */
+  Expected: number;
+  Precision: number;
+  Recall: number;
+  F1: number;
+};
+
+export type ExtractionEvalReport = Omit<EvalReport, "Entries"> & {
+  Entries: ExtractionEntryResult[];
+  /** Report-only (REQ-TEST-007 AC6): the pass rule and threshold do not use these. */
+  Matching: ExtractionMatching;
+  /** Share of entries that should yield no candidate and returned a valid empty list. */
+  EmptyEntryAccuracy: number | null;
+  /** Quote rates and positions (REQ-TEST-007 AC3, ADR 0064, ADR 0065). */
+  Quotes: {
+    /** Share of traced entries accepted on the first attempt with nothing dropped. */
+    FirstAttempt: number | null;
+    /** Share of kept quotes that match only after normalisation. */
+    NormalisedOnly: number | null;
+    /** Share of returned candidates dropped on the last attempt. */
+    Dropped: number | null;
+    /** Kept quotes by tenth of the input text where they start, first tenth first. */
+    Positions: number[];
+  };
+  /** Mean of (Confidence - pass)^2 over entries with valid output (REQ-TEST-007 AC4). */
+  Brier: number | null;
+  /** Whether the top third by Confidence passes at least as often as the bottom third. */
+  TopThirdAtLeastBottom: boolean | null;
+};
+
+type MatchCount = { TruePositive: number; Returned: number; Expected: number };
+
+/** Greedy one-to-one matching, in list order, of returned to expected candidates. */
+function matchCandidates(
+  expected: ReadonlyArray<{ evidenceQuote: string; optional?: boolean | undefined }>,
+  returned: ReadonlyArray<{ EvidenceQuote: string }>,
+): MatchCount {
+  const used = new Set<number>();
+  let truePositive = 0;
+  let matchedOptional = 0;
+  for (const candidate of returned) {
+    const index = expected.findIndex(
+      (item, i) => !used.has(i) && quotesOverlap(item.evidenceQuote, candidate.EvidenceQuote),
+    );
+    if (index === -1) {
+      continue;
+    }
+    used.add(index);
+    if (expected[index]?.optional === true) {
+      matchedOptional += 1;
+    } else {
+      truePositive += 1;
+    }
+  }
+  return {
+    TruePositive: truePositive,
+    Returned: returned.length - matchedOptional,
+    Expected: expected.filter((item) => item.optional !== true).length,
+  };
+}
+
+const QUOTE_FIELDS = ["EvidenceQuote", "CustomerQuote", "WhyNowQuote", "AlternativeQuote"] as const;
+
+/**
+ * Extraction eval (REQ-PROC-009). The pass rule is unchanged: schema, quotes that occur in the
+ * text after normalisation (REQ-AGENT-008), and the number of candidates. The reference check of
+ * `Finding` and `Customer` needs a model judge with a rubric (OQ-020) and is not part of this
+ * runner yet. The report adds the report-only metrics of ADR 0067 (REQ-TEST-007 AC2 to AC4).
  */
 export async function runExtractionEval(
   entries: readonly ExtractionEntry[],
   model: ModelFn,
   threshold: Threshold,
   maxCandidates?: number,
-): Promise<EvalReport> {
+): Promise<ExtractionEvalReport> {
   const schema = extractionOutputSchema(maxCandidates);
-  const results: EntryResult[] = [];
+  const results: ExtractionEntryResult[] = [];
+  const matching: MatchCount = { TruePositive: 0, Returned: 0, Expected: 0 };
+  let emptyEntries = 0;
+  let emptyCorrect = 0;
+  let traced = 0;
+  let firstAttempt = 0;
+  let returnedTotal = 0;
+  let droppedTotal = 0;
+  let normalisedOnly = 0;
+  let tracedQuotes = 0;
+  const positions = new Array<number>(10).fill(0);
+
   for (const entry of entries) {
     const failures: string[] = [];
-    const repaired = repairModelOutput(await model(entry.Publication), schema);
+    const answer = await model(entry.Publication);
+    const trace = isTrace(answer) ? answer : null;
+    const repaired = repairModelOutput(trace ? trace.Output : answer, schema);
     const parsed = repaired.Ok ? schema.safeParse(repaired.Value) : null;
+    // The step reads the text without LaTeX markup and quotes from it (ADR 0089).
+    const text = cleanLatexMarkup(entry.Publication.Text);
+    const expected = entry.expected.candidates;
+    if (expected.length === 0) {
+      emptyEntries += 1;
+    }
+    if (trace) {
+      traced += 1;
+      returnedTotal += trace.Returned;
+      droppedTotal += trace.Dropped;
+      normalisedOnly += trace.NormalisedOnly;
+    }
     if (!parsed?.success) {
       failures.push("schema");
     } else {
-      failures.push(
-        // The step reads the text without LaTeX markup and quotes from it (ADR 0089).
-        ...extractionMissingQuotes(parsed.data, cleanLatexMarkup(entry.Publication.Text)).map(
-          (f) => `quote:${f}`,
-        ),
-      );
-      if (parsed.data.Candidates.length !== entry.expected.candidates.length) {
+      const output = parsed.data;
+      failures.push(...extractionMissingQuotes(output, text).map((f) => `quote:${f}`));
+      if (output.Candidates.length !== expected.length) {
         failures.push("candidate-count");
+      }
+      if (expected.length === 0 && output.Candidates.length === 0) {
+        emptyCorrect += 1;
+      }
+      const counted = matchCandidates(expected, output.Candidates);
+      matching.TruePositive += counted.TruePositive;
+      matching.Returned += counted.Returned;
+      matching.Expected += counted.Expected;
+      if (trace && trace.Attempts === 1 && trace.Dropped === 0) {
+        firstAttempt += 1;
+      }
+      const normalisedText = normalizeForQuote(text);
+      for (const candidate of output.Candidates) {
+        for (const field of QUOTE_FIELDS) {
+          const quote = candidate[field];
+          if (quote === null) {
+            continue;
+          }
+          tracedQuotes += trace ? 1 : 0;
+          const at = normalisedText.indexOf(normalizeForQuote(quote));
+          if (at !== -1 && normalisedText.length > 0) {
+            const tenth = Math.min(9, Math.floor((at / normalisedText.length) * 10));
+            positions[tenth] = (positions[tenth] ?? 0) + 1;
+          }
+        }
       }
     }
     results.push({
@@ -350,7 +535,66 @@ export async function runExtractionEval(
       Passed: failures.length === 0,
       Failures: failures,
       Repairs: repaired.Repairs,
+      CandidateCount: parsed?.success ? parsed.data.Candidates.length : null,
+      Confidence: parsed?.success ? parsed.data.Confidence : null,
     });
   }
-  return report(results, threshold);
+
+  const ratio = (num: number, den: number) => (den === 0 ? 0 : num / den);
+  const precision = ratio(matching.TruePositive, matching.Returned);
+  const recall = ratio(matching.TruePositive, matching.Expected);
+  const scored = results.filter(
+    (result): result is ExtractionEntryResult & { Confidence: number } =>
+      result.Confidence !== null,
+  );
+  const third = Math.floor(scored.length / 3);
+  const byConfidence = [...scored].sort((a, b) => a.Confidence - b.Confidence);
+  const passShare = (group: ReadonlyArray<{ Passed: boolean }>) =>
+    ratio(group.filter((item) => item.Passed).length, group.length);
+  return {
+    ...report(results, threshold),
+    Entries: results,
+    Matching: {
+      ...matching,
+      Precision: precision,
+      Recall: recall,
+      F1: ratio(2 * precision * recall, precision + recall),
+    },
+    EmptyEntryAccuracy: emptyEntries === 0 ? null : emptyCorrect / emptyEntries,
+    Quotes: {
+      FirstAttempt: traced === 0 ? null : firstAttempt / traced,
+      NormalisedOnly: tracedQuotes === 0 ? null : normalisedOnly / tracedQuotes,
+      Dropped: traced === 0 ? null : ratio(droppedTotal, returnedTotal),
+      Positions: positions,
+    },
+    Brier:
+      scored.length === 0
+        ? null
+        : scored.reduce((sum, item) => sum + (item.Confidence - (item.Passed ? 1 : 0)) ** 2, 0) /
+          scored.length,
+    TopThirdAtLeastBottom:
+      third === 0
+        ? null
+        : passShare(byConfidence.slice(-third)) >= passShare(byConfidence.slice(0, third)),
+  };
+}
+
+/**
+ * How stable the number of candidates is over repeated runs (REQ-TEST-007 AC5), report-only: the
+ * share of entries with the same count in every run. An invalid output in any run counts as a
+ * disagreement.
+ */
+export function extractionStability(
+  runs: ReadonlyArray<ReadonlyArray<{ Id: string; CandidateCount: number | null }>>,
+): number {
+  const ids = runs[0]?.map((entry) => entry.Id) ?? [];
+  if (ids.length === 0) {
+    return 0;
+  }
+  const byRun = runs.map((run) => new Map(run.map((entry) => [entry.Id, entry.CandidateCount])));
+  const stable = ids.filter((id) => {
+    const counts = byRun.map((run) => run.get(id) ?? null);
+    return counts[0] !== null && counts.every((count) => count === counts[0]);
+  }).length;
+  return stable / ids.length;
 }

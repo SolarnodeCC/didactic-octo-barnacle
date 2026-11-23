@@ -41,6 +41,11 @@ export const CandidateSchema = z.object({
   whyNowQuote: z.string().nullable().optional(),
   currentAlternative: z.string().nullable().optional(),
   alternativeQuote: z.string().nullable().optional(),
+  /**
+   * Missing it does not lower recall, and finding it does not lower precision (ADR 0067). Set by
+   * the owner at the threshold review; the entry pass rule still counts every candidate.
+   */
+  optional: z.boolean().optional(),
 });
 
 const ExtractionEntrySchema = z.object({

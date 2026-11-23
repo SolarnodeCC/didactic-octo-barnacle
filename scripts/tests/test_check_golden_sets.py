@@ -51,6 +51,14 @@ class GoldenSetsTest(ScriptTestCase):
         )
         self.assert_passes()
 
+    def test_req_test_007_passes_on_an_optional_candidate(self) -> None:
+        self.replace(EXTRACTION, '      evidenceQuote: "Extreme weather', '      optional: true\n      evidenceQuote: "Extreme weather')
+        self.assert_passes()
+
+    def test_req_test_007_fails_on_an_optional_flag_that_is_not_a_boolean(self) -> None:
+        self.replace(EXTRACTION, '      evidenceQuote: "Extreme weather', '      optional: "yes"\n      evidenceQuote: "Extreme weather')
+        self.assert_fails_with("gs-extraction-001.yaml: candidate 0: optional must be true or false")
+
     def test_req_test_005_fails_when_an_industry_has_no_extraction_entry(self) -> None:
         for number in ("035", "036"):
             self.replace(f"{EXT}/extraction/gs-extraction-{number}.yaml", "industry: insurance", "industry: other")

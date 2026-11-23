@@ -221,6 +221,8 @@ def extraction(accepted: dict[str, dict]) -> dict[str, tuple[Path, list]]:
             for key in ("finding", "evidenceQuote", "customer", "customerQuote"):
                 if not cand.get(key):
                     err(path, f"candidate {i}: {key} is missing")
+            if "optional" in cand and not isinstance(cand["optional"], bool):
+                err(path, f"candidate {i}: optional must be true or false (ADR 0067)")
             if (cand.get("whyNow") is None) != (cand.get("whyNowQuote") is None):
                 err(path, f"candidate {i}: whyNow and whyNowQuote must both be set or both be null")
             if (cand.get("currentAlternative") is None) != (cand.get("alternativeQuote") is None):

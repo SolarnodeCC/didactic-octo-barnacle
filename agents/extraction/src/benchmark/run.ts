@@ -11,10 +11,12 @@ import {
 } from "@roi/models";
 
 import {
+  extractionStability,
   runExtractionEval,
   runTriageEval,
   triageStability,
   type EvalReport,
+  type ExtractionEvalReport,
   type TriageEvalReport,
   type TriagePrediction,
 } from "../eval.js";
@@ -157,6 +159,14 @@ export type RunSummary = {
   ByIndustry?: TriageEvalReport["ByIndustry"];
   /** Triage: what each entry returned, for the stability over runs (REQ-TEST-007 AC5). */
   TriagePredictions?: Array<{ Id: string; Predicted: TriagePrediction }>;
+  /** Extraction, report-only (REQ-TEST-007 AC2 to AC4, ADR 0067). */
+  Extraction?: Pick<
+    ExtractionEvalReport,
+    "Matching" | "EmptyEntryAccuracy" | "Quotes" | "Brier" | "TopThirdAtLeastBottom"
+  > & {
+    /** What each entry returned, for the stability over runs (REQ-TEST-007 AC5). */
+    Counts: Array<{ Id: string; CandidateCount: number | null }>;
+  };
   /** Problem Discovery: required facts the judge found present, of those it judged. */
   FactsPresent?: number;
   FactsJudged?: number;
@@ -538,13 +548,26 @@ export async function runBenchmark(
             JudgeErrors: pd.JudgeErrors,
           };
         } else {
+          let extraction: RunSummary["Extraction"];
           if (step === "extraction") {
             const set = need(inputs.Extraction, step);
-            report = await runExtractionEval(
+            const extracted = await runExtractionEval(
               set.Entries,
               extractionModelFn(options),
               set.Threshold,
             );
+            report = extracted;
+            extraction = {
+              Matching: extracted.Matching,
+              EmptyEntryAccuracy: extracted.EmptyEntryAccuracy,
+              Quotes: extracted.Quotes,
+              Brier: extracted.Brier,
+              TopThirdAtLeastBottom: extracted.TopThirdAtLeastBottom,
+              Counts: extracted.Entries.map((entry) => ({
+                Id: entry.Id,
+                CandidateCount: entry.CandidateCount,
+              })),
+            };
           } else if (step === "research-analyst") {
             const set = need(inputs.ResearchAnalyst, step);
             report = await runResearchAnalystEval(
@@ -556,7 +579,12 @@ export async function runBenchmark(
             const set = need(inputs.Relevance, step);
             report = await runRelevanceEval(set.Entries, relevanceModelFn(options), set.Threshold);
           }
-          summary = { Run: run, PassRate: report.PassRate, ThresholdPassed: report.Passed };
+          summary = {
+            Run: run,
+            PassRate: report.PassRate,
+            ThresholdPassed: report.Passed,
+            ...(extraction === undefined ? {} : { Extraction: extraction }),
+          };
         }
         const checkpoint: RunCheckpoint = {
           BenchmarkId: plan.BenchmarkId,
@@ -614,6 +642,42 @@ export function formatBenchmarkMarkdown(result: BenchmarkResult, plan: Benchmark
         `| ${s.Step} | \`${s.Model}\` | ${pct(s.MeanPassRate)} | ${pct(s.MinPassRate)} | ${s.Runs.every((r) => r.ThresholdPassed) ? "yes" : "no"} | ${pct(s.Stability)} | ${pct(s.FirstAttemptValid)} | ${pct(s.RepairRate)} | ${pct(s.FailedAfterMaxAttempts)} | ${s.ProviderErrors} | ${s.LatencyMsP50} / ${s.LatencyMsP95} | ${s.CostPerStepEur.toFixed(6)} |`,
     ),
   ];
+  const extraction = result.Summaries.filter((s) => s.Step === "extraction");
+  if (extraction.some((s) => s.Runs.some((r) => r.Extraction !== undefined))) {
+    const optionalPct = (value: number | null | undefined) =>
+      value === null || value === undefined ? "n/a" : pct(value);
+    lines.push(
+      "",
+      "## Extraction report (report-only, ADR 0067)",
+      "",
+      "Candidate matching by overlap of normalised evidence quotes, and quote rates (mean over runs); confidence calibration of the first run; stability of the candidate count over all runs.",
+      "",
+      "| Model | Precision | Recall | F1 | Empty-entry accuracy | First-attempt pass | Normalised only | Dropped | Brier | Top third ≥ bottom | Count stable |",
+      "|---|---|---|---|---|---|---|---|---|---|---|",
+      ...extraction.map((s) => {
+        const runs = s.Runs.map((r) => r.Extraction).filter(
+          (r): r is NonNullable<RunSummary["Extraction"]> => r !== undefined,
+        );
+        const mean = (pick: (r: NonNullable<RunSummary["Extraction"]>) => number | null) => {
+          const values = runs.map(pick).filter((v): v is number => v !== null);
+          return values.length === 0 ? null : values.reduce((a, b) => a + b, 0) / values.length;
+        };
+        const first = runs[0];
+        const stable = extractionStability(runs.map((r) => r.Counts));
+        const thirds = first?.TopThirdAtLeastBottom;
+        return `| \`${s.Model}\` | ${optionalPct(mean((r) => r.Matching.Precision))} | ${optionalPct(mean((r) => r.Matching.Recall))} | ${optionalPct(mean((r) => r.Matching.F1))} | ${optionalPct(mean((r) => r.EmptyEntryAccuracy))} | ${optionalPct(mean((r) => r.Quotes.FirstAttempt))} | ${optionalPct(mean((r) => r.Quotes.NormalisedOnly))} | ${optionalPct(mean((r) => r.Quotes.Dropped))} | ${first?.Brier === null || first?.Brier === undefined ? "n/a" : first.Brier.toFixed(3)} | ${thirds === null || thirds === undefined ? "n/a" : thirds ? "yes" : "no"} | ${pct(stable)} |`;
+      }),
+      "",
+      "Where kept quotes start, by tenth of the input text (first run):",
+      "",
+      "| Model | 0-10% | 10-20% | 20-30% | 30-40% | 40-50% | 50-60% | 60-70% | 70-80% | 80-90% | 90-100% |",
+      "|---|---|---|---|---|---|---|---|---|---|---|",
+      ...extraction.map(
+        (s) =>
+          `| \`${s.Model}\` | ${(s.Runs[0]?.Extraction?.Quotes.Positions ?? new Array<number>(10).fill(0)).join(" | ")} |`,
+      ),
+    );
+  }
   const triage = result.Summaries.filter((s) => s.Step === "triage");
   if (triage.length > 0) {
     lines.push(
