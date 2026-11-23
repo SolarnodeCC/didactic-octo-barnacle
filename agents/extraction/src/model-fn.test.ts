@@ -6,7 +6,7 @@ import {
 } from "@roi/models";
 import { describe, expect, it } from "vitest";
 
-import { runExtractionEval, runTriageEval } from "./eval.js";
+import { runExtractionEval, runTriageEval, type ExtractionTrace } from "./eval.js";
 import { loadExtractionSet, loadThreshold, loadTriageSet } from "./golden-set.js";
 import { extractionModelFn, triageModelFn } from "./model-fn.js";
 
@@ -128,10 +128,13 @@ describe("REQ-TEST-006: the eval runner scores a model through callModel and the
       },
     };
     const { records, callDeps } = deps([answer, answer, answer]);
-    const output = (await extractionModelFn({ Deps: callDeps, Model: MODEL, RunId: "bench_1" })(
+    const trace = (await extractionModelFn({ Deps: callDeps, Model: MODEL, RunId: "bench_1" })(
       entry.Publication,
-    )) as { Candidates: Array<{ Customer: string }> } | null;
+    )) as ExtractionTrace | null;
+    const output = trace?.Output as { Candidates: Array<{ Customer: string }> } | undefined;
     expect(output?.Candidates.map((c) => c.Customer)).toEqual([expected?.customer]);
+    // REQ-TEST-007 AC3: the trace counts the returned and the dropped candidate.
+    expect(trace).toMatchObject({ Kind: "extraction-trace", Attempts: 3, Returned: 2, Dropped: 1 });
     expect(records.map((r) => r.Outcome)).toEqual([
       "invalid-output",
       "invalid-output",

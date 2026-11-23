@@ -1,7 +1,15 @@
 import { decideTriage, type TriageSignals } from "@roi/models";
 import { describe, expect, it } from "vitest";
 
-import { runExtractionEval, runTriageEval, triageStability, type ModelFn } from "./eval.js";
+import {
+  extractionStability,
+  quotesOverlap,
+  runExtractionEval,
+  runTriageEval,
+  triageStability,
+  type ExtractionTrace,
+  type ModelFn,
+} from "./eval.js";
 import {
   loadExtractionSet,
   loadThreshold,
@@ -374,5 +382,201 @@ describe("REQ-TEST-007: the triage eval report", () => {
     expect(stability.Decision).toBeCloseTo(6 / 8);
     expect(stability.Signals.Trigger).toBeCloseTo(5 / 8);
     expect(stability.Signals.Adoptable).toBeCloseTo(7 / 8);
+  });
+});
+
+const Q1 = "Grid operators lose transformers to undetected faults every winter season.";
+const Q2 = "Banks reconcile payment exceptions by hand across many legacy systems today.";
+const FILLER = Array.from({ length: 120 }, () => "lorem").join(" ");
+const TEXT = `${Q1} ${FILLER} ${Q2}`;
+/** Spans the end of Q1 and the start of the filler: overlaps Q1 by 50 characters. */
+const Q1_OVERLAP = `${Q1.slice(Q1.length - 50)} lorem lorem`;
+
+type Labelled = { evidenceQuote: string; customerQuote: string; optional?: boolean };
+
+function labelled(
+  quote: string,
+  optional = false,
+): Labelled & ExtractionEntry["expected"]["candidates"][number] {
+  return {
+    finding: "A finding.",
+    evidenceQuote: quote,
+    customer: quote === Q2 ? "banks" : "grid operators",
+    customerQuote: quote === Q2 ? "Banks" : "Grid operators",
+    ...(optional ? { optional: true } : {}),
+  };
+}
+
+function entry(id: string, candidates: ReturnType<typeof labelled>[]): ExtractionEntry {
+  return {
+    id,
+    publicationFixture: "fixtures/none.json",
+    industry: "other",
+    expected: { candidates, ...(candidates.length === 0 ? { reason: "none" } : {}) },
+    Publication: { Id: id, Title: "", Abstract: TEXT, Text: TEXT },
+  };
+}
+
+function returned(quote: string) {
+  return {
+    Finding: "A finding.",
+    EvidenceQuote: quote,
+    Customer: quote === Q2 ? "banks" : "grid operators",
+    CustomerQuote: quote === Q2 ? "Banks" : "Grid operators",
+    WhyNow: null,
+    WhyNowQuote: null,
+    CurrentAlternative: null,
+    AlternativeQuote: null,
+  };
+}
+
+function output(quotes: string[], confidence = 0.6) {
+  return {
+    Candidates: quotes.map(returned),
+    Confidence: confidence,
+    Notes: quotes.length === 0 ? "No candidate." : null,
+  };
+}
+
+/** A stub that answers each entry ID with its scripted answer. */
+function answering(answers: Record<string, unknown>): ModelFn {
+  return (publication) => Promise.resolve(answers[publication.Id]);
+}
+
+const threshold = loadThreshold("extraction");
+
+describe("REQ-TEST-007: the extraction eval report (ADR 0067)", () => {
+  it("REQ-TEST-007 AC2: evidence quotes match when one contains the other or they share 40 characters", () => {
+    expect(quotesOverlap(Q1, Q1.slice(0, 30))).toBe(true);
+    expect(quotesOverlap(Q1, Q1_OVERLAP)).toBe(true);
+    expect(quotesOverlap(Q1, `${Q1.slice(Q1.length - 30)} lorem lorem`)).toBe(false);
+    expect(quotesOverlap(Q1, Q2)).toBe(false);
+  });
+
+  it("REQ-TEST-007 AC2: precision, recall, and F1 of candidate matching", async () => {
+    const report = await runExtractionEval(
+      [entry("e1", [labelled(Q1)])],
+      answering({ e1: output([Q1_OVERLAP, Q2]) }),
+      threshold,
+    );
+    expect(report.Matching).toEqual({
+      TruePositive: 1,
+      Returned: 2,
+      Expected: 1,
+      Precision: 0.5,
+      Recall: 1,
+      F1: 2 / 3,
+    });
+  });
+
+  it("REQ-TEST-007 AC2: an optional candidate counts for neither precision nor recall", async () => {
+    const set = [entry("e1", [labelled(Q1), labelled(Q2, true)])];
+    const missed = await runExtractionEval(set, answering({ e1: output([Q1]) }), threshold);
+    expect(missed.Matching).toMatchObject({ Precision: 1, Recall: 1 });
+    const found = await runExtractionEval(set, answering({ e1: output([Q1, Q2]) }), threshold);
+    expect(found.Matching).toMatchObject({ Returned: 1, Precision: 1, Recall: 1 });
+  });
+
+  it("REQ-TEST-007 AC2: accuracy on entries that should yield no candidate", async () => {
+    const report = await runExtractionEval(
+      [entry("e1", []), entry("e2", [])],
+      answering({ e1: output([]), e2: output([Q1]) }),
+      threshold,
+    );
+    expect(report.EmptyEntryAccuracy).toBe(0.5);
+  });
+
+  it("REQ-TEST-007 AC3: quote rates from the step's traces, and quote positions by tenth", async () => {
+    const trace = (quotes: string[], extra: Partial<ExtractionTrace>): ExtractionTrace => ({
+      Kind: "extraction-trace",
+      Output: output(quotes),
+      Attempts: 1,
+      Returned: quotes.length,
+      Dropped: 0,
+      NormalisedOnly: 0,
+      ...extra,
+    });
+    const report = await runExtractionEval(
+      [entry("e1", [labelled(Q1)]), entry("e2", [labelled(Q2)])],
+      answering({
+        e1: trace([Q1], {}),
+        e2: trace([Q2], { Attempts: 2, Returned: 2, Dropped: 1, NormalisedOnly: 1 }),
+      }),
+      threshold,
+    );
+    expect(report.Quotes.FirstAttempt).toBe(0.5);
+    expect(report.Quotes.Dropped).toBe(1 / 3);
+    // Two kept candidates with two quotes each.
+    expect(report.Quotes.NormalisedOnly).toBe(0.25);
+    expect(report.Quotes.Positions).toEqual([2, 0, 0, 0, 0, 0, 0, 0, 0, 2]);
+  });
+
+  it("REQ-TEST-007 AC3: without traces the quote rates are not reported", async () => {
+    const report = await runExtractionEval(
+      [entry("e1", [labelled(Q1)])],
+      answering({ e1: output([Q1]) }),
+      threshold,
+    );
+    expect(report.Quotes).toMatchObject({
+      FirstAttempt: null,
+      NormalisedOnly: null,
+      Dropped: null,
+    });
+  });
+
+  it("REQ-TEST-007 AC4: the Brier score of Confidence against entry pass", async () => {
+    const report = await runExtractionEval(
+      [entry("pass", [labelled(Q1)]), entry("fail", [labelled(Q1)])],
+      answering({ pass: output([Q1], 0.8), fail: output([], 0.4) }),
+      threshold,
+    );
+    expect(report.Entries.map((e) => e.Passed)).toEqual([true, false]);
+    expect(report.Brier).toBeCloseTo(0.1, 10);
+  });
+
+  it("REQ-TEST-007 AC4: whether the top third by Confidence passes at least as often as the bottom third", async () => {
+    const set = [
+      entry("a", [labelled(Q1)]),
+      entry("b", [labelled(Q1)]),
+      entry("c", [labelled(Q1)]),
+    ];
+    const calibrated = await runExtractionEval(
+      set,
+      answering({ a: output([Q1], 0.9), b: output([Q1], 0.5), c: output([], 0.1) }),
+      threshold,
+    );
+    expect(calibrated.TopThirdAtLeastBottom).toBe(true);
+    const inverted = await runExtractionEval(
+      set,
+      answering({ a: output([], 0.9), b: output([Q1], 0.5), c: output([Q1], 0.1) }),
+      threshold,
+    );
+    expect(inverted.TopThirdAtLeastBottom).toBe(false);
+  });
+
+  it("REQ-TEST-007 AC5: stability is the share of entries with the same candidate count in every run", () => {
+    expect(
+      extractionStability([
+        [
+          { Id: "a", CandidateCount: 1 },
+          { Id: "b", CandidateCount: 1 },
+        ],
+        [
+          { Id: "a", CandidateCount: 1 },
+          { Id: "b", CandidateCount: 2 },
+        ],
+      ]),
+    ).toBe(0.5);
+  });
+
+  it("REQ-TEST-007 AC6: the report-only metrics leave the pass rate unchanged", async () => {
+    const report = await runExtractionEval(
+      extractionSet,
+      extractionOracle(extractionSet),
+      loadThreshold("extraction"),
+    );
+    expect(report.PassRate).toBe(1);
+    expect(report.Matching).toMatchObject({ Precision: 1, Recall: 1, F1: 1 });
+    expect(report.EmptyEntryAccuracy).toBe(1);
   });
 });

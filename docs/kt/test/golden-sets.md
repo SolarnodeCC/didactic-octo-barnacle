@@ -92,7 +92,7 @@ expected:
 notes: "Reviewer R7, 2026-.."
 ```
 
-An expected candidate can carry `optional: true`: the eval report then counts it for neither precision nor recall (ADR 0067). Triage entries carry the same `industry` field as extraction entries, so the eval report can break down triage per industry (REQ-TEST-007). The owner confirmed the triage labels (ADR 0072); `scripts/check-golden-sets.py` requires the field on every triage entry and at least one triage entry per target industry, as for extraction.
+An expected candidate can carry `optional: true`: the eval report then counts it for neither precision nor recall (ADR 0067). `scripts/check-golden-sets.py` checks that the flag is `true` or `false`. No entry is marked yet: the owner sets flags at the threshold review, and the entry pass rule still counts every candidate. Triage entries carry the same `industry` field as extraction entries, so the eval report can break down triage per industry (REQ-TEST-007). The owner confirmed the triage labels (ADR 0072); `scripts/check-golden-sets.py` requires the field on every triage entry and at least one triage entry per target industry, as for extraction.
 
 Every quote must occur in the fixture text after the quote normalisation of the [contract conventions](../agents/contract-conventions.md) (ADR 0064). `scripts/check-golden-sets.py` and the eval runner apply the same normalisation, so a golden quote and a model quote are judged alike. Extraction quotes come from the fixture text without LaTeX markup, the text the step receives; both the script and the eval runner remove the markup by the same rules ([ADR 0089](../decisions/0089-extraction-reads-text-without-latex-markup.md)).
 

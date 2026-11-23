@@ -22,7 +22,7 @@ import {
   modelConfig,
 } from "@roi/prompts";
 
-import { type ModelFn } from "./eval.js";
+import { type ExtractionTrace, type ModelFn } from "./eval.js";
 
 /**
  * `ModelFn`s that run the versioned prompts through `callModel`, so the eval runner scores a
@@ -113,6 +113,30 @@ export function extractionModelFn(
     options.OnResult?.(publication.Id, result);
     const checked = !result.Ok && "Checked" in result ? result.Checked : undefined;
     const output = result.Ok ? result.Output : (checked?.Output ?? null);
-    return output === null ? null : applyExtractionChecks(output, built.QuoteText, terms).Output;
+    if (output === null) {
+      return null;
+    }
+    const applied = applyExtractionChecks(output, built.QuoteText, terms);
+    const dropped = new Set(applied.Dropped.map((item) => item.Index));
+    // Counted on the model's own quotes, before the source spans replace them (REQ-TEST-007 AC3).
+    const normalisedOnly = output.Candidates.filter((_, index) => !dropped.has(index))
+      .flatMap((candidate) =>
+        [
+          candidate.EvidenceQuote,
+          candidate.CustomerQuote,
+          candidate.WhyNowQuote,
+          candidate.AlternativeQuote,
+        ].filter((quote): quote is string => quote !== null),
+      )
+      .filter((quote) => !built.QuoteText.includes(quote)).length;
+    const trace: ExtractionTrace = {
+      Kind: "extraction-trace",
+      Output: applied.Output,
+      Attempts: result.Attempts,
+      Returned: output.Candidates.length,
+      Dropped: dropped.size,
+      NormalisedOnly: normalisedOnly,
+    };
+    return trace;
   };
 }
