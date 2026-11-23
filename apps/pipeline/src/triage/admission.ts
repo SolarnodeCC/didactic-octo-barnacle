@@ -53,7 +53,8 @@ type PoolRow = {
  *
  * One run per UTC day: the `admission_day` row is written last, so a repeated trigger, or one
  * after a run that stopped halfway, admits nobody twice. With the day's budget used up, it
- * admits nobody (REQ-NFR-005 AC2). Extraction messages for the admitted come with WP7.
+ * admits nobody (REQ-NFR-005 AC2). `queueAdmittedExtractions` then sends the extraction
+ * messages, after this batch has committed.
  */
 export async function admitDay(deps: PipelineDeps, day: string): Promise<AdmissionOutcome> {
   const triage = deps.Triage;

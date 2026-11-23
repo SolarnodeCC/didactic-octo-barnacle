@@ -85,6 +85,25 @@ export type PipelineDeps = {
     };
   };
   /**
+   * Extraction (REQ-PROC-004, REQ-PROC-009, REQ-DATA-006 AC3). The consumer needs `Call`,
+   * `Model`, and the limits; `Queue` is set only where `processing.enabled` is on, and only then
+   * does the daily admission send `publication.extract` for the admitted. Optional, so a test or
+   * environment without it admits as before.
+   */
+  Extraction?: {
+    Queue?: QueueSender;
+    /** `callModel` dependencies: Workers AI through AI Gateway, usage store, prices. */
+    Call: CallModelDeps;
+    /** `model.extraction`: model, prompt version, output mode (ADR 0091). */
+    Model: ModelConfig;
+    /** `extraction.max_candidates_per_publication`. */
+    MaxCandidates: number;
+    /** `extraction.full_text_max_chars`: the cut before the call. */
+    FullTextMaxChars: number;
+    /** `extraction.generic_customer_terms` (ADR 0066). */
+    GenericCustomerTerms: readonly string[];
+  };
+  /**
    * Automatic recovery (REQ-PROC-010, REQ-DATA-012, ADR 0063): re-drive limits, dead-letter
    * replay, and the circuit breaker. Optional; without it nothing is re-driven or replayed.
    */
@@ -151,6 +170,17 @@ export function triageEnvelope(publicationId: string): QueueMessageEnvelope {
   return {
     MessageId: `triage:${publicationId}`,
     Type: "publication.triage",
+    SchemaVersion: QUEUE_SCHEMA_VERSION,
+    Ids: { PublicationId: publicationId },
+    Attempt: 0,
+  };
+}
+
+/** Deterministic ID: a publication is extracted once (REQ-PROC-010 AC7, ADR 0055). */
+export function extractEnvelope(publicationId: string): QueueMessageEnvelope {
+  return {
+    MessageId: `extract:${publicationId}`,
+    Type: "publication.extract",
     SchemaVersion: QUEUE_SCHEMA_VERSION,
     Ids: { PublicationId: publicationId },
     Attempt: 0,

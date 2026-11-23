@@ -103,3 +103,26 @@ export async function addRunCounts(
     .bind(JSON.stringify(merged), runId)
     .run();
 }
+
+/**
+ * Statements that add counts to a processing run's `counts_json` inside the database, so
+ * consumers running in parallel never overwrite each other's counts. The key is bound as a
+ * JSON path parameter.
+ */
+export function addRunCountStatements(
+  db: SqlDatabase,
+  runId: string,
+  counts: Record<string, number>,
+): SqlStatement[] {
+  return Object.entries(counts)
+    .filter(([, value]) => value !== 0)
+    .map(([key, value]) =>
+      db
+        .prepare(
+          `UPDATE processing_run
+           SET counts_json = json_set(counts_json, ?, COALESCE(json_extract(counts_json, ?), 0) + ?)
+           WHERE id = ?`,
+        )
+        .bind(`$.${key}`, `$.${key}`, value, runId),
+    );
+}

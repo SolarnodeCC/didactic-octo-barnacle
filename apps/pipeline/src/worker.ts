@@ -9,7 +9,7 @@ import { createAuthorKeyHasher } from "./privacy/author-key.js";
 import { logLine } from "./log-line.js";
 import { createPdfFetcher } from "./documents/safe-fetch.js";
 import { extractPdfText } from "./documents/pdf-text.js";
-import { loadProcessingConfig } from "./processing-config.js";
+import { loadProcessingConfig, type ProcessingConfig } from "./processing-config.js";
 import { PRICE_TABLE } from "./prices.js";
 import { createModelUsageStore } from "./store/model-usage.js";
 import { type ObjectStore } from "./documents/object-store.js";
@@ -30,7 +30,7 @@ export type Env = {
   DOCUMENT_QUEUE: QueueSender;
   /** Text extraction of stored PDFs, one file per invocation (ADR 0009, ADR 0053). */
   TEXT_QUEUE?: QueueSender;
-  /** Model steps: triage now, extraction in WP7; concurrency 8 bounds calls in flight (ADR 0053). */
+  /** Model steps, triage and extraction; concurrency 8 bounds calls in flight (ADR 0053). */
   MODEL_QUEUE?: QueueSender;
   /** Workers AI, always called through the environment's AI Gateway (REQ-NFR-003). */
   AI?: WorkersAiBinding;
@@ -65,6 +65,49 @@ const arxivSlot = createRateLimiter({
   Now: () => Date.now(),
   Sleep: sleep,
 });
+
+/**
+ * Triage and extraction share one model queue, one usage store, and one budget (ADR 0053,
+ * ADR 0059). New messages are sent only where `processing.enabled` is on.
+ */
+function modelSteps(
+  env: Env,
+  ai: NonNullable<Env["AI"]>,
+  processing: ProcessingConfig,
+): Pick<PipelineDeps, "Triage" | "Extraction"> {
+  const queue = processing.Enabled && env.MODEL_QUEUE ? { Queue: env.MODEL_QUEUE } : {};
+  const call = {
+    Ai: ai,
+    GatewayId: `roi-${env.ENVIRONMENT}`,
+    Usage: createModelUsageStore(env.DB, { Amount: processing.BudgetDailyEur, Currency: "EUR" }),
+    Prices: PRICE_TABLE,
+    MaxAttempts: processing.ModelMaxAttempts,
+    NewId: () => crypto.randomUUID(),
+    Now: () => new Date(),
+    Sleep: sleep,
+  };
+  return {
+    Triage: {
+      ...queue,
+      Call: call,
+      Model: processing.TriageModel,
+      AcceptScoreCut: processing.AcceptScoreCut,
+      Admission: {
+        DailyLimit: processing.DailyExtractionLimit,
+        PoolDays: processing.AdmissionPoolDays,
+        FullTextWaitHours: processing.FullTextWaitHours,
+      },
+    },
+    Extraction: {
+      ...queue,
+      Call: call,
+      Model: processing.ExtractionModel,
+      MaxCandidates: processing.MaxCandidates,
+      FullTextMaxChars: processing.FullTextMaxChars,
+      GenericCustomerTerms: processing.GenericCustomerTerms,
+    },
+  };
+}
 
 function buildDeps(env: Env): PipelineDeps {
   const config = DEFAULT_INGEST_CONFIG;
@@ -107,33 +150,7 @@ function buildDeps(env: Env): PipelineDeps {
         BackfillPerRun: processing.TextBackfillPerRun,
       },
     },
-    ...(env.AI
-      ? {
-          Triage: {
-            ...(processing.Enabled && env.MODEL_QUEUE ? { Queue: env.MODEL_QUEUE } : {}),
-            Call: {
-              Ai: env.AI,
-              GatewayId: `roi-${env.ENVIRONMENT}`,
-              Usage: createModelUsageStore(env.DB, {
-                Amount: processing.BudgetDailyEur,
-                Currency: "EUR",
-              }),
-              Prices: PRICE_TABLE,
-              MaxAttempts: processing.ModelMaxAttempts,
-              NewId: () => crypto.randomUUID(),
-              Now: () => new Date(),
-              Sleep: sleep,
-            },
-            Model: processing.TriageModel,
-            AcceptScoreCut: processing.AcceptScoreCut,
-            Admission: {
-              DailyLimit: processing.DailyExtractionLimit,
-              PoolDays: processing.AdmissionPoolDays,
-              FullTextWaitHours: processing.FullTextWaitHours,
-            },
-          },
-        }
-      : {}),
+    ...(env.AI ? modelSteps(env, env.AI, processing) : {}),
     Recovery: {
       MaxRedrives: processing.MaxRedrives,
       MaxRedrivesPerDay: processing.MaxRedrivesPerDay,
