@@ -22,3 +22,10 @@ export {
   type SearchOptions,
   type SearchResult,
 } from "./publications.js";
+export {
+  RECALL_K,
+  evaluateRecall,
+  recallAt10,
+  type RecallCorpus,
+  type RecallReport,
+} from "./recall.js";

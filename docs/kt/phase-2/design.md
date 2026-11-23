@@ -53,6 +53,11 @@ Every consumer uses the existing claim in `queue_message_log`, the growing retry
   - The registry is read by `registryIndexes` (`apps/pipeline/src/store/embedding-index-repo.ts`). While it is empty, that function seeds the first row, `idx_bge_base_768`: `roi-publications-<env>`, bound as `PUBLICATION_VECTORS`, current. The seed is in code because a migration does not know the environment.
   - The retraction sweep deletes the vectors of flagged publications from every bound index, before it stamps them.
 - **Model change** (REQ-PROC-001 AC2, ADR 0056): a new index and its binding are added, the backfill command queues `publication.embed` for every publication against the new index, and search keeps reading the current index. When every publication has a vector in the new index, a reviewed configuration change marks it current. The old binding is removed in the next release.
+- **Backfill as built (WP5):**
+  - A reviewed migration adds the new index's registry row, with `backfill_started_at` set and `current` off, and the release binds it as `PUBLICATION_VECTORS_NEXT`.
+  - The admission cron then continues the backfill each day with `continueEmbeddingBackfills` (`apps/pipeline/src/embedding/backfill.ts`). It queues up to 5,000 publications without a vector in that index, and sends again a message that ended without one.
+  - When every publication that is not retracted has its vector, it sets `backfill_done_at`. The run is a `processing_run` of kind `backfill` with ID `bf_<indexId>`.
+  - `searchCurrentIndex` reads only the index marked `current`.
 
 ## Triage
 

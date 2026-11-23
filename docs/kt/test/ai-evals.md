@@ -70,3 +70,23 @@ Eval runs that call live models use the secrets of the `evals` GitHub environmen
 ## Cost and latency
 
 Because model calls go through AI Gateway (REQ-NFR-003), each eval run reports tokens, cost, and latency per agent. A large increase compared to the previous nightly run is flagged in the run summary. An eval run stops when it exceeds the eval budget configured for the `evals` environment.
+
+## Search recall
+
+The recall-at-10 corpus of ADR 0057 is in `packages/vector-store/fixtures/recall/` (REQ-PROC-003 AC3):
+
+- `publications.json` holds 356 publications: the 91 arXiv fixtures of the extraction golden set and every publication of the 34 Research Analyst neighbour files, by arXiv ID without version.
+- `queries.json` holds 34 queries. A query is a publication that has a neighbour file, embedded from its title and abstract, and its relevant publications are the neighbours in that file: its frozen nearest publications. The owner reviews these labels, as for golden sets.
+- `recall.threshold.json` is `{ "metric": "recall-at-10", "minimum": 0.8 }`.
+- `buildRecallCorpus` (`packages/vector-store/src/recall-corpus.ts`) rebuilds the corpus from the fixtures. A test checks that the committed files match it, that each relevant publication is in the corpus, and that there are at least 30 queries.
+
+Recall at 10 is, per query, the relevant publications among the first ten results, divided by the number of relevant publications (at most ten), averaged over the queries. The query's own publication is left out of its results (`recallAt10`, `evaluateRecall` in `packages/vector-store/src/recall.ts`). CI checks the evaluator with known rankings and deterministic fake vectors.
+
+The live recall of a model is the WP5 exit. It needs `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` (Workers AI Read), and embeds the corpus through the AI Gateway `roi-evals`:
+
+```bash
+pnpm --filter @roi/agent-extraction run build && pnpm --filter @roi/agent-extraction run recall -- --out recall-report.md
+```
+
+The same command measures a candidate for the embedding benchmark of ADR 0010 with `--model`.
+
