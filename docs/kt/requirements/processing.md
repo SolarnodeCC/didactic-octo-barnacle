@@ -13,7 +13,7 @@ Every ingested publication gets an embedding of its title and abstract.
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: README roadmap phase 2
 - Acceptance criteria:
   1. Each publication has exactly one current embedding of its title and abstract, created with a recorded model name and version.
@@ -27,7 +27,7 @@ Embeddings are stored in a vector database.
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: README roadmap phase 2 and Technology Stack (Cloudflare Vectorize)
 - Acceptance criteria:
   1. Each vector is linked to its publication ID and carries the source and publication date as filterable metadata.
@@ -40,7 +40,7 @@ Agents and the dashboard can search publications by meaning.
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: README roadmap phase 2
 - Depends on: REQ-PROC-002
 - Acceptance criteria:

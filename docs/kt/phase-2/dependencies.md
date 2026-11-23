@@ -56,7 +56,7 @@ flowchart TD
 |---|---|---|---|
 | Workers AI | Triage, extraction, embeddings | Yes (binding `AI`) | Rate limit per model; input size per call; batch size for embedding models |
 | AI Gateway | Every model call, logs, cost | Gateway exists in bootstrap; first use | Request metadata size; log retention; whether the binding response carries the cost |
-| Vectorize | Publication vectors | Index exists (ADR 0027); metadata indexes new | Maximum metadata indexes; topK with metadata returned; delete-by-ID batch size |
+| Vectorize | Publication vectors | Index exists (ADR 0027); metadata indexes new | Checked on 2026-11-23 against the Cloudflare limits page: at most 10 metadata indexes per index; `topK` at most 100 without values or metadata and 50 with them; at most 1,000 vectors per upsert from a Worker; vector IDs at most 64 bytes; at most 1,536 dimensions. `searchPublications` returns no metadata, so its `topK` is capped at 100 |
 | Queues | Text, embedding, model queues | Three queues and their dead-letter queues | Batch size, delivery delay (maximum 12 hours), concurrency |
 | Workflows | Candidate Workflow, thin slice only | Yes | Steps per instance; local development support |
 | D1 | New tables | Migrations 0009, 0010, and 0011 | Rows written per batch; database size |

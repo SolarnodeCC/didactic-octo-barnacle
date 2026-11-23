@@ -183,6 +183,14 @@ export {
 export { FakeWorkersAi, type FakeCall, type FakeReply } from "./fake-workers-ai.js";
 
 export {
+  callEmbedding,
+  fakeEmbedding,
+  parseEmbedding,
+  type EmbeddingRequest,
+  type EmbeddingResult,
+} from "./embedding.js";
+
+export {
   callModel,
   type CallModelDeps,
   type CallModelRequest,

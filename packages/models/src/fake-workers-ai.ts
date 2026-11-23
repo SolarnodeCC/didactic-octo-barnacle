@@ -1,3 +1,4 @@
+import { fakeEmbedding } from "./embedding.js";
 import {
   ProviderCallError,
   type WorkersAiBinding,
@@ -18,7 +19,12 @@ export type FakeReply =
       /** Reported as `usage.prompt_tokens_details.cached_tokens` when set. */
       CachedInputTokens?: number;
     }
-  | { Kind: "error"; Status: number | null; Message?: string; RetryAfterSeconds?: number };
+  | { Kind: "error"; Status: number | null; Message?: string; RetryAfterSeconds?: number }
+  /**
+   * An embedding response `{ shape, data }`. Without `Data`, each input text gets its
+   * deterministic `fakeEmbedding`.
+   */
+  | { Kind: "embedding"; Data?: number[][]; Dimensions?: number; InputTokens?: number };
 
 export type FakeCall = {
   Model: string;
@@ -59,6 +65,15 @@ export class FakeWorkersAi implements WorkersAiBinding {
           reply.RetryAfterSeconds ?? null,
         ),
       );
+    }
+    if (reply.Kind === "embedding") {
+      const texts = Array.isArray(inputs.text) ? (inputs.text as string[]) : [];
+      const data = reply.Data ?? texts.map((text) => fakeEmbedding(text, reply.Dimensions));
+      return Promise.resolve({
+        shape: [data.length, data[0]?.length ?? 0],
+        data,
+        ...(reply.InputTokens === undefined ? {} : { usage: { prompt_tokens: reply.InputTokens } }),
+      });
     }
     return Promise.resolve({
       response: reply.Output,
