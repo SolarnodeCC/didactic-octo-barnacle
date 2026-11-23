@@ -91,5 +91,11 @@ export const ADMISSION_CRON = "0 11 * * *";
  */
 export const RECOVERY_CRON = "*/30 * * * *";
 
+/**
+ * Cron expression (UTC) of the weekly retraction check, Monday 08:00 (REQ-DATA-008 AC1,
+ * ADR 0061, ADR 0112).
+ */
+export const RETRACTION_CRON = "0 8 * * 1";
+
 /** Version of the queue message schema (docs/kt/architecture/defaults.md). */
 export const QUEUE_SCHEMA_VERSION = "1";

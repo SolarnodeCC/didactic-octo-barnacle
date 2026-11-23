@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { buildArxivUrl, fetchArxivPage } from "./client.js";
+import { buildArxivIdListUrl, buildArxivUrl, fetchArxivPage } from "./client.js";
 import { type FetchFn } from "../../http/retry.js";
 import { SCOPE_ARXIV_CATEGORIES } from "../../normalize/scope.js";
 
@@ -113,5 +113,14 @@ describe("REQ-DATA-002: arXiv client on a recorded empty feed", () => {
         },
       ),
     ).rejects.toThrow(/larger than 64 bytes/u);
+  });
+});
+
+describe("REQ-DATA-008: the retraction check looks arXiv preprints up by ID (ADR 0112)", () => {
+  it("REQ-DATA-008: the id_list URL names every ID and asks for as many results", () => {
+    const url = new URL(buildArxivIdListUrl(["2409.00001", "2409.00002"]));
+    expect(url.searchParams.get("id_list")).toBe("2409.00001,2409.00002");
+    expect(url.searchParams.get("max_results")).toBe("2");
+    expect(url.searchParams.has("search_query")).toBe(false);
   });
 });

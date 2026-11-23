@@ -1,6 +1,6 @@
 import { type CallModelDeps } from "@roi/models";
 
-import { fetchArxivPage } from "./collectors/arxiv/client.js";
+import { fetchArxivByIds, fetchArxivPage } from "./collectors/arxiv/client.js";
 import { fetchOpenAlexPage } from "./collectors/openalex/client.js";
 import { DEFAULT_INGEST_CONFIG } from "./config.js";
 import { createAlertSink } from "./alerts/sink.js";
@@ -151,6 +151,7 @@ function buildDeps(env: Env): PipelineDeps {
       },
     },
     ...(env.AI ? modelSteps(env, env.AI, processing) : {}),
+    Retraction: { LookbackDays: processing.RetractionLookbackDays },
     Recovery: {
       MaxRedrives: processing.MaxRedrives,
       MaxRedrivesPerDay: processing.MaxRedrivesPerDay,
@@ -189,6 +190,8 @@ function buildDeps(env: Env): PipelineDeps {
             WorkTypes: config.OpenAlexScope.WorkTypes,
             RequireAbstract: config.OpenAlexScope.RequireAbstract,
             ...(request.Cursor ? { Cursor: request.Cursor } : {}),
+            ...(request.Retracted ? { Retracted: true } : {}),
+            ...(request.Page !== undefined ? { Page: request.Page } : {}),
             ...(env.OPENALEX_API_KEY ? { ApiKey: env.OPENALEX_API_KEY } : {}),
           },
           {
@@ -212,6 +215,13 @@ function buildDeps(env: Env): PipelineDeps {
             MaxResponseBytes: config.Http.MaxResponseBytes,
           },
         ),
+      FetchArxivByIds: (ids) =>
+        fetchArxivByIds(ids, {
+          Fetch: workerFetch,
+          Backoff: backoff,
+          WaitForSlot: arxivSlot,
+          MaxResponseBytes: config.Http.MaxResponseBytes,
+        }),
     },
   };
 }

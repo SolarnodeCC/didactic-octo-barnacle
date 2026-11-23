@@ -27,6 +27,8 @@ related: [REQ-TEST-003, REQ-TEST-005, REQ-DATA-010, REQ-AGENT-013]
   - a preprint with two versions, `arxiv/feed-two-versions-v1.xml` and `-v2.xml` (2609.30137; REQ-DATA-002 AC3);
   - empty results, `openalex/page-empty.json` and `arxiv/feed-empty.xml`.
 
+  Recorded on 2026-11-23: retracted works of one day, `openalex/page-retracted.json` (the `is_retracted:true` list query of ADR 0112, trimmed to the `id` and `is_retracted` of three works with W4380078608 first).
+
   Written by hand: a work without an abstract (`openalex/work-no-abstract.json`) and malformed records (`makeBrokenWork` in `apps/pipeline/src/test/harness.ts`). Rate limiting, `Retry-After`, timeouts, and server errors are HTTP behaviour, not a response body to record; they are tested with stubbed responses in `apps/pipeline/src/http/retry.test.ts`.
 
 ## Search results

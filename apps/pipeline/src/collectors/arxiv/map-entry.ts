@@ -19,7 +19,7 @@ export type MappedArxivEntry = {
   Authorships: Array<Omit<Authorship, "PublicationId" | "AuthorId"> & { SourceAuthorId: string }>;
 };
 
-function parseArxivId(id: string): string {
+export function parseArxivId(id: string): string {
   return id.replace(/^https?:\/\/arxiv\.org\/abs\//i, "").trim();
 }
 

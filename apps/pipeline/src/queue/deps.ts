@@ -6,6 +6,7 @@ import {
 } from "@roi/models";
 
 import { type ArxivPage } from "../collectors/arxiv/client.js";
+import { type ArxivEntry } from "../collectors/arxiv/types.js";
 import { type OpenAlexPage } from "../collectors/openalex/client.js";
 import { QUEUE_SCHEMA_VERSION, type IngestConfig } from "../config.js";
 import { type AlertSink } from "../alerts/types.js";
@@ -42,6 +43,10 @@ export type PipelineDeps = {
       ToDate?: string;
       Cursor?: string;
       SubfieldIds?: readonly string[];
+      /** Asks for retracted works only (ADR 0112). */
+      Retracted?: boolean;
+      /** Basic paging, 1-based, instead of a cursor (ADR 0112). */
+      Page?: number;
     }) => Promise<OpenAlexPage>;
     FetchArxivPage: (request: {
       Start: number;
@@ -49,6 +54,8 @@ export type PipelineDeps = {
       SubmittedFrom?: string;
       SubmittedTo?: string;
     }) => Promise<ArxivPage>;
+    /** Preprints by version-less ID, with no category filter (ADR 0112). */
+    FetchArxivByIds: (ids: readonly string[]) => Promise<ArxivEntry[]>;
   };
   /**
    * Full-text extraction of stored PDFs (REQ-DATA-006, ADR 0009). The consumer needs
@@ -102,6 +109,11 @@ export type PipelineDeps = {
     FullTextMaxChars: number;
     /** `extraction.generic_customer_terms` (ADR 0066). */
     GenericCustomerTerms: readonly string[];
+  };
+  /** The weekly retraction check (REQ-DATA-008 AC1, ADR 0061, ADR 0112). */
+  Retraction?: {
+    /** `retraction.lookback_days`. */
+    LookbackDays: number;
   };
   /**
    * Automatic recovery (REQ-PROC-010, REQ-DATA-012, ADR 0063): re-drive limits, dead-letter
@@ -183,6 +195,21 @@ export function extractEnvelope(publicationId: string): QueueMessageEnvelope {
     Type: "publication.extract",
     SchemaVersion: QUEUE_SCHEMA_VERSION,
     Ids: { PublicationId: publicationId },
+    Attempt: 0,
+  };
+}
+
+/** Deterministic ID: a page of a retraction check is sent once per run. */
+export function retractionCheckEnvelope(
+  runId: string,
+  source: RunSource,
+  page: number,
+): QueueMessageEnvelope {
+  return {
+    MessageId: `retraction:${runId}:${source}:${page}`,
+    Type: "retraction.check_page",
+    SchemaVersion: QUEUE_SCHEMA_VERSION,
+    Ids: { RunId: runId, Source: source, Page: page },
     Attempt: 0,
   };
 }

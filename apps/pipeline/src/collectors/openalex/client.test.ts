@@ -176,3 +176,24 @@ describe("REQ-DATA-001: OpenAlex client on a recorded empty page", () => {
     expect(page).toEqual({ Works: [], NextCursor: null });
   });
 });
+
+describe("REQ-DATA-008: the retraction check asks OpenAlex for retracted works (ADR 0112)", () => {
+  it("REQ-DATA-008: the filter keeps the ingestion scope, adds is_retracted:true, and pages by number", () => {
+    const url = new URL(
+      buildOpenAlexUrl({
+        FromDate: "2026-10-15",
+        ToDate: "2026-11-14",
+        SubfieldIds: ["1702"],
+        WorkTypes: ["article"],
+        RequireAbstract: true,
+        Retracted: true,
+        Page: 2,
+      }),
+    );
+    expect(url.searchParams.get("filter")).toBe(
+      "from_publication_date:2026-10-15,to_publication_date:2026-11-14,language:en,primary_topic.subfield.id:1702,type:article,has_abstract:true,is_retracted:true",
+    );
+    expect(url.searchParams.get("page")).toBe("2");
+    expect(url.searchParams.has("cursor")).toBe(false);
+  });
+});
