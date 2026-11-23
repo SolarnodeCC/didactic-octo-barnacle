@@ -58,6 +58,15 @@ class GoldenSetsTest(ScriptTestCase):
         self.replace(TRIAGE_REJECTED, "industry: other", "industry: farming")
         self.assert_fails_with("gs-triage-001.yaml: industry 'farming' is not one of the eight industries or 'other'")
 
+    def test_req_test_007_fails_on_a_triage_entry_without_an_industry(self) -> None:
+        self.replace(TRIAGE_REJECTED, "industry: other\n", "")
+        self.assert_fails_with("gs-triage-001.yaml: industry is missing")
+
+    def test_req_test_007_fails_when_an_industry_has_no_triage_entry(self) -> None:
+        for number in ("084", "085", "086", "087"):
+            self.replace(f"{EXT}/triage/gs-triage-{number}.yaml", "industry: insurance", "industry: other")
+        self.assert_fails_with("no triage entry for industry insurance")
+
     def test_req_test_005_fails_on_a_range_that_is_too_wide(self) -> None:
         self.replace(ANALYST, "noveltyRange: [50, 80]", "noveltyRange: [10, 80]")
         self.assert_fails_with("noveltyRange [10, 80] is wider than 30")
