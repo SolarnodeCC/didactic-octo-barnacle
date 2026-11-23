@@ -2,6 +2,9 @@
 # productivity loss among knowledge workers. The publication, IDs, quotes, and
 # figures are illustrative and do not refer to a real record. Field names follow
 # the agent contracts in docs/kt/agents/ and the score model in ADR 0005.
+# Each agent section is the agent's output with its evidence items beside it
+# under `Evidence`; packages/models/src/examples.test.ts validates both
+# (REQ-PROC-007 AC3). The thin slice uses these sections as its stub outputs.
 Publication:
   Id: pub-example-0001
   Title: Task switching and focus loss among knowledge workers
@@ -10,10 +13,21 @@ Publication:
   Doi: 10.0000/example.0001
   PublicationDate: "2026-09-15"
   InputMode: abstract
+  Abstract: >-
+    We followed 412 knowledge workers in three public agencies for six months.
+    Frequent switching between tasks reduced sustained focus. Workers who
+    switched more than ten times an hour finished a fifth less work. Current
+    calendar tools schedule meetings but do not plan focus time.
 Candidate:
   Id: cand-example-0001
   Finding: Frequent task switching measurably reduces the focus and output of knowledge workers.
   EvidenceQuote: Frequent switching between tasks reduced sustained focus.
+  Customer: knowledge workers in public agencies
+  CustomerQuote: We followed 412 knowledge workers in three public agencies for six months.
+  WhyNow: null
+  WhyNowQuote: null
+  CurrentAlternative: Calendar tools that schedule meetings
+  AlternativeQuote: Current calendar tools schedule meetings but do not plan focus time.
 Agents:
   ResearchAnalyst:
     Novelty: 60
@@ -23,16 +37,21 @@ Agents:
     Industry: [public-sector]
     Technology: [activity sensing, scheduling optimization]
     Confidence: 0.6
+    Notes: null
     Evidence:
       - Field: NoveltyRationale
         Kind: publication-quote
         Quote: Frequent switching between tasks reduced sustained focus.
+        PublicationId: pub-example-0001
         Url: null
+        Note: null
         RetrievedAt: "2026-10-01T12:00:00Z"
       - Field: RelatedPublicationIds
         Kind: related-publication
         Quote: null
-        Url: https://openalex.org/W0000000102
+        PublicationId: pub-example-0102
+        Url: null
+        Note: null
         RetrievedAt: "2026-10-01T12:00:00Z"
   ProblemDiscovery:
     Problem: Knowledge workers lose focus and output when they switch between tasks and meetings.
@@ -43,16 +62,21 @@ Agents:
     PainLevel: 4
     PainRationale: Lost focus time costs measurable output, and employers already pay for productivity tools.
     Confidence: 0.6
+    Notes: null
     Evidence:
       - Field: Problem
         Kind: publication-quote
         Quote: Frequent switching between tasks reduced sustained focus.
+        PublicationId: pub-example-0001
         Url: null
+        Note: null
         RetrievedAt: "2026-10-01T12:00:00Z"
       - Field: PainRationale
         Kind: none-found
         Quote: null
+        PublicationId: null
         Url: null
+        Note: The publication measures lost output but not what employers pay for tools.
         RetrievedAt: "2026-10-01T12:00:00Z"
   MarketAnalysis:
     TAM:
@@ -75,11 +99,14 @@ Agents:
     Assumptions:
       - Productivity software spend per knowledge worker stays stable.
     Confidence: 0.4
+    Notes: null
     Evidence:
       - Field: TAM
         Kind: none-found
         Quote: null
+        PublicationId: null
         Url: null
+        Note: No market study was found; the range is a top-down estimate.
         RetrievedAt: "2026-10-01T12:00:00Z"
   Competition:
     Competitors:
@@ -91,11 +118,14 @@ Agents:
     GapStrength: 3
     Differentiation: Plans focus blocks from measured switching patterns instead of static rules.
     Confidence: 0.5
+    Notes: null
     Evidence:
       - Field: Competitors
         Kind: none-found
         Quote: null
+        PublicationId: null
         Url: null
+        Note: The competitors are named from general knowledge, not found by the search tool.
         RetrievedAt: "2026-10-01T12:00:00Z"
   Relevance:
     IndustryFit:
@@ -120,12 +150,12 @@ Agents:
         public-sector: clear,
         life-sciences: none,
       }
-    StrategicRelevanceScore: 90
     TechnicalFeasibility: 80
     ImplementationEffort: M
     Constraints:
       - Calendar and activity data need employee consent.
     Confidence: 0.6
+    Notes: null
   StartupGenerator:
     StartupName: AI Focus Planner
     OpportunityType: saas
@@ -153,9 +183,26 @@ Agents:
       KeyRisks:
         - Established calendar vendors add the same feature.
         - Employees see activity sensing as surveillance.
+    ValidationBrief:
+      Problem:
+        KillQuestion: Do teams that switch often actually finish less work than teams that do not?
+        StopCriterion: Drop it if the switching rate shows no link to finished work in two pilot teams.
+      Customer:
+        KillQuestion: Does a head of employee experience own the budget for focus tools?
+        StopCriterion: Drop it if none of five interviewed heads controls such a budget.
+      Market:
+        KillQuestion: Do employers pay per user for productivity add-ons today?
+        StopCriterion: Drop it if no employer in the interviews pays for one.
+      ReasonToWin:
+        KillQuestion: Can plans built from measured switching beat static focus rules?
+        StopCriterion: Drop it if a pilot shows no more focus time than static rules.
+      WhyNow:
+        KillQuestion: Has anything changed that makes employers act on focus time now?
+        StopCriterion: Drop it if no interviewed employer names a current reason to act.
     Confidence: 0.5
+    Notes: null
 Score:
-  ModelVersion: 1
+  ModelVersion: "1"
   Categories:
     ScientificNovelty: 60
     MarketPotential: 76.1
