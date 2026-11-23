@@ -5,6 +5,8 @@ import { fetchArxivByIds, fetchArxivPage } from "./collectors/arxiv/client.js";
 import { fetchOpenAlexPage } from "./collectors/openalex/client.js";
 import { DEFAULT_INGEST_CONFIG } from "./config.js";
 import { createAlertSink } from "./alerts/sink.js";
+import { notify } from "./alerts/notify.js";
+import { budgetStopAlert, environmentBudget } from "./budget/budget-stop.js";
 import { createAuthorGuard } from "./privacy/author-guard.js";
 import { createAuthorKeyHasher } from "./privacy/author-key.js";
 import { logLine } from "./log-line.js";
@@ -12,7 +14,7 @@ import { createPdfFetcher } from "./documents/safe-fetch.js";
 import { extractPdfText } from "./documents/pdf-text.js";
 import { loadProcessingConfig, type ProcessingConfig } from "./processing-config.js";
 import { PRICE_TABLE } from "./prices.js";
-import { createModelUsageStore } from "./store/model-usage.js";
+import { createModelUsageStore, type ModelBudget } from "./store/model-usage.js";
 import { type ObjectStore } from "./documents/object-store.js";
 import { ARXIV_MIN_REQUEST_INTERVAL_MS, createRateLimiter } from "./http/rate-limit.js";
 import { consumeBatch } from "./queue/consume.js";
@@ -58,6 +60,9 @@ export type Env = {
   ALERT_EMAIL_FROM?: string;
   /** `processing.enabled` (`"true"` or `"false"`); unset means off. See processing-config.ts. */
   PROCESSING_ENABLED?: string;
+  /** `budget.expected_daily_triaged` and `budget.expected_daily_embeddings` of the environment (ADR 0059). */
+  BUDGET_EXPECTED_DAILY_TRIAGED?: string;
+  BUDGET_EXPECTED_DAILY_EMBEDDINGS?: string;
 };
 
 type WorkersAiBinding = CallModelDeps["Ai"];
@@ -81,12 +86,13 @@ function modelSteps(
   env: Env,
   ai: NonNullable<Env["AI"]>,
   processing: ProcessingConfig,
+  budget: ModelBudget,
 ): Pick<PipelineDeps, "Triage" | "Extraction" | "Embedding"> {
   const queue = processing.Enabled && env.MODEL_QUEUE ? { Queue: env.MODEL_QUEUE } : {};
   const call = {
     Ai: ai,
     GatewayId: `roi-${env.ENVIRONMENT}`,
-    Usage: createModelUsageStore(env.DB, { Amount: processing.BudgetDailyEur, Currency: "EUR" }),
+    Usage: createModelUsageStore(env.DB, budget),
     Prices: PRICE_TABLE,
     MaxAttempts: processing.ModelMaxAttempts,
     NewId: () => crypto.randomUUID(),
@@ -141,7 +147,15 @@ function buildDeps(env: Env): PipelineDeps {
   const log = (event: string, fields: Record<string, unknown>) =>
     console.log(logLine(env.ENVIRONMENT, event, fields));
   const processing = loadProcessingConfig(env);
-  return {
+  // The day's model budget (ADR 0059); its first refusal sends the day's one budget-stop alert.
+  const budget = environmentBudget({
+    Db: env.DB,
+    Processing: processing,
+    Prices: PRICE_TABLE,
+    OnStop: (stop) => notify(deps, budgetStopAlert(stop)),
+    Log: log,
+  });
+  const deps: PipelineDeps = {
     Db: env.DB,
     Queue: env.PUBLICATION_QUEUE,
     DocumentQueue: env.DOCUMENT_QUEUE,
@@ -172,7 +186,7 @@ function buildDeps(env: Env): PipelineDeps {
         BackfillPerRun: processing.TextBackfillPerRun,
       },
     },
-    ...(env.AI ? modelSteps(env, env.AI, processing) : {}),
+    ...(env.AI ? modelSteps(env, env.AI, processing, budget) : {}),
     Retraction: { LookbackDays: processing.RetractionLookbackDays },
     Recovery: {
       MaxRedrives: processing.MaxRedrives,
@@ -246,6 +260,7 @@ function buildDeps(env: Env): PipelineDeps {
         }),
     },
   };
+  return deps;
 }
 
 /**

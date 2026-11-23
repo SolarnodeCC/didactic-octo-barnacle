@@ -10,8 +10,13 @@ compatibility_flags = ["nodejs_compat"]
 workers_dev = false
 preview_urls = false
 
+# BUDGET_EXPECTED_DAILY_*: the expected daily volumes in the budget formula of ADR 0059, per
+# environment. Staging and production use the largest measured day (4,634 publications) until a
+# steady state is measured; local and preview use a small day.
 [vars]
 ENVIRONMENT = "local"
+BUDGET_EXPECTED_DAILY_TRIAGED = "100"
+BUDGET_EXPECTED_DAILY_EMBEDDINGS = "100"
 
 [[d1_databases]]
 binding = "DB"
@@ -132,7 +137,7 @@ binding = "AI"
 
 [env.preview]
 name = "roi-pipeline-preview"
-vars = { ENVIRONMENT = "preview" }
+vars = { ENVIRONMENT = "preview", BUDGET_EXPECTED_DAILY_TRIAGED = "100", BUDGET_EXPECTED_DAILY_EMBEDDINGS = "100" }
 
 [[env.preview.d1_databases]]
 binding = "DB"
@@ -251,7 +256,7 @@ binding = "AI"
 
 [env.staging]
 name = "roi-pipeline-staging"
-vars = { ENVIRONMENT = "staging", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo-barnacle", ALERT_EMAIL_FROM = "onboarding@resend.dev" }
+vars = { ENVIRONMENT = "staging", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo-barnacle", ALERT_EMAIL_FROM = "onboarding@resend.dev", BUDGET_EXPECTED_DAILY_TRIAGED = "4634", BUDGET_EXPECTED_DAILY_EMBEDDINGS = "4634" }
 
 [env.staging.triggers]
 crons = ["0 6 * * *", "30 7 * * *", "0 8 * * 1", "0 11 * * *", "*/30 * * * *"]
@@ -395,7 +400,7 @@ binding = "AI"
 
 [env.production]
 name = "roi-pipeline-production"
-vars = { ENVIRONMENT = "production", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo-barnacle" }
+vars = { ENVIRONMENT = "production", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo-barnacle", BUDGET_EXPECTED_DAILY_TRIAGED = "4634", BUDGET_EXPECTED_DAILY_EMBEDDINGS = "4634" }
 
 [env.production.triggers]
 crons = ["0 6 * * *", "30 7 * * *", "0 8 * * 1", "0 11 * * *", "*/30 * * * *"]

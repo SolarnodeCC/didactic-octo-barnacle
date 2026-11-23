@@ -67,7 +67,7 @@ It adds no organization-scoped table. Those arrive with phase 4 (ADR 0019).
 
 ## Configuration keys
 
-New keys for [defaults](../architecture/defaults.md). They are added there in the pull request that first reads them. WP4 added the `text.*` keys. WP6 reads `triage.accept_score_cut`, `ingestion.daily_extraction_limit`, `extraction.full_text_wait_hours`, the `recovery.*` keys, and a provisional `budget.daily_eur` (see [defaults](../architecture/defaults.md)). WP7 reads `extraction.max_candidates_per_publication` (an existing key, `3`) and adds `extraction.generic_customer_terms`. WP1 added `processing.enabled`, `triage.admission_pool_days`, `extraction.full_text_max_chars`, `embedding.batch_size`, `retraction.lookback_days`, and `model.price_table_version`; ADR 0088 added `model.triage` and ADR 0091 `model.extraction`.
+New keys for [defaults](../architecture/defaults.md). They are added there in the pull request that first reads them. WP4 added the `text.*` keys. WP6 reads `triage.accept_score_cut`, `ingestion.daily_extraction_limit`, `extraction.full_text_wait_hours`, the `recovery.*` keys, and a provisional `budget.daily_eur` (see [defaults](../architecture/defaults.md)); WP9 replaces it with the computed limit and adds the `budget.expected_daily_*` and `budget.measured_cost_*` keys (ADR 0113). WP7 reads `extraction.max_candidates_per_publication` (an existing key, `3`) and adds `extraction.generic_customer_terms`. WP1 added `processing.enabled`, `triage.admission_pool_days`, `extraction.full_text_max_chars`, `embedding.batch_size`, `retraction.lookback_days`, and `model.price_table_version`; ADR 0088 added `model.triage` and ADR 0091 `model.extraction`.
 
 | Key | Default | Notes |
 |---|---|---|
@@ -79,7 +79,8 @@ New keys for [defaults](../architecture/defaults.md). They are added there in th
 | `text.min_chars` | `200` | Less text means no usable text layer, as in a scan (ADR 0009) |
 | `text.backfill_per_run` | `500` | Stored PDFs without text queued at each ingestion start, WP4 |
 | `embedding.batch_size` | `50` | Messages per embedding call |
-| `budget.expected_daily_triaged`, `budget.expected_daily_embeddings` | from the measured daily volume | Largest measured day until a steady state is known (ADR 0059) |
+| `budget.expected_daily_triaged`, `budget.expected_daily_embeddings` | `4634` (staging, production), `100` (local, preview) | Largest measured day until a steady state is known (ADR 0059); Worker variables per environment (ADR 0113) |
+| `budget.measured_cost_days`, `budget.measured_cost_min_items` | `7`, `20` | When a step's measured cost replaces its estimate (ADR 0113) |
 | `retraction.lookback_days` | `30` | How far back the weekly retraction check looks (ADR 0061) |
 | `model.price_table_version` | `2026-11-11` | Versioned price table in `infrastructure/cloudflare`, used when the gateway gives no cost (REQ-NFR-011 AC2); cached input tokens at the cached-input price (ADR 0078) |
 | `model.triage` | `@cf/google/gemma-4-26b-a4b-it`, thinking off, `triage@2`, `json-schema` | Chosen by benchmark round two ([ADR 0088](../decisions/0088-benchmark-round-two-selects-the-triage-model.md)); temperature and output budget come with the prompt version |

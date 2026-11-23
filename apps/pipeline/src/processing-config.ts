@@ -4,6 +4,8 @@ import {
   type ModelConfig,
 } from "@roi/models";
 
+import { type BudgetEstimate } from "./budget/daily-budget.js";
+
 /**
  * Runtime configuration of phase 2 processing (docs/kt/phase-2/schema.md, defaults in
  * docs/kt/architecture/defaults.md). The text consumer of WP4 reads the `text.*` keys; the
@@ -53,12 +55,24 @@ export type ProcessingConfig = {
    */
   FullTextWaitHours: number;
   /**
-   * `budget.daily_eur`: the day's model budget in euro (REQ-NFR-005). Provisional: the ADR 0059
-   * formula on the largest measured day (4,634 publications) and the benchmark costs
-   * (triage EUR 0.00008, ADR 0088; extraction EUR 0.00177, ADR 0091; embeddings at
-   * USD 0.0666 per million tokens), (0.371 + 0.177 + 0.124) x 1.5 = EUR 1.01. WP9 computes it.
+   * `budget.expected_daily_triaged`: triage calls a day in the budget formula, per environment
+   * (`BUDGET_EXPECTED_DAILY_TRIAGED`). The largest measured day until a steady state is known
+   * (ADR 0059).
    */
-  BudgetDailyEur: number;
+  ExpectedDailyTriaged: number;
+  /** `budget.expected_daily_embeddings`: embeddings a day, per environment (`BUDGET_EXPECTED_DAILY_EMBEDDINGS`). */
+  ExpectedDailyEmbeddings: number;
+  /** `budget.phase2_multiplier`: the margin on the daily budget (ADR 0059). */
+  BudgetMultiplier: number;
+  /**
+   * `budget.measured_cost_days` and `budget.measured_cost_min_items`: the measured cost per item
+   * replaces the estimate once this many items over this many complete days are behind it
+   * (ADR 0032).
+   */
+  BudgetMeasuredDays: number;
+  BudgetMeasuredMinItems: number;
+  /** The estimate behind the budget until a cost is measured (ADR 0032, ADR 0059). */
+  BudgetEstimate: BudgetEstimate;
   /** `recovery.max_redrives`: re-drives of an item's failed step before it is failed-final (ADR 0063). */
   MaxRedrives: number;
   /** `recovery.max_redrives_per_day`: items re-driven a UTC day (ADR 0063). */
@@ -103,7 +117,18 @@ export const DEFAULT_PROCESSING_CONFIG: ProcessingConfig = {
   AcceptScoreCut: 0.55,
   DailyExtractionLimit: 100,
   FullTextWaitHours: 24,
-  BudgetDailyEur: 1.0,
+  ExpectedDailyTriaged: 100,
+  ExpectedDailyEmbeddings: 100,
+  BudgetMultiplier: 1.5,
+  BudgetMeasuredDays: 7,
+  BudgetMeasuredMinItems: 20,
+  BudgetEstimate: {
+    TriageUsdPerItem: 0.0000876,
+    ExtractionUsdPerItem: 0.002344,
+    MeanAbstractTokens: 373,
+    CharsPerToken: 4,
+    EmbeddingInputTokens: 400,
+  },
   MaxRedrives: 3,
   MaxRedrivesPerDay: 20,
   DeadLetterReplayHours: 6,
@@ -126,15 +151,42 @@ export const DEFAULT_PROCESSING_CONFIG: ProcessingConfig = {
 /** The Worker variables the loader reads; every one is optional and falls back to the default. */
 export type ProcessingVars = {
   PROCESSING_ENABLED?: string;
+  BUDGET_EXPECTED_DAILY_TRIAGED?: string;
+  BUDGET_EXPECTED_DAILY_EMBEDDINGS?: string;
 };
 
 /**
- * The processing configuration for an environment. Only `processing.enabled` varies per
- * environment, through `PROCESSING_ENABLED` (`"true"` or `"false"`); the other keys change by
- * reviewed pull request. An unrecognized value throws, so a typo cannot turn processing on.
+ * The processing configuration for an environment. `processing.enabled` and the two expected
+ * daily volumes of the budget vary per environment (`wrangler.toml` vars); the other keys
+ * change by reviewed pull request. An unrecognized value throws, so a typo cannot turn
+ * processing on or change the budget.
  */
 export function loadProcessingConfig(vars: ProcessingVars): ProcessingConfig {
-  return { ...DEFAULT_PROCESSING_CONFIG, Enabled: parseFlag(vars.PROCESSING_ENABLED) };
+  return {
+    ...DEFAULT_PROCESSING_CONFIG,
+    Enabled: parseFlag(vars.PROCESSING_ENABLED),
+    ExpectedDailyTriaged: parseCount(
+      "BUDGET_EXPECTED_DAILY_TRIAGED",
+      vars.BUDGET_EXPECTED_DAILY_TRIAGED,
+      DEFAULT_PROCESSING_CONFIG.ExpectedDailyTriaged,
+    ),
+    ExpectedDailyEmbeddings: parseCount(
+      "BUDGET_EXPECTED_DAILY_EMBEDDINGS",
+      vars.BUDGET_EXPECTED_DAILY_EMBEDDINGS,
+      DEFAULT_PROCESSING_CONFIG.ExpectedDailyEmbeddings,
+    ),
+  };
+}
+
+function parseCount(name: string, value: string | undefined, fallback: number): number {
+  if (value === undefined || value.trim() === "") {
+    return fallback;
+  }
+  const trimmed = value.trim();
+  if (!/^\d+$/u.test(trimmed)) {
+    throw new Error(`${name} must be a whole number, got "${value}"`);
+  }
+  return Number(trimmed);
 }
 
 function parseFlag(value: string | undefined): boolean {

@@ -15,6 +15,22 @@ describe("REQ-NFR-005: processing configuration", () => {
     expect(() => loadProcessingConfig({ PROCESSING_ENABLED: "1" })).toThrow(/PROCESSING_ENABLED/);
   });
 
+  it("REQ-NFR-005: the expected daily volumes of the budget are set per environment", () => {
+    const config = loadProcessingConfig({
+      BUDGET_EXPECTED_DAILY_TRIAGED: "4634",
+      BUDGET_EXPECTED_DAILY_EMBEDDINGS: " 4634 ",
+    });
+    expect(config.ExpectedDailyTriaged).toBe(4634);
+    expect(config.ExpectedDailyEmbeddings).toBe(4634);
+    expect(loadProcessingConfig({}).ExpectedDailyTriaged).toBe(100);
+    expect(() => loadProcessingConfig({ BUDGET_EXPECTED_DAILY_TRIAGED: "4,634" })).toThrow(
+      /BUDGET_EXPECTED_DAILY_TRIAGED/,
+    );
+    expect(() => loadProcessingConfig({ BUDGET_EXPECTED_DAILY_EMBEDDINGS: "-1" })).toThrow(
+      /BUDGET_EXPECTED_DAILY_EMBEDDINGS/,
+    );
+  });
+
   it("REQ-NFR-005: the other keys hold the values of docs/kt/architecture/defaults.md", () => {
     expect(loadProcessingConfig({ PROCESSING_ENABLED: "true" })).toEqual({
       ...DEFAULT_PROCESSING_CONFIG,
@@ -46,7 +62,18 @@ describe("REQ-NFR-005: processing configuration", () => {
       AcceptScoreCut: 0.55,
       DailyExtractionLimit: 100,
       FullTextWaitHours: 24,
-      BudgetDailyEur: 1.0,
+      ExpectedDailyTriaged: 100,
+      ExpectedDailyEmbeddings: 100,
+      BudgetMultiplier: 1.5,
+      BudgetMeasuredDays: 7,
+      BudgetMeasuredMinItems: 20,
+      BudgetEstimate: {
+        TriageUsdPerItem: 0.0000876,
+        ExtractionUsdPerItem: 0.002344,
+        MeanAbstractTokens: 373,
+        CharsPerToken: 4,
+        EmbeddingInputTokens: 400,
+      },
       MaxRedrives: 3,
       MaxRedrivesPerDay: 20,
       DeadLetterReplayHours: 6,

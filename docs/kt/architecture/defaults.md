@@ -115,7 +115,10 @@ Read by `loadProcessingConfig` in `apps/pipeline/src/processing-config.ts`. Only
 |---|---|---|
 | `budget.phase2_multiplier` | `1.5` | Margin on the phase 2 budget: (expected daily triage calls × triage cost + daily limit × extraction cost + expected daily embeddings × embedding cost) × multiplier (ADR 0059) |
 | `budget.cost_per_opportunity_ceiling_eur` | `2.0` | Until ADR 0023 lock |
-| `budget.daily_eur` | `1.0` | Provisional phase 2 value (`BudgetDailyEur`): the ADR 0059 formula on the largest measured day of 4,634 publications with the benchmark costs (triage EUR 0.00008, ADR 0088; extraction EUR 0.00177, ADR 0091; embeddings at USD 0.0666 per million tokens), (0.371 + 0.177 + 0.124) × 1.5 = EUR 1.01. WP9 computes it per environment; the ADR 0023 formula replaces it before phase 4 scoring |
+| `budget.daily_eur` | computed | Not configured: the ADR 0059 formula, computed per environment on the first use of each day and stored in `budget_day.limit_amount` (ADR 0113). About EUR 1.25 in staging and production and EUR 0.56 in local and preview with the benchmark costs. The ADR 0023 formula replaces it before phase 4 scoring |
+| `budget.expected_daily_triaged`, `budget.expected_daily_embeddings` | `4634` in staging and production, `100` in local and preview | Worker variables `BUDGET_EXPECTED_DAILY_TRIAGED` and `BUDGET_EXPECTED_DAILY_EMBEDDINGS` in `wrangler.toml`; the largest measured day until a steady state is known (ADR 0059) |
+| `budget.measured_cost_days` | `7` | Complete days of `model_call` rows behind a step's measured cost per item (ADR 0113) |
+| `budget.measured_cost_min_items` | `20` | Items a step needs in that window before its measured cost replaces the estimate (ADR 0032, ADR 0113) |
 
 ## Schedules (cron)
 
