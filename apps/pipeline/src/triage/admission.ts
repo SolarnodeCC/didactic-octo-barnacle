@@ -1,6 +1,7 @@
 import { admitWithinDailyLimit } from "@roi/models";
 
 import { type PipelineDeps } from "../queue/deps.js";
+import { addRunCountStatements } from "../recovery/redrive-repo.js";
 import { normalizePdfLicense } from "../normalize/license.js";
 import { dailyRunId } from "../store/processing-run-repo.js";
 import { type SqlDatabase, type SqlStatement } from "../store/sql.js";
@@ -23,6 +24,8 @@ export type AdmissionCounts = {
   ExpiredFromPool: number;
   /** Dated after the run day, so left out of today's ranking (ADR 0068). */
   FutureDated: number;
+  /** Extractions re-driven this day, taken from the day's limit (REQ-PROC-010 AC3). */
+  RedrivenExtractionsCounted: number;
 };
 
 export type AdmissionOutcome =
@@ -85,14 +88,23 @@ export async function admitDay(deps: PipelineDeps, day: string): Promise<Admissi
     AdmittedOnAbstractAfterWait: 0,
     ExpiredFromPool: 0,
     FutureDated: 0,
+    RedrivenExtractionsCounted: 0,
   };
 
-  // Admissions already made this day count against its limit.
+  // Admissions already made this day count against its limit, and so do the extractions
+  // re-driven this day (REQ-PROC-010 AC3, ADR 0063).
   const already = await db
     .prepare("SELECT COUNT(*) AS n FROM triage_decision WHERE admitted_on = ?")
     .bind(day)
     .first<{ n: number }>();
-  let room = Math.max(0, DailyLimit - (already?.n ?? 0));
+  const redriven = await db
+    .prepare(
+      "SELECT COUNT(*) AS n FROM redrive WHERE step = 'extraction' AND substr(last_attempt_at, 1, 10) = ?",
+    )
+    .bind(day)
+    .first<{ n: number }>();
+  counts.RedrivenExtractionsCounted = redriven?.n ?? 0;
+  let room = Math.max(0, DailyLimit - (already?.n ?? 0) - counts.RedrivenExtractionsCounted);
 
   const { results: pool } = await db
     .prepare(
@@ -184,7 +196,7 @@ export async function admitDay(deps: PipelineDeps, day: string): Promise<Admissi
   ];
   const runId = await dailyRunId(db, day, now, deps.NewId);
   statements.push(
-    await addRunCounts(db, runId, counts),
+    ...addRunCountStatements(db, runId, counts),
     db
       .prepare(
         "INSERT INTO admission_day (day, daily_limit, admitted, deferred, ran_at) VALUES (?, ?, ?, ?, ?)",
@@ -282,28 +294,6 @@ function chunked(
     statements.push(make(slice, slice.map(() => "?").join(", ")));
   }
   return statements;
-}
-
-/** Adds the admission counts to the day's processing run report (REQ-PROC-011 AC5). */
-async function addRunCounts(
-  db: SqlDatabase,
-  runId: string,
-  counts: AdmissionCounts,
-): Promise<SqlStatement> {
-  const row = await db
-    .prepare("SELECT counts_json FROM processing_run WHERE id = ?")
-    .bind(runId)
-    .first<{ counts_json: string }>();
-  const merged: Record<string, number> = JSON.parse(row?.counts_json ?? "{}") as Record<
-    string,
-    number
-  >;
-  for (const [key, value] of Object.entries(counts)) {
-    merged[key] = (merged[key] ?? 0) + value;
-  }
-  return db
-    .prepare("UPDATE processing_run SET counts_json = ? WHERE id = ?")
-    .bind(JSON.stringify(merged), runId);
 }
 
 /** The ISO date `days` days after `day` (negative for before). */

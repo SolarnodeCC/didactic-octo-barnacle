@@ -93,7 +93,7 @@ In phase 2 the model queue's concurrency (8, equal to `model.semaphore_max`) is 
   - It extracts only a publication whose triage decision is `accepted`, and completes with `already extracted` when a result exists.
   - A stored text that cannot be read throws, so the queue retries the message.
   - Each kept quote is stored as the matched source span (ADR 0064). Candidate rows are inserted only when this message's result row is the one stored, so a parallel duplicate adds none (REQ-PROC-010 AC7).
-  - A budget-refused, paused, or failed step records the failure in `redrive` with step `extraction`, as triage does. The re-drive of extraction failures comes with the rest of WP7 (REQ-PROC-010 AC3).
+  - A budget-refused, paused, or failed step records the failure in `redrive` with step `extraction`, as triage does. The daily re-drive picks it up (see [Recovery](#recovery)).
   - The day's run counts `Extracted`, `ExtractedOnFullText`, `ExtractedOnAbstract`, `ExtractedWithoutCandidate`, `CandidatesStored`, `CandidatesDropped`, `DroppedQuote`, `DroppedGenericCustomer`, and the report-only `CustomerQuoteNoOverlap` (ADR 0066). They are added inside the database, so parallel consumers never overwrite each other's counts.
 
 ## Full text
@@ -141,6 +141,12 @@ Memory grows with about twice the file size and with the amount of text. `text.m
   - The triage consumer records each failure in `redrive` in the batch that completes its message: `provider-error`, `budget-exhausted`, and a paused step as transient, `invalid-output` as content, with the model and prompt version of the failed attempt.
   - The admission cron re-drives a publication that still has no decision by reopening its `triage:` message and sending it again. Nothing is re-driven while the step is paused or the day's budget is used up, so waiting uses up no re-drive.
   - Dead letters of every message type are replayed by the recovery cron (`*/30 * * * *`), not re-driven. It also runs the breaker probe: one triage call on a fixed probe text, with no stored publication.
+- **Extended to extraction (WP7):**
+  - `redriveTriage` and `redriveExtraction` share one algorithm, `redriveStep`. Extraction re-drives a publication that still has no `extraction_result` by reopening its `extract:` message. Its run-report counts carry the prefix `Extraction`, for example `ExtractionRedriven` and `ExtractionFailedFinal`.
+  - The admission cron runs the triage re-drive, then the extraction re-drive, then the admission, then `queueAdmittedExtractions`.
+  - The admission takes the extractions re-driven that day from the day's limit and counts them as `RedrivenExtractionsCounted` (REQ-PROC-010 AC3). The `recovery.max_redrives_per_day` cap is shared by both steps.
+  - The recovery cron probes each paused step with `probeStep`. The extraction probe runs `runExtractionStep` on the same fixed probe text and stores nothing.
+  - Run counts are added inside the database with `json_set` (`addRunCounts`, `addRunCountStatements`), so the crons and the parallel consumers never overwrite each other's counts.
 
 ## Retractions
 
