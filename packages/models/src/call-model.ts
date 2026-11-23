@@ -284,9 +284,21 @@ export async function callModel<S extends z.ZodObject>(
   };
 }
 
-async function writeRecord<S extends z.ZodObject>(
+/** What a usage record needs to know about the step that made the call. */
+export type CallIdentity = {
+  RunKind: ModelCallRunKind;
+  RunId: string;
+  StepName: string;
+  Agent: string | null;
+  PublicationId: string | null;
+  CandidateId: string | null;
+  Config: Pick<ModelConfig, "Model" | "PromptVersion">;
+};
+
+/** Writes one `model_call` record for an attempt; shared by `callModel` and `callEmbedding`. */
+export async function writeRecord(
   deps: CallModelDeps,
-  request: CallModelRequest<S>,
+  request: CallIdentity,
   attempt: number,
   usage: TokenUsage,
   latencyMs: number,
