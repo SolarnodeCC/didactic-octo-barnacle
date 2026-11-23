@@ -2,7 +2,13 @@ import { type ModelConfig, type ModelUsageStore, type QueueMessageEnvelope } fro
 
 import { isPaused } from "./breaker.js";
 import { addRunCounts, addRunFailures } from "./redrive-repo.js";
-import { extractEnvelope, triageEnvelope, type PipelineDeps } from "../queue/deps.js";
+import {
+  embedEnvelope,
+  extractEnvelope,
+  triageEnvelope,
+  type PipelineDeps,
+} from "../queue/deps.js";
+import { registryIndexes } from "../store/embedding-index-repo.js";
 import { type QueueSender } from "../queue/types.js";
 import { dailyRunId } from "../store/processing-run-repo.js";
 
@@ -34,17 +40,17 @@ type RedriveRow = {
 
 /** What differs between the steps that are re-driven; the algorithm is the same. */
 type RedriveSpec = {
-  Step: "triage" | "extraction";
+  Step: "triage" | "extraction" | "embedding";
   /** A row here for the publication ends its re-drives, so none can create a second (AC7). */
-  ResultTable: "triage_decision" | "extraction_result";
+  ResultTable: "triage_decision" | "extraction_result" | "embedding";
   /** The step's message: its ID is fixed, so its log row is reopened before it is sent again. */
   Envelope: (publicationId: string) => QueueMessageEnvelope;
   /** The step's current model and prompt version, compared for content failures (AC2). */
-  Model: ModelConfig;
+  Model: Pick<ModelConfig, "Model" | "PromptVersion">;
   Queue: QueueSender;
   Usage: ModelUsageStore;
   /** Prefix of the run-report counts, so the steps do not add into the same keys. */
-  CountPrefix: "" | "Extraction";
+  CountPrefix: "" | "Extraction" | "Embedding";
 };
 
 /**
@@ -99,6 +105,31 @@ export async function redriveExtraction(deps: PipelineDeps, day: string): Promis
     Queue: extraction.Queue,
     Usage: extraction.Call.Usage,
     CountPrefix: "Extraction",
+  });
+}
+
+/**
+ * The daily re-drive of failed embeddings, by the same rules (REQ-PROC-010, ADR 0063). A
+ * publication with an `embedding` row is not re-driven; it is sent again to the current index of
+ * the registry. Its counts are prefixed `Embedding`.
+ */
+export async function redriveEmbedding(deps: PipelineDeps, day: string): Promise<RedriveOutcome> {
+  const embedding = deps.Embedding;
+  if (!embedding?.Queue) {
+    return { Outcome: "not-configured" };
+  }
+  const current = (await registryIndexes(deps.Db, embedding.Environment)).find((i) => i.Current);
+  if (!current) {
+    return { Outcome: "not-configured" };
+  }
+  return redriveStep(deps, day, {
+    Step: "embedding",
+    ResultTable: "embedding",
+    Envelope: (publicationId) => embedEnvelope(publicationId, current.Id),
+    Model: { Model: current.ModelName, PromptVersion: null },
+    Queue: embedding.Queue,
+    Usage: embedding.Call.Usage,
+    CountPrefix: "Embedding",
   });
 }
 

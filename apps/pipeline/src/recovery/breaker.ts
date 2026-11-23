@@ -1,5 +1,8 @@
+import { callEmbedding } from "@roi/models";
+
 import { notify } from "../alerts/notify.js";
 import { type PipelineDeps } from "../queue/deps.js";
+import { registryIndexes } from "../store/embedding-index-repo.js";
 import { dailyRunId } from "../store/processing-run-repo.js";
 import { type SqlDatabase } from "../store/sql.js";
 import { runExtractionStep } from "../extraction/step.js";
@@ -75,7 +78,7 @@ export async function checkBreaker(deps: PipelineDeps, step: string): Promise<bo
 export type ProbeOutcome = "not-paused" | "not-due" | "resumed" | "still-failing";
 
 /** The model steps with a breaker: each has a probe call with a fixed input. */
-export type ProbedStep = "triage" | "extraction";
+export type ProbedStep = "triage" | "extraction" | "embedding";
 
 /**
  * One probe call of the step with its fixed input, through the step's own prompt and checks.
@@ -95,6 +98,26 @@ async function probeCall(
       RunId: runId,
       PublicationId: null,
       ...PROBE_INPUT,
+    });
+    return result.Ok ? { Ok: true } : { Ok: false, Reason: result.Reason };
+  }
+  if (step === "embedding") {
+    const embedding = deps.Embedding;
+    if (!embedding) {
+      return null;
+    }
+    const current = (await registryIndexes(deps.Db, embedding.Environment)).find(
+      (index) => index.Current,
+    );
+    if (!current) {
+      return null;
+    }
+    const result = await callEmbedding(embedding.Call, {
+      RunKind: "processing",
+      RunId: runId,
+      StepName: "embedding",
+      Model: current.ModelName,
+      Texts: [`${PROBE_INPUT.Title}\n\n${PROBE_INPUT.Abstract}`],
     });
     return result.Ok ? { Ok: true } : { Ok: false, Reason: result.Reason };
   }
@@ -124,7 +147,8 @@ export async function probeStep(deps: PipelineDeps, step: ProbedStep): Promise<P
   )
     .bind(step)
     .first<{ last_probe_at: string | null; paused_at: string }>();
-  const configured = step === "triage" ? deps.Triage : deps.Extraction;
+  const configured =
+    step === "triage" ? deps.Triage : step === "extraction" ? deps.Extraction : deps.Embedding;
   if (!row || !configured) {
     return "not-paused";
   }

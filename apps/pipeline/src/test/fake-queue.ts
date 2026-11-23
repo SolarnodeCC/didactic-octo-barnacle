@@ -22,6 +22,12 @@ export type DrainOptions = {
  * A queue in memory with at-least-once delivery, retries, and a dead-letter queue.
  * It stands in for Cloudflare Queues in integration tests (REQ-TEST-003).
  */
+const EMBED_BATCH = 50;
+
+function isEmbed(body: unknown): boolean {
+  return (body as { Type?: unknown } | null)?.Type === "publication.embed";
+}
+
 export class FakeQueue implements QueueSender {
   static readonly QUEUE = "roi-publications-test";
   static readonly DLQ = "roi-publications-dlq-test";
@@ -42,6 +48,9 @@ export class FakeQueue implements QueueSender {
   /** Each `sendBatch` call, by the number of messages it held. */
   readonly batchSizes: number[] = [];
 
+  /** Each delivered batch of embedding messages, by its size. */
+  readonly deliveredBatches: number[] = [];
+
   async sendBatch(messages: Iterable<{ body: unknown; delaySeconds?: number }>): Promise<void> {
     const list = [...messages];
     if (list.length > SEND_BATCH_LIMIT) {
@@ -61,6 +70,28 @@ export class FakeQueue implements QueueSender {
   async drain(options: DrainOptions): Promise<number> {
     let deliveries = 0;
     while (this.pending.length > 0) {
+      // Embedding messages arrive as a batch of up to 50, as `roi-embeddings-<env>` delivers
+      // them (ADR 0053).
+      if (isEmbed(this.pending[0]?.body)) {
+        const group = this.pending.filter((item) => isEmbed(item.body)).slice(0, EMBED_BATCH);
+        this.pending = this.pending.filter((item) => !group.includes(item));
+        deliveries += 1;
+        this.deliveredBatches.push(group.length);
+        const acked = await this.deliverBatch(options.Consume, group);
+        for (const item of group) {
+          if (acked.has(item.id)) {
+            continue;
+          }
+          item.attempts += 1;
+          if (item.attempts > options.MaxRetries) {
+            this.deadLettered.push(item.body);
+            await this.deliver(options.Consume, FakeQueue.DLQ, { ...item, attempts: 0 });
+          } else {
+            this.pending.push(item);
+          }
+        }
+        continue;
+      }
       const item = this.pending.shift() as Pending;
       const times = options.Duplicate ? 2 : 1;
       let acked = false;
@@ -82,6 +113,35 @@ export class FakeQueue implements QueueSender {
       }
     }
     return deliveries;
+  }
+
+  private async deliverBatch(
+    consume: DrainOptions["Consume"],
+    items: Pending[],
+  ): Promise<Set<string>> {
+    const acked = new Set<string>();
+    const messages: QueueMessageLike[] = items.map((item) => ({
+      id: item.id,
+      body: item.body,
+      attempts: item.attempts + 1,
+      ack: () => {
+        acked.add(item.id);
+      },
+      retry: (options) => {
+        acked.delete(item.id);
+        this.retries.push({
+          id: item.id,
+          attempts: item.attempts + 1,
+          delaySeconds: options?.delaySeconds ?? 0,
+        });
+      },
+    }));
+    try {
+      await consume({ queue: FakeQueue.QUEUE, messages });
+    } catch {
+      acked.clear();
+    }
+    return acked;
   }
 
   private async deliver(

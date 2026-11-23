@@ -102,7 +102,12 @@ describe("REQ-DATA-008: the daily retraction sweep", () => {
 
     h.Clock.Now = `${DAY_2}T11:00:00.000Z`;
     const counts = await sweepRetractions(h.Deps, DAY_2);
-    expect(counts).toEqual({ RetractionsHandled: 2, CandidatesHidden: 1, DecisionsWithdrawn: 1 });
+    expect(counts).toEqual({
+      RetractionsHandled: 2,
+      CandidatesHidden: 1,
+      DecisionsWithdrawn: 1,
+      VectorsDeleted: 0,
+    });
 
     const candidate = h.Database.Raw.prepare(
       "SELECT hidden_reason FROM candidate WHERE publication_id = ?",
@@ -142,6 +147,7 @@ describe("REQ-DATA-008: the daily retraction sweep", () => {
       RetractionsHandled: 0,
       CandidatesHidden: 0,
       DecisionsWithdrawn: 0,
+      VectorsDeleted: 0,
     });
     expect(h.Database.Raw.prepare("SELECT retraction_handled_at FROM publication").get()).toEqual(
       before,
