@@ -97,6 +97,33 @@ describe("REQ-PROC-005: model steps have their own queue and Workers AI in every
   });
 });
 
+describe("REQ-PROC-001: embeddings have their own queue and the publication vectors in every environment", () => {
+  const environments = ["local", "preview", "staging", "production"];
+
+  it.each(environments)(
+    "REQ-PROC-001: %s binds EMBEDDING_QUEUE with batches of 50, at most 2 at once, and its own dead-letter queue",
+    (environment) => {
+      expect(wrangler).toContain(
+        `binding = "EMBEDDING_QUEUE"\nqueue = "roi-embeddings-${environment}"`,
+      );
+      expect(wrangler).toContain(
+        `queue = "roi-embeddings-${environment}"\nmax_batch_size = 50\nmax_concurrency = 2\nmax_retries = 3\ndead_letter_queue = "roi-embeddings-dlq-${environment}"`,
+      );
+      expect(wrangler).toContain(`queue = "roi-embeddings-dlq-${environment}"\nmax_batch_size = 1`);
+    },
+  );
+
+  it.each(environments)(
+    "REQ-PROC-002: %s binds the Vectorize index as PUBLICATION_VECTORS",
+    (environment) => {
+      const table = environment === "local" ? "[[vectorize]]" : `[[env.${environment}.vectorize]]`;
+      expect(wrangler).toContain(
+        `${table}\nbinding = "PUBLICATION_VECTORS"\nindex_name = "roi-publications-${environment}"`,
+      );
+    },
+  );
+});
+
 describe("REQ-PROC-005: the daily admission runs in the deployed environments", () => {
   it.each(["staging", "production"])(
     "REQ-PROC-005: %s triggers the admission at 11:00 UTC, after both ingestion crons, the recovery check every 30 minutes (REQ-DATA-012), and the retraction check on Monday 08:00 (REQ-DATA-008)",

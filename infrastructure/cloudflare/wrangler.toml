@@ -102,6 +102,30 @@ queue = "roi-models-dlq-local"
 max_batch_size = 1
 max_retries = 1
 
+# Embeddings: 50 messages per invocation, one model call per batch, at most 2 at once
+# (ADR 0053). Sent only where processing is enabled.
+[[queues.producers]]
+binding = "EMBEDDING_QUEUE"
+queue = "roi-embeddings-local"
+
+[[queues.consumers]]
+queue = "roi-embeddings-local"
+max_batch_size = 50
+max_concurrency = 2
+max_retries = 3
+dead_letter_queue = "roi-embeddings-dlq-local"
+
+[[queues.consumers]]
+queue = "roi-embeddings-dlq-local"
+max_batch_size = 1
+max_retries = 1
+
+# Publication vectors: 768 dimensions, cosine, metadata indexes `source` and `published_day`,
+# created by bootstrap before the first write (ADR 0027, ADR 0056, REQ-PROC-002).
+[[vectorize]]
+binding = "PUBLICATION_VECTORS"
+index_name = "roi-publications-local"
+
 # Workers AI, called only through the environment's AI Gateway `roi-local` (REQ-NFR-003).
 [ai]
 binding = "AI"
@@ -196,6 +220,30 @@ dead_letter_queue = "roi-models-dlq-preview"
 queue = "roi-models-dlq-preview"
 max_batch_size = 1
 max_retries = 1
+
+# Embeddings: 50 messages per invocation, one model call per batch, at most 2 at once
+# (ADR 0053). Sent only where processing is enabled.
+[[env.preview.queues.producers]]
+binding = "EMBEDDING_QUEUE"
+queue = "roi-embeddings-preview"
+
+[[env.preview.queues.consumers]]
+queue = "roi-embeddings-preview"
+max_batch_size = 50
+max_concurrency = 2
+max_retries = 3
+dead_letter_queue = "roi-embeddings-dlq-preview"
+
+[[env.preview.queues.consumers]]
+queue = "roi-embeddings-dlq-preview"
+max_batch_size = 1
+max_retries = 1
+
+# Publication vectors: 768 dimensions, cosine, metadata indexes `source` and `published_day`,
+# created by bootstrap before the first write (ADR 0027, ADR 0056, REQ-PROC-002).
+[[env.preview.vectorize]]
+binding = "PUBLICATION_VECTORS"
+index_name = "roi-publications-preview"
 
 # Workers AI, called only through the environment's AI Gateway `roi-preview` (REQ-NFR-003).
 [env.preview.ai]
@@ -317,6 +365,30 @@ queue = "roi-models-dlq-staging"
 max_batch_size = 1
 max_retries = 1
 
+# Embeddings: 50 messages per invocation, one model call per batch, at most 2 at once
+# (ADR 0053). Sent only where processing is enabled.
+[[env.staging.queues.producers]]
+binding = "EMBEDDING_QUEUE"
+queue = "roi-embeddings-staging"
+
+[[env.staging.queues.consumers]]
+queue = "roi-embeddings-staging"
+max_batch_size = 50
+max_concurrency = 2
+max_retries = 3
+dead_letter_queue = "roi-embeddings-dlq-staging"
+
+[[env.staging.queues.consumers]]
+queue = "roi-embeddings-dlq-staging"
+max_batch_size = 1
+max_retries = 1
+
+# Publication vectors: 768 dimensions, cosine, metadata indexes `source` and `published_day`,
+# created by bootstrap before the first write (ADR 0027, ADR 0056, REQ-PROC-002).
+[[env.staging.vectorize]]
+binding = "PUBLICATION_VECTORS"
+index_name = "roi-publications-staging"
+
 # Workers AI, called only through the environment's AI Gateway `roi-staging` (REQ-NFR-003).
 [env.staging.ai]
 binding = "AI"
@@ -436,6 +508,30 @@ dead_letter_queue = "roi-models-dlq-production"
 queue = "roi-models-dlq-production"
 max_batch_size = 1
 max_retries = 1
+
+# Embeddings: 50 messages per invocation, one model call per batch, at most 2 at once
+# (ADR 0053). Sent only where processing is enabled.
+[[env.production.queues.producers]]
+binding = "EMBEDDING_QUEUE"
+queue = "roi-embeddings-production"
+
+[[env.production.queues.consumers]]
+queue = "roi-embeddings-production"
+max_batch_size = 50
+max_concurrency = 2
+max_retries = 3
+dead_letter_queue = "roi-embeddings-dlq-production"
+
+[[env.production.queues.consumers]]
+queue = "roi-embeddings-dlq-production"
+max_batch_size = 1
+max_retries = 1
+
+# Publication vectors: 768 dimensions, cosine, metadata indexes `source` and `published_day`,
+# created by bootstrap before the first write (ADR 0027, ADR 0056, REQ-PROC-002).
+[[env.production.vectorize]]
+binding = "PUBLICATION_VECTORS"
+index_name = "roi-publications-production"
 
 # Workers AI, called only through the environment's AI Gateway `roi-production` (REQ-NFR-003).
 [env.production.ai]

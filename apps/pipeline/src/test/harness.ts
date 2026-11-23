@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 
 import { stripArxivVersion, type WorkersAiBinding } from "@roi/models";
+import { FakeVectorize, type VectorIndex } from "@roi/vector-store";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -152,6 +153,14 @@ export function createHarness(
       FullTextMaxChars?: number;
       MaxCandidates?: number;
     };
+    /** Embeddings (REQ-PROC-001, REQ-PROC-002); one `PUBLICATION_VECTORS` index by default. */
+    Embedding?: {
+      Ai: WorkersAiBinding;
+      /** `false` consumes embedding messages but sends none, as with processing off. */
+      Send?: boolean;
+      BudgetEur?: number;
+      Indexes?: Record<string, VectorIndex>;
+    };
     /** Recovery settings (REQ-PROC-010, REQ-DATA-012); the configured defaults when left out. */
     Recovery?: Partial<NonNullable<PipelineDeps["Recovery"]>>;
   } = {},
@@ -273,6 +282,28 @@ export function createHarness(
         }
       : {}),
     Retraction: { LookbackDays: DEFAULT_PROCESSING_CONFIG.RetractionLookbackDays },
+    ...(overrides.Embedding
+      ? {
+          Embedding: {
+            ...(overrides.Embedding.Send === false ? {} : { Queue: queue }),
+            Call: {
+              Ai: overrides.Embedding.Ai,
+              GatewayId: "roi-test",
+              Usage: createModelUsageStore(database.Db, {
+                Amount: overrides.Embedding.BudgetEur ?? DEFAULT_PROCESSING_CONFIG.BudgetDailyEur,
+                Currency: "EUR",
+              }),
+              Prices: PRICE_TABLE,
+              MaxAttempts: DEFAULT_PROCESSING_CONFIG.ModelMaxAttempts,
+              NewId: counter("mcm"),
+              Now: () => new Date(clock.Now),
+              Sleep: () => Promise.resolve(),
+            },
+            Environment: "test",
+            Indexes: overrides.Embedding.Indexes ?? { PUBLICATION_VECTORS: new FakeVectorize() },
+          },
+        }
+      : {}),
     Recovery: {
       MaxRedrives: DEFAULT_PROCESSING_CONFIG.MaxRedrives,
       MaxRedrivesPerDay: DEFAULT_PROCESSING_CONFIG.MaxRedrivesPerDay,

@@ -13,6 +13,7 @@ export const QueueMessageTypeSchema = z.enum([
   "publication.triage",
   "publication.extract",
   "retraction.check_page",
+  "publication.embed",
 ]);
 
 export type QueueMessageType = z.infer<typeof QueueMessageTypeSchema>;
@@ -36,6 +37,8 @@ export const QueueMessageIdsSchema = z
     PublicationId: z.string().min(1).optional(),
     DocumentId: z.string().min(1).optional(),
     CandidateId: z.string().min(1).optional(),
+    /** The `embedding_index` row a `publication.embed` message writes to (ADR 0056). */
+    IndexId: z.string().min(1).optional(),
   })
   .strict();
 

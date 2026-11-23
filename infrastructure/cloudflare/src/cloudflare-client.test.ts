@@ -21,6 +21,7 @@ function fakeAccount(seed: { d1?: string[]; queues?: string[]; other?: string[] 
     r2: [...(seed.other ?? [])],
     queues: [...(seed.queues ?? [])],
     vectorize: [] as string[],
+    metadataIndexes: [] as Array<{ index: string; propertyName: string; indexType: string }>,
     gateways: [] as string[],
   };
   const calls: Call[] = [];
@@ -47,6 +48,15 @@ function fakeAccount(seed: { d1?: string[]; queues?: string[]; other?: string[] 
         return Promise.resolve(ok(slice(store.queues).map((queue_name) => ({ queue_name }))));
       if (path === "/vectorize/v2/indexes")
         return Promise.resolve(ok(slice(store.vectorize).map((name) => ({ name }))));
+      const listed = /^\/vectorize\/v2\/indexes\/([^/]+)\/metadata_index\/list$/u.exec(path);
+      if (listed)
+        return Promise.resolve(
+          ok({
+            metadataIndexes: store.metadataIndexes
+              .filter((item) => item.index === listed[1])
+              .map(({ propertyName, indexType }) => ({ propertyName, indexType })),
+          }),
+        );
       if (path === "/ai-gateway/gateways")
         return Promise.resolve(ok(slice(store.gateways).map((id) => ({ id }))));
     } else {
@@ -56,6 +66,12 @@ function fakeAccount(seed: { d1?: string[]; queues?: string[]; other?: string[] 
       else if (path === "/queues") store.queues.push(name);
       else if (path === "/vectorize/v2/indexes") store.vectorize.push(name);
       else if (path === "/ai-gateway/gateways") store.gateways.push(name);
+      else if (/^\/vectorize\/v2\/indexes\/[^/]+\/metadata_index\/create$/u.test(path))
+        store.metadataIndexes.push({
+          index: path.split("/")[4] ?? "",
+          propertyName: body.propertyName,
+          indexType: body.indexType,
+        });
       else
         return Promise.resolve(
           Response.json({ success: false, errors: [{ message: "no route" }] }, { status: 404 }),
@@ -145,6 +161,8 @@ describe("REQ-NFR-020: Cloudflare bootstrap client", () => {
     expect(account.store.queues.sort()).toEqual([
       "roi-documents-dlq-staging",
       "roi-documents-staging",
+      "roi-embeddings-dlq-staging",
+      "roi-embeddings-staging",
       "roi-models-dlq-staging",
       "roi-models-staging",
       "roi-publications-dlq-staging",
@@ -160,6 +178,11 @@ describe("REQ-NFR-020: Cloudflare bootstrap client", () => {
       config: { dimensions: VECTORIZE_DIMENSIONS, metric: VECTORIZE_METRIC },
     });
     expect([VECTORIZE_DIMENSIONS, VECTORIZE_METRIC]).toEqual([768, "cosine"]);
+    // REQ-PROC-002 AC1: both metadata indexes exist before the first vector is written.
+    expect(account.store.metadataIndexes).toEqual([
+      { index: "roi-publications-staging", propertyName: "source", indexType: "string" },
+      { index: "roi-publications-staging", propertyName: "published_day", indexType: "number" },
+    ]);
   });
 
   it("REQ-NFR-020: ignores resources of other projects and of other environments", async () => {

@@ -1,3 +1,5 @@
+import { deletePublicationVectors } from "@roi/vector-store";
+
 import { type PipelineDeps } from "../queue/deps.js";
 import { addRunCountStatements } from "../recovery/redrive-repo.js";
 import { dailyRunId } from "../store/processing-run-repo.js";
@@ -13,6 +15,8 @@ export type SweepCounts = {
   CandidatesHidden: number;
   /** Their triage decisions still waiting for admission, now decided as `retracted`. */
   DecisionsWithdrawn: number;
+  /** Publications whose vectors were deleted from every index (REQ-DATA-008 AC3). */
+  VectorsDeleted: number;
 };
 
 /**
@@ -24,13 +28,21 @@ export type SweepCounts = {
  * - has a triage decision still awaiting admission decided as `retracted`, so it is never admitted;
  * - is stamped `retraction_handled_at`, so a repeated sweep changes nothing.
  *
- * Its opportunities are hidden the same way once the `opportunity` table exists (WP10), and its
- * vectors are deleted by WP5, which also never embeds a retracted publication.
+ * - has its vectors deleted from every index of the registry, first (REQ-DATA-008 AC3).
+ *
+ * Its opportunities are hidden the same way once the `opportunity` table exists (WP10). The
+ * embedding consumer never embeds a retracted publication.
  */
 export async function sweepRetractions(deps: PipelineDeps, day: string): Promise<SweepCounts> {
   const db = deps.Db;
   const now = deps.Now();
-  const counts: SweepCounts = { RetractionsHandled: 0, CandidatesHidden: 0, DecisionsWithdrawn: 0 };
+  const counts: SweepCounts = {
+    RetractionsHandled: 0,
+    CandidatesHidden: 0,
+    DecisionsWithdrawn: 0,
+    VectorsDeleted: 0,
+  };
+  const vectorIndexes = Object.values(deps.Embedding?.Indexes ?? {});
   const { results } = await db
     .prepare(
       "SELECT id FROM publication WHERE retracted = 1 AND retraction_handled_at IS NULL ORDER BY id",
@@ -54,6 +66,12 @@ export async function sweepRetractions(deps: PipelineDeps, day: string): Promise
       )
       .bind(...slice)
       .first<{ n: number }>();
+    // Vectors first, from every index: a failed delete leaves the publication unstamped, so the
+    // next sweep tries again (REQ-DATA-008 AC3, REQ-PROC-002 AC2, ADR 0056).
+    if (vectorIndexes.length > 0) {
+      await deletePublicationVectors(vectorIndexes, slice);
+      counts.VectorsDeleted += slice.length;
+    }
     const statements: SqlStatement[] = [
       db
         .prepare(

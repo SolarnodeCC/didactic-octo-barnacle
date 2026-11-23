@@ -6,7 +6,22 @@
 
 export type EnvironmentName = "local" | "preview" | "staging" | "production";
 
-export type ResourceKind = "d1" | "r2" | "queue" | "queue-dlq" | "vectorize" | "ai-gateway";
+export type ResourceKind =
+  "d1" | "r2" | "queue" | "queue-dlq" | "vectorize" | "vectorize-metadata-index" | "ai-gateway";
+
+/**
+ * The metadata indexes of the publication vectors and their types (ADR 0056, REQ-PROC-002 AC1).
+ * Vectorize indexes only vectors written after a metadata index exists, so bootstrap creates
+ * them right after the index, before the first write. A resource name is
+ * `<property>@<index name>`.
+ */
+export const PUBLICATION_METADATA_INDEXES = { source: "string", published_day: "number" } as const;
+
+/** `source@roi-publications-staging` becomes its index name and property. */
+export function parseMetadataIndexName(name: string): { Index: string; Property: string } {
+  const at = name.indexOf("@");
+  return { Property: name.slice(0, at), Index: name.slice(at + 1) };
+}
 
 export type DesiredResource = {
   Kind: ResourceKind;
@@ -45,7 +60,14 @@ export function desiredResources(environment: EnvironmentName): DesiredResource[
     // Model steps, at most 8 in flight (ADR 0053).
     { Kind: "queue", Name: `roi-models-${suffix}` },
     { Kind: "queue-dlq", Name: `roi-models-dlq-${suffix}` },
+    // Embeddings, 50 per batch (ADR 0053).
+    { Kind: "queue", Name: `roi-embeddings-${suffix}` },
+    { Kind: "queue-dlq", Name: `roi-embeddings-dlq-${suffix}` },
     { Kind: "vectorize", Name: `roi-publications-${suffix}` },
+    ...Object.keys(PUBLICATION_METADATA_INDEXES).map((property): DesiredResource => ({
+      Kind: "vectorize-metadata-index",
+      Name: `${property}@roi-publications-${suffix}`,
+    })),
     { Kind: "ai-gateway", Name: `roi-${suffix}` },
   ];
 }

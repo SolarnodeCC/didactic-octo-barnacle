@@ -1,4 +1,6 @@
 import {
+  PUBLICATION_METADATA_INDEXES,
+  parseMetadataIndexName,
   type DesiredResource,
   type EnvironmentName,
   type ExistingResource,
@@ -159,7 +161,21 @@ export function createCloudflareClient(options: CloudflareClientOptions): Resour
         queues.filter((name) => !isDeadLetterQueue(name)),
       );
       add("queue-dlq", queues.filter(isDeadLetterQueue));
-      add("vectorize", await listPages("/vectorize/v2/indexes", named("name")));
+      const indexes = await listPages("/vectorize/v2/indexes", named("name"));
+      add("vectorize", indexes);
+      for (const index of indexes.filter((name) => name.startsWith(PROJECT_PREFIX))) {
+        const result = await call<{ metadataIndexes?: Array<{ propertyName?: string }> }>(
+          "GET",
+          `/vectorize/v2/indexes/${index}/metadata_index/list`,
+        );
+        // Named `<property>@<index>`; the index is ours, so its metadata indexes are too.
+        for (const item of result.metadataIndexes ?? []) {
+          found.push({
+            Kind: "vectorize-metadata-index",
+            Name: `${item.propertyName ?? ""}@${index}`,
+          });
+        }
+      }
       add("ai-gateway", await listPages("/ai-gateway/gateways", named("id")));
       return found;
     },
@@ -182,6 +198,16 @@ export function createCloudflareClient(options: CloudflareClientOptions): Resour
             config: { dimensions: VECTORIZE_DIMENSIONS, metric: VECTORIZE_METRIC },
           });
           return;
+        case "vectorize-metadata-index": {
+          const { Index, Property } = parseMetadataIndexName(resource.Name);
+          const type =
+            PUBLICATION_METADATA_INDEXES[Property as keyof typeof PUBLICATION_METADATA_INDEXES];
+          await call("POST", `/vectorize/v2/indexes/${Index}/metadata_index/create`, {
+            propertyName: Property,
+            indexType: type,
+          });
+          return;
+        }
         case "ai-gateway":
           await call("POST", "/ai-gateway/gateways", {
             id: resource.Name,

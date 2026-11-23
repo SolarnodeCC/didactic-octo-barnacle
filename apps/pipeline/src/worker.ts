@@ -1,4 +1,5 @@
 import { type CallModelDeps } from "@roi/models";
+import { type VectorIndex } from "@roi/vector-store";
 
 import { fetchArxivByIds, fetchArxivPage } from "./collectors/arxiv/client.js";
 import { fetchOpenAlexPage } from "./collectors/openalex/client.js";
@@ -34,6 +35,12 @@ export type Env = {
   MODEL_QUEUE?: QueueSender;
   /** Workers AI, always called through the environment's AI Gateway (REQ-NFR-003). */
   AI?: WorkersAiBinding;
+  /** Embeddings, 50 per batch and one model call per batch (ADR 0053). */
+  EMBEDDING_QUEUE?: QueueSender;
+  /** Vectorize `roi-publications-<env>`, the current index of the registry (ADR 0056). */
+  PUBLICATION_VECTORS?: VectorIndex;
+  /** The index of a new embedding model during its backfill, when one is bound (ADR 0056). */
+  PUBLICATION_VECTORS_NEXT?: VectorIndex;
   /** Worker secret; the name is listed in docs/kt/operations.md. */
   OPENALEX_API_KEY?: string;
   /**
@@ -74,7 +81,7 @@ function modelSteps(
   env: Env,
   ai: NonNullable<Env["AI"]>,
   processing: ProcessingConfig,
-): Pick<PipelineDeps, "Triage" | "Extraction"> {
+): Pick<PipelineDeps, "Triage" | "Extraction" | "Embedding"> {
   const queue = processing.Enabled && env.MODEL_QUEUE ? { Queue: env.MODEL_QUEUE } : {};
   const call = {
     Ai: ai,
@@ -106,6 +113,21 @@ function modelSteps(
       FullTextMaxChars: processing.FullTextMaxChars,
       GenericCustomerTerms: processing.GenericCustomerTerms,
     },
+    ...(env.PUBLICATION_VECTORS
+      ? {
+          Embedding: {
+            ...(processing.Enabled && env.EMBEDDING_QUEUE ? { Queue: env.EMBEDDING_QUEUE } : {}),
+            Call: call,
+            Environment: env.ENVIRONMENT,
+            Indexes: {
+              PUBLICATION_VECTORS: env.PUBLICATION_VECTORS,
+              ...(env.PUBLICATION_VECTORS_NEXT
+                ? { PUBLICATION_VECTORS_NEXT: env.PUBLICATION_VECTORS_NEXT }
+                : {}),
+            },
+          },
+        }
+      : {}),
   };
 }
 

@@ -9,7 +9,8 @@ import { handleTextExtract } from "./text-extract.js";
 import { handleTriage } from "../triage/triage-consumer.js";
 import { handleExtraction } from "../extraction/extraction-consumer.js";
 import { handleRetractionCheckPage } from "../retraction/check.js";
-import { type QueueBatchLike } from "./types.js";
+import { handleEmbeddingMessages } from "../embedding/consumer.js";
+import { type QueueBatchLike, type QueueMessageLike } from "./types.js";
 
 /** Dead-letter queues are named `roi-<queue>-dlq-<env>`, for pages, PDFs, texts, and model steps (ADR 0047, ADR 0053). */
 export function isDeadLetterQueue(queueName: string): boolean {
@@ -71,7 +72,19 @@ export async function consumeBatch(
   random: () => number = Math.random,
 ): Promise<void> {
   const deadLetters = isDeadLetterQueue(batch.queue);
+  const typeOf = (message: QueueMessageLike) =>
+    QueueMessageEnvelopeSchema.safeParse(message.body).data?.Type;
+  // Embedding messages are handled as one batch: one model call per index (ADR 0053).
+  const embeds = deadLetters
+    ? []
+    : batch.messages.filter((message) => typeOf(message) === "publication.embed");
+  if (embeds.length > 0) {
+    await handleEmbeddingMessages(deps, embeds, (attempts) => retryDelaySeconds(attempts, random));
+  }
   for (const message of batch.messages) {
+    if (embeds.includes(message)) {
+      continue;
+    }
     try {
       const type = QueueMessageEnvelopeSchema.safeParse(message.body).data?.Type;
       if (deadLetters) {

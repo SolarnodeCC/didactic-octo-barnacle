@@ -1,7 +1,7 @@
 import { ADMISSION_CRON, CRON_SOURCES, RECOVERY_CRON, RETRACTION_CRON } from "../config.js";
 import { probeStep } from "../recovery/breaker.js";
 import { replayDueDeadLetters } from "../recovery/dead-letters.js";
-import { redriveExtraction, redriveTriage } from "../recovery/redrive.js";
+import { redriveEmbedding, redriveExtraction, redriveTriage } from "../recovery/redrive.js";
 import { admitDay } from "../triage/admission.js";
 import { startRetractionCheck } from "../retraction/check.js";
 import { sweepRetractions } from "../retraction/sweep.js";
@@ -26,6 +26,7 @@ export async function runScheduled(
     // Re-driven extractions count toward the day's limit, so they go before the admission
     // (REQ-PROC-010 AC3).
     await redriveExtraction(deps, day);
+    await redriveEmbedding(deps, day);
     await admitDay(deps, day);
     await queueAdmittedExtractions(deps, day);
     return null;
@@ -40,6 +41,7 @@ export async function runScheduled(
     await replayDueDeadLetters(deps);
     await probeStep(deps, "triage");
     await probeStep(deps, "extraction");
+    await probeStep(deps, "embedding");
     return null;
   }
   const source = CRON_SOURCES[cron];

@@ -5,6 +5,8 @@ import {
   type SourceName,
 } from "@roi/models";
 
+import { type VectorIndex } from "@roi/vector-store";
+
 import { type ArxivPage } from "../collectors/arxiv/client.js";
 import { type ArxivEntry } from "../collectors/arxiv/types.js";
 import { type OpenAlexPage } from "../collectors/openalex/client.js";
@@ -110,6 +112,21 @@ export type PipelineDeps = {
     /** `extraction.generic_customer_terms` (ADR 0066). */
     GenericCustomerTerms: readonly string[];
   };
+  /**
+   * Embeddings (REQ-PROC-001, REQ-PROC-002, ADR 0053, ADR 0056). The consumer needs `Call` and
+   * the bound indexes; `Queue` is set only where `processing.enabled` is on, and only then does a
+   * new publication get a `publication.embed` message. Optional, so a test or environment
+   * without it ingests as before.
+   */
+  Embedding?: {
+    Queue?: QueueSender;
+    /** `callModel` dependencies: Workers AI through AI Gateway, usage store, prices. */
+    Call: CallModelDeps;
+    /** The environment, which names the first index of the registry `roi-publications-<env>`. */
+    Environment: string;
+    /** The Vectorize bindings by name: `PUBLICATION_VECTORS`, and `PUBLICATION_VECTORS_NEXT` during a model change. */
+    Indexes: Record<string, VectorIndex>;
+  };
   /** The weekly retraction check (REQ-DATA-008 AC1, ADR 0061, ADR 0112). */
   Retraction?: {
     /** `retraction.lookback_days`. */
@@ -210,6 +227,17 @@ export function retractionCheckEnvelope(
     Type: "retraction.check_page",
     SchemaVersion: QUEUE_SCHEMA_VERSION,
     Ids: { RunId: runId, Source: source, Page: page },
+    Attempt: 0,
+  };
+}
+
+/** Deterministic ID: a publication is embedded once per index (ADR 0056, REQ-PROC-010 AC7). */
+export function embedEnvelope(publicationId: string, indexId: string): QueueMessageEnvelope {
+  return {
+    MessageId: `embed:${publicationId}:${indexId}`,
+    Type: "publication.embed",
+    SchemaVersion: QUEUE_SCHEMA_VERSION,
+    Ids: { PublicationId: publicationId, IndexId: indexId },
     Attempt: 0,
   };
 }

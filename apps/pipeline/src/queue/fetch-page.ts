@@ -5,6 +5,7 @@ import { SEND_BATCH_LIMIT } from "./types.js";
 import {
   documentIngestEnvelope,
   documentQueue,
+  embedEnvelope,
   fetchPageEnvelope,
   triageEnvelope,
   type PipelineDeps,
@@ -17,6 +18,7 @@ import {
 import { SCOPE_ARXIV_CATEGORIES } from "../normalize/scope.js";
 import { earliestWindowStart } from "../schedule/window.js";
 import { pendingDocumentIds } from "../store/document-repo.js";
+import { registryIndexes } from "../store/embedding-index-repo.js";
 import { finishRunStatement, getRun, recordPageStatement, type RunRow } from "../store/run-repo.js";
 
 export type PageOutcome = "processed" | "duplicate" | "dead-lettered" | "skipped";
@@ -156,6 +158,24 @@ async function processPage(
           .slice(start, start + SEND_BATCH_LIMIT)
           .map((publicationId) => ({ body: triageEnvelope(publicationId) })),
       );
+    }
+  }
+
+  // New publications get an embedding message per index of the registry, in parallel with
+  // triage (REQ-PROC-001, ADR 0053, ADR 0056).
+  const embedding = deps.Embedding;
+  if (embedding?.Queue) {
+    const created = [...new Set(fetched.Result.CreatedIds)];
+    if (created.length > 0) {
+      const indexes = await registryIndexes(deps.Db, embedding.Environment);
+      const envelopes = created.flatMap((publicationId) =>
+        indexes.map((index) => embedEnvelope(publicationId, index.Id)),
+      );
+      for (let start = 0; start < envelopes.length; start += SEND_BATCH_LIMIT) {
+        await embedding.Queue.sendBatch(
+          envelopes.slice(start, start + SEND_BATCH_LIMIT).map((body) => ({ body })),
+        );
+      }
     }
   }
 
