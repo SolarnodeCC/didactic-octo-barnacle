@@ -2,15 +2,19 @@ import { notify } from "../alerts/notify.js";
 import { type PipelineDeps } from "../queue/deps.js";
 import { dailyRunId } from "../store/processing-run-repo.js";
 import { type SqlDatabase } from "../store/sql.js";
+import { runExtractionStep } from "../extraction/step.js";
 import { runTriageStep } from "../triage/step.js";
 
 /** One probe call every 30 minutes while a step is paused (ADR 0063). */
 export const PROBE_INTERVAL_MS = 30 * 60 * 1000;
 const HOUR_MS = 60 * 60 * 1000;
 
-/** A fixed, harmless input for the probe: no stored publication, no publication text. */
+/**
+ * A fixed, harmless input for the probe: no stored publication, no publication text. The abstract
+ * names a customer and a quotable problem, so the extraction probe can succeed too.
+ */
 const PROBE_INPUT = {
-  Title: "Probe of the triage step",
+  Title: "Probe of a model step",
   Abstract:
     "Hospital planners lose theatre time to late cancellations and rebuild the schedule by hand each morning.",
 };
@@ -70,19 +74,58 @@ export async function checkBreaker(deps: PipelineDeps, step: string): Promise<bo
 
 export type ProbeOutcome = "not-paused" | "not-due" | "resumed" | "still-failing";
 
+/** The model steps with a breaker: each has a probe call with a fixed input. */
+export type ProbedStep = "triage" | "extraction";
+
+/**
+ * One probe call of the step with its fixed input, through the step's own prompt and checks.
+ * Null when the step is not configured in this Worker. Nothing is stored but the usage record.
+ */
+async function probeCall(
+  deps: PipelineDeps,
+  step: ProbedStep,
+  runId: string,
+): Promise<{ Ok: boolean; Reason?: string } | null> {
+  if (step === "triage") {
+    const triage = deps.Triage;
+    if (!triage) {
+      return null;
+    }
+    const result = await runTriageStep(triage.Call, triage.Model, {
+      RunId: runId,
+      PublicationId: null,
+      ...PROBE_INPUT,
+    });
+    return result.Ok ? { Ok: true } : { Ok: false, Reason: result.Reason };
+  }
+  const extraction = deps.Extraction;
+  if (!extraction) {
+    return null;
+  }
+  const result = await runExtractionStep(extraction.Call, extraction.Model, {
+    RunId: runId,
+    PublicationId: null,
+    ...PROBE_INPUT,
+    FullText: null,
+    MaxCandidates: extraction.MaxCandidates,
+    FullTextMaxChars: extraction.FullTextMaxChars,
+    GenericCustomerTerms: extraction.GenericCustomerTerms,
+  });
+  return result.Ok ? { Ok: true } : { Ok: false, Reason: result.Reason };
+}
+
 /**
  * The probe of a paused step: at most one call every 30 minutes; a call that succeeds resumes
- * the step (REQ-PROC-010 AC6). Only the triage step has a model in WP6.
+ * the step (REQ-PROC-010 AC6).
  */
-export async function probeTriage(deps: PipelineDeps): Promise<ProbeOutcome> {
-  const step = "triage";
-  const triage = deps.Triage;
+export async function probeStep(deps: PipelineDeps, step: ProbedStep): Promise<ProbeOutcome> {
   const row = await deps.Db.prepare(
     "SELECT last_probe_at, paused_at FROM step_pause WHERE step = ? AND resumed_at IS NULL",
   )
     .bind(step)
     .first<{ last_probe_at: string | null; paused_at: string }>();
-  if (!row || !triage) {
+  const configured = step === "triage" ? deps.Triage : deps.Extraction;
+  if (!row || !configured) {
     return "not-paused";
   }
   const now = deps.Now();
@@ -94,13 +137,9 @@ export async function probeTriage(deps: PipelineDeps): Promise<ProbeOutcome> {
     .bind(now, step)
     .run();
   const runId = await dailyRunId(deps.Db, now.slice(0, 10), now, deps.NewId);
-  const result = await runTriageStep(triage.Call, triage.Model, {
-    RunId: runId,
-    PublicationId: null,
-    ...PROBE_INPUT,
-  });
-  if (!result.Ok) {
-    deps.Log?.("breaker.probe_failed", { step, reason: result.Reason });
+  const result = await probeCall(deps, step, runId);
+  if (!result?.Ok) {
+    deps.Log?.("breaker.probe_failed", { step, reason: result?.Reason });
     return "still-failing";
   }
   await deps.Db.prepare("UPDATE step_pause SET resumed_at = ? WHERE step = ?")
@@ -108,4 +147,9 @@ export async function probeTriage(deps: PipelineDeps): Promise<ProbeOutcome> {
     .run();
   deps.Log?.("breaker.resumed", { step });
   return "resumed";
+}
+
+/** The probe of the triage step (WP6). */
+export function probeTriage(deps: PipelineDeps): Promise<ProbeOutcome> {
+  return probeStep(deps, "triage");
 }

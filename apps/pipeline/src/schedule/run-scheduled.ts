@@ -1,7 +1,7 @@
 import { ADMISSION_CRON, CRON_SOURCES, RECOVERY_CRON } from "../config.js";
-import { probeTriage } from "../recovery/breaker.js";
+import { probeStep } from "../recovery/breaker.js";
 import { replayDueDeadLetters } from "../recovery/dead-letters.js";
-import { redriveTriage } from "../recovery/redrive.js";
+import { redriveExtraction, redriveTriage } from "../recovery/redrive.js";
 import { admitDay } from "../triage/admission.js";
 import { queueAdmittedExtractions } from "../extraction/queue-extractions.js";
 import { notify } from "../alerts/notify.js";
@@ -20,6 +20,9 @@ export async function runScheduled(
     // for the admitted (ADR 0063, ADR 0055).
     const day = deps.Now().slice(0, 10);
     await redriveTriage(deps, day);
+    // Re-driven extractions count toward the day's limit, so they go before the admission
+    // (REQ-PROC-010 AC3).
+    await redriveExtraction(deps, day);
     await admitDay(deps, day);
     await queueAdmittedExtractions(deps, day);
     return null;
@@ -27,7 +30,8 @@ export async function runScheduled(
   if (cron === RECOVERY_CRON) {
     // Dead-letter replay and the breaker probe (REQ-DATA-012, REQ-PROC-010 AC6).
     await replayDueDeadLetters(deps);
-    await probeTriage(deps);
+    await probeStep(deps, "triage");
+    await probeStep(deps, "extraction");
     return null;
   }
   const source = CRON_SOURCES[cron];

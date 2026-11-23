@@ -84,24 +84,19 @@ export async function addRunFailures(
     .run();
 }
 
-/** Adds counts to a processing run's `counts_json`. */
+/**
+ * Adds counts to a processing run's `counts_json` inside the database, so a cron step never
+ * overwrites counts that consumers add in parallel (`addRunCountStatements`).
+ */
 export async function addRunCounts(
   db: SqlDatabase,
   runId: string,
   counts: Record<string, number>,
 ): Promise<void> {
-  const row = await db
-    .prepare("SELECT counts_json FROM processing_run WHERE id = ?")
-    .bind(runId)
-    .first<{ counts_json: string }>();
-  const merged = JSON.parse(row?.counts_json ?? "{}") as Record<string, number>;
-  for (const [key, value] of Object.entries(counts)) {
-    merged[key] = (merged[key] ?? 0) + value;
+  const statements = addRunCountStatements(db, runId, counts);
+  if (statements.length > 0) {
+    await db.batch(statements);
   }
-  await db
-    .prepare("UPDATE processing_run SET counts_json = ? WHERE id = ?")
-    .bind(JSON.stringify(merged), runId)
-    .run();
 }
 
 /**
@@ -114,15 +109,13 @@ export function addRunCountStatements(
   runId: string,
   counts: Record<string, number>,
 ): SqlStatement[] {
-  return Object.entries(counts)
-    .filter(([, value]) => value !== 0)
-    .map(([key, value]) =>
-      db
-        .prepare(
-          `UPDATE processing_run
+  return Object.entries(counts).map(([key, value]) =>
+    db
+      .prepare(
+        `UPDATE processing_run
            SET counts_json = json_set(counts_json, ?, COALESCE(json_extract(counts_json, ?), 0) + ?)
            WHERE id = ?`,
-        )
-        .bind(`$.${key}`, `$.${key}`, value, runId),
-    );
+      )
+      .bind(`$.${key}`, `$.${key}`, value, runId),
+  );
 }

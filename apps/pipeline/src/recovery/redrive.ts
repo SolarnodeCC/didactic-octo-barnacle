@@ -1,6 +1,9 @@
+import { type ModelConfig, type ModelUsageStore, type QueueMessageEnvelope } from "@roi/models";
+
 import { isPaused } from "./breaker.js";
 import { addRunCounts, addRunFailures } from "./redrive-repo.js";
-import { triageEnvelope, type PipelineDeps } from "../queue/deps.js";
+import { extractEnvelope, triageEnvelope, type PipelineDeps } from "../queue/deps.js";
+import { type QueueSender } from "../queue/types.js";
 import { dailyRunId } from "../store/processing-run-repo.js";
 
 export type RedriveCounts = {
@@ -29,6 +32,21 @@ type RedriveRow = {
   last_prompt_version: string | null;
 };
 
+/** What differs between the steps that are re-driven; the algorithm is the same. */
+type RedriveSpec = {
+  Step: "triage" | "extraction";
+  /** A row here for the publication ends its re-drives, so none can create a second (AC7). */
+  ResultTable: "triage_decision" | "extraction_result";
+  /** The step's message: its ID is fixed, so its log row is reopened before it is sent again. */
+  Envelope: (publicationId: string) => QueueMessageEnvelope;
+  /** The step's current model and prompt version, compared for content failures (AC2). */
+  Model: ModelConfig;
+  Queue: QueueSender;
+  Usage: ModelUsageStore;
+  /** Prefix of the run-report counts, so the steps do not add into the same keys. */
+  CountPrefix: "" | "Extraction";
+};
+
 /**
  * The daily re-drive of failed triage steps (REQ-PROC-010 AC1 to AC5, AC7; ADR 0063), run by
  * the admission cron before it admits. A publication whose triage ended without a decision is
@@ -38,7 +56,7 @@ type RedriveRow = {
  *   day, up to `recovery.max_redrives` times;
  * - a content failure (`invalid-output`) once, the day after it failed, and again only when the
  *   triage model or prompt version has changed since its last attempt;
- * - at most `recovery.max_redrives_per_day` items a day.
+ * - at most `recovery.max_redrives_per_day` items a day, shared with the extraction re-drive.
  *
  * When the re-drives are used up the item is `failed-final`: it is listed in the run report and
  * no longer re-driven, with no alert per item. Nothing is re-driven while the step is paused or
@@ -48,15 +66,55 @@ type RedriveRow = {
  */
 export async function redriveTriage(deps: PipelineDeps, day: string): Promise<RedriveOutcome> {
   const triage = deps.Triage;
-  const recovery = deps.Recovery;
-  const queue = triage?.Queue;
-  if (!triage || !recovery || !queue) {
+  if (!triage?.Queue) {
     return { Outcome: "not-configured" };
   }
-  if (await isPaused(deps.Db, "triage")) {
+  return redriveStep(deps, day, {
+    Step: "triage",
+    ResultTable: "triage_decision",
+    Envelope: triageEnvelope,
+    Model: triage.Model,
+    Queue: triage.Queue,
+    Usage: triage.Call.Usage,
+    CountPrefix: "",
+  });
+}
+
+/**
+ * The daily re-drive of failed extractions, by the same rules as triage (REQ-PROC-010 AC1 to
+ * AC5, AC7). It runs after the triage re-drive and before the admission, which counts the
+ * extractions re-driven that day toward `ingestion.daily_extraction_limit` (AC3). A publication
+ * with an `extraction_result` is never re-driven. Its counts are prefixed `Extraction`.
+ */
+export async function redriveExtraction(deps: PipelineDeps, day: string): Promise<RedriveOutcome> {
+  const extraction = deps.Extraction;
+  if (!extraction?.Queue) {
+    return { Outcome: "not-configured" };
+  }
+  return redriveStep(deps, day, {
+    Step: "extraction",
+    ResultTable: "extraction_result",
+    Envelope: extractEnvelope,
+    Model: extraction.Model,
+    Queue: extraction.Queue,
+    Usage: extraction.Call.Usage,
+    CountPrefix: "Extraction",
+  });
+}
+
+async function redriveStep(
+  deps: PipelineDeps,
+  day: string,
+  spec: RedriveSpec,
+): Promise<RedriveOutcome> {
+  const recovery = deps.Recovery;
+  if (!recovery) {
+    return { Outcome: "not-configured" };
+  }
+  if (await isPaused(deps.Db, spec.Step)) {
     return { Outcome: "paused" };
   }
-  if (!(await triage.Call.Usage.budgetAllows(day))) {
+  if (!(await spec.Usage.budgetAllows(day))) {
     return { Outcome: "budget-stopped" };
   }
 
@@ -68,6 +126,7 @@ export async function redriveTriage(deps: PipelineDeps, day: string): Promise<Re
     OverDailyCap: 0,
   };
   const failures: Array<{ PublicationId: string; Reason: string }> = [];
+  // The cap is shared by every step: the count has no step filter.
   const done = await deps.Db.prepare(
     "SELECT COUNT(*) AS n FROM redrive WHERE substr(last_attempt_at, 1, 10) = ?",
   )
@@ -75,14 +134,17 @@ export async function redriveTriage(deps: PipelineDeps, day: string): Promise<Re
     .first<{ n: number }>();
   let room = Math.max(0, recovery.MaxRedrivesPerDay - (done?.n ?? 0));
 
+  // `ResultTable` comes from the closed union of the spec, never from input.
   const { results } = await deps.Db.prepare(
     `SELECT r.id, r.item_id, r.failure_class, r.count, r.last_attempt_at, r.last_failed_at,
             r.last_model, r.last_prompt_version
      FROM redrive r
-     WHERE r.item_kind = 'publication' AND r.step = 'triage' AND r.final = 0
-       AND NOT EXISTS (SELECT 1 FROM triage_decision td WHERE td.publication_id = r.item_id)
+     WHERE r.item_kind = 'publication' AND r.step = ? AND r.final = 0
+       AND NOT EXISTS (SELECT 1 FROM ${spec.ResultTable} x WHERE x.publication_id = r.item_id)
      ORDER BY r.last_failed_at, r.id`,
-  ).all<RedriveRow>();
+  )
+    .bind(spec.Step)
+    .all<RedriveRow>();
 
   for (const row of results) {
     if (row.last_attempt_at !== null && row.last_attempt_at.slice(0, 10) === day) {
@@ -95,14 +157,13 @@ export async function redriveTriage(deps: PipelineDeps, day: string): Promise<Re
       counts.FailedFinal += 1;
       failures.push({
         PublicationId: row.item_id,
-        Reason: `triage failed-final after ${row.count} re-drives (${row.failure_class})`,
+        Reason: `${spec.Step} failed-final after ${row.count} re-drives (${row.failure_class})`,
       });
       continue;
     }
     if (row.failure_class === "content") {
       const changed =
-        row.last_model !== triage.Model.Model ||
-        row.last_prompt_version !== triage.Model.PromptVersion;
+        row.last_model !== spec.Model.Model || row.last_prompt_version !== spec.Model.PromptVersion;
       const nextDay = row.last_failed_at.slice(0, 10) < day;
       // Once the day after it failed; after that only when the model or prompt changed.
       if (!nextDay || (row.count >= 1 && !changed)) {
@@ -115,22 +176,32 @@ export async function redriveTriage(deps: PipelineDeps, day: string): Promise<Re
       continue;
     }
     room -= 1;
+    const envelope = spec.Envelope(row.item_id);
     // The message ID is fixed, so its log row is reopened before it is sent again.
     await deps.Db.batch([
       deps.Db.prepare(
         "UPDATE queue_message_log SET status = 'pending', attempts = 0, last_error = NULL, updated_at = ? WHERE message_id = ?",
-      ).bind(now, `triage:${row.item_id}`),
+      ).bind(now, envelope.MessageId),
       deps.Db.prepare(
         "UPDATE redrive SET count = count + 1, last_attempt_at = ?, updated_at = ? WHERE id = ?",
       ).bind(now, now, row.id),
     ]);
-    await queue.send(triageEnvelope(row.item_id));
+    await spec.Queue.send(envelope);
     counts.Redriven += 1;
   }
 
   const runId = await dailyRunId(deps.Db, day, now, deps.NewId);
-  await addRunCounts(deps.Db, runId, counts);
+  await addRunCounts(
+    deps.Db,
+    runId,
+    Object.fromEntries(
+      Object.entries(counts).map(([key, value]) => [`${spec.CountPrefix}${key}`, value]),
+    ),
+  );
   await addRunFailures(deps.Db, runId, failures);
-  deps.Log?.("redrive.done", { day, ...counts });
+  deps.Log?.(spec.Step === "triage" ? "redrive.done" : `redrive.${spec.Step}.done`, {
+    day,
+    ...counts,
+  });
   return { Outcome: "redriven", Counts: counts };
 }
