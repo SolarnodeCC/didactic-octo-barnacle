@@ -285,6 +285,12 @@ export function createHarness(
         }
       : {}),
     Retraction: { LookbackDays: DEFAULT_PROCESSING_CONFIG.RetractionLookbackDays },
+    Monitor: {
+      BaselineDays: DEFAULT_PROCESSING_CONFIG.MonitorBaselineDays,
+      DriftBand: DEFAULT_PROCESSING_CONFIG.MonitorDriftBand,
+      MinDailyItems: DEFAULT_PROCESSING_CONFIG.MonitorMinDailyItems,
+      NearDuplicateCosine: DEFAULT_PROCESSING_CONFIG.MonitorNearDuplicateCosine,
+    },
     ...(overrides.Embedding
       ? {
           Embedding: {

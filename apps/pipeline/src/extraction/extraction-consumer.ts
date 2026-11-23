@@ -220,8 +220,8 @@ async function extract(
     deps.Db.prepare(
       `INSERT INTO extraction_result (
         id, publication_id, run_id, model, prompt_version, input_mode, confidence, notes,
-        candidate_count, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        candidate_count, quote_positions_json, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT (publication_id) DO NOTHING`,
     ).bind(
       resultRow.Id,
@@ -233,6 +233,7 @@ async function extract(
       resultRow.Confidence,
       resultRow.Notes,
       resultRow.CandidateCount,
+      JSON.stringify(result.QuotePositions),
       resultRow.CreatedAt,
     ),
     // Inserted only when this result row is the one stored, so a parallel duplicate adds no

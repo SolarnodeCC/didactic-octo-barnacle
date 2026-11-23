@@ -188,6 +188,12 @@ function buildDeps(env: Env): PipelineDeps {
     },
     ...(env.AI ? modelSteps(env, env.AI, processing, budget) : {}),
     Retraction: { LookbackDays: processing.RetractionLookbackDays },
+    Monitor: {
+      BaselineDays: processing.MonitorBaselineDays,
+      DriftBand: processing.MonitorDriftBand,
+      MinDailyItems: processing.MonitorMinDailyItems,
+      NearDuplicateCosine: processing.MonitorNearDuplicateCosine,
+    },
     Recovery: {
       MaxRedrives: processing.MaxRedrives,
       MaxRedrivesPerDay: processing.MaxRedrivesPerDay,

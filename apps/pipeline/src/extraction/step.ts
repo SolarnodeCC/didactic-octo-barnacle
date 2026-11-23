@@ -37,6 +37,8 @@ export type ExtractionStepResult =
       Output: ExtractionOutput;
       /** Candidates dropped on the last attempt (envelope `Dropped`, REQ-PROC-009 AC7). */
       Dropped: ExtractionItemFailure[];
+      /** Kept quotes by where they start in the text sent, in tenths of its length (ADR 0071). */
+      QuotePositions: number[];
       InputMode: InputMode;
       Model: string;
       PromptVersion: string;
@@ -107,9 +109,37 @@ export async function runExtractionStep(
     Ok: true,
     Output: applied.Output,
     Dropped: applied.Dropped,
+    QuotePositions: quotePositions(applied.Output, built.QuoteText),
     InputMode: built.InputMode,
     Model: config.Model,
     PromptVersion: EXTRACTION_PROMPT_VERSION,
     Attempts: result.Attempts,
   };
+}
+
+/**
+ * Where the kept quotes start in the text that was sent, counted per tenth of its length
+ * (ADR 0071, ADR 0065). Each quote is the exact span of that text (ADR 0064), so it is found
+ * as it is. Only counts leave the step, never the text.
+ */
+export function quotePositions(output: ExtractionOutput, text: string): number[] {
+  const tenths = Array.from({ length: 10 }, () => 0);
+  if (text.length === 0) {
+    return tenths;
+  }
+  for (const candidate of output.Candidates) {
+    for (const quote of [
+      candidate.EvidenceQuote,
+      candidate.CustomerQuote,
+      candidate.WhyNowQuote,
+      candidate.AlternativeQuote,
+    ]) {
+      const at = quote ? text.indexOf(quote) : -1;
+      if (at >= 0) {
+        const tenth = Math.min(9, Math.floor((at * 10) / text.length));
+        tenths[tenth] = (tenths[tenth] ?? 0) + 1;
+      }
+    }
+  }
+  return tenths;
 }

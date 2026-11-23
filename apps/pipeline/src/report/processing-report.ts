@@ -1,5 +1,6 @@
 import { ProcessingReportSchema, type ProcessingReport } from "@roi/models";
 
+import { qualitySection } from "./quality.js";
 import { sanitizeReason } from "./sanitize.js";
 import { type PipelineDeps } from "../queue/deps.js";
 import { type SqlDatabase } from "../store/sql.js";
@@ -127,6 +128,7 @@ export async function buildProcessingReport(
       Opportunities: opportunityCount,
       CostPerOpportunity: per(total, opportunityCount),
     },
+    Quality: null,
   });
 }
 
@@ -160,10 +162,22 @@ export async function reportProcessingRuns(deps: PipelineDeps, day: string): Pro
     .all<{ id: string }>();
   const reported: string[] = [];
   for (const { id } of results) {
-    const report = await buildProcessingReport(db, id);
-    if (report === null) {
+    const built = await buildProcessingReport(db, id);
+    if (built === null) {
       continue;
     }
+    // The daily run also gets its quality section, which may raise drift alerts (ADR 0071).
+    const report =
+      built.Kind === "daily"
+        ? {
+            ...built,
+            Quality: await qualitySection(deps, {
+              RunId: built.RunId,
+              Day: built.Day,
+              Counts: built.Counts,
+            }),
+          }
+        : built;
     await db
       .prepare("UPDATE processing_run SET report_json = ? WHERE id = ? AND report_json IS NULL")
       .bind(JSON.stringify(report), id)

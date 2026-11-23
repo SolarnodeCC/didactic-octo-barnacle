@@ -50,6 +50,7 @@ related: [REQ-TEST-001, REQ-TEST-002, REQ-TEST-003, REQ-TEST-004, REQ-TEST-005, 
 | Prompt injection | Fixtures with instructions hidden in abstracts and full text, in contract tests | REQ-NFR-006 |
 | Evidence | Quotes are checked against the input text in contract tests and evals | REQ-AGENT-008 |
 | Data quality | Ingestion run reports count incomplete records, duplicates flagged for review, and failed PDFs | REQ-NFR-008 |
+| Live output quality | The daily quality section is built from seeded rows, and a drift alert is checked against a seeded 14-day baseline | REQ-NFR-023 |
 | Cost | Budget stop tested with a stubbed gateway; eval runs report cost | REQ-NFR-005 |
 | Usage records | Model call records checked against stubbed gateway totals | REQ-NFR-011 |
 | Output repair | Unit tests of the repair function and contract tests with malformed responses | REQ-AGENT-011 |

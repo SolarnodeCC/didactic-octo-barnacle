@@ -28,7 +28,7 @@ describe("REQ-NFR-008: run report contract", () => {
 });
 
 describe("REQ-NFR-019: alert types", () => {
-  it("REQ-NFR-019: names the six events of the requirement", () => {
+  it("REQ-NFR-019: names the seven events of the requirement", () => {
     expect(AlertTypeSchema.options).toEqual([
       "failed-run",
       "run-timeout",
@@ -36,6 +36,7 @@ describe("REQ-NFR-019: alert types", () => {
       "budget-stop",
       "availability-breach",
       "step-paused",
+      "quality-drift",
     ]);
   });
 });

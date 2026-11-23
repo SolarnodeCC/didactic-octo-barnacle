@@ -31,6 +31,8 @@ export interface VectorIndex {
     options: { topK: number; filter?: VectorFilter; returnMetadata?: "none" },
   ): Promise<{ matches: VectorMatch[]; count?: number }>;
   deleteByIds(ids: string[]): Promise<unknown>;
+  /** The stored vectors of these IDs; an unknown ID is left out. */
+  getByIds(ids: string[]): Promise<Array<{ id: string; values: ArrayLike<number> }>>;
 }
 
 /** Vectorize returns at most 100 matches without values or metadata (Vectorize limits). */
@@ -108,5 +110,14 @@ export class FakeVectorize implements VectorIndex {
       this.Vectors.delete(id);
     }
     return Promise.resolve({ mutationId: `d_${ids.length}` });
+  }
+
+  getByIds(ids: string[]): Promise<Array<{ id: string; values: number[] }>> {
+    return Promise.resolve(
+      ids.flatMap((id) => {
+        const record = this.Vectors.get(id);
+        return record ? [{ id, values: [...record.values] }] : [];
+      }),
+    );
   }
 }

@@ -92,6 +92,14 @@ describe("REQ-PROC-002: publication vectors", () => {
     });
   });
 
+  it("REQ-PROC-002 AC1: stored vectors are read back by publication ID, unknown IDs left out", async () => {
+    const index = new FakeVectorize();
+    await upsertPublicationVectors(index, CORPUS);
+    const [found, ...rest] = await index.getByIds([CORPUS[0]!.id, "pub_unknown"]);
+    expect(rest).toEqual([]);
+    expect(found).toEqual({ id: CORPUS[0]!.id, values: CORPUS[0]!.values });
+  });
+
   it("REQ-PROC-002 AC2: deleting removes the vector from every index", async () => {
     const current = new FakeVectorize();
     const next = new FakeVectorize();
