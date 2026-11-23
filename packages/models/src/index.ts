@@ -79,9 +79,11 @@ export {
   InputModeSchema,
   OutputModeSchema,
   RepairKindSchema,
+  DroppedItemSchema,
   agentEnvelopeSchema,
   missingQuotes,
   repairModelOutput,
+  type DroppedItem,
   type Evidence,
   type Industry,
   type InputMode,
@@ -104,13 +106,23 @@ export {
 } from "./triage.js";
 
 export {
+  ALL_CANDIDATES_FAILED_NOTE,
+  DEFAULT_GENERIC_CUSTOMER_TERMS,
   DEFAULT_MAX_CANDIDATES,
   ExtractionCandidateSchema,
+  applyExtractionChecks,
+  customerQuoteOverlaps,
+  extractionFailureMessage,
+  extractionItemChecks,
   extractionMissingQuotes,
   extractionOutputSchema,
+  isGenericCustomer,
   type ExtractionCandidate,
+  type ExtractionCheckReason,
+  type ExtractionItemFailure,
   type ExtractionOutput,
 } from "./extraction.js";
+export { findQuoteSpan, normalizeForQuote, quoteOccurs } from "./quote.js";
 export { cleanLatexMarkup } from "./latex.js";
 
 export { CurrencyCodeSchema, MoneySchema, type Money } from "./money.js";

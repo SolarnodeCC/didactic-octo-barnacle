@@ -83,6 +83,12 @@ export type CallModelRequest<S extends z.ZodObject> = {
    * example `extractionMissingQuotes(output, text)`. Any entry fails the attempt (REQ-AGENT-008).
    */
   MissingQuotes?: (output: z.infer<S>) => string[];
+  /**
+   * Item-level checks of a valid output, each failure with the message the retry sends, for
+   * example a quote not in the text or a generic customer (ADR 0064, ADR 0066). Any entry fails
+   * the attempt like a missing quote.
+   */
+  ItemChecks?: (output: z.infer<S>) => string[];
 };
 
 export type CallModelResult<T> =
@@ -104,6 +110,12 @@ export type CallModelResult<T> =
       Attempts: number;
       /** The validation or provider errors of the last attempt, stored with the failed step. */
       Errors: string[];
+      /**
+       * Set when the last attempt was schema-valid and failed only its quote or item checks: its
+       * output, so a step whose output is a list of independent items can drop the failing ones
+       * and keep the rest (ADR 0064). Other steps fail as before.
+       */
+      Checked?: { Output: T; Repairs: RepairKind[] };
     };
 
 const MAX_ERRORS = 20;
@@ -166,9 +178,11 @@ export async function callModel<S extends z.ZodObject>(
   let attemptsMade = 0;
   let lastErrors: string[] = [];
   let lastReason: "invalid-output" | "provider-error" = "provider-error";
+  let lastChecked: { Output: z.infer<S>; Repairs: RepairKind[] } | null = null;
 
   for (let attempt = 1; attempt <= deps.MaxAttempts; attempt += 1) {
     attemptsMade = attempt;
+    lastChecked = null;
     const inputs: Record<string, unknown> = { messages: [...messages] };
     if (responseFormat !== undefined) {
       inputs.response_format = responseFormat;
@@ -229,7 +243,13 @@ export async function callModel<S extends z.ZodObject>(
       if (parsed.success) {
         output = parsed.data as z.infer<S>;
         const missing = request.MissingQuotes?.(output) ?? [];
-        errors = missing.map((field) => `${field}: the quote is not verbatim in the text`);
+        errors = [
+          ...missing.map((field) => `${field}: the quote is not verbatim in the text`),
+          ...(request.ItemChecks?.(output) ?? []),
+        ];
+        if (errors.length > 0) {
+          lastChecked = { Output: output, Repairs: repaired.Repairs };
+        }
       } else {
         errors = validationErrors(parsed.error);
       }
@@ -255,7 +275,13 @@ export async function callModel<S extends z.ZodObject>(
     messages.push({ role: "user", content: retryMessage(errors) });
   }
 
-  return { Ok: false, Reason: lastReason, Attempts: attemptsMade, Errors: lastErrors };
+  return {
+    Ok: false,
+    Reason: lastReason,
+    Attempts: attemptsMade,
+    Errors: lastErrors,
+    ...(lastChecked === null ? {} : { Checked: lastChecked }),
+  };
 }
 
 async function writeRecord<S extends z.ZodObject>(

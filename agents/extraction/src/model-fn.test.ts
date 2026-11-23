@@ -103,6 +103,42 @@ describe("REQ-TEST-006: the eval runner scores a model through callModel and the
     expect(records.every((r) => r.Outcome === "ok")).toBe(true);
   });
 
+  it("REQ-PROC-009 AC7: on the last attempt a generic-customer candidate is dropped and the rest kept", async () => {
+    const entry = loadExtractionSet().find((e) => e.expected.candidates.length === 1);
+    if (entry === undefined) {
+      throw new Error("the golden set has no entry with one candidate");
+    }
+    const [expected] = entry.expected.candidates;
+    const kept = {
+      Finding: expected?.finding,
+      EvidenceQuote: expected?.evidenceQuote,
+      Customer: expected?.customer,
+      CustomerQuote: expected?.customerQuote,
+      WhyNow: null,
+      WhyNowQuote: null,
+      CurrentAlternative: null,
+      AlternativeQuote: null,
+    };
+    const answer: FakeReply = {
+      Kind: "output",
+      Output: {
+        Candidates: [kept, { ...kept, Customer: "the public" }],
+        Confidence: 0.6,
+        Notes: null,
+      },
+    };
+    const { records, callDeps } = deps([answer, answer, answer]);
+    const output = (await extractionModelFn({ Deps: callDeps, Model: MODEL, RunId: "bench_1" })(
+      entry.Publication,
+    )) as { Candidates: Array<{ Customer: string }> } | null;
+    expect(output?.Candidates.map((c) => c.Customer)).toEqual([expected?.customer]);
+    expect(records.map((r) => r.Outcome)).toEqual([
+      "invalid-output",
+      "invalid-output",
+      "invalid-output",
+    ]);
+  });
+
   it("REQ-AGENT-009: a step that fails every attempt is scored as a failed entry", async () => {
     const set = loadTriageSet().slice(0, 1);
     const bad: FakeReply = { Kind: "output", Output: "no JSON here" };

@@ -6,3 +6,5 @@ coverage
 *.md
 
 .claude/
+# Escaped invisible and typographic characters that Prettier would print as raw characters.
+packages/models/test-fixtures/quote-normalisation.json

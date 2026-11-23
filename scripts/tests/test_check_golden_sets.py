@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import importlib.util
+import json
 import unittest
 
-from support import ScriptTestCase
+from support import REPO, ScriptTestCase
 
 EXT = "agents/extraction/evals"
 TRIAGE_REJECTED = f"{EXT}/triage/gs-triage-001.yaml"
@@ -40,6 +42,14 @@ class GoldenSetsTest(ScriptTestCase):
     def test_req_test_005_fails_on_a_quote_that_is_not_verbatim(self) -> None:
         self.replace(EXTRACTION, 'evidenceQuote: "Extreme weather', 'evidenceQuote: "Severe weather')
         self.assert_fails_with("gs-extraction-001.yaml: candidate 0: evidenceQuote is not verbatim in the fixture")
+
+    def test_req_agent_008_passes_on_a_quote_that_differs_only_in_typography(self) -> None:
+        self.replace(
+            EXTRACTION,
+            'evidenceQuote: "Extreme weather is forecast days ahead,',
+            'evidenceQuote: "Extreme  weather is forecast days\u00a0ahead,',
+        )
+        self.assert_passes()
 
     def test_req_test_005_fails_when_an_industry_has_no_extraction_entry(self) -> None:
         for number in ("035", "036"):
@@ -78,6 +88,21 @@ class GoldenSetsTest(ScriptTestCase):
     def test_req_test_005_fails_on_a_candidate_reference_that_points_nowhere(self) -> None:
         self.replace(ANALYST, "gs-extraction-001.yaml#0", "gs-extraction-001.yaml#9")
         self.assert_fails_with("does not point to a candidate")
+
+
+class QuoteNormalisationTest(unittest.TestCase):
+    """The Python mirror equals normalizeForQuote on the shared cases (ADR 0064)."""
+
+    def test_req_agent_008_matches_the_typescript_cases(self) -> None:
+        spec = importlib.util.spec_from_file_location("check_golden_sets", REPO / "scripts/check-golden-sets.py")
+        assert spec is not None and spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        cases = json.loads((REPO / "packages/models/test-fixtures/quote-normalisation.json").read_text(encoding="utf-8"))
+        for case in cases["normalize"]:
+            self.assertEqual(module.normalize_for_quote(case["input"]), case["expected"], case["input"])
+        for case in cases["spans"]:
+            self.assertEqual(module.quote_occurs(case["text"], case["quote"]), case["span"] is not None, case["quote"])
 
 
 if __name__ == "__main__":

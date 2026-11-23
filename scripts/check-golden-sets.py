@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import unicodedata
 from pathlib import Path
 
 import yaml
@@ -64,6 +65,52 @@ LATEX_SYMBOLS = {
     "times": "×", "approx": "≈", "sim": "~", "leq": "≤", "le": "≤", "geq": "≥", "ge": "≥",
     "neq": "≠", "pm": "±", "cdot": "·", "ldots": "...", "dots": "...",
 }
+
+
+# The same rules as normalizeForQuote in packages/models/src/quote.ts (ADR 0064): a quote is
+# verbatim when it occurs in the text after both are normalised. The shared cases in
+# packages/models/test-fixtures/quote-normalisation.json keep the two equal.
+SINGLE_QUOTES = set("\u2018\u2019\u201a\u201b\u2032\u2035")
+DOUBLE_QUOTES = set("\u201c\u201d\u201e\u201f\u2033\u2036")
+DASHES = set("\u2010\u2011\u2012\u2013\u2014\u2212")
+REMOVED = set("\u00ad\u200b\u200c\u200d\u2060\ufeff")
+WHITESPACE = set(
+    "\t\n\u000b\f\r \u0085\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006"
+    "\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000"
+)
+KEPT = {"\u2026"}
+
+
+def normalize_for_quote(text: str) -> str:
+    out: list[str] = []
+    clusters: list[str] = []
+    for char in text:
+        if clusters and unicodedata.category(char).startswith("M"):
+            clusters[-1] += char
+        else:
+            clusters.append(char)
+    for cluster in clusters:
+        normalised = cluster if cluster in KEPT else unicodedata.normalize("NFKC", cluster)
+        for char in normalised:
+            if char in REMOVED:
+                continue
+            if char in WHITESPACE:
+                if out and out[-1] != " ":
+                    out.append(" ")
+                continue
+            if char in SINGLE_QUOTES:
+                char = "'"
+            elif char in DOUBLE_QUOTES:
+                char = '"'
+            elif char in DASHES:
+                char = "-"
+            out.append(char)
+    return "".join(out).rstrip(" ")
+
+
+def quote_occurs(text: str, quote: str) -> bool:
+    needle = normalize_for_quote(quote)
+    return needle != "" and needle in normalize_for_quote(text)
 
 
 def clean_latex(text: str) -> str:
@@ -169,8 +216,8 @@ def extraction(accepted: dict[str, dict]) -> dict[str, tuple[Path, list]]:
         for i, cand in enumerate(cands):
             for key in ("evidenceQuote", "customerQuote", "whyNowQuote", "alternativeQuote"):
                 quote = cand.get(key)
-                if quote is not None and text is not None and quote not in text:
-                    err(path, f"candidate {i}: {key} is not verbatim in the fixture without LaTeX markup")
+                if quote is not None and text is not None and not quote_occurs(text, quote):
+                    err(path, f"candidate {i}: {key} is not verbatim in the fixture without LaTeX markup, after quote normalisation")
             for key in ("finding", "evidenceQuote", "customer", "customerQuote"):
                 if not cand.get(key):
                     err(path, f"candidate {i}: {key} is missing")
