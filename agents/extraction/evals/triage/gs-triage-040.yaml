@@ -1,5 +1,6 @@
 id: gs-triage-040
 publicationFixture: fixtures/arxiv/2610.03932.json
+industry: public-sector
 expected:
   signals:
     namedParty: true

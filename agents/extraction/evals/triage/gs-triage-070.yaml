@@ -1,5 +1,6 @@
 id: gs-triage-070
 publicationFixture: fixtures/arxiv/2601.05033.json
+industry: consumer-retail
 expected:
   signals:
     namedParty: false
