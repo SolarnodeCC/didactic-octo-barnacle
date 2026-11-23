@@ -3,6 +3,7 @@ import { probeTriage } from "../recovery/breaker.js";
 import { replayDueDeadLetters } from "../recovery/dead-letters.js";
 import { redriveTriage } from "../recovery/redrive.js";
 import { admitDay } from "../triage/admission.js";
+import { queueAdmittedExtractions } from "../extraction/queue-extractions.js";
 import { notify } from "../alerts/notify.js";
 import { textExtractEnvelope, type PipelineDeps } from "../queue/deps.js";
 import { documentsAwaitingText } from "../store/document-repo.js";
@@ -15,10 +16,12 @@ export async function runScheduled(
   cron: string,
 ): Promise<StartRunResult | null> {
   if (cron === ADMISSION_CRON) {
-    // Failed steps are re-driven first, then the day's admission (ADR 0063, ADR 0055).
+    // Failed steps are re-driven first, then the day's admission, then extraction is queued
+    // for the admitted (ADR 0063, ADR 0055).
     const day = deps.Now().slice(0, 10);
     await redriveTriage(deps, day);
     await admitDay(deps, day);
+    await queueAdmittedExtractions(deps, day);
     return null;
   }
   if (cron === RECOVERY_CRON) {

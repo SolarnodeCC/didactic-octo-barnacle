@@ -17,7 +17,7 @@ Tables, configuration keys, and bindings are in [schema](schema.md). Behavior th
 | `packages/models` | `MoneySchema`; schemas for the model-call record, processing run, triage decision row, extraction result, and candidate row; the new queue message types and `CandidateId` in the message IDs; the `callModel` helper (ADR 0003) and its Workers AI and budget interfaces |
 | `packages/prompts` (new) | One versioned prompt per step (`triage@2`, `extraction@4`, ADR 0076, ADR 0085, ADR 0090), the sampling settings that go with it, and the delimiters that mark publication text as data |
 | `packages/vector-store` (new) | `embedTexts`, `upsertPublicationVectors`, `deletePublicationVectors`, `searchPublications`, the index registry, and the recall-at-10 corpus and evaluator (ADR 0056, ADR 0057) |
-| `agents/extraction` | `runExtractionStep`: a pure function from input to validated output through `callModel`; an eval command that runs the existing eval runner on `callModel` for the benchmark. `runTriageStep` lives in `apps/pipeline/src/triage/step.ts` instead, on `@roi/prompts` and `@roi/models`, so the Worker bundle stays free of the benchmark command's dependencies (WP6) |
+| `agents/extraction` | `runExtractionStep`: a pure function from input to validated output through `callModel`; an eval command that runs the existing eval runner on `callModel` for the benchmark. `runTriageStep` and `runExtractionStep` live in `apps/pipeline/src/triage/step.ts` and `apps/pipeline/src/extraction/step.ts` instead, on `@roi/prompts` and `@roi/models`, so the Worker bundle stays free of the benchmark command's dependencies (WP6, WP7). The checks they share with the benchmark are in `packages/models` |
 | `apps/pipeline` | Consumers for embedding, triage, extraction, and text extraction; the admission cron; the retraction check; budget handling; the thin-slice Workflow with stub steps; run-report fields for processing |
 | `apps/api` (new, minimal) | One read-only route for the thin slice (ADR 0058) |
 | `infrastructure/cloudflare` | Migrations 0009, 0010, and 0011; Workers AI, Vectorize, Workflow, and queue bindings; new crons; bootstrap entries for the new queues and the Vectorize metadata indexes; the price table |
@@ -78,7 +78,7 @@ In phase 2 the model queue's concurrency (8, equal to `model.semaphore_max`) is 
    - It ranks them with `admitWithinDailyLimit`, using the limit minus the publications already admitted that UTC day (REQ-PROC-008 AC4).
    - It leaves out a publication dated after the day of the run. The 613 OpenAlex works with a future date that were stored before ADR 0068 stay in the database, and a date in the future is no sign that a work is recent.
    - It admits a ranked publication only when it is ready: text stored or failed, no license-allowed PDF, or the document message finished without a document (completed, failed after its retries as `unavailable`, or dead-lettered). After `extraction.full_text_wait_hours` every publication is ready. A publication that is not ready keeps its rank, its empty reason, and its place in the pool, and uses none of the limit (REQ-PROC-011, ADR 0065).
-   - It sets the admitted to `accepted` with `admitted_on`. The `publication.extract` message for them comes with WP7, together with its consumer; until then the admission only records them.
+   - It sets the admitted to `accepted` with `admitted_on`. After its batch commits, `queueAdmittedExtractions` (`apps/pipeline/src/extraction/queue-extractions.ts`) sends `publication.extract` for every accepted publication that has no `extraction_result` and no `extract:` message yet. That covers today's admitted, and any whose message was lost in a stop between the commit and the send or while processing was off. It sends nothing while the day's budget is used up (WP7).
    - With the day's budget used up it admits nobody (REQ-NFR-005 AC2). The counts (admitted, deferred for the limit, not ready, admitted on the abstract after the wait, left the pool, dated after the run day) go into the day's processing run. Code: `apps/pipeline/src/triage/admission.ts`.
    - The rest get `daily-limit`, stay in the pool, and are considered again the next day. A decision that leaves the pool keeps `daily-limit` as its final reason.
    - The run is keyed by its day, so a repeated trigger admits nothing twice.
@@ -89,6 +89,12 @@ In phase 2 the model queue's concurrency (8, equal to `model.semaphore_max`) is 
 - `runExtractionStep` returns the candidates, `Confidence`, and `Notes`. With abstract-only input, `Confidence` is capped at 0.7 (contract conventions).
 - The pipeline gives each candidate an ID from `deps.NewId` and writes one `extraction_result` row and zero to `extraction.max_candidates_per_publication` `candidate` rows in one batch (REQ-PROC-004 AC1, AC2).
 - Outside the thin slice, phase 2 queues no `candidate.run`. Candidates wait for the phase 3 agents.
+- Implementation (WP7): `handleExtraction` in `apps/pipeline/src/extraction/extraction-consumer.ts`.
+  - It extracts only a publication whose triage decision is `accepted`, and completes with `already extracted` when a result exists.
+  - A stored text that cannot be read throws, so the queue retries the message.
+  - Each kept quote is stored as the matched source span (ADR 0064). Candidate rows are inserted only when this message's result row is the one stored, so a parallel duplicate adds none (REQ-PROC-010 AC7).
+  - A budget-refused, paused, or failed step records the failure in `redrive` with step `extraction`, as triage does. The re-drive of extraction failures comes with the rest of WP7 (REQ-PROC-010 AC3).
+  - The day's run counts `Extracted`, `ExtractedOnFullText`, `ExtractedOnAbstract`, `ExtractedWithoutCandidate`, `CandidatesStored`, `CandidatesDropped`, `DroppedQuote`, `DroppedGenericCustomer`, and the report-only `CustomerQuoteNoOverlap` (ADR 0066). They are added inside the database, so parallel consumers never overwrite each other's counts.
 
 ## Full text
 

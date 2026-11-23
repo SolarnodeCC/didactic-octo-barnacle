@@ -131,6 +131,16 @@ export function createHarness(
       /** `ingestion.daily_extraction_limit`; the configured default when left out. */
       DailyLimit?: number;
     };
+    /** Extraction (REQ-PROC-004, REQ-PROC-009); the configured defaults when left out. */
+    Extraction?: {
+      Ai: WorkersAiBinding;
+      /** `false` consumes extraction messages but sends none, as with processing off. */
+      Send?: boolean;
+      /** The day's budget in euro; the configured default when left out. */
+      BudgetEur?: number;
+      FullTextMaxChars?: number;
+      MaxCandidates?: number;
+    };
     /** Recovery settings (REQ-PROC-010, REQ-DATA-012); the configured defaults when left out. */
     Recovery?: Partial<NonNullable<PipelineDeps["Recovery"]>>;
   } = {},
@@ -220,6 +230,32 @@ export function createHarness(
               PoolDays: DEFAULT_PROCESSING_CONFIG.AdmissionPoolDays,
               FullTextWaitHours: DEFAULT_PROCESSING_CONFIG.FullTextWaitHours,
             },
+          },
+        }
+      : {}),
+    ...(overrides.Extraction
+      ? {
+          Extraction: {
+            ...(overrides.Extraction.Send === false ? {} : { Queue: queue }),
+            Call: {
+              Ai: overrides.Extraction.Ai,
+              GatewayId: "roi-test",
+              Usage: createModelUsageStore(database.Db, {
+                Amount: overrides.Extraction.BudgetEur ?? DEFAULT_PROCESSING_CONFIG.BudgetDailyEur,
+                Currency: "EUR",
+              }),
+              Prices: PRICE_TABLE,
+              MaxAttempts: DEFAULT_PROCESSING_CONFIG.ModelMaxAttempts,
+              NewId: counter("mce"),
+              Now: () => new Date(clock.Now),
+              Sleep: () => Promise.resolve(),
+            },
+            Model: DEFAULT_PROCESSING_CONFIG.ExtractionModel,
+            MaxCandidates:
+              overrides.Extraction.MaxCandidates ?? DEFAULT_PROCESSING_CONFIG.MaxCandidates,
+            FullTextMaxChars:
+              overrides.Extraction.FullTextMaxChars ?? DEFAULT_PROCESSING_CONFIG.FullTextMaxChars,
+            GenericCustomerTerms: DEFAULT_PROCESSING_CONFIG.GenericCustomerTerms,
           },
         }
       : {}),

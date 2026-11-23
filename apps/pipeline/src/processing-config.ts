@@ -1,4 +1,8 @@
-import { type ModelConfig } from "@roi/models";
+import {
+  DEFAULT_GENERIC_CUSTOMER_TERMS,
+  DEFAULT_MAX_CANDIDATES,
+  type ModelConfig,
+} from "@roi/models";
 
 /**
  * Runtime configuration of phase 2 processing (docs/kt/phase-2/schema.md, defaults in
@@ -12,6 +16,13 @@ export type ProcessingConfig = {
   AdmissionPoolDays: number;
   /** `extraction.full_text_max_chars`: cut before the call; the quote check uses the cut text. */
   FullTextMaxChars: number;
+  /** `extraction.max_candidates_per_publication`: the hard cap on candidates (REQ-PROC-004 AC2). */
+  MaxCandidates: number;
+  /**
+   * `extraction.generic_customer_terms`: parties that never count as `Customer` (REQ-PROC-009
+   * AC4, ADR 0066). Changes by reviewed pull request.
+   */
+  GenericCustomerTerms: readonly string[];
   /** `embedding.batch_size`: messages per embedding call. */
   EmbeddingBatchSize: number;
   /** `retraction.lookback_days`: how far back the weekly retraction check looks (ADR 0061). */
@@ -80,6 +91,8 @@ export const DEFAULT_PROCESSING_CONFIG: ProcessingConfig = {
   Enabled: false,
   AdmissionPoolDays: 7,
   FullTextMaxChars: 24_000,
+  MaxCandidates: DEFAULT_MAX_CANDIDATES,
+  GenericCustomerTerms: DEFAULT_GENERIC_CUSTOMER_TERMS,
   EmbeddingBatchSize: 50,
   RetractionLookbackDays: 30,
   PriceTableVersion: "2026-11-11",
