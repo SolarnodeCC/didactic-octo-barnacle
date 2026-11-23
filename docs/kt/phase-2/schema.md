@@ -16,7 +16,7 @@ It extends the tables planned in schema migration 0001 with the fields that REQ-
 
 | Table | Columns | Keys and indexes |
 |---|---|---|
-| `processing_run` | `id`, `kind` (`daily`, `backfill`, `retraction-check`, `slice`), `day`, `status`, `started_at`, `ended_at`, `counts_json`, `failures_json` | UNIQUE (`kind`, `day`) for `daily`; index `day` |
+| `processing_run` | `id`, `kind` (`daily`, `backfill`, `retraction-check`, `slice`), `day`, `status`, `started_at`, `ended_at`, `counts_json`, `failures_json`, `report_json` (from migration 0012) | UNIQUE (`kind`, `day`) for `daily`; index `day` |
 | `model_call` | `id`, `run_kind` (`processing`, `pipeline`), `run_id`, `step_name`, `agent`, `publication_id`, `candidate_id`, `model`, `prompt_version`, `attempt`, `input_tokens`, `cached_input_tokens` (from migration 0010), `output_tokens`, `latency_ms`, `cost_amount`, `cost_currency`, `price_table_version`, `estimated`, `outcome` (`ok`, `invalid-output`, `provider-error`), `gateway_request_id`, `call_kind` (`model`, `search`), `search_query`, `search_result_count`, `created_at` | index (`run_kind`, `run_id`); index `created_at`. No prompt or publication text |
 | `budget_day` | `day`, `limit_amount`, `spent_amount`, `currency`, `stopped_at`, `alerted_at` | PRIMARY `day` |
 | `embedding_index` | `id`, `binding`, `vectorize_name`, `model_name`, `model_version`, `dimensions`, `metric`, `current`, `backfill_started_at`, `backfill_done_at` | UNIQUE `vectorize_name`; at most one row with `current = 1` |
@@ -42,6 +42,10 @@ Signals are nullable: a rule rejection has no signals, no model, and no prompt v
 ## Migration 0010: cached input tokens
 
 `model_call.cached_input_tokens` (INTEGER, NOT NULL, default 0, between 0 and `input_tokens`): the input tokens the provider served from its prompt cache, as Workers AI reports them in `usage.prompt_tokens_details.cached_tokens`. They are a part of `input_tokens` and are billed at the cached-input price of the price table, so the stored cost can be recomputed from the row and its `price_table_version` ([ADR 0078](../decisions/0078-cached-input-tokens-in-the-cost-estimate.md)). The column is added with `ALTER TABLE ... ADD COLUMN`: rows written before it, and a Worker that does not write it, read 0. Migration 0010 is `infrastructure/cloudflare/migrations/0010_model_call_cached_input_tokens.sql`.
+
+## Migration 0012: processing report
+
+`processing_run.report_json` (TEXT, NULL until reported): the `ProcessingReport` of the run, written once the run is finished (WP9; REQ-NFR-005 AC3, REQ-NFR-008 AC2, ADR 0114). It holds IDs, counts, and amounts, never publication text. Migration 0012 is `infrastructure/cloudflare/migrations/0012_processing_report.sql`, added with `ALTER TABLE ... ADD COLUMN`, so it is expand-only.
 
 ## Migration 0011: recovery
 

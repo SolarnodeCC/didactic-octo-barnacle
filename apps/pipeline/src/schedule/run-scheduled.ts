@@ -8,6 +8,7 @@ import { sweepRetractions } from "../retraction/sweep.js";
 import { queueAdmittedExtractions } from "../extraction/queue-extractions.js";
 import { continueEmbeddingBackfills } from "../embedding/backfill.js";
 import { notify } from "../alerts/notify.js";
+import { reportProcessingRuns } from "../report/processing-report.js";
 import { textExtractEnvelope, type PipelineDeps } from "../queue/deps.js";
 import { documentsAwaitingText } from "../store/document-repo.js";
 import { SEND_BATCH_LIMIT } from "../queue/types.js";
@@ -22,6 +23,8 @@ export async function runScheduled(
     // Retracted publications are swept first, then failed steps are re-driven, then the day's
     // admission, then extraction is queued for the admitted (REQ-DATA-008, ADR 0063, ADR 0055).
     const day = deps.Now().slice(0, 10);
+    // Yesterday's daily run is closed and reported first, with its cost (REQ-NFR-005 AC3).
+    await reportProcessingRuns(deps, day);
     await sweepRetractions(deps, day);
     await redriveTriage(deps, day);
     // Re-driven extractions count toward the day's limit, so they go before the admission

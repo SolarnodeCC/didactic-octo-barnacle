@@ -122,6 +122,8 @@ Memory grows with about twice the file size and with the amount of text. `text.m
   - A `budget-stop` alert is sent once that day (REQ-NFR-005 AC2).
 - The overshoot is at most the steps already started: model-queue concurrency × `model.max_attempts` × the dearest call.
 - Each processing run report holds the cost per publication and per opportunity (candidate) for its day (REQ-NFR-005 AC3).
+  - As built (ADR 0114, `report/processing-report.ts`): the admission cron first closes the earlier days' `daily` runs (`partial` with failed-final items) and stores each finished run's `ProcessingReport` in `processing_run.report_json`.
+  - The total is every call of the run; it is divided by the distinct publications with a call and by the candidates written.
 
 ## Recovery
 
