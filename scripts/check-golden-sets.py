@@ -96,15 +96,21 @@ def check_range(path: Path, name: str, value, low: int, high: int, width: int) -
 
 def triage() -> dict[str, dict]:
     accepted: dict[str, dict] = {}
+    industries: dict[str, int] = {}
     files = sorted((EXT / "triage").glob("gs-triage-*.yaml"))
     for path in files:
         entry = load(path)
         if not isinstance(entry, dict):
             continue
         check_id(path, entry)
-        # `industry` is optional until the owner confirms every label (ADR 0067, ADR 0072).
-        if "industry" in entry and entry["industry"] not in EXTRACTION_INDUSTRIES:
-            err(path, f"industry {entry['industry']!r} is not one of the eight industries or 'other'")
+        # Every triage entry carries an industry for the per-industry eval report (REQ-TEST-007).
+        industry = entry.get("industry")
+        if industry is None:
+            err(path, "industry is missing")
+        elif industry not in EXTRACTION_INDUSTRIES:
+            err(path, f"industry {industry!r} is not one of the eight industries or 'other'")
+        else:
+            industries[industry] = industries.get(industry, 0) + 1
         fixture = (EXT / entry["publicationFixture"]).resolve()
         text = fixture_text(path, fixture)
         signals = entry["expected"]["signals"]
@@ -128,6 +134,9 @@ def triage() -> dict[str, dict]:
             accepted[fixture.name] = entry
     if len(files) < MIN_ENTRIES:
         err(EXT / "triage", f"{len(files)} entries, minimum {MIN_ENTRIES}")
+    for industry in INDUSTRIES:
+        if industries.get(industry, 0) < 1:
+            err(EXT / "triage", f"no triage entry for industry {industry}")
     return accepted
 
 
