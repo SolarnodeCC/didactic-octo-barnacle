@@ -1,6 +1,9 @@
 import {
+  DEFAULT_GENERIC_CUSTOMER_TERMS,
+  applyExtractionChecks,
   callModel,
-  extractionMissingQuotes,
+  extractionFailureMessage,
+  extractionItemChecks,
   type CallModelDeps,
   type CallModelResult,
   type CallOutputMode,
@@ -67,9 +70,19 @@ export function triageModelFn(options: CallModelFnOptions): ModelFn {
   };
 }
 
+/**
+ * Extraction as the pipeline runs it: the candidate-level checks fail an attempt and are retried;
+ * on the last attempt the failing candidates are dropped and the rest kept, and kept quotes become
+ * the matched source spans (ADR 0064, ADR 0066).
+ */
 export function extractionModelFn(
-  options: CallModelFnOptions & { MaxCandidates?: number },
+  options: CallModelFnOptions & {
+    MaxCandidates?: number;
+    /** `extraction.generic_customer_terms`; the ADR 0066 list by default. */
+    GenericCustomerTerms?: readonly string[];
+  },
 ): ModelFn {
+  const terms = options.GenericCustomerTerms ?? DEFAULT_GENERIC_CUSTOMER_TERMS;
   const config = withReasoning(
     modelConfig(options.Model, EXTRACTION_PROMPT_VERSION, EXTRACTION_SAMPLING, options.OutputMode),
     options.Reasoning,
@@ -92,9 +105,14 @@ export function extractionModelFn(
       Config: config,
       Prompt: built.Prompt,
       Contract: contract,
-      MissingQuotes: (output) => extractionMissingQuotes(output, built.QuoteText),
+      ItemChecks: (output) =>
+        extractionItemChecks(output, built.QuoteText, terms).map((failure) =>
+          extractionFailureMessage(output, failure),
+        ),
     });
     options.OnResult?.(publication.Id, result);
-    return result.Ok ? result.Output : null;
+    const checked = !result.Ok && "Checked" in result ? result.Checked : undefined;
+    const output = result.Ok ? result.Output : (checked?.Output ?? null);
+    return output === null ? null : applyExtractionChecks(output, built.QuoteText, terms).Output;
   };
 }

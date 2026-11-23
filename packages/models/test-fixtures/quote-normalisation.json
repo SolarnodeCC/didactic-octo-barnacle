@@ -1,0 +1,23 @@
+{
+  "normalize": [
+    {"input": "plain text", "expected": "plain text"},
+    {"input": "the \u201cquoted\u201d word and it\u2019s", "expected": "the \"quoted\" word and it's"},
+    {"input": "a \u2032 prime and \u201equote\u201f", "expected": "a ' prime and \"quote\""},
+    {"input": "low\u2010cost, non\u2011breaking, 1\u20122, 1\u20132, a\u2014b, \u22125", "expected": "low-cost, non-breaking, 1-2, 1-2, a-b, -5"},
+    {"input": "soft\u00adhyphen and zero\u200bwidth\u200c\u200d\u2060\ufeff", "expected": "softhyphen and zerowidth"},
+    {"input": "  line\n  break\t\tand\u00a0nbsp\u2009thin  ", "expected": "line break and nbsp thin"},
+    {"input": "the \ufb01rst e\ufb03cient", "expected": "the first efficient"},
+    {"input": "cafe\u0301 and caf\u00e9", "expected": "caf\u00e9 and caf\u00e9"},
+    {"input": "Case Stays", "expected": "Case Stays"},
+    {"input": "ellipsis\u2026 and ...", "expected": "ellipsis\u2026 and ..."},
+    {"input": "line-\nbreak", "expected": "line- break"}
+  ],
+  "spans": [
+    {"text": "Hospitals face \u201crising costs\u201d\nin\u00a0care.", "quote": "face \"rising costs\" in care", "span": "face \u201crising costs\u201d\nin\u00a0care"},
+    {"text": "a low\u2013cost sensor", "quote": "low-cost sensor", "span": "low\u2013cost sensor"},
+    {"text": "an e\ufb03cient grid", "quote": "efficient grid", "span": "e\ufb03cient grid"},
+    {"text": "Banks report losses", "quote": "banks report losses", "span": null},
+    {"text": "wait\u2026 then", "quote": "wait... then", "span": null},
+    {"text": "anything", "quote": "   ", "span": null}
+  ]
+}

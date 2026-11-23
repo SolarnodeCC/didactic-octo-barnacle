@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
 
 import { callModel, type CallModelDeps, type ModelUsageStore } from "./call-model.js";
-import { extractionMissingQuotes, extractionOutputSchema } from "./extraction.js";
+import {
+  DEFAULT_GENERIC_CUSTOMER_TERMS,
+  extractionFailureMessage,
+  extractionItemChecks,
+  extractionMissingQuotes,
+  extractionOutputSchema,
+  type ExtractionOutput,
+} from "./extraction.js";
 import { FakeWorkersAi, type FakeReply } from "./fake-workers-ai.js";
 import { ModelCallRecordSchema, type ModelCallRecord } from "./model-call.js";
 import {
@@ -213,6 +220,63 @@ describe("REQ-AGENT-008: quotes are checked after validation", () => {
     });
     expect(result).toMatchObject({ Ok: true, Attempts: 2 });
     expect(usage.Records[0]?.Outcome).toBe("invalid-output");
+  });
+});
+
+describe("REQ-PROC-009: item checks and the last attempt (ADR 0064)", () => {
+  const text = "Grid operators report transformer failures that cause outages.";
+  const good = {
+    Finding: "Grid operators lack early warning of transformer failures.",
+    EvidenceQuote: "transformer failures that cause outages",
+    Customer: "Grid operators",
+    CustomerQuote: "Grid operators",
+    WhyNow: null,
+    WhyNowQuote: null,
+    CurrentAlternative: null,
+    AlternativeQuote: null,
+  };
+  const generic = { ...good, Customer: "users" };
+  const contract = extractionOutputSchema();
+  const itemChecks = (output: ExtractionOutput) =>
+    extractionItemChecks(output, text, DEFAULT_GENERIC_CUSTOMER_TERMS).map((failure) =>
+      extractionFailureMessage(output, failure),
+    );
+
+  it("REQ-PROC-009 AC7: the last attempt that fails only its item checks returns its output", async () => {
+    const answer: FakeReply = {
+      Kind: "output",
+      Output: { Candidates: [good, generic], Confidence: 0.5, Notes: null },
+    };
+    const { ai, deps } = setup([answer, answer, answer]);
+    const result = await callModel(deps, {
+      ...request,
+      StepName: "extraction",
+      Contract: contract,
+      ItemChecks: itemChecks,
+    });
+    expect(result).toMatchObject({ Ok: false, Reason: "invalid-output", Attempts: 3 });
+    expect(
+      result.Ok === false && "Checked" in result ? result.Checked?.Output.Candidates : null,
+    ).toHaveLength(2);
+    // The retry names the failing candidate and field (REQ-PROC-009 AC3, AC4).
+    const retry = ai.Calls[1]?.Inputs.messages as Array<{ content: string }>;
+    expect(retry.at(-1)?.content).toContain('Candidates[1].Customer: "users" is a generic party');
+  });
+
+  it("REQ-PROC-009 AC7: a schema-invalid last attempt returns no output", async () => {
+    const { deps } = setup([
+      { Kind: "output", Output: { Candidates: [generic], Confidence: 0.5, Notes: null } },
+      { Kind: "output", Output: { Candidates: [generic], Confidence: 0.5, Notes: null } },
+      { Kind: "output", Output: { Candidates: "none" } },
+    ]);
+    const result = await callModel(deps, {
+      ...request,
+      StepName: "extraction",
+      Contract: contract,
+      ItemChecks: itemChecks,
+    });
+    expect(result).toMatchObject({ Ok: false, Reason: "invalid-output", Attempts: 3 });
+    expect("Checked" in result).toBe(false);
   });
 });
 

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { quoteOccurs } from "./quote.js";
+
 /**
  * Shared parts of every agent and extraction contract (docs/kt/agents/contract-conventions.md).
  * The model fills only `Output`; the pipeline fills the rest of the envelope.
@@ -62,6 +64,14 @@ export type InputMode = z.infer<typeof InputModeSchema>;
 export const RepairKindSchema = z.enum(["unwrapped-json-string", "stripped-code-fence"]);
 export type RepairKind = z.infer<typeof RepairKindSchema>;
 
+/** An item dropped on the last attempt because it failed an item-level check (ADR 0064). */
+export const DroppedItemSchema = z.object({
+  Index: z.number().int().min(0),
+  Field: z.string().min(1),
+  Reason: z.string().min(1),
+});
+export type DroppedItem = z.infer<typeof DroppedItemSchema>;
+
 /** The envelope around an agent output; `output` is that agent's contract schema. */
 export function agentEnvelopeSchema<T extends z.ZodType>(output: T) {
   return z.object({
@@ -76,6 +86,8 @@ export function agentEnvelopeSchema<T extends z.ZodType>(output: T) {
     OutputMode: OutputModeSchema,
     Attempts: z.number().int().min(1),
     Repairs: z.array(RepairKindSchema),
+    /** Items dropped on the last attempt; extraction only (ADR 0064). */
+    Dropped: z.array(DroppedItemSchema).default([]),
     Output: output,
     Evidence: z.array(EvidenceSchema).max(20),
   });
@@ -164,12 +176,15 @@ export function repairModelOutput(raw: unknown, contract: z.ZodObject): RepairRe
   return { Ok: true, Value: fields, Repairs: repairs };
 }
 
-/** Quotes that do not occur verbatim in the text the step received (REQ-AGENT-008). */
+/**
+ * Quotes that do not occur in the text the step received, after both are normalised
+ * (REQ-AGENT-008 AC2, ADR 0064).
+ */
 export function missingQuotes(
   quotes: ReadonlyArray<{ Field: string; Quote: string | null }>,
   text: string,
 ): string[] {
   return quotes
-    .filter((item) => item.Quote !== null && !text.includes(item.Quote))
+    .filter((item) => item.Quote !== null && !quoteOccurs(text, item.Quote))
     .map((item) => item.Field);
 }
