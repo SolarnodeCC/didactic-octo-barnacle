@@ -3,6 +3,7 @@ import { probeStep } from "../recovery/breaker.js";
 import { replayDueDeadLetters } from "../recovery/dead-letters.js";
 import { redriveExtraction, redriveTriage } from "../recovery/redrive.js";
 import { admitDay } from "../triage/admission.js";
+import { sweepRetractions } from "../retraction/sweep.js";
 import { queueAdmittedExtractions } from "../extraction/queue-extractions.js";
 import { notify } from "../alerts/notify.js";
 import { textExtractEnvelope, type PipelineDeps } from "../queue/deps.js";
@@ -16,9 +17,10 @@ export async function runScheduled(
   cron: string,
 ): Promise<StartRunResult | null> {
   if (cron === ADMISSION_CRON) {
-    // Failed steps are re-driven first, then the day's admission, then extraction is queued
-    // for the admitted (ADR 0063, ADR 0055).
+    // Retracted publications are swept first, then failed steps are re-driven, then the day's
+    // admission, then extraction is queued for the admitted (REQ-DATA-008, ADR 0063, ADR 0055).
     const day = deps.Now().slice(0, 10);
+    await sweepRetractions(deps, day);
     await redriveTriage(deps, day);
     // Re-driven extractions count toward the day's limit, so they go before the admission
     // (REQ-PROC-010 AC3).

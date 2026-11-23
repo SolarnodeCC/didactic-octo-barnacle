@@ -110,7 +110,7 @@ export async function admitDay(deps: PipelineDeps, day: string): Promise<Admissi
     .prepare(
       `SELECT td.publication_id, td.score, td.created_at, p.published_at
        FROM triage_decision td JOIN publication p ON p.id = td.publication_id
-       WHERE td.status = 'awaiting-admission' AND td.created_at >= ?`,
+       WHERE td.status = 'awaiting-admission' AND td.created_at >= ? AND p.retracted = 0`,
     )
     .bind(poolStart)
     .all<PoolRow>();

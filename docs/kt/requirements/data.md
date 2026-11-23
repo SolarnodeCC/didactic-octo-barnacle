@@ -140,7 +140,7 @@ Retracted or withdrawn publications do not produce or keep active opportunities.
 
 - Phase: 2
 - Priority: should
-- Status: planned
+- Status: in-progress
 - Source: overview principle Reliability
 - Acceptance criteria:
   1. A publication that OpenAlex marks as retracted, or that arXiv marks as withdrawn, is flagged on the next run.

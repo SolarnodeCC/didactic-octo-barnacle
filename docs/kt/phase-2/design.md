@@ -152,7 +152,14 @@ Memory grows with about twice the file size and with the amount of text. `text.m
 
 - Ingestion already sets `publication.retracted` and never clears it.
 - The weekly retraction check (`0 8 * * 1`) asks OpenAlex for retracted works, and arXiv for withdrawals, among the stored publications of the last `retraction.lookback_days` (30 days, ADR 0061), and sets the flag (REQ-DATA-008 AC1).
-- The daily admission cron starts with a sweep of flagged publications not yet handled. It deletes their vectors from every index, hides their candidates and, from migration 0011, their opportunities with `hidden_reason = retracted`, and stamps `retraction_handled_at` (REQ-DATA-008 AC2, AC3; REQ-PROC-002 AC2).
+- The daily admission cron starts with a sweep of flagged publications not yet handled. It deletes their vectors from every index, hides their candidates and, from migration 0012 (WP10), their opportunities with `hidden_reason = retracted`, and stamps `retraction_handled_at` (REQ-DATA-008 AC2, AC3; REQ-PROC-002 AC2).
+- **As built (WP8):** `sweepRetractions` in `apps/pipeline/src/retraction/sweep.ts` runs before the re-drives.
+  - It hides the candidates of each flagged publication.
+  - It decides a triage decision still awaiting admission as `retracted`, so the publication is never admitted.
+  - It stamps `retraction_handled_at`, so a repeated sweep changes nothing.
+  - It counts `RetractionsHandled`, `CandidatesHidden`, and `DecisionsWithdrawn` in the day's run.
+- A publication retracted after its admission goes no further: `queueAdmittedExtractions` and the re-drives skip it, and the extraction consumer completes its message as `retracted` without a model call.
+- WP8 was built before WP5, so the vector part moves to WP5. The embedding consumer never embeds a retracted publication, and the sweep deletes the vectors of flagged publications from every index (REQ-DATA-008 AC3, REQ-PROC-002 AC2).
 
 ## Thin slice
 
