@@ -43,6 +43,15 @@ Signals are nullable: a rule rejection has no signals, no model, and no prompt v
 
 `model_call.cached_input_tokens` (INTEGER, NOT NULL, default 0, between 0 and `input_tokens`): the input tokens the provider served from its prompt cache, as Workers AI reports them in `usage.prompt_tokens_details.cached_tokens`. They are a part of `input_tokens` and are billed at the cached-input price of the price table, so the stored cost can be recomputed from the row and its `price_table_version` ([ADR 0078](../decisions/0078-cached-input-tokens-in-the-cost-estimate.md)). The column is added with `ALTER TABLE ... ADD COLUMN`: rows written before it, and a Worker that does not write it, read 0. Migration 0010 is `infrastructure/cloudflare/migrations/0010_model_call_cached_input_tokens.sql`.
 
+## Migration 0013: quality
+
+Migration 0013 is `infrastructure/cloudflare/migrations/0013_quality.sql` (WP9; REQ-NFR-023, ADR 0071, ADR 0115). It is expand-only.
+
+| Table or column | Columns | Notes |
+|---|---|---|
+| `extraction_result.quote_positions_json` | ten counts, default `[]` | Kept quotes by the tenth of the sent text they start in |
+| `quality_metric` | `day`, `metric`, `value`, `items` | PRIMARY (`day`, `metric`); each day's quality rates, the baseline of the drift check |
+
 ## Migration 0012: processing report
 
 `processing_run.report_json` (TEXT, NULL until reported): the `ProcessingReport` of the run, written once the run is finished (WP9; REQ-NFR-005 AC3, REQ-NFR-008 AC2, ADR 0114). It holds IDs, counts, and amounts, never publication text. Migration 0012 is `infrastructure/cloudflare/migrations/0012_processing_report.sql`, added with `ALTER TABLE ... ADD COLUMN`, so it is expand-only.
@@ -57,9 +66,9 @@ Migration 0011 is `infrastructure/cloudflare/migrations/0011_recovery.sql` (WP6;
 | `queue_message_log.replay_count`, `queue_message_log.dead_lettered_at` | | Automatic dead-letter replays, at most two per message ID, each `recovery.dead_letter_replay_hours` after the dead letter |
 | `step_pause` | `step`, `paused_at`, `last_probe_at`, `resumed_at`, `alerted_at` | The breaker: a step is paused while `resumed_at` is empty |
 
-## Migration 0012: thin slice
+## Migration 0014: thin slice
 
-ADR 0054 planned this migration as 0010; it became 0011 when migration 0010 went to cached input tokens (ADR 0078), and 0012 when migration 0011 went to recovery (WP6).
+ADR 0054 planned this migration as 0010; it became 0011 when migration 0010 went to cached input tokens (ADR 0078), 0012 when migration 0011 went to recovery (WP6), and 0014 when migrations 0012 and 0013 went to the processing report and quality monitoring (WP9).
 
 The tables of schema migration 0001 for the pipeline, with these changes:
 

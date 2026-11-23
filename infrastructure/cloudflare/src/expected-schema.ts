@@ -247,6 +247,7 @@ export const EXPECTED_PHASE2_TABLES: ExpectedTable[] = [
       "confidence",
       "notes",
       "candidate_count",
+      "quote_positions_json",
       "created_at",
     ],
   },
@@ -293,5 +294,9 @@ export const EXPECTED_PHASE2_TABLES: ExpectedTable[] = [
   {
     name: "step_pause",
     columns: ["step", "paused_at", "last_probe_at", "resumed_at", "alerted_at"],
+  },
+  {
+    name: "quality_metric",
+    columns: ["day", "metric", "value", "items"],
   },
 ];
