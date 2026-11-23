@@ -66,6 +66,15 @@ export {
 export { AlertTypeSchema, RunReportSchema, type AlertType, type RunReport } from "./run-report.js";
 
 export {
+  ProcessingCostSchema,
+  ProcessingReportSchema,
+  ProcessingStepCostSchema,
+  type ProcessingCost,
+  type ProcessingReport,
+  type ProcessingStepCost,
+} from "./processing-report.js";
+
+export {
   ErasureReasonSchema,
   ErasureRecordSchema,
   type ErasureReason,

@@ -148,6 +148,7 @@ export const EXPECTED_PHASE2_TABLES: ExpectedTable[] = [
       "ended_at",
       "counts_json",
       "failures_json",
+      "report_json",
     ],
   },
   {

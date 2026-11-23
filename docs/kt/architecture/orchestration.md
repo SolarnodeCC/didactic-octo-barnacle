@@ -81,7 +81,8 @@ Daily admission cron (ADR 0055)
 ## Run reports and alerts
 
 - A run report (`RunReport` in `packages/models`) is built from the run row and the message log: status, window, pages, counts, failed items with short reasons, the dead-lettered messages of the run, and three data-quality counters (incomplete records, duplicates flagged, failed PDFs). It holds IDs, counts, and shortened reasons, never publication text (REQ-NFR-008).
-- Three events raise an alert today: a dead-lettered message (`dead-letter`, which also closes its run as failed), a scheduled start that fails (`failed-run`), and a run that outlived `ingestion.run_timeout_hours` (`run-timeout`). The budget stop and availability alerts arrive with their requirements.
+- A processing run report (`ProcessingReport`, phase 2) holds a processing run's counts, its failed-final items, the day's budget, and its model cost by step, per publication, and per opportunity. The admission cron closes and reports each day the morning after, into `processing_run.report_json` (REQ-NFR-005 AC3, ADR 0114).
+- Three events raise an alert today: a dead-lettered message (`dead-letter`, which also closes its run as failed), a scheduled start that fails (`failed-run`), and a run that outlived `ingestion.run_timeout_hours` (`run-timeout`). A `budget-stop` alert is sent once on the day the model budget runs out (REQ-NFR-005 AC2); the availability alert arrives with its requirement.
 - An alert opens a GitHub issue with the label `alert` and sends a plain-text email. The key is the type, the environment, and the source (or message type). A repeat within 24 hours of the first alert adds a comment to the issue and sends nothing else. State is kept in `alert_state` and written only after a channel delivered, so an alert nobody received is tried again (REQ-NFR-019).
 - Each channel fails on its own and never stops the pipeline: a failure is logged without secrets and the other channel still delivers.
 
