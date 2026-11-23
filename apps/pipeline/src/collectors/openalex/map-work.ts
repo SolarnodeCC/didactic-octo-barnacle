@@ -21,7 +21,7 @@ export type MappedOpenAlexWork = {
   OpenAlexIds: string[];
 };
 
-function openAlexShortId(id: string): string {
+export function openAlexShortId(id: string): string {
   return id.replace(/^https:\/\/openalex\.org\//i, "");
 }
 

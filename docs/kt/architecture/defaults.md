@@ -45,6 +45,7 @@ Starter configuration values. Stored as versioned config in `infrastructure/clou
 | `publication.embed` | `1` | Page consumer, when a publication is stored (ADR 0053) | Embedding consumer (`roi-embeddings-<env>`) |
 | `publication.triage` | `1` | Page consumer, when a publication is created and `processing.enabled` is on; runs in parallel with embedding (ADR 0053) | Triage consumer (`roi-models-<env>`, binding `MODEL_QUEUE`, one message per invocation and at most 8 at once); message ID `triage:<publicationId>` |
 | `publication.extract` | `1` | Daily admission cron, for admitted and re-driven publications, only where `processing.enabled` is on (ADR 0055, ADR 0063, ADR 0065) | Extraction consumer (`roi-models-<env>`, binding `MODEL_QUEUE`); message ID `extract:<publicationId>` |
+| `retraction.check_page` | `1` | Weekly retraction check (`0 8 * * 1`), one message per page and source (ADR 0112) | Retraction check on the page queue (`roi-publications-<env>`); message ID `retraction:<runId>:<source>:<page>` |
 | `candidate.run` | `1` | Extraction (0..N) | Starts one candidate Workflow |
 | `queue.dead_letter` | `1` | Any consumer after max attempts | Automatic replay after `recovery.dead_letter_replay_hours`, at most twice (REQ-DATA-012); admin replay (REQ-DATA-011) |
 

@@ -31,7 +31,7 @@ A preprint is in scope when its primary category or a cross-listed category is i
 - Use the arXiv API or OAI-PMH for metadata, not page scraping. The API terms ask for no more than one request every three seconds.
 - arXiv IDs carry a version (`v1`, `v2`). A new version updates the same publication (REQ-DATA-002).
 - A run stores only preprints whose first version was submitted within `ingestion.max_age_days` of the day of the run (REQ-DATA-009 AC3, AC6, ADR 0042). The request limits the query with `submittedDate:[from TO to]` (GMT, `YYYYMMDDHHMM`) and the collector checks `published` again when it stores. The feed stays sorted by the last update, so a new version of a preprint within the limit still comes back and updates its record (REQ-DATA-002 AC3); the window of a run follows that last-update date. A preprint first submitted before the limit is not stored, also not when it has a recent new version, and a record stored before ADR 0042 is not updated any more.
-- Withdrawn preprints are flagged (REQ-DATA-008).
+- Withdrawn preprints are flagged (REQ-DATA-008). The weekly retraction check looks the stored preprints of the last 30 days up again with `id_list`, 100 IDs a request, three seconds apart (ADR 0112).
 
 ## Licensing
 

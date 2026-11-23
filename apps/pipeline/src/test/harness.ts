@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 
-import { type WorkersAiBinding } from "@roi/models";
+import { stripArxivVersion, type WorkersAiBinding } from "@roi/models";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -8,6 +8,7 @@ import { FakeBucket } from "./fake-bucket.js";
 import { FakeQueue } from "./fake-queue.js";
 import { counter, createTestDatabase, type TestDatabase } from "./sqlite-d1.js";
 import { type ArxivPage } from "../collectors/arxiv/client.js";
+import { parseArxivId } from "../collectors/arxiv/map-entry.js";
 import { type ArxivEntry } from "../collectors/arxiv/types.js";
 import { type OpenAlexPage } from "../collectors/openalex/client.js";
 import { type OpenAlexWork } from "../collectors/openalex/types.js";
@@ -85,7 +86,15 @@ export type Harness = {
   /** What `eraseAuthor` and `reapplyErasures` need, on the same database and bucket. */
   Erasure: ErasureDeps;
   Clock: { Now: string };
-  OpenAlexRequests: Array<{ FromDate: string; ToDate?: string; Cursor?: string }>;
+  OpenAlexRequests: Array<{
+    FromDate: string;
+    ToDate?: string;
+    Cursor?: string;
+    Retracted?: boolean;
+    Page?: number;
+  }>;
+  /** The ID lists the retraction check asked arXiv for (ADR 0112). */
+  ArxivIdRequests: string[][];
   ArxivRequests: Array<{
     Start: number;
     MaxResults: number;
@@ -95,6 +104,8 @@ export type Harness = {
   /** Replace the scripted OpenAlex pages; each call to the client takes the next one. */
   SetOpenAlexPages(pages: Array<OpenAlexPage | Error>): void;
   SetArxivPages(pages: Array<ArxivPage | Error>): void;
+  /** What arXiv returns for an ID lookup: these entries, by version-less ID. */
+  SetArxivEntries(entries: ArxivEntry[]): void;
   /** Script the PDF fetcher: bytes, or an error, per URL. */
   SetPdfs(pdfs: Record<string, Uint8Array | Error>): void;
   Drain(options?: { Duplicate?: boolean; MaxRetries?: number }): Promise<number>;
@@ -156,6 +167,8 @@ export function createHarness(
   let arxivPages: Array<ArxivPage | Error> = [];
   const openAlexRequests: Harness["OpenAlexRequests"] = [];
   const arxivRequests: Harness["ArxivRequests"] = [];
+  const arxivIdRequests: string[][] = [];
+  let arxivEntries = new Map<string, ArxivEntry>();
 
   const take = <T>(pages: Array<T | Error>, label: string): Promise<T> => {
     const next = pages.shift();
@@ -259,6 +272,7 @@ export function createHarness(
           },
         }
       : {}),
+    Retraction: { LookbackDays: DEFAULT_PROCESSING_CONFIG.RetractionLookbackDays },
     Recovery: {
       MaxRedrives: DEFAULT_PROCESSING_CONFIG.MaxRedrives,
       MaxRedrivesPerDay: DEFAULT_PROCESSING_CONFIG.MaxRedrivesPerDay,
@@ -275,6 +289,15 @@ export function createHarness(
       FetchArxivPage: (request) => {
         arxivRequests.push(request);
         return take(arxivPages, "arXiv");
+      },
+      FetchArxivByIds: (ids) => {
+        arxivIdRequests.push([...ids]);
+        return Promise.resolve(
+          ids.flatMap((id) => {
+            const entry = arxivEntries.get(id);
+            return entry ? [entry] : [];
+          }),
+        );
       },
     },
   };
@@ -295,11 +318,17 @@ export function createHarness(
     Clock: clock,
     OpenAlexRequests: openAlexRequests,
     ArxivRequests: arxivRequests,
+    ArxivIdRequests: arxivIdRequests,
     SetOpenAlexPages: (pages) => {
       openAlexPages = [...pages];
     },
     SetArxivPages: (pages) => {
       arxivPages = [...pages];
+    },
+    SetArxivEntries: (entries) => {
+      arxivEntries = new Map(
+        entries.map((entry) => [stripArxivVersion(parseArxivId(entry.id)), entry]),
+      );
     },
     SetPdfs: (next) => {
       pdfs = { ...next };

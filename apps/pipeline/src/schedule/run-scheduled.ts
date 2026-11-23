@@ -1,8 +1,9 @@
-import { ADMISSION_CRON, CRON_SOURCES, RECOVERY_CRON } from "../config.js";
+import { ADMISSION_CRON, CRON_SOURCES, RECOVERY_CRON, RETRACTION_CRON } from "../config.js";
 import { probeStep } from "../recovery/breaker.js";
 import { replayDueDeadLetters } from "../recovery/dead-letters.js";
 import { redriveExtraction, redriveTriage } from "../recovery/redrive.js";
 import { admitDay } from "../triage/admission.js";
+import { startRetractionCheck } from "../retraction/check.js";
 import { sweepRetractions } from "../retraction/sweep.js";
 import { queueAdmittedExtractions } from "../extraction/queue-extractions.js";
 import { notify } from "../alerts/notify.js";
@@ -27,6 +28,11 @@ export async function runScheduled(
     await redriveExtraction(deps, day);
     await admitDay(deps, day);
     await queueAdmittedExtractions(deps, day);
+    return null;
+  }
+  if (cron === RETRACTION_CRON) {
+    // The weekly retraction check; the next admission sweep handles what it flags (REQ-DATA-008).
+    await startRetractionCheck(deps, deps.Now().slice(0, 10));
     return null;
   }
   if (cron === RECOVERY_CRON) {

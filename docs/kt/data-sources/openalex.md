@@ -20,7 +20,7 @@ Used for publications, authors, institutions, topics, and citations. OpenAlex is
 | `topics` | Ingestion scope, triage, and topic trends (REQ-DASH-003) |
 | `cited_by_count` | Citation count |
 | `open_access` and locations | Open access URL and license for PDF storage (REQ-DATA-004, REQ-DATA-010) |
-| `is_retracted` | Retraction flag (REQ-DATA-008) |
+| `is_retracted` | Retraction flag (REQ-DATA-008). List endpoints leave retracted works out unless the filter asks for `is_retracted:true`, so ingestion seldom sees one; the weekly check asks for them (ADR 0112) |
 
 ## Ingestion
 

@@ -152,6 +152,10 @@ Memory grows with about twice the file size and with the amount of text. `text.m
 
 - Ingestion already sets `publication.retracted` and never clears it.
 - The weekly retraction check (`0 8 * * 1`) asks OpenAlex for retracted works, and arXiv for withdrawals, among the stored publications of the last `retraction.lookback_days` (30 days, ADR 0061), and sets the flag (REQ-DATA-008 AC1).
+- **Check as built (WP8, ADR 0112):** `startRetractionCheck` and `handleRetractionCheckPage` are in `apps/pipeline/src/retraction/check.ts`.
+  - OpenAlex list endpoints leave retracted works out unless the filter asks for them, so ingestion seldom sees a retraction. The check asks OpenAlex for the retracted works of the window, with the ingestion scope and `is_retracted:true`, paged by number, and flags the stored ones.
+  - It looks up the stored arXiv preprints of the window by `id_list`, 100 a page.
+  - Each page is a `retraction.check_page` message on the page queue. The run has kind `retraction-check` and ID `rc_<day>`, and counts `OpenAlexRetractedSeen`, `OpenAlexFlagged`, `ArxivChecked`, and `ArxivFlagged`.
 - The daily admission cron starts with a sweep of flagged publications not yet handled. It deletes their vectors from every index, hides their candidates and, from migration 0012 (WP10), their opportunities with `hidden_reason = retracted`, and stamps `retraction_handled_at` (REQ-DATA-008 AC2, AC3; REQ-PROC-002 AC2).
 - **As built (WP8):** `sweepRetractions` in `apps/pipeline/src/retraction/sweep.ts` runs before the re-drives.
   - It hides the candidates of each flagged publication.

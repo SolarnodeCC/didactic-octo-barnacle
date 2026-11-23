@@ -1,0 +1,21 @@
+{
+  "meta": {
+    "count": 14,
+    "page": 1,
+    "per_page": 3
+  },
+  "results": [
+    {
+      "id": "https://openalex.org/W4380078608",
+      "is_retracted": true
+    },
+    {
+      "id": "https://openalex.org/W4379987356",
+      "is_retracted": true
+    },
+    {
+      "id": "https://openalex.org/W4380089322",
+      "is_retracted": true
+    }
+  ]
+}

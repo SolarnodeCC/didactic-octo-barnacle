@@ -8,6 +8,7 @@ import { handleFetchPage } from "./fetch-page.js";
 import { handleTextExtract } from "./text-extract.js";
 import { handleTriage } from "../triage/triage-consumer.js";
 import { handleExtraction } from "../extraction/extraction-consumer.js";
+import { handleRetractionCheckPage } from "../retraction/check.js";
 import { type QueueBatchLike } from "./types.js";
 
 /** Dead-letter queues are named `roi-<queue>-dlq-<env>`, for pages, PDFs, texts, and model steps (ADR 0047, ADR 0053). */
@@ -83,6 +84,8 @@ export async function consumeBatch(
         await handleTriage(deps, message.body);
       } else if (type === "publication.extract") {
         await handleExtraction(deps, message.body);
+      } else if (type === "retraction.check_page") {
+        await handleRetractionCheckPage(deps, message.body);
       } else {
         await handleFetchPage(deps, message.body);
       }

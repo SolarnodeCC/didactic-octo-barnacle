@@ -120,6 +120,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0109](0109-fact-judge-rubric-pd-facts-4.md) | Fact judge rubric pd-facts@4; the judge stays report-only | Accepted |
 | [0110](0110-fact-judge-round-three-not-calibrated.md) | Fact judge round three: not calibrated on fresh outputs | Accepted |
 | [0111](0111-problem-discovery-settled-on-the-code-checks.md) | Problem Discovery is settled on the code checks | Accepted |
+| [0112](0112-retraction-check-asks-for-retracted-works.md) | The retraction check asks OpenAlex for retracted works and arXiv by stored ID | Accepted |
 
 ## When an ADR is needed
 

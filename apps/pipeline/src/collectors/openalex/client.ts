@@ -13,6 +13,11 @@ export type OpenAlexPageRequest = {
   ToDate?: string;
   /** Cursor from the previous page; omit for the first page. */
   Cursor?: string;
+  /**
+   * Basic paging instead of a cursor, 1-based (at most 10,000 results). The retraction check
+   * uses it, so its message carries a page number only (ADR 0112).
+   */
+  Page?: number;
   PerPage?: number;
   /**
    * OpenAlex subfield IDs of the topic map (REQ-DATA-001 AC1), matched against the work's
@@ -24,6 +29,12 @@ export type OpenAlexPageRequest = {
   WorkTypes?: readonly string[];
   /** Sends `has_abstract:true` (ADR 0048). */
   RequireAbstract?: boolean;
+  /**
+   * Sends `is_retracted:true`, for the weekly retraction check (ADR 0112). OpenAlex list
+   * endpoints leave retracted works out unless the filter asks for them, so ingestion seldom
+   * sees a retraction.
+   */
+  Retracted?: boolean;
   /**
    * From the `OPENALEX_API_KEY` secret (docs/kt/operations.md). Required for cursor
    * paging past the first page (ADR 0034); omit only for a keyless single-page smoke test.
@@ -88,13 +99,20 @@ export function buildOpenAlexUrl(request: OpenAlexPageRequest): string {
   if (request.RequireAbstract) {
     filters.push("has_abstract:true");
   }
+  if (request.Retracted) {
+    filters.push("is_retracted:true");
+  }
   params.set("filter", filters.join(","));
   // An explicit sort keeps the cursor order stable between runs, so a continued run reaches
   // new works instead of re-reading ones whose internal ranking moved (ADR 0041).
   params.set("sort", "publication_date:desc");
   params.set("select", OPENALEX_WORK_FIELDS.join(","));
   params.set("per-page", String(request.PerPage ?? 100));
-  params.set("cursor", request.Cursor ?? "*");
+  if (request.Page !== undefined) {
+    params.set("page", String(request.Page));
+  } else {
+    params.set("cursor", request.Cursor ?? "*");
+  }
   return `${OPENALEX_WORKS_URL}?${params.toString()}`;
 }
 

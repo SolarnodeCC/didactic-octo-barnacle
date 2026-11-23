@@ -88,3 +88,44 @@ export async function fetchArxivPage(
     Returned: returned.length,
   };
 }
+
+/** The `id_list` lookup of the weekly retraction check (ADR 0112): version-less arXiv IDs. */
+export function buildArxivIdListUrl(ids: readonly string[]): string {
+  const params = new URLSearchParams({
+    id_list: ids.join(","),
+    start: "0",
+    max_results: String(ids.length),
+  });
+  return `${ARXIV_API_URL}?${params.toString()}`;
+}
+
+/**
+ * Fetch the given preprints by ID, with no category filter, for the retraction check
+ * (REQ-DATA-008 AC1). The rate limiter is awaited before every request, as for pages.
+ */
+export async function fetchArxivByIds(
+  ids: readonly string[],
+  deps: {
+    Fetch: FetchFn;
+    Backoff: BackoffOptions;
+    WaitForSlot: () => Promise<void>;
+    MaxResponseBytes?: number;
+  },
+): Promise<ArxivEntry[]> {
+  if (ids.length === 0) {
+    return [];
+  }
+  const rateLimitedFetch: FetchFn = async (input, init) => {
+    await deps.WaitForSlot();
+    return deps.Fetch(input, init);
+  };
+  const response = await fetchWithBackoff(
+    rateLimitedFetch,
+    buildArxivIdListUrl(ids),
+    { headers: { accept: "application/atom+xml" } },
+    deps.Backoff,
+  );
+  return parseArxivFeed(
+    await readTextCapped(response, deps.MaxResponseBytes ?? DEFAULT_MAX_RESPONSE_BYTES),
+  );
+}
