@@ -16,6 +16,7 @@ How phase 2 of the [roadmap](../roadmap.md) is delivered: what it builds, how it
 | [Approach](approach.md) | Gate-first, model-free build, one work package per pull request, and how the exit criteria are shown |
 | [Design](design.md) | Components per package, queues and message types, the model-call helper, search, triage admission, budget, retractions, and the thin slice |
 | [Model calls](model-calls.md) | The model-call and embedding helpers, price tables and cost, quotes and item checks |
-| [Schema](schema.md) | Migrations 0009 to 0011, configuration keys, and bindings |
+| [Schema](schema.md) | Migrations 0009 to 0015, configuration keys, and bindings |
 | [Build plan](build-plan.md) | Work packages WP0 to WP11 with requirements, outputs, tests, and exit evidence |
 | [Dependencies](dependencies.md) | Gates and their owners, the order of the work packages, services, libraries, and cost limits |
+| [Exit evidence](exit-evidence.md) | Where the phase 2 exit evidence is collected: the staging days, the eval and recall reports, and what closes each requirement |

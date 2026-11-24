@@ -3,7 +3,7 @@ title: Phase 2 build plan
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-11-24
-related: [REQ-DATA-006, REQ-DATA-008, REQ-PROC-001, REQ-PROC-002, REQ-PROC-003, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-PROC-007, REQ-PROC-008, REQ-PROC-009, REQ-NFR-003, REQ-NFR-005, REQ-NFR-010, REQ-NFR-011, REQ-TEST-002]
+related: [REQ-DATA-006, REQ-DATA-008, REQ-DATA-012, REQ-PROC-001, REQ-PROC-002, REQ-PROC-003, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-PROC-007, REQ-PROC-008, REQ-PROC-009, REQ-PROC-010, REQ-PROC-011, REQ-NFR-003, REQ-NFR-005, REQ-NFR-010, REQ-NFR-011, REQ-NFR-023, REQ-TEST-002, REQ-TEST-006, REQ-TEST-007, REQ-REV-001, REQ-REV-002, REQ-REV-003, REQ-REV-004, REQ-REV-005]
 ---
 
 # Phase 2 build plan
@@ -152,5 +152,6 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 ## WP11: Throughput and exit
 
 - A load test on recorded fixtures with stubbed models at the largest measured day: ingestion and triage finish before the next run, and the daily limit completes extraction within 24 hours (REQ-NFR-010).
-- Seven staging days with the switch on. Collect the exit evidence of [approach](approach.md#exit-evidence). Set every phase 2 requirement to `done` with its tests.
+- Seven staging days with the switch on (`PROCESSING_ENABLED` in the staging vars). Collect the exit evidence of [approach](approach.md#exit-evidence) in [exit evidence](exit-evidence.md). Set every phase 2 requirement to `done` with its tests.
+- As built: the load test of ADR 0118 runs in CI at 4,634 publications, and extraction is sent paced to the model's request limit.
 - **Exit:** the phase 2 exit criteria of the [roadmap](../roadmap.md#exit-criteria) are met, and phase 3 can start.

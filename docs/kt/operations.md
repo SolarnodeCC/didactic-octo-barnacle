@@ -55,6 +55,15 @@ The bootstrap script creates D1, R2, two Queues, one for pages and one for PDF d
 
 Staging is deployed by `.github/workflows/staging-deploy.yml`, run from `main` only. `.github/workflows/staging-pipeline.yml` starts it automatically, as a run of its own, when `CI` and `Configuration` are green for the newest commit of `main`; the deploy first stops if a resource is missing, and the pull request approval is the gate (ADR 0046). You can also run it by hand. It builds, applies pending database migrations (unless switched off), and uploads the Worker together with its secrets in one version (`wrangler deploy --secrets-file`), so the Worker never runs without its erasure key. The workflow then lists the live deployment. Production is released weekly by `.github/workflows/production-release.yml`: a planner picks the newest commit of `main` whose changes ran on staging for the soak time (`RELEASE_SOAK_HOURS`, default 48), have no open `Depends on #N`, no `hold` label, and no drop or rename migration without `contract-ok`, and it starts `production-deploy.yml` as a run of its own, which deploys that commit and tags it `release-<date>-<sha>` (ADR 0044, ADR 0046). A run by hand is a dry run unless `dry_run` is off, and nothing deploys until the variable `PRODUCTION_AUTO_RELEASE` is `true` after the launch checklist. A failed release opens an `alert` issue, which pauses releases until it is closed. Database migrations are plain SQL files that `wrangler d1 migrations` applies before the Worker that needs them (ADR 0020, REQ-NFR-020). A rollback redeploys the previous Worker version via Wrangler rollback or re-deploy of the prior git tag; migrations are written expand/contract so the previous version still works with the new schema. Vectorize index rebuilds are a separate runbook step after a restore.
 
+### Phase 2 processing in staging
+
+Staging runs with `PROCESSING_ENABLED = "true"` for the seven staging days of WP11; production stays off until the phase 2 release (ADR 0118, [exit evidence](phase-2/exit-evidence.md)). Before the first deploy with processing on:
+
+1. Run `Staging bootstrap` with `apply`, so the text, model, and embedding queues with their dead-letter queues and the Vectorize metadata indexes exist.
+2. Check that the AI Gateway `roi-staging` exists and that the staging budget variables are set (`BUDGET_EXPECTED_DAILY_*`, ADR 0113).
+3. Run `Staging deploy`; it applies migrations 0009 to 0015 before the Worker that needs them.
+4. The next morning, after the 11:00 UTC admission run, read the daily processing run report (`processing_run.report_json`) and the alerts. Record each day in the exit evidence. A `budget-stop` or `quality-drift` alert, or a dead letter, is looked at the same day.
+
 ### Owner review tool
 
 The owner review tool (`apps/review`, ADR 0116, REQ-REV-001 to REQ-REV-005) is deployed to staging only, at `review.wispel.cc`, by `.github/workflows/review-deploy.yml` (by hand, from `main`, environment `staging`). It reads the staging D1 database and writes only `output_review`; migration 0014 ships with the normal staging deploy, so run `Staging deploy` first. Before the first deploy, the owner:

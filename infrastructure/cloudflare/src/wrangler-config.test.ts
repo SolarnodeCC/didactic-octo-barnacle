@@ -152,3 +152,12 @@ describe("REQ-PROC-007: the candidate Workflow of the thin slice", () => {
     expect(wrangler).not.toMatch(/^\[\[env\.(staging|production)\.workflows\]\]/m);
   });
 });
+
+describe("REQ-NFR-010: processing in staging for the seven staging days (WP11)", () => {
+  it("REQ-NFR-010: staging turns processing on and production leaves it off", () => {
+    const staging = /^vars = \{ ENVIRONMENT = "staging",.*\}$/m.exec(wrangler)?.[0] ?? "";
+    const production = /^vars = \{ ENVIRONMENT = "production",.*\}$/m.exec(wrangler)?.[0] ?? "";
+    expect(staging).toContain('PROCESSING_ENABLED = "true"');
+    expect(production).not.toContain("PROCESSING_ENABLED");
+  });
+});
