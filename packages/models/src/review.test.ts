@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  CANDIDATE_TAGS,
+  CandidateCorrectionSchema,
   RecordVerdictRequestSchema,
+  TRIAGE_TAGS,
+  UndoVerdictRequestSchema,
   ReviewListQuerySchema,
   REVIEW_NOTE_MAX,
   agreementRate,
@@ -22,6 +26,9 @@ describe("REQ-REV-003: verdict request", () => {
       Verdict: "incorrect",
       Note: null,
       Corrected: null,
+      Tags: [],
+      CorrectedSignals: null,
+      CorrectedCandidate: null,
     });
   });
 
@@ -48,5 +55,89 @@ describe("REQ-REV-004: agreement rate", () => {
   it("REQ-REV-004: is correct over correct plus incorrect, and null without either", () => {
     expect(agreementRate(3, 1)).toBe(0.75);
     expect(agreementRate(0, 0)).toBeNull();
+  });
+});
+
+describe("REQ-REV-007: error tags in the verdict request", () => {
+  const base = { TargetKind: "candidate", TargetId: "c1", Verdict: "incorrect" } as const;
+
+  it("REQ-REV-007: accepts tags of the target's step and removes duplicates", () => {
+    const parsed = RecordVerdictRequestSchema.parse({
+      ...base,
+      Tags: ["duplicate", "duplicate", "overstated"],
+    });
+    expect(parsed.Tags).toEqual(["duplicate", "overstated"]);
+    expect(CANDIDATE_TAGS).toContain("duplicate");
+    expect(TRIAGE_TAGS).toEqual(["should-accept", "should-reject", "wrong-signal"]);
+  });
+
+  it("REQ-REV-007: refuses a tag of the other step and any tag on a correct verdict", () => {
+    expect(RecordVerdictRequestSchema.safeParse({ ...base, Tags: ["should-accept"] }).success).toBe(
+      false,
+    );
+    expect(
+      RecordVerdictRequestSchema.safeParse({ ...base, Verdict: "correct", Tags: ["duplicate"] })
+        .success,
+    ).toBe(false);
+  });
+});
+
+describe("REQ-REV-008: corrections and undo requests", () => {
+  const signals = {
+    NamedParty: true,
+    StatedHarm: true,
+    Trigger: false,
+    ExistingAlternative: false,
+    Adoptable: true,
+  };
+
+  it("REQ-REV-008: allows signals only on triage and candidate fields only on a candidate", () => {
+    expect(
+      RecordVerdictRequestSchema.safeParse({
+        TargetKind: "triage",
+        TargetId: "t1",
+        Verdict: "incorrect",
+        CorrectedSignals: signals,
+      }).success,
+    ).toBe(true);
+    expect(
+      RecordVerdictRequestSchema.safeParse({
+        TargetKind: "candidate",
+        TargetId: "c1",
+        Verdict: "incorrect",
+        CorrectedSignals: signals,
+      }).success,
+    ).toBe(false);
+    expect(
+      RecordVerdictRequestSchema.safeParse({
+        TargetKind: "triage",
+        TargetId: "t1",
+        Verdict: "incorrect",
+        CorrectedCandidate: { Customer: "Hospitals" },
+      }).success,
+    ).toBe(false);
+  });
+
+  it("REQ-REV-008: refuses an empty candidate correction and an unknown field", () => {
+    expect(CandidateCorrectionSchema.safeParse({}).success).toBe(false);
+    expect(CandidateCorrectionSchema.safeParse({ Customer: "Hospitals", Model: "x" }).success).toBe(
+      false,
+    );
+    expect(CandidateCorrectionSchema.parse({ Customer: "Hospitals" })).toEqual({
+      Customer: "Hospitals",
+    });
+  });
+
+  it("REQ-REV-008: an undo names only the target", () => {
+    expect(
+      UndoVerdictRequestSchema.safeParse({ TargetKind: "triage", TargetId: "t1" }).success,
+    ).toBe(true);
+    expect(
+      UndoVerdictRequestSchema.safeParse({
+        TargetKind: "triage",
+        TargetId: "t1",
+        Verdict: "correct",
+      }).success,
+    ).toBe(false);
   });
 });

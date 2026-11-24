@@ -121,6 +121,14 @@ Read by `loadProcessingConfig` into `PipelineDeps.Monitor` (WP9, ADR 0071, ADR 0
 | `monitor.min_daily_items` | `20` | Fewest items behind a rate before it can alert |
 | `monitor.near_duplicate_cosine` | `0.92` | Publication-vector cosine for counting possible near-duplicate opportunities |
 
+## Owner review tool (phase 2)
+
+Read by `apps/review` from the Worker variable `REVIEW_DAILY_SAMPLE` (ADR 0124).
+
+| Key | Default | Notes |
+|---|---|---|
+| `review.daily_sample` | `20` | Publications in the daily review queue, between 5 and 100 (REQ-REV-006) |
+
 ## Budgets
 
 | Key | Default | Notes |

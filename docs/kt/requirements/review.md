@@ -86,3 +86,93 @@ Only the owner can reach the review tool.
   3. A state-changing request needs a same-origin `Origin` header (REQ-NFR-014). Responses carry a Content Security Policy without inline scripts, `frame-ancestors 'none'`, `X-Content-Type-Options: nosniff`, and a `Referrer-Policy`.
   4. The Worker has no workers.dev address and no preview URLs, and only staging has a route.
 - Verification: unit test, integration test, and the hardening check
+
+### REQ-REV-006: Daily review queue
+
+The reviewer works through a small daily sample chosen to be informative.
+
+- Phase: 2
+- Priority: should
+- Status: in-progress
+- Source: owner request of 2026-11-24 (ADR 0124)
+- Depends on: REQ-REV-002
+- Acceptance criteria:
+  1. Each decision day has a sample of `review.daily_sample` publications (default 20, between 5 and 100), drawn once with a generator seeded by the day, so every reload shows the same items in the same order.
+  2. Strata are filled in the order and shares of ADR 0124 (new prompt version, borderline triage within one signal of the cut, accepted with no candidates, extraction confidence below 0.5, model rejection), and random items fill the rest. Each item shows its stratum.
+  3. A sample smaller than its size is topped up when the day has more decisions later; items already in it never change.
+  4. The queue opens the newest decision day by default, offers the 14 most recent days, and shows how many publications have a verdict on every item.
+  5. When every item of a publication has a verdict, the queue moves to the next publication that does not.
+- Verification: unit test and integration test
+
+### REQ-REV-007: Error tags
+
+An incorrect or unsure verdict says why.
+
+- Phase: 2
+- Priority: should
+- Status: in-progress
+- Source: owner request of 2026-11-24 (ADR 0124)
+- Depends on: REQ-REV-003
+- Acceptance criteria:
+  1. A verdict carries tags from the list `tags-v1` of ADR 0124 for its step; a tag of the other step, or a tag on a correct verdict, is refused with a validation error.
+  2. Tags are stored with the verdict, returned with the current verdict, and included in the export.
+  3. The reasons can be chosen with one key each while the reason picker is open.
+- Verification: unit test and integration test
+
+### REQ-REV-008: Structured corrections and undo
+
+The reviewer records what the right output is, and can take a verdict back.
+
+- Phase: 2
+- Priority: should
+- Status: in-progress
+- Source: owner request of 2026-11-24 (ADR 0124)
+- Depends on: REQ-REV-003
+- Acceptance criteria:
+  1. A triage verdict can carry the five signals as the reviewer reads them, and the tool previews the score and decision with the pipeline's triage rule (REQ-PROC-008).
+  2. A candidate verdict can carry a corrected finding, customer, evidence quote, and customer quote. When extraction read the abstract, a corrected quote that does not occur in it after normalisation (ADR 0064) is refused.
+  3. Undo withdraws the current verdict of a target: the row stays, the newest verdict that is not withdrawn becomes current, and the list, queue, summary, and export reflect it. Undo with nothing left to withdraw answers not-found.
+  4. `a` marks every item of a publication without a verdict correct, and `u` undoes the last verdict of the session.
+- Verification: unit test and integration test
+
+### REQ-REV-009: Quotes in full-text context
+
+The reviewer sees full-text quotes in context.
+
+- Phase: 2
+- Priority: could
+- Status: planned
+- Source: review tool plan of 2026-11-24
+- Depends on: REQ-REV-002
+- Acceptance criteria:
+  1. When extraction read the full text, each quote is shown with about 300 characters around it from the stored text, and never the whole text (ADR 0014).
+  2. Each quote shows whether it was found in the abstract, in the full text, or not at all.
+- Verification: integration test
+
+### REQ-REV-010: Review insights
+
+The reviewer sees where the model output goes wrong.
+
+- Phase: 2
+- Priority: could
+- Status: planned
+- Source: review tool plan of 2026-11-24
+- Depends on: REQ-REV-004, REQ-REV-007
+- Acceptance criteria:
+  1. Agreement is shown over time per step, prompt version, and stratum.
+  2. Error tags are counted per step and prompt version, with up to three example publications per tag.
+- Verification: integration test
+
+### REQ-REV-011: Golden-set drafts from reviews
+
+Reviewed and corrected output becomes golden-set entries with little retyping.
+
+- Phase: 2
+- Priority: could
+- Status: planned
+- Source: review tool plan of 2026-11-24; ADR 0072
+- Depends on: REQ-REV-008, REQ-TEST-005, REQ-TEST-006
+- Acceptance criteria:
+  1. A reviewed publication can be exported as a draft golden-set entry in the format of `agents/extraction/evals`, using the corrected values.
+  2. A draft passes `scripts/check-golden-sets.py` before export, and is added only by a pull request the owner merges, so the owner confirms every label (ADR 0072).
+- Verification: integration test and the golden-set check

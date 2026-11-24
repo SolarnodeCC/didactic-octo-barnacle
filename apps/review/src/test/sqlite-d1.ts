@@ -94,7 +94,7 @@ export function insertPublication(
 export function insertTriage(
   raw: Database.Database,
   publicationId: string,
-  options: { Accepted: boolean; CreatedAt: string; PromptVersion?: string },
+  options: { Accepted: boolean; CreatedAt: string; PromptVersion?: string; Score?: number },
 ): string {
   const id = `triage-${publicationId}`;
   const signal = options.Accepted ? 1 : 0;
@@ -110,7 +110,7 @@ export function insertTriage(
       id,
       publicationId,
       signal,
-      options.Accepted ? 0.8 : 0.2,
+      options.Score ?? (options.Accepted ? 0.8 : 0.2),
       options.Accepted ? "accepted" : "low-score",
       signal,
       signal,
@@ -130,15 +130,22 @@ export function insertExtraction(
   raw: Database.Database,
   publicationId: string,
   candidates: { Finding: string; EvidenceQuote: string; CustomerQuote: string; Hidden?: boolean }[],
+  options: { Confidence?: number; CreatedAt?: string } = {},
 ): string[] {
   const resultId = `extraction-${publicationId}`;
   raw
     .prepare(
       `INSERT INTO extraction_result (id, publication_id, run_id, model, prompt_version, input_mode,
         confidence, notes, candidate_count, created_at)
-       VALUES (?, ?, 'run-1', 'model-b', 'extraction-v1', 'abstract', 0.6, NULL, ?, ?)`,
+       VALUES (?, ?, 'run-1', 'model-b', 'extraction-v1', 'abstract', ?, NULL, ?, ?)`,
     )
-    .run(resultId, publicationId, candidates.length, NOW);
+    .run(
+      resultId,
+      publicationId,
+      options.Confidence ?? 0.6,
+      candidates.length,
+      options.CreatedAt ?? NOW,
+    );
   return candidates.map((candidate, index) => {
     const id = `cand-${publicationId}-${index + 1}`;
     raw

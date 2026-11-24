@@ -23,6 +23,8 @@ run_worker_first = ["/api/*"]
 [vars]
 ENVIRONMENT = "local"
 ACCESS_DEV_SUBJECT = "local-owner"
+# `review.daily_sample`: publications in the daily review queue (REQ-REV-006).
+REVIEW_DAILY_SAMPLE = "20"
 
 [[d1_databases]]
 binding = "DB"
@@ -38,7 +40,7 @@ routes = [{ pattern = "review.wispel.cc", custom_domain = true }]
 # REVIEW_ACCESS_AUD (operations). They are not secrets. While either is empty, the API refuses
 # every request.
 # ACCESS_DEV_SUBJECT stays empty: the development bypass works only in `local`.
-vars = { ENVIRONMENT = "staging", ACCESS_TEAM_DOMAIN = "", ACCESS_AUD = "", ACCESS_DEV_SUBJECT = "" }
+vars = { ENVIRONMENT = "staging", ACCESS_TEAM_DOMAIN = "", ACCESS_AUD = "", ACCESS_DEV_SUBJECT = "", REVIEW_DAILY_SAMPLE = "20" }
 
 [env.staging.observability]
 enabled = true

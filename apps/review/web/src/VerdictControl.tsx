@@ -1,8 +1,14 @@
-import type { CurrentVerdict, ReviewTargetKind, ReviewVerdict } from "@roi/models";
-import { useState } from "react";
+import type { CurrentVerdict, ReviewTag, ReviewTargetKind, ReviewVerdict } from "@roi/models";
 
-import { recordVerdict } from "./api.js";
-import { CORRECTED_MAX, NOTE_MAX } from "./text.js";
+import { TAG_OPTIONS, tagLabel } from "./review-rules.js";
+import { NOTE_MAX } from "./text.js";
+
+/** The open reason picker of one target: the verdict being given and the tags chosen so far. */
+export type Picker = {
+  Index: number;
+  Verdict: Exclude<ReviewVerdict, "correct">;
+  Tags: ReviewTag[];
+};
 
 export const VERDICTS: { Value: ReviewVerdict; Label: string; Key: string; Tone: string }[] = [
   { Value: "correct", Label: "Correct", Key: "1", Tone: "bg-emerald-600 text-white" },
@@ -10,60 +16,64 @@ export const VERDICTS: { Value: ReviewVerdict; Label: string; Key: string; Tone:
   { Value: "unsure", Label: "Unsure", Key: "3", Tone: "bg-amber-500 text-white" },
 ];
 
-export type VerdictTarget = { Kind: ReviewTargetKind; Id: string; Current: CurrentVerdict | null };
-
-/** Verdict buttons with an optional note and correction (REQ-REV-003). */
-export function VerdictControl({
-  target,
+/**
+ * Verdict buttons, the reason picker (REQ-REV-007), and the note of one target. Stateless: the
+ * review panel owns the drafts, so keys and clicks share one path.
+ */
+export function VerdictBar({
+  kind,
+  current,
   selected,
-  onSaved,
-  registerSave,
+  saving,
+  picker,
+  note,
+  onNote,
+  onNoteBlur,
+  onVerdict,
+  onPicker,
+  onSavePicker,
 }: {
-  target: VerdictTarget;
+  kind: ReviewTargetKind;
+  current: CurrentVerdict | null;
   selected: boolean;
-  onSaved: (verdict: CurrentVerdict) => void;
-  /** Lets the page record a verdict from the keyboard with the note typed here. */
-  registerSave: (save: (verdict: ReviewVerdict) => void) => void;
+  saving: boolean;
+  picker: Picker | null;
+  note: string;
+  onNote: (note: string) => void;
+  onNoteBlur: () => void;
+  onVerdict: (verdict: ReviewVerdict) => void;
+  onPicker: (picker: Picker | null) => void;
+  onSavePicker: () => void;
 }) {
-  const [note, setNote] = useState(target.Current?.Note ?? "");
-  const [corrected, setCorrected] = useState(target.Current?.Corrected ?? "");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const save = (verdict: ReviewVerdict) => {
-    setSaving(true);
-    setError(null);
-    recordVerdict({
-      TargetKind: target.Kind,
-      TargetId: target.Id,
-      Verdict: verdict,
-      Note: note,
-      Corrected: corrected,
-    })
-      .then(onSaved)
-      .catch((e: unknown) => setError(String((e as Error).message)))
-      .finally(() => setSaving(false));
-  };
-  registerSave(save);
-
-  const input =
-    "w-full rounded border border-slate-300 bg-white px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-950";
+  const toggle = (tag: ReviewTag) =>
+    picker &&
+    onPicker({
+      ...picker,
+      Tags: picker.Tags.includes(tag)
+        ? picker.Tags.filter((t) => t !== tag)
+        : [...picker.Tags, tag],
+    });
 
   return (
     <div
-      className={`mt-3 rounded-md border p-3 ${selected ? "border-blue-500 ring-1 ring-blue-500" : "border-slate-200 dark:border-slate-800"}`}
+      className={`mt-3 rounded-md border p-3 ${
+        selected ? "border-blue-500 ring-1 ring-blue-500" : "border-slate-200 dark:border-slate-800"
+      }`}
     >
       <div className="flex flex-wrap items-center gap-2">
         {VERDICTS.map((verdict) => {
-          const active = target.Current?.Verdict === verdict.Value;
+          const active = (picker?.Verdict ?? current?.Verdict) === verdict.Value;
           return (
             <button
               key={verdict.Value}
               type="button"
               disabled={saving}
-              onClick={() => save(verdict.Value)}
+              onClick={(event) => {
+                event.stopPropagation();
+                onVerdict(verdict.Value);
+              }}
               aria-pressed={active}
-              className={`rounded px-2.5 py-1 text-sm font-medium disabled:opacity-50 ${
+              className={`min-h-9 rounded px-3 py-1 text-sm font-medium disabled:opacity-50 ${
                 active
                   ? verdict.Tone
                   : "border border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
@@ -74,39 +84,73 @@ export function VerdictControl({
             </button>
           );
         })}
-        {target.Current && (
+        {current && !picker && (
           <span className="text-xs text-slate-500">
-            Saved {target.Current.CreatedAt.slice(0, 16).replace("T", " ")}
-          </span>
-        )}
-        {error && (
-          <span role="alert" className="text-xs text-red-600">
-            {error}
+            Saved {current.CreatedAt.slice(0, 16).replace("T", " ")}
+            {current.Tags.length > 0 && ` · ${current.Tags.map(tagLabel).join(", ")}`}
+            {(current.CorrectedSignals || current.CorrectedCandidate) && " · with correction"}
           </span>
         )}
       </div>
-      <div className="mt-2 grid gap-2 sm:grid-cols-2">
-        <label className="text-xs text-slate-500">
-          Note ({note.length}/{NOTE_MAX})
-          <textarea
-            className={input}
-            rows={2}
-            maxLength={NOTE_MAX}
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-          />
-        </label>
-        <label className="text-xs text-slate-500">
-          Corrected value (optional)
-          <textarea
-            className={input}
-            rows={2}
-            maxLength={CORRECTED_MAX}
-            value={corrected}
-            onChange={(e) => setCorrected(e.target.value)}
-          />
-        </label>
-      </div>
+
+      {picker && (
+        <div
+          className="mt-3 rounded bg-slate-50 p-2 dark:bg-slate-950"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <p className="mb-2 text-xs text-slate-500">
+            Why {picker.Verdict}? Pick any that apply, then <kbd>Enter</kbd> to save or{" "}
+            <kbd>Esc</kbd> to cancel.
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {TAG_OPTIONS[kind].map((option) => {
+              const on = picker.Tags.includes(option.Tag);
+              return (
+                <button
+                  key={option.Tag}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => toggle(option.Tag)}
+                  className={`min-h-9 rounded border px-2 py-1 text-xs ${
+                    on
+                      ? "border-blue-600 bg-blue-600 text-white"
+                      : "border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  <kbd className="mr-1 opacity-70">{option.Key}</kbd>
+                  {option.Label}
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-2 flex gap-2">
+            <button
+              type="button"
+              disabled={saving}
+              onClick={onSavePicker}
+              className="min-h-9 rounded bg-slate-900 px-3 py-1 text-sm text-white disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900"
+            >
+              Save
+            </button>
+            <button type="button" onClick={() => onPicker(null)} className="text-sm underline">
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      <label className="mt-2 block text-xs text-slate-500" onClick={(e) => e.stopPropagation()}>
+        Note ({note.length}/{NOTE_MAX}) — saved with the verdict, and kept in step when you edit it
+        later
+        <textarea
+          className="mt-0.5 w-full rounded border border-slate-300 bg-white px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-950"
+          rows={2}
+          maxLength={NOTE_MAX}
+          value={note}
+          onChange={(e) => onNote(e.target.value)}
+          onBlur={onNoteBlur}
+        />
+      </label>
     </div>
   );
 }

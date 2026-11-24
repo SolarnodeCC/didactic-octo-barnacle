@@ -132,6 +132,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0121](0121-redact-query-strings-in-traces.md) | Staging and production redact query strings in traces | Accepted |
 | [0122](0122-hard-checks-against-planted-instructions.md) | Hard checks and an adversarial set against planted instructions | Accepted |
 | [0123](0123-erasure-key-and-route-gates.md) | Gates for the erasure-list key and for routes before authentication | Accepted |
+| [0124](0124-review-queue-tags-and-corrections.md) | A daily review queue, error tags, and structured corrections | Accepted |
 
 ## When an ADR is needed
 

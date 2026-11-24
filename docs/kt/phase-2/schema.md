@@ -3,7 +3,7 @@ title: Phase 2 schema, configuration, and bindings
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-11-24
-related: [REQ-NFR-020, REQ-NFR-011, REQ-PROC-001, REQ-PROC-006, REQ-PROC-009, REQ-DATA-006, REQ-DATA-008, REQ-PROC-007, REQ-REV-003]
+related: [REQ-NFR-020, REQ-NFR-011, REQ-PROC-001, REQ-PROC-006, REQ-PROC-009, REQ-DATA-006, REQ-DATA-008, REQ-PROC-007, REQ-REV-003, REQ-REV-006]
 ---
 
 # Phase 2 schema, configuration, and bindings
@@ -82,6 +82,17 @@ Migration 0015 is `infrastructure/cloudflare/migrations/0015_thin_slice.sql` (WP
 - The seed row of `score_model` version `placeholder-0`: the ADR 0005 rules with equal weights, not active.
 
 It adds no organization-scoped table. Those arrive with phase 4 (ADR 0019).
+
+## Migration 0016: review queue
+
+Migration 0016 is `infrastructure/cloudflare/migrations/0016_review_queue.sql` (ADR 0124; REQ-REV-006 to REQ-REV-008). It is expand-only, and only `apps/review` reads or writes what it adds.
+
+| Table or column | Columns | Notes |
+|---|---|---|
+| `output_review.tags_json` | | Error tags of the verdict as a JSON array (`tags-v1`); `[]` for rows written before it |
+| `output_review.corrected_json` | | Structured correction as JSON: corrected triage signals or changed candidate fields |
+| `output_review.withdrawn_at` | | Set by undo; the newest verdict per target that is not withdrawn is current |
+| `review_sample` | `day`, `publication_id`, `stratum`, `position`, `created_at` | PRIMARY KEY (`day`, `publication_id`); index (`day`, `position`). The daily sample, drawn once and topped up, never reshuffled |
 
 ## Configuration keys
 

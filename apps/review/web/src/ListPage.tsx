@@ -49,7 +49,7 @@ export function ListPage({ search }: { search: URLSearchParams }) {
     if (value) next.set(name, value);
     else next.delete(name);
     const query = next.toString();
-    navigate(query ? `/?${query}` : "/");
+    navigate(query ? `/browse?${query}` : "/browse");
   };
 
   const more = () => {
@@ -134,7 +134,7 @@ export function ListPage({ search }: { search: URLSearchParams }) {
           <button
             type="button"
             className="text-sm text-slate-500 underline"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/browse")}
           >
             Clear filters
           </button>

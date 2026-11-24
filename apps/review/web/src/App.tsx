@@ -1,7 +1,8 @@
-import { DetailPage } from "./DetailPage.js";
 import { ListPage } from "./ListPage.js";
+import { ReviewPanel } from "./ReviewPanel.js";
 import { Link, useLocation } from "./router.js";
 import { StatsPage } from "./StatsPage.js";
+import { TodayPage } from "./TodayPage.js";
 
 const DETAIL = /^\/p\/([^/]+)$/u;
 
@@ -23,8 +24,11 @@ export function App() {
           <p className="text-xs text-slate-500">Triage and extraction output · staging</p>
         </div>
         <nav className="flex gap-1">
-          <Link href="/" className={linkClass(Path === "/" || detail !== null)}>
-            Publications
+          <Link href="/" className={linkClass(Path === "/")}>
+            Today
+          </Link>
+          <Link href="/browse" className={linkClass(Path === "/browse" || detail !== null)}>
+            Browse
           </Link>
           <Link href="/stats" className={linkClass(Path === "/stats")}>
             Summary
@@ -33,11 +37,21 @@ export function App() {
       </header>
       <main className="pt-6">
         {detail ? (
-          <DetailPage key={detail[1]} id={decodeURIComponent(detail[1] as string)} />
+          <ReviewPanel
+            key={detail[1]}
+            id={decodeURIComponent(detail[1] as string)}
+            header={
+              <Link href="/browse" className="text-slate-500 hover:underline">
+                ← All publications
+              </Link>
+            }
+          />
         ) : Path === "/stats" ? (
           <StatsPage />
-        ) : (
+        ) : Path === "/browse" ? (
           <ListPage search={Search} />
+        ) : (
+          <TodayPage search={Search} />
         )}
       </main>
     </div>

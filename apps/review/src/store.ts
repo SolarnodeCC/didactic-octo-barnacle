@@ -2,7 +2,9 @@ import {
   CANDIDATE_QUOTE_FIELDS,
   agreementRate,
   findQuoteSpan,
+  quoteOccurs,
   type AbstractHighlight,
+  type CandidateCorrection,
   type CurrentVerdict,
   type InputMode,
   type RecordVerdict,
@@ -13,9 +15,11 @@ import {
   type ReviewListQuery,
   type ReviewListResponse,
   type ReviewStatsRow,
+  type ReviewTag,
   type ReviewTargetKind,
   type ReviewVerdict,
   type TriageReason,
+  type TriageSignals,
 } from "@roi/models";
 
 import { type SqlDatabase, type SqlValue } from "./sql.js";
@@ -25,17 +29,22 @@ import { type SqlDatabase, type SqlValue } from "./sql.js";
  * `output_review`; pipeline tables are read-only here.
  */
 
-/** The current verdict per target: the newest row, by insertion order (REQ-REV-003 AC2). */
-const CURRENT_REVIEW = `
+/**
+ * The current verdict per target: the newest row that is not withdrawn, by insertion order
+ * (REQ-REV-003 AC2, REQ-REV-008).
+ */
+export const CURRENT_REVIEW = `
   latest AS (
-    SELECT MAX(rowid) AS rid FROM output_review GROUP BY target_kind, target_id
+    SELECT MAX(rowid) AS rid FROM output_review
+    WHERE withdrawn_at IS NULL
+    GROUP BY target_kind, target_id
   ),
   current_review AS (
     SELECT r.* FROM output_review r JOIN latest ON r.rowid = latest.rid
   )`;
 
 /** Visible candidates; retracted ones are hidden from review as from every other view. */
-const VISIBLE_CANDIDATE = "c.hidden_reason IS NULL";
+export const VISIBLE_CANDIDATE = "c.hidden_reason IS NULL";
 
 type ListRow = {
   PublicationId: string;
@@ -200,15 +209,34 @@ type ReviewRow = {
   verdict: ReviewVerdict;
   note: string | null;
   corrected: string | null;
+  tags_json: string;
+  corrected_json: string | null;
+  withdrawn_at: string | null;
   model: string | null;
   prompt_version: string | null;
   created_at: string;
 };
 
+type Correction = { Signals?: TriageSignals; Candidate?: CandidateCorrection };
+
+function parseCorrection(row: ReviewRow): Correction {
+  return row.corrected_json ? (JSON.parse(row.corrected_json) as Correction) : {};
+}
+
 function current(row: ReviewRow | undefined): CurrentVerdict | null {
-  return row
-    ? { Verdict: row.verdict, Note: row.note, Corrected: row.corrected, CreatedAt: row.created_at }
-    : null;
+  if (!row) {
+    return null;
+  }
+  const correction = parseCorrection(row);
+  return {
+    Verdict: row.verdict,
+    Note: row.note,
+    Corrected: row.corrected,
+    Tags: JSON.parse(row.tags_json) as ReviewTag[],
+    CorrectedSignals: correction.Signals ?? null,
+    CorrectedCandidate: correction.Candidate ?? null,
+    CreatedAt: row.created_at,
+  };
 }
 
 /** Spans of the abstract that the candidates quote, with ADR 0064 normalisation (REQ-REV-002 AC4). */
@@ -388,38 +416,90 @@ export async function getPublication(
 
 export type VerdictDeps = { Db: SqlDatabase; NewId: () => string; Now: () => string };
 
+export type RecordResult =
+  | { Kind: "stored"; Current: CurrentVerdict }
+  | { Kind: "not-found" }
+  | { Kind: "invalid"; Message: string };
+
+type Target = {
+  publication_id: string;
+  model: string | null;
+  prompt_version: string | null;
+  input_mode: InputMode | null;
+  abstract: string | null;
+};
+
+async function findTarget(
+  db: SqlDatabase,
+  kind: ReviewTargetKind,
+  id: string,
+): Promise<Target | null> {
+  return kind === "triage"
+    ? db
+        .prepare(
+          `SELECT t.publication_id, t.model, t.prompt_version, NULL AS input_mode, p.abstract
+           FROM triage_decision t JOIN publication p ON p.id = t.publication_id
+           WHERE t.id = ?`,
+        )
+        .bind(id)
+        .first<Target>()
+    : db
+        .prepare(
+          `SELECT c.publication_id, e.model, e.prompt_version, e.input_mode, p.abstract
+           FROM candidate c
+           JOIN extraction_result e ON e.id = c.extraction_result_id
+           JOIN publication p ON p.id = c.publication_id
+           WHERE c.id = ? AND ${VISIBLE_CANDIDATE}`,
+        )
+        .bind(id)
+        .first<Target>();
+}
+
 /**
- * Stores a verdict on a triage decision or a visible candidate (REQ-REV-003), copying the model
- * and prompt version of the judged output. Returns null when the target does not exist.
+ * A corrected quote must occur in the text the step read (REQ-REV-008 AC2). Only abstract input
+ * can be checked here; full text is checked once the tool reads stored texts.
+ */
+function quoteProblem(target: Target, correction: CandidateCorrection | null): string | null {
+  if (!correction || target.input_mode !== "abstract" || !target.abstract) {
+    return null;
+  }
+  for (const field of ["EvidenceQuote", "CustomerQuote"] as const) {
+    const quote = correction[field];
+    if (quote !== undefined && !quoteOccurs(target.abstract, quote)) {
+      return `the corrected ${field} does not occur in the abstract`;
+    }
+  }
+  return null;
+}
+
+/**
+ * Stores a verdict on a triage decision or a visible candidate (REQ-REV-003), with its error tags
+ * (REQ-REV-007) and structured correction (REQ-REV-008), copying the model and prompt version of
+ * the judged output.
  */
 export async function recordVerdict(
   deps: VerdictDeps,
   verdict: RecordVerdict,
   reviewer: string,
-): Promise<CurrentVerdict | null> {
-  const target =
-    verdict.TargetKind === "triage"
-      ? await deps.Db.prepare(
-          "SELECT publication_id, model, prompt_version FROM triage_decision WHERE id = ?",
-        )
-          .bind(verdict.TargetId)
-          .first<{ publication_id: string; model: string | null; prompt_version: string | null }>()
-      : await deps.Db.prepare(
-          `SELECT c.publication_id, e.model, e.prompt_version
-           FROM candidate c JOIN extraction_result e ON e.id = c.extraction_result_id
-           WHERE c.id = ? AND ${VISIBLE_CANDIDATE}`,
-        )
-          .bind(verdict.TargetId)
-          .first<{ publication_id: string; model: string | null; prompt_version: string | null }>();
+): Promise<RecordResult> {
+  const target = await findTarget(deps.Db, verdict.TargetKind, verdict.TargetId);
   if (!target) {
-    return null;
+    return { Kind: "not-found" };
   }
+  const problem = quoteProblem(target, verdict.CorrectedCandidate);
+  if (problem) {
+    return { Kind: "invalid", Message: problem };
+  }
+  const correction: Correction = {
+    ...(verdict.CorrectedSignals ? { Signals: verdict.CorrectedSignals } : {}),
+    ...(verdict.CorrectedCandidate ? { Candidate: verdict.CorrectedCandidate } : {}),
+  };
   const createdAt = deps.Now();
   await deps.Db.prepare(
     `INSERT INTO output_review (
       id, target_kind, target_id, publication_id, verdict, corrected, note, reviewer_opaque,
-      model, prompt_version, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      model, prompt_version, created_at, tags_json, corrected_json
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   )
     .bind(
       deps.NewId(),
@@ -433,14 +513,64 @@ export async function recordVerdict(
       target.model,
       target.prompt_version,
       createdAt,
+      JSON.stringify(verdict.Tags),
+      Object.keys(correction).length ? JSON.stringify(correction) : null,
     )
     .run();
   return {
-    Verdict: verdict.Verdict,
-    Note: verdict.Note,
-    Corrected: verdict.Corrected,
-    CreatedAt: createdAt,
+    Kind: "stored",
+    Current: {
+      Verdict: verdict.Verdict,
+      Note: verdict.Note,
+      Corrected: verdict.Corrected,
+      Tags: verdict.Tags,
+      CorrectedSignals: verdict.CorrectedSignals,
+      CorrectedCandidate: verdict.CorrectedCandidate,
+      CreatedAt: createdAt,
+    },
   };
+}
+
+/** The current verdict of one target, or null. */
+async function currentVerdict(
+  db: SqlDatabase,
+  kind: ReviewTargetKind,
+  id: string,
+): Promise<CurrentVerdict | null> {
+  const row = await db
+    .prepare(
+      `SELECT * FROM output_review
+       WHERE target_kind = ? AND target_id = ? AND withdrawn_at IS NULL
+       ORDER BY rowid DESC LIMIT 1`,
+    )
+    .bind(kind, id)
+    .first<ReviewRow>();
+  return current(row ?? undefined);
+}
+
+/**
+ * Withdraws the current verdict of a target (REQ-REV-008 AC3): the row stays as history, and the
+ * verdict before it, if any, becomes current again. Returns null when there was nothing to undo.
+ */
+export async function undoVerdict(
+  deps: Omit<VerdictDeps, "NewId">,
+  kind: ReviewTargetKind,
+  id: string,
+): Promise<{ Current: CurrentVerdict | null } | null> {
+  const latest = await deps.Db.prepare(
+    `SELECT rowid AS rid FROM output_review
+     WHERE target_kind = ? AND target_id = ? AND withdrawn_at IS NULL
+     ORDER BY rowid DESC LIMIT 1`,
+  )
+    .bind(kind, id)
+    .first<{ rid: number }>();
+  if (!latest) {
+    return null;
+  }
+  await deps.Db.prepare("UPDATE output_review SET withdrawn_at = ? WHERE rowid = ?")
+    .bind(deps.Now(), latest.rid)
+    .run();
+  return { Current: await currentVerdict(deps.Db, kind, id) };
 }
 
 /** Current verdicts per step and prompt version (REQ-REV-004 AC1). */
@@ -473,8 +603,12 @@ export async function exportVerdicts(db: SqlDatabase): Promise<ReviewExportLine[
     Verdict: row.verdict,
     Note: row.note,
     Corrected: row.corrected,
+    Tags: JSON.parse(row.tags_json) as ReviewTag[],
+    CorrectedSignals: parseCorrection(row).Signals ?? null,
+    CorrectedCandidate: parseCorrection(row).Candidate ?? null,
     Model: row.model,
     PromptVersion: row.prompt_version,
     CreatedAt: row.created_at,
+    WithdrawnAt: row.withdrawn_at,
   }));
 }
