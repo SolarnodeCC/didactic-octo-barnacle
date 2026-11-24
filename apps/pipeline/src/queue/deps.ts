@@ -120,6 +120,12 @@ export type PipelineDeps = {
     FullTextMaxChars: number;
     /** `extraction.generic_customer_terms` (ADR 0066). */
     GenericCustomerTerms: readonly string[];
+    /**
+     * `model.extraction_requests_per_minute`: the extraction model's request limit. Extraction
+     * messages are sent spaced to it, so the model queue's concurrency does not run into 429s
+     * (REQ-NFR-010, ADR 0118). Left out, they are sent at once.
+     */
+    RequestsPerMinute?: number;
   };
   /**
    * Embeddings (REQ-PROC-001, REQ-PROC-002, ADR 0053, ADR 0056). The consumer needs `Call` and
@@ -280,4 +286,15 @@ export function candidateRunEnvelope(candidateId: string, runId?: string): Queue
     Ids: { CandidateId: candidateId, ...(runId ? { RunId: runId } : {}) },
     Attempt: 0,
   };
+}
+
+/**
+ * The send delay, in whole seconds, of the `index`-th message of a run that is paced to
+ * `requestsPerMinute` (ADR 0118): 3 s apart at 20 a minute. Unpaced, every message is sent at once.
+ */
+export function pacedDelaySeconds(index: number, requestsPerMinute: number | undefined): number {
+  if (requestsPerMinute === undefined || requestsPerMinute <= 0) {
+    return 0;
+  }
+  return index * Math.ceil(60 / requestsPerMinute);
 }

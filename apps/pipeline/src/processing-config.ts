@@ -94,6 +94,11 @@ export type ProcessingConfig = {
    * one failed call at the start of a day does not pause the step (WP6).
    */
   BreakerMinCalls: number;
+  /**
+   * `model.extraction_requests_per_minute`: the request limit of `model.extraction` on Workers AI
+   * (20 for a paid model). Extraction messages are sent spaced to it (REQ-NFR-010, ADR 0118).
+   */
+  ExtractionRequestsPerMinute: number;
   /** `model.max_attempts`: attempts per step, including retries (REQ-AGENT-009). */
   ModelMaxAttempts: number;
   /**
@@ -146,6 +151,7 @@ export const DEFAULT_PROCESSING_CONFIG: ProcessingConfig = {
   DeadLetterReplayHours: 6,
   BreakerFailureShare: 0.5,
   BreakerMinCalls: 10,
+  ExtractionRequestsPerMinute: 20,
   ModelMaxAttempts: 3,
   TriageModel: {
     Model: "@cf/google/gemma-4-26b-a4b-it",

@@ -13,7 +13,8 @@
     "scope-lookup": "node ./dist/scope/lookup-cli.js",
     "scope-sync": "node ./dist/scope/sync-cli.js",
     "measure:pdf-text": "node ./dist/documents/measure-pdf-text.js",
-    "slice": "node ./dist/slice/cli.js"
+    "slice": "node ./dist/slice/cli.js",
+    "load": "node ./dist/load/cli.js"
   },
   "dependencies": {
     "@roi/api": "workspace:*",

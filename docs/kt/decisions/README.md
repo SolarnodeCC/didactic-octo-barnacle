@@ -126,6 +126,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0115](0115-quality-section-as-built.md) | The daily quality section: metrics, stored values, and the drift rule as built | Accepted |
 | [0116](0116-owner-review-frontend.md) | An owner review tool on Workers behind Cloudflare Access | Accepted |
 | [0117](0117-thin-slice-runs-in-process.md) | The thin slice runs in-process with stub steps and a placeholder score model | Accepted |
+| [0118](0118-load-test-on-a-virtual-clock.md) | The throughput load test runs the real consumers on a virtual clock, and extraction is paced | Accepted |
 
 ## When an ADR is needed
 

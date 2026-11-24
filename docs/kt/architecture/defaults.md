@@ -32,6 +32,7 @@ Starter configuration values. Stored as versioned config in `infrastructure/clou
 | `pipeline.max_candidate_workflows` | `10` | Global in-flight candidate Workflows |
 | `model.semaphore_max` | `8` | Durable Object semaphore (REQ-AGENT-012, ADR 0017) |
 | `model.max_attempts` | `3` | Contract validation retries (REQ-AGENT-009) |
+| `model.extraction_requests_per_minute` | `20` | The request limit of `model.extraction` on Workers AI; extraction messages are sent spaced to it (REQ-NFR-010, ADR 0118) |
 | `search.max_calls_per_agent_run` | `5` | Per Market Analysis or Competition run (REQ-AGENT-013) |
 | `search.timeout_ms` | `8000` | Per search call |
 
