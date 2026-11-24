@@ -1,3 +1,4 @@
+import { handleCandidateRun } from "../candidate/run-consumer.js";
 import { QueueMessageEnvelopeSchema } from "@roi/models";
 
 import { PdfFetchError } from "../documents/safe-fetch.js";
@@ -97,6 +98,8 @@ export async function consumeBatch(
         await handleTriage(deps, message.body);
       } else if (type === "publication.extract") {
         await handleExtraction(deps, message.body);
+      } else if (type === "candidate.run") {
+        await handleCandidateRun(deps, message.body);
       } else if (type === "retraction.check_page") {
         await handleRetractionCheckPage(deps, message.body);
       } else {

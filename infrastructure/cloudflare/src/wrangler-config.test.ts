@@ -135,3 +135,20 @@ describe("REQ-PROC-005: the daily admission runs in the deployed environments", 
     },
   );
 });
+
+describe("REQ-PROC-007: the candidate Workflow of the thin slice", () => {
+  it("REQ-PROC-007: local and preview bind CANDIDATE_WORKFLOW to the CandidateWorkflow class", () => {
+    for (const [table, environment] of [
+      ["[[workflows]]", "local"],
+      ["[[env.preview.workflows]]", "preview"],
+    ] as const) {
+      expect(wrangler).toContain(
+        `${table}\nname = "roi-candidate-${environment}"\nbinding = "CANDIDATE_WORKFLOW"\nclass_name = "CandidateWorkflow"`,
+      );
+    }
+  });
+
+  it("REQ-PROC-007: staging and production have no Workflow in phase 2 (ADR 0116)", () => {
+    expect(wrangler).not.toMatch(/^\[\[env\.(staging|production)\.workflows\]\]/m);
+  });
+});

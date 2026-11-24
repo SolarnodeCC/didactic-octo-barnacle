@@ -19,6 +19,12 @@ import { extractPdfText, type PdfTextExtractor } from "../documents/pdf-text.js"
 import { DEFAULT_PROCESSING_CONFIG } from "../processing-config.js";
 import { PRICE_TABLE } from "../prices.js";
 import { createModelUsageStore, type ModelBudget } from "../store/model-usage.js";
+import {
+  runCandidatePipeline,
+  type CandidatePipelineOutcome,
+  type StepRunner,
+} from "../candidate/pipeline.js";
+import { STUB_STEPS, type CandidateSteps } from "../candidate/steps.js";
 import { notify } from "../alerts/notify.js";
 import { budgetStopAlert } from "../budget/budget-stop.js";
 import { consumeBatch } from "../queue/consume.js";
@@ -112,6 +118,13 @@ export type Harness = {
   /** Script the PDF fetcher: bytes, or an error, per URL. */
   SetPdfs(pdfs: Record<string, Uint8Array | Error>): void;
   Drain(options?: { Duplicate?: boolean; MaxRetries?: number }): Promise<number>;
+  /** Workflow instances started by `candidate.run`, run inline, with their step order. */
+  Workflows: Array<{
+    Id: string;
+    Steps: string[];
+    Outcome?: CandidatePipelineOutcome;
+    Error?: unknown;
+  }>;
   Count(table: string): number;
   Run(id?: string): Record<string, unknown>;
 };
@@ -165,6 +178,8 @@ export function createHarness(
     };
     /** Recovery settings (REQ-PROC-010, REQ-DATA-012); the configured defaults when left out. */
     Recovery?: Partial<NonNullable<PipelineDeps["Recovery"]>>;
+    /** The candidate Workflow, run inline; the stub steps unless a test replaces one (ADR 0116). */
+    Candidate?: { Steps?: Partial<CandidateSteps> };
   } = {},
 ): Harness {
   const database = createTestDatabase();
@@ -201,6 +216,10 @@ export function createHarness(
     OnStop: (stop) => notify(deps, budgetStopAlert(stop)),
     Now: () => clock.Now,
   });
+  // The candidate Workflow binding, run inline: each step runs once, in the order the pipeline
+  // asks for it, as a Workflow step does (ADR 0116).
+  const workflows: Harness["Workflows"] = [];
+  const steps: CandidateSteps = { ...STUB_STEPS, ...overrides.Candidate?.Steps };
   const deps: PipelineDeps = {
     AuthorGuard: createAuthorGuard(database.Db, hashAuthorId),
     Db: database.Db,
@@ -310,6 +329,36 @@ export function createHarness(
           },
         }
       : {}),
+    ...(overrides.Candidate
+      ? {
+          Candidate: {
+            Steps: steps,
+            Workflow: {
+              async create(options) {
+                const record: Harness["Workflows"][number] = { Id: options.id, Steps: [] };
+                workflows.push(record);
+                const runner: StepRunner = {
+                  do(name, callback) {
+                    record.Steps.push(name);
+                    return callback();
+                  },
+                };
+                try {
+                  record.Outcome = await runCandidatePipeline(
+                    { ...deps, Steps: steps },
+                    runner,
+                    options.params,
+                  );
+                } catch (error) {
+                  // A failed instance does not fail its `candidate.run` message, as in Workflows.
+                  record.Error = error;
+                }
+                return { id: options.id };
+              },
+            },
+          },
+        }
+      : {}),
     Recovery: {
       MaxRedrives: DEFAULT_PROCESSING_CONFIG.MaxRedrives,
       MaxRedrivesPerDay: DEFAULT_PROCESSING_CONFIG.MaxRedrivesPerDay,
@@ -356,6 +405,7 @@ export function createHarness(
     OpenAlexRequests: openAlexRequests,
     ArxivRequests: arxivRequests,
     ArxivIdRequests: arxivIdRequests,
+    Workflows: workflows,
     SetOpenAlexPages: (pages) => {
       openAlexPages = [...pages];
     },
