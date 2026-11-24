@@ -1,5 +1,5 @@
--- Migration 0013: verdicts of the owner review tool on triage decisions and extraction
--- candidates (ADR 0115; REQ-REV-003, REQ-REV-004). Additive (expand only): a new table that
+-- Migration 0014: verdicts of the owner review tool on triage decisions and extraction
+-- candidates (ADR 0116; REQ-REV-003, REQ-REV-004). Additive (expand only): a new table that
 -- the pipeline never reads or writes (REQ-NFR-020, ADR 0028).
 
 -- One row per verdict. A newer row on the same target replaces the current verdict; older rows

@@ -13,7 +13,7 @@ import {
 } from "./store.js";
 
 /**
- * The API of the owner review tool under `/api/review/` (ADR 0115). Every request is
+ * The API of the owner review tool under `/api/review/` (ADR 0116). Every request is
  * authenticated first (REQ-REV-005); writes also need a same-origin `Origin` (REQ-NFR-014).
  */
 

@@ -2,7 +2,7 @@
 title: Phase 2 build plan
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-10
+last_reviewed: 2026-11-24
 related: [REQ-DATA-006, REQ-DATA-008, REQ-PROC-001, REQ-PROC-002, REQ-PROC-003, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-PROC-007, REQ-PROC-008, REQ-PROC-009, REQ-NFR-003, REQ-NFR-005, REQ-NFR-010, REQ-NFR-011, REQ-TEST-002]
 ---
 
@@ -144,7 +144,7 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 
 ## WP10: Thin slice
 
-- Migration 0012 (planned as 0010 before ADR 0078, and as 0011 before the recovery migration of WP6), `CandidateWorkflow` with stub steps from the examples, the placeholder score model, the read route of ADR 0058, and the `slice` command and run report.
+- Migration 0015 (planned as 0010 before ADR 0078, as 0011 before the recovery migration of WP6, as 0012 before the two migrations of WP9, and as 0014 before output review of ADR 0116), `CandidateWorkflow` with stub steps from the examples, the placeholder score model, the read route of ADR 0058, and the `slice` command and run report.
 - Add `Customer` and `CustomerQuote` to the example candidate. Add a test that validates the examples against the `packages/models` schemas.
 - **Tests:** the slice integration test with local bindings covers AC1 to AC3 (REQ-PROC-007). A test replaces one stub step with another implementation and the pipeline is unchanged (AC4).
 - **Exit:** `pnpm --filter @roi/pipeline slice` runs locally and the read route returns the opportunity.

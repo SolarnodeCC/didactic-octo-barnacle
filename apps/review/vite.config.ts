@@ -2,7 +2,7 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
-// The single-page app of the owner review tool (ADR 0115). The Worker serves the build output
+// The single-page app of the owner review tool (ADR 0116). The Worker serves the build output
 // in dist/client as static assets; `web/public/_headers` sets the security headers on them.
 export default defineConfig({
   root: "web",

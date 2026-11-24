@@ -1,4 +1,4 @@
-# The owner review tool (ADR 0115, REQ-REV-001 to REQ-REV-005): a single-page app served as
+# The owner review tool (ADR 0116, REQ-REV-001 to REQ-REV-005): a single-page app served as
 # Workers static assets, and the `/api/review/` routes of src/worker.ts. Run `pnpm build` first,
 # so dist/client exists.
 name = "roi-review"

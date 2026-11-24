@@ -1,12 +1,12 @@
 ---
-title: "0115: An owner review tool on Workers behind Cloudflare Access"
+title: "0116: An owner review tool on Workers behind Cloudflare Access"
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-11-24
 related: [REQ-REV-001, REQ-REV-002, REQ-REV-003, REQ-REV-004, REQ-REV-005, REQ-NFR-013, REQ-NFR-021]
 ---
 
-# 0115: An owner review tool on Workers behind Cloudflare Access
+# 0116: An owner review tool on Workers behind Cloudflare Access
 
 - Decision status: Accepted
 - Date: 2026-11-24
@@ -30,7 +30,7 @@ Option 3.
 - It runs on Workers, not Cloudflare Pages, for the reasons of ADR 0012: Cloudflare recommends Workers for new projects, and the platform uses one Wrangler deployment model, one hardening check, and the same bindings everywhere.
 - Staging serves it at `review.wispel.cc` as a Worker custom domain. Local runs on `wrangler dev`. Preview and production get no review tool.
 - A Cloudflare Access application allows only the owner. The Worker verifies the Access token on every API request as well, so a misconfigured Access policy does not expose data. The reviewer is stored as the token's opaque `sub`, never as an email address.
-- It reads `publication`, `triage_decision`, `extraction_result`, and `candidate`, and writes only `output_review` (migration 0013). Verdicts never change pipeline output.
+- It reads `publication`, `triage_decision`, `extraction_result`, and `candidate`, and writes only `output_review` (migration 0014). Verdicts never change pipeline output.
 - ADR 0016 applies: plain-text rendering, `https`-only links, a strict Content Security Policy, and an `Origin` check on writes.
 
 ## Consequences

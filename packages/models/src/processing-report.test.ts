@@ -22,6 +22,7 @@ const REPORT = {
     Opportunities: 0,
     CostPerOpportunity: null,
   },
+  Quality: null,
 };
 
 describe("REQ-NFR-005: the processing run report", () => {

@@ -102,7 +102,7 @@ One publication runs through every layer with stubbed agents, so the value of th
 
 - Phase: 2
 - Priority: must
-- Status: planned
+- Status: in-progress
 - Source: OQ-016
 - Depends on: REQ-PROC-004, REQ-PROC-005
 - Acceptance criteria:

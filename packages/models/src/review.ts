@@ -4,7 +4,7 @@ import { type InputMode } from "./agent-contract.js";
 import { type TriageReason, type TriageSignals } from "./triage.js";
 
 /**
- * Contracts of the owner review tool (`apps/review`, ADR 0115, REQ-REV-001 to REQ-REV-004).
+ * Contracts of the owner review tool (`apps/review`, ADR 0116, REQ-REV-001 to REQ-REV-004).
  * The request schemas are validated by the Worker; the response types are shared with the
  * single-page app, which imports them as types only.
  */

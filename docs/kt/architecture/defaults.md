@@ -109,6 +109,17 @@ Read by `loadProcessingConfig` in `apps/pipeline/src/processing-config.ts`. Only
 | `model.extraction` | `@cf/deepseek-ai/deepseek-v4.1-flash-1017` at its default reasoning, prompt `extraction@4`, `json-schema` output | Chosen by benchmark round three (ADR 0091); temperature 0 and at most 8192 output tokens come with the prompt version |
 | `model.relevance` | `@cf/deepseek-ai/deepseek-v4.1-flash-1017` at its default reasoning, prompt `relevance@5`, `json-schema` output | Chosen by analysis round five (ADR 0106); temperature 0 and at most 8192 output tokens come with the prompt version |
 
+## Quality monitoring (phase 2)
+
+Read by `loadProcessingConfig` into `PipelineDeps.Monitor` (WP9, ADR 0071, ADR 0115).
+
+| Key | Default | Notes |
+|---|---|---|
+| `monitor.baseline_days` | `14` | Days in the rolling median of each quality rate; no drift alert before that many days after processing starts |
+| `monitor.drift_band` | `0.5` | Relative move from the median that counts as drift; a median of 0 never alerts |
+| `monitor.min_daily_items` | `20` | Fewest items behind a rate before it can alert |
+| `monitor.near_duplicate_cosine` | `0.92` | Publication-vector cosine for counting possible near-duplicate opportunities |
+
 ## Budgets
 
 | Key | Default | Notes |

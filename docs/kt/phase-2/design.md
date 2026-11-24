@@ -125,6 +125,11 @@ Memory grows with about twice the file size and with the amount of text. `text.m
   - As built (ADR 0114, `report/processing-report.ts`): the admission cron first closes the earlier days' `daily` runs (`partial` with failed-final items) and stores each finished run's `ProcessingReport` in `processing_run.report_json`.
   - The total is every call of the run; it is divided by the distinct publications with a call and by the candidates written.
 
+## Quality section
+
+- When the admission cron reports a `daily` run, `report/quality.ts` adds its quality section from stored rows and makes no model call (REQ-NFR-023, ADR 0071, ADR 0115). It reports rates, histograms, counts per industry, and near-duplicates.
+- Each rate is stored in `quality_metric` and compared with its median over `monitor.baseline_days`. A drift sends one `quality-drift` alert per metric and day; there are none during start-up.
+
 ## Recovery
 
 - The admission cron re-drives failed work after the retraction sweep and before it admits new publications (ADR 0063, REQ-PROC-010):
@@ -153,7 +158,7 @@ Memory grows with about twice the file size and with the amount of text. `text.m
   - OpenAlex list endpoints leave retracted works out unless the filter asks for them, so ingestion seldom sees a retraction. The check asks OpenAlex for the retracted works of the window, with the ingestion scope and `is_retracted:true`, paged by number, and flags the stored ones.
   - It looks up the stored arXiv preprints of the window by `id_list`, 100 a page.
   - Each page is a `retraction.check_page` message on the page queue. The run has kind `retraction-check` and ID `rc_<day>`, and counts `OpenAlexRetractedSeen`, `OpenAlexFlagged`, `ArxivChecked`, and `ArxivFlagged`.
-- The daily admission cron starts with a sweep of flagged publications not yet handled. It deletes their vectors from every index, hides their candidates and, from migration 0012 (WP10), their opportunities with `hidden_reason = retracted`, and stamps `retraction_handled_at` (REQ-DATA-008 AC2, AC3; REQ-PROC-002 AC2).
+- The daily admission cron starts with a sweep of flagged publications not yet handled. It deletes their vectors from every index, hides their candidates and, from migration 0014 (WP10), their opportunities with `hidden_reason = retracted`, and stamps `retraction_handled_at` (REQ-DATA-008 AC2, AC3; REQ-PROC-002 AC2).
 - **As built (WP8):** `sweepRetractions` in `apps/pipeline/src/retraction/sweep.ts` runs before the re-drives.
   - It hides the candidates of each flagged publication.
   - It decides a triage decision still awaiting admission as `retracted`, so the publication is never admitted.

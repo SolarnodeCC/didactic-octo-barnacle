@@ -57,7 +57,7 @@ Staging is deployed by `.github/workflows/staging-deploy.yml`, run from `main` o
 
 ### Owner review tool
 
-The owner review tool (`apps/review`, ADR 0115, REQ-REV-001 to REQ-REV-005) is deployed to staging only, at `review.wispel.cc`, by `.github/workflows/review-deploy.yml` (by hand, from `main`, environment `staging`). It reads the staging D1 database and writes only `output_review`; migration 0013 ships with the normal staging deploy, so run `Staging deploy` first. Before the first deploy, the owner:
+The owner review tool (`apps/review`, ADR 0116, REQ-REV-001 to REQ-REV-005) is deployed to staging only, at `review.wispel.cc`, by `.github/workflows/review-deploy.yml` (by hand, from `main`, environment `staging`). It reads the staging D1 database and writes only `output_review`; migration 0014 ships with the normal staging deploy, so run `Staging deploy` first. Before the first deploy, the owner:
 
 1. Creates a self-hosted Cloudflare Access application for `review.wispel.cc` with one policy that allows only the owner's email address.
 2. Sets the variables `REVIEW_ACCESS_TEAM_DOMAIN` (for example `<team>.cloudflareaccess.com`) and `REVIEW_ACCESS_AUD` (the application's audience tag) in the GitHub environment `staging`. They are not secrets. The workflow stops when either is missing and passes both to the Worker as `ACCESS_TEAM_DOMAIN` and `ACCESS_AUD`; a Worker without them refuses every API request.

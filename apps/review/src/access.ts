@@ -1,5 +1,5 @@
 /**
- * Verification of the Cloudflare Access token on every API request (REQ-REV-005 AC2, ADR 0115).
+ * Verification of the Cloudflare Access token on every API request (REQ-REV-005 AC2, ADR 0116).
  * Access already blocks other users at the edge; this check keeps the data closed when the
  * Access application is missing or misconfigured.
  */

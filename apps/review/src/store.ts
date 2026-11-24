@@ -21,7 +21,7 @@ import {
 import { type SqlDatabase, type SqlValue } from "./sql.js";
 
 /**
- * Reads of the pipeline's output and writes of review verdicts (ADR 0115). The tool writes only
+ * Reads of the pipeline's output and writes of review verdicts (ADR 0116). The tool writes only
  * `output_review`; pipeline tables are read-only here.
  */
 

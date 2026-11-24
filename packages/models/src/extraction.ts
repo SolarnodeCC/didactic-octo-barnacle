@@ -98,6 +98,16 @@ function customerKey(text: string): string {
 }
 
 /**
+ * The customer as two candidates are compared for near-duplicates (ADR 0071): normalised as a
+ * quote (ADR 0064), lowercased, and without one leading `the`, `all`, `many`, or `most`.
+ */
+export function normalisedCustomer(customer: string): string {
+  const key = customerKey(customer);
+  const prefix = LEADING_QUANTIFIERS.find((word) => key.startsWith(word));
+  return prefix === undefined ? key : key.slice(prefix.length);
+}
+
+/**
  * Whether `customer` is a generic party (REQ-PROC-009 AC4, ADR 0066): after normalisation and
  * lowercasing, and without one leading `the`, `all`, `many`, or `most`, it equals a listed term.
  * A qualified party such as `hospital IT administrators` never matches.

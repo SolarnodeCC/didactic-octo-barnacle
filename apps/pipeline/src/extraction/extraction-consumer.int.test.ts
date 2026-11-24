@@ -203,6 +203,19 @@ describe("REQ-PROC-004: the extraction consumer", () => {
     ]);
   });
 
+  it("REQ-NFR-023: AC1 stores where the kept quotes fall in the input, as counts only", async () => {
+    const { h, ids } = await setup(1, [answer([CANDIDATE])]);
+    const [id] = ids as [string];
+    await extract(h, id);
+    const row = h.Database.Raw.prepare(
+      "SELECT quote_positions_json FROM extraction_result WHERE publication_id = ?",
+    ).get(id) as { quote_positions_json: string };
+    const positions = JSON.parse(row.quote_positions_json) as number[];
+    expect(positions).toHaveLength(10);
+    // The evidence and customer quotes at least; WhyNow and the alternative when quoted.
+    expect(positions.reduce((sum, count) => sum + count, 0)).toBeGreaterThanOrEqual(2);
+  });
+
   it("REQ-PROC-004 AC2: an empty list is stored with its Notes reason", async () => {
     const { h, ids } = await setup(1, [answer([], 0.5, "No customer that can act is named.")]);
     const [id] = ids as [string];

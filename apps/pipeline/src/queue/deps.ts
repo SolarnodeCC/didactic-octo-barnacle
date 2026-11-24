@@ -127,6 +127,17 @@ export type PipelineDeps = {
     /** The Vectorize bindings by name: `PUBLICATION_VECTORS`, and `PUBLICATION_VECTORS_NEXT` during a model change. */
     Indexes: Record<string, VectorIndex>;
   };
+  /** The daily quality section and its drift alert (REQ-NFR-023, ADR 0071). */
+  Monitor?: {
+    /** `monitor.baseline_days`: days in each metric's median; no alert before that many. */
+    BaselineDays: number;
+    /** `monitor.drift_band`: relative move from the median that counts as drift. */
+    DriftBand: number;
+    /** `monitor.min_daily_items`: fewest items behind a rate before it can alert. */
+    MinDailyItems: number;
+    /** `monitor.near_duplicate_cosine`: publication-vector cosine for possible near-duplicates. */
+    NearDuplicateCosine: number;
+  };
   /** The weekly retraction check (REQ-DATA-008 AC1, ADR 0061, ADR 0112). */
   Retraction?: {
     /** `retraction.lookback_days`. */

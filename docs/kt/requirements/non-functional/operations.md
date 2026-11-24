@@ -95,8 +95,8 @@ The daily run report shows the quality of live triage and extraction output and 
 
 - Phase: 2
 - Priority: should
-- Status: planned
-- Source: ADR 0071
+- Status: in-progress
+- Source: ADR 0071, ADR 0115
 - Depends on: REQ-NFR-008, REQ-NFR-011, REQ-NFR-019
 - Acceptance criteria:
   1. The daily processing run report has a quality section computed from stored rows: accept rate and signal shares; empty-extraction share, candidates per publication, and abstract-only share; first-attempt validity, repair, quote-failure, and drop rates per step; the report-only code checks of ADR 0066; the extraction `Confidence` histogram; counts per industry; where accepted quotes fall in the input; agreement between triage signals and extraction; and possible near-duplicate opportunities.

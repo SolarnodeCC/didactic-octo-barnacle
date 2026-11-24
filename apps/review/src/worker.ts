@@ -4,7 +4,7 @@ import { errorResponse } from "./http.js";
 import { type SqlDatabase } from "./sql.js";
 
 /**
- * Worker entry of the owner review tool (ADR 0115). Wrangler runs this script only for
+ * Worker entry of the owner review tool (ADR 0116). Wrangler runs this script only for
  * `/api/*` (`assets.run_worker_first`); every other path is a static asset of the single-page app.
  */
 

@@ -1,6 +1,6 @@
 name: Review deploy
 
-# Deploy of the owner review tool to staging at review.wispel.cc, by hand from main (ADR 0115,
+# Deploy of the owner review tool to staging at review.wispel.cc, by hand from main (ADR 0116,
 # REQ-REV-005). Run `Staging deploy` first: it applies the database migrations this tool reads.
 # The GitHub environment `staging` supplies:
 #   secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID (the token also edits Workers routes

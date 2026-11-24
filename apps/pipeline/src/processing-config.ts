@@ -73,6 +73,14 @@ export type ProcessingConfig = {
   BudgetMeasuredMinItems: number;
   /** The estimate behind the budget until a cost is measured (ADR 0032, ADR 0059). */
   BudgetEstimate: BudgetEstimate;
+  /**
+   * `monitor.baseline_days`, `monitor.drift_band`, `monitor.min_daily_items`, and
+   * `monitor.near_duplicate_cosine`: the daily quality section and its drift alert (ADR 0071).
+   */
+  MonitorBaselineDays: number;
+  MonitorDriftBand: number;
+  MonitorMinDailyItems: number;
+  MonitorNearDuplicateCosine: number;
   /** `recovery.max_redrives`: re-drives of an item's failed step before it is failed-final (ADR 0063). */
   MaxRedrives: number;
   /** `recovery.max_redrives_per_day`: items re-driven a UTC day (ADR 0063). */
@@ -129,6 +137,10 @@ export const DEFAULT_PROCESSING_CONFIG: ProcessingConfig = {
     CharsPerToken: 4,
     EmbeddingInputTokens: 400,
   },
+  MonitorBaselineDays: 14,
+  MonitorDriftBand: 0.5,
+  MonitorMinDailyItems: 20,
+  MonitorNearDuplicateCosine: 0.92,
   MaxRedrives: 3,
   MaxRedrivesPerDay: 20,
   DeadLetterReplayHours: 6,
