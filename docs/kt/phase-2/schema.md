@@ -116,7 +116,7 @@ New keys for [defaults](../architecture/defaults.md). They are added there in th
 | `monitor.min_daily_items` | `20` | Fewest items behind a rate before it can alert (ADR 0071) |
 | `monitor.near_duplicate_cosine` | `0.92` | Publication-vector cosine for counting possible near-duplicate opportunities (ADR 0071) |
 
-Schedules: admission at `0 11 * * *` UTC, after both ingestion crons, with the re-drive before it; the recovery check (dead-letter replay and breaker probe) every 30 minutes, `*/30 * * * *`. The retraction check stays `0 8 * * 1`. The slice trigger exists only in the local environment.
+Schedules: admission at `0 11 * * *` UTC, after both ingestion crons, with the re-drive before it; the recovery check (dead-letter replay and breaker probe) every 30 minutes, `*/30 * * * *`. The retraction check stays `0 8 * * 1`. The thin slice has no cron: it runs from `pnpm --filter @roi/pipeline slice` (ADR 0117).
 
 ## Bindings
 

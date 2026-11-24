@@ -19,7 +19,7 @@ Tables, configuration keys, and bindings are in [schema](schema.md). Behavior th
 | `packages/vector-store` (new) | `upsertPublicationVectors`, `deletePublicationVectors`, `searchPublications`, `FakeVectorize` with exact cosine ranking, and the recall-at-10 corpus and evaluator (ADR 0056, ADR 0057). The embedding call itself is `callEmbedding` in `packages/models`, next to `callModel`. The registry rows are read and seeded by the pipeline, which owns the D1 binding; the package takes them as `IndexEntry` values (WP5) |
 | `agents/extraction` | `runExtractionStep`: a pure function from input to validated output through `callModel`; an eval command that runs the existing eval runner on `callModel` for the benchmark. `runTriageStep` and `runExtractionStep` live in `apps/pipeline/src/triage/step.ts` and `apps/pipeline/src/extraction/step.ts` instead, on `@roi/prompts` and `@roi/models`, so the Worker bundle stays free of the benchmark command's dependencies (WP6, WP7). The checks they share with the benchmark are in `packages/models` |
 | `apps/pipeline` | Consumers for embedding, triage, extraction, and text extraction; the admission cron; the retraction check; budget handling; the thin-slice Workflow with stub steps; run-report fields for processing |
-| `apps/api` (new, minimal) | One read-only route for the thin slice (ADR 0058) |
+| `apps/api` (new, minimal) | One read-only route for the thin slice (ADR 0058), `GET /api/v1/opportunities/:id`, local and preview only (`apps/api/wrangler.toml`) |
 | `infrastructure/cloudflare` | Migrations 0009 to 0015; Workers AI, Vectorize, Workflow, and queue bindings; new crons; bootstrap entries for the new queues and the Vectorize metadata indexes; the price table |
 
 ## Queues and message types

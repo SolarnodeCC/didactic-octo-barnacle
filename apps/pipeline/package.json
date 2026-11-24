@@ -12,9 +12,11 @@
     "test:coverage": "vitest run --coverage",
     "scope-lookup": "node ./dist/scope/lookup-cli.js",
     "scope-sync": "node ./dist/scope/sync-cli.js",
-    "measure:pdf-text": "node ./dist/documents/measure-pdf-text.js"
+    "measure:pdf-text": "node ./dist/documents/measure-pdf-text.js",
+    "slice": "node ./dist/slice/cli.js"
   },
   "dependencies": {
+    "@roi/api": "workspace:*",
     "@roi/models": "workspace:*",
     "@roi/prompts": "workspace:*",
     "@roi/vector-store": "workspace:*",
