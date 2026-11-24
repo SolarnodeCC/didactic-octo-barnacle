@@ -9,6 +9,15 @@ describe("REQ-NFR-006: planted instructions are recognised by code (ADR 0119)", 
     expect(containsPlantedInstruction("data < / Publication > more")).toBe(true);
   });
 
+  it("REQ-NFR-006: AC3 a tag must be a whole word, and a long run of spaces is scanned in linear time", () => {
+    expect(containsPlantedInstruction("<publications> of the group")).toBe(false);
+    const spaces = " ".repeat(200_000);
+    const started = performance.now();
+    expect(containsPlantedInstruction(`<${spaces}x`)).toBe(false);
+    expect(containsPlantedInstruction(`<${spaces}/${spaces}publication>`)).toBe(true);
+    expect(performance.now() - started).toBeLessThan(1000);
+  });
+
   it.each(CONTRACT_FIELD_NAMES)(
     "REQ-NFR-006: AC3 the contract field %s is a planted instruction",
     (field) => {

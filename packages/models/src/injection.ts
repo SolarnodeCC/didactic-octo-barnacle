@@ -28,10 +28,44 @@ export const CONTRACT_FIELD_NAMES = [
 
 const FIELD_NAME = new RegExp(`\\b(?:${CONTRACT_FIELD_NAMES.join("|")})\\b`, "u");
 
-/** A defused (`‹`) or live (`<`) publication tag, with optional spaces and slash. */
-const DELIMITER = /[<‹]\s*\/?\s*publication\b/iu;
+const TAG_NAME = "publication";
+const WHITESPACE = /\s/u;
+const WORD = /[A-Za-z0-9_]/u;
+
+function skipWhitespace(text: string, from: number): number {
+  let index = from;
+  while (index < text.length && WHITESPACE.test(text.charAt(index))) {
+    index += 1;
+  }
+  return index;
+}
+
+/**
+ * True when a defused (`‹`) or live (`<`) publication tag starts at `index`: optional
+ * whitespace, an optional `/`, optional whitespace, then `publication` in any letter case as
+ * a whole word. A plain scan, no regular expression: quotes come from untrusted text, and a
+ * pattern with two adjacent whitespace runs backtracks quadratically on `<` and many spaces.
+ */
+function delimiterAt(text: string, index: number): boolean {
+  let at = skipWhitespace(text, index + 1);
+  if (text.charAt(at) === "/") {
+    at = skipWhitespace(text, at + 1);
+  }
+  const end = at + TAG_NAME.length;
+  return text.slice(at, end).toLowerCase() === TAG_NAME && !WORD.test(text.charAt(end));
+}
+
+function containsDelimiter(text: string): boolean {
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text.charAt(index);
+    if ((char === "<" || char === "‹") && delimiterAt(text, index)) {
+      return true;
+    }
+  }
+  return false;
+}
 
 /** True when the text carries an instruction aimed at this pipeline (ADR 0119). */
 export function containsPlantedInstruction(text: string): boolean {
-  return DELIMITER.test(text) || FIELD_NAME.test(text);
+  return containsDelimiter(text) || FIELD_NAME.test(text);
 }
