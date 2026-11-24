@@ -129,6 +129,7 @@ function modelSteps(
       MaxCandidates: processing.MaxCandidates,
       FullTextMaxChars: processing.FullTextMaxChars,
       GenericCustomerTerms: processing.GenericCustomerTerms,
+      RequestsPerMinute: processing.ExtractionRequestsPerMinute,
     },
     ...(env.PUBLICATION_VECTORS
       ? {

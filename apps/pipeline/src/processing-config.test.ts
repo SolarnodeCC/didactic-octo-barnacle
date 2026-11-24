@@ -83,6 +83,7 @@ describe("REQ-NFR-005: processing configuration", () => {
       DeadLetterReplayHours: 6,
       BreakerFailureShare: 0.5,
       BreakerMinCalls: 10,
+      ExtractionRequestsPerMinute: 20,
       ModelMaxAttempts: 3,
       TriageModel: {
         Model: "@cf/google/gemma-4-26b-a4b-it",

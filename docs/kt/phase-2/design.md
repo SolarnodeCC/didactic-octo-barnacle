@@ -176,4 +176,4 @@ Memory grows with about twice the file size and with the amount of text. `text.m
 
 ## Throughput
 
-The largest measured day is about 4,600 publications. The ingestion filters of ADR 0041 and ADR 0048 make most of them in scope, so most reach the triage model. At about 20 requests per minute per paid model ([benchmark plan](../test/model-benchmark-plan.md)), 4,600 triage calls take about four hours, and 100 extractions well under one. A day therefore finishes before the next run (REQ-NFR-010). WP11 checks this with a load test on recorded fixtures and stubbed models, and on the staging days.
+The largest measured day is about 4,600 publications, and most reach the triage model. Triage runs on Gemma at the default 300 requests a minute; the paid extraction model allows 20, so extraction messages are sent 3 s apart (`model.extraction_requests_per_minute`). The load test of ADR 0118 (`pnpm --filter @roi/pipeline load`) runs that day through the real consumers on a virtual clock. Every publication is triaged by 07:35, before the 11:00 admission run, and the 100 admitted are extracted by 11:06 (REQ-NFR-010). The staging days confirm the times.

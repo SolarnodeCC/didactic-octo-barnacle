@@ -1,4 +1,4 @@
-import { extractEnvelope, type PipelineDeps } from "../queue/deps.js";
+import { extractEnvelope, pacedDelaySeconds, type PipelineDeps } from "../queue/deps.js";
 import { SEND_BATCH_LIMIT } from "../queue/types.js";
 
 /** Publications queued per run; the daily limit keeps the real number far below it. */
@@ -11,8 +11,16 @@ export const MAX_EXTRACTIONS_QUEUED_PER_RUN = 1_000;
  * processing was off. It runs after the admission and sends nothing while the day's budget is
  * used up (REQ-NFR-005 AC2). Message IDs are fixed, so a publication queued twice is one
  * extraction (REQ-PROC-010 AC7).
+ *
+ * The messages are spaced to `model.extraction_requests_per_minute`, after the `alreadyPaced`
+ * re-driven extractions of the same run, so the model queue stays under the model's request
+ * limit and no extraction uses up its attempts on 429s (REQ-NFR-010 AC2, ADR 0118).
  */
-export async function queueAdmittedExtractions(deps: PipelineDeps, day: string): Promise<number> {
+export async function queueAdmittedExtractions(
+  deps: PipelineDeps,
+  day: string,
+  alreadyPaced = 0,
+): Promise<number> {
   const extraction = deps.Extraction;
   if (!extraction?.Queue) {
     return 0;
@@ -37,9 +45,15 @@ export async function queueAdmittedExtractions(deps: PipelineDeps, day: string):
   const ids = results.map((row) => row.publication_id);
   for (let start = 0; start < ids.length; start += SEND_BATCH_LIMIT) {
     await extraction.Queue.sendBatch(
-      ids
-        .slice(start, start + SEND_BATCH_LIMIT)
-        .map((publicationId) => ({ body: extractEnvelope(publicationId) })),
+      ids.slice(start, start + SEND_BATCH_LIMIT).map((publicationId, offset) => {
+        const delaySeconds = pacedDelaySeconds(
+          alreadyPaced + start + offset,
+          extraction.RequestsPerMinute,
+        );
+        return delaySeconds > 0
+          ? { body: extractEnvelope(publicationId), delaySeconds }
+          : { body: extractEnvelope(publicationId) };
+      }),
     );
   }
   deps.Log?.("extraction.queued", { day, count: ids.length });
