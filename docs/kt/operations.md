@@ -91,6 +91,8 @@ Settings outside the repository cannot be checked by `scripts/check-hardening.py
 | Cloudflare API token | Least permissions for the environment (see the secrets table); one token per environment (ADR 0046, ADR 0074) |
 | Repository visibility | Private while alert issues are opened here: they hold run IDs, failure reasons, and host names (REQ-NFR-019). Move `ALERT_GITHUB_REPO` to a private operations repository before this one is made public |
 | Workers Builds on `roi-pipeline-staging` | Preview Builds off; no automatic deploy that replaces Staging deploy |
+| Authenticated Gateway on `roi-staging` and `roi-production` | On; the bootstrap drift check fails when it is off (ADR 0120), so a failed `Staging deploy` names the gateway to fix |
+| Who can read `ERASURE_HASH_KEY` and the erasure list | Admins of the GitHub environments, holders of the offline copy, and Cloudflare account members with D1 read: list them and remove anyone who no longer needs it (ADR 0123) |
 
 Set these in the GitHub environment `staging` before the first run:
 
@@ -126,7 +128,8 @@ Cron expressions (UTC) are in [defaults](architecture/defaults.md).
 - Every ingestion and pipeline run writes a run report with counts and failures (REQ-NFR-008).
 - A failed scheduled run, a run that exceeds its time window, a budget stop, a dead-lettered message, or a breach of the availability target (REQ-NFR-017) raises an alert (REQ-NFR-019). An alert sends an email to the ops address and opens a GitHub issue labeled `alert`; repeats within 24 hours comment on the open issue.
 - The staging and production Workers keep every log line and trace in Workers Observability, with issue detection on (REQ-NFR-008, ADR 0077).
-- AI Gateway shows tokens, cost, and latency per agent (REQ-NFR-003).
+- AI Gateway shows tokens, cost, and latency per agent (REQ-NFR-003). The Worker calls it through its Workers AI binding, which needs no gateway token; every gateway has Authenticated Gateway on (ADR 0120).
+- Query strings are redacted in staging and production traces (ADR 0121); the pipeline's log lines name hosts, not URLs.
 
 ## Runbooks
 
@@ -139,6 +142,8 @@ Severity: **SEV1** production down or data loss risk; **SEV2** ingestion or pipe
 | The daily budget is reached | SEV2 | Check cost per opportunity in AI Gateway before raising the budget (ADR 0023). |
 | Bad output reached the dashboard | SEV3 | Hide the opportunity in Operations (REQ-ADM-001), add the case to the golden set, and fix the prompt through a pull request with evals. |
 | Candidates failed or are incomplete | SEV3 | Open Pipeline health and rerun them from the first failed step (REQ-ADM-002). Check the budget first. |
+| PDFs of a new host are refused (`document.refused` with code `blocked-url`) | SEV3 | Staging and production fetch only allowlisted hosts (ADR 0119). Count the refusals by `host` and `refusedHost`; for a host that serves open access PDFs, add it to `apps/pipeline/src/documents/pdf-proven-hosts.json` (sorted, exact name) or a curated domain to `pdf.allowed_hosts`, through a pull request. The next run that stores the publication queues the PDF again. |
+| A deploy stops on an AI Gateway with authentication off | SEV2 | Turn on Authenticated Gateway for the named gateway in the Cloudflare dashboard (AI, AI Gateway, the gateway, Settings) and rerun `Staging deploy`. The Worker's binding keeps working; HTTP clients need a gateway token (ADR 0120). |
 | A message is dead-lettered | SEV3 | An alert names the message and its run. Inspect `payload_json` and `last_error` in `queue_message_log`, fix the cause, and replay it with `replayDeadLetter` (REQ-DATA-011; the route `POST /admin/queue/replay` comes with the admin API in phase 4). |
 | An author asks for erasure | SEV3 | Follow the erasure process in [privacy](architecture/privacy.md) (REQ-NFR-016): find the author records, erase each with `eraseAuthor`, and answer within one month. The route `POST /admin/authors/:id/erase` comes with the admin API in phase 4. |
 | Availability below 99.5% (REQ-NFR-017) | SEV1 | Check Workers/D1 status, last deploy, and error rate; roll back Worker if the last deploy correlates; open a SEV1 issue. |
@@ -160,7 +165,6 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` (benchmark) | Run model benchmark rounds through AI Gateway ([running a round](test/model-benchmark-run.md)); the token has Workers AI Read, and R2 Edit only when raw responses go to R2 | GitHub environment `evals` or Cursor environment secret | evals |
 | `SCOPE_PR_TOKEN` | Opens the draft pull request of `OpenAlex scope sync`; fine-grained token for this repository with Contents and Pull requests write, so the CI checks run on that pull request (ADR 0046) | GitHub environment secret | staging |
 | `OPENALEX_API_KEY` | OpenAlex requests by the collector (REQ-DATA-001); free key required for cursor paging (ADR 0034) | Worker secret, uploaded by `Staging deploy` from the GitHub environment secret; also Cursor environment secret for local agent work | preview, staging, production |
-| `AI_GATEWAY_ACCOUNT_ID`, `AI_GATEWAY_API_TOKEN` | Route model calls through AI Gateway (REQ-NFR-003) | Worker secret | preview, staging, production |
 | `SEARCH_PROVIDER_API_KEY` | Primary web search provider for Market Analysis and Competition (ADR 0022) | Worker secret | preview, staging, production |
 | `SEARCH_PROVIDER_FALLBACK_API_KEY` | Second search provider for benchmark and failover (ADR 0022) | Worker secret | preview, staging, production |
 | `ALERT_GITHUB_TOKEN` | Opens and comments on alert issues; a fine-grained token for this repository only, with the permission Issues: read and write and no other (REQ-NFR-019 AC5) | Cloudflare Worker secret | preview, staging, production |

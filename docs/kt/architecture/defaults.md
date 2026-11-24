@@ -2,7 +2,7 @@
 title: Runtime defaults
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-21
+last_reviewed: 2026-11-24
 related: [REQ-PROC-005, REQ-PROC-006, REQ-AGENT-007, REQ-AGENT-012, REQ-AGENT-013, REQ-DATA-011, REQ-NFR-005]
 ---
 
@@ -60,7 +60,7 @@ Payload of every message: `{ schemaVersion, type, ids: { runId?, source?, page?,
 | `http.max_response_bytes` | `16777216` | 16 MiB; the most read from one OpenAlex or arXiv API response (REQ-NFR-021, ADR 0074) |
 | `pdf.timeout_ms` | `20000` | One deadline for all redirects and the download |
 | `pdf.max_redirects` | `3` | Each redirect target is checked again |
-| `pdf.allowed_hosts` | empty | Empty means any public host; a list limits fetching to those hosts and their subdomains (ADR 0029) |
+| `pdf.allowed_hosts` | empty | Hosts allowed with their subdomains, in addition to the proven hosts. In local and preview an empty list means any public host; staging and production fetch only from these and from the proven hosts in `apps/pipeline/src/documents/pdf-proven-hosts.json`, by exact name, and refuse every host when both are empty (ADR 0029, ADR 0119) |
 
 ## Search tool I/O
 

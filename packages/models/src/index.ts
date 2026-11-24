@@ -118,6 +118,8 @@ export {
   type TriageSignals,
 } from "./triage.js";
 
+export { CONTRACT_FIELD_NAMES, containsPlantedInstruction } from "./injection.js";
+
 export {
   ALL_CANDIDATES_FAILED_NOTE,
   DEFAULT_GENERIC_CUSTOMER_TERMS,

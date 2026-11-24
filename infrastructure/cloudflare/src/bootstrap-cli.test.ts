@@ -57,7 +57,11 @@ describe("REQ-NFR-020: bootstrap CLI", () => {
       const h = harness();
       h.deps.Bootstrap = vi.fn(() =>
         Promise.resolve({
-          Drift: { Missing: Array.from({ length: missing }, () => ({})), Extra: [] },
+          Drift: {
+            Missing: Array.from({ length: missing }, () => ({})),
+            Extra: [],
+            Unauthenticated: [],
+          },
         }),
       ) as unknown as typeof bootstrapEnvironment;
       return h;
@@ -69,6 +73,23 @@ describe("REQ-NFR-020: bootstrap CLI", () => {
     const clean = withDrift(0);
     expect(await runBootstrapCli(["--env", "staging", "--fail-on-drift"], clean.deps)).toBe(0);
     expect(clean.errors).toEqual([]);
+  });
+
+  it("REQ-NFR-003: --fail-on-drift exits 3 when an AI Gateway has Authenticated Gateway off (ADR 0120)", async () => {
+    const h = harness();
+    h.deps.Bootstrap = vi.fn(() =>
+      Promise.resolve({
+        Drift: {
+          Missing: [],
+          Extra: [],
+          Unauthenticated: [{ Kind: "ai-gateway", Name: "roi-staging" }],
+        },
+      }),
+    ) as unknown as typeof bootstrapEnvironment;
+
+    expect(await runBootstrapCli(["--env", "staging", "--fail-on-drift"], h.deps)).toBe(3);
+    expect(h.errors).toHaveLength(1);
+    expect(h.errors[0]).toMatch(/AI Gateway roi-staging has Authenticated Gateway off/);
   });
 
   it.each([

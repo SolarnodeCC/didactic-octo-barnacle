@@ -8,6 +8,17 @@
 export type UrlPolicy = {
   /** When set, only these hosts and their subdomains may be fetched. Empty means any public host. */
   AllowedHosts: readonly string[];
+  /**
+   * Hosts allowed by their exact name, without subdomains: the hosts that have already
+   * served a stored PDF (ADR 0119). Exact, because some are shared storage such as
+   * `<bucket>.s3.amazonaws.com`, where anyone can create a name below the listed one.
+   */
+  ExactHosts?: ReadonlySet<string>;
+  /**
+   * Refuse every host that neither list names, even when both are empty. Set in every
+   * deployed environment, so a missing list fails closed instead of open (ADR 0119).
+   */
+  RequireAllowlist?: boolean;
 };
 
 export type UrlCheck = { Ok: true; Url: URL } | { Ok: false; Reason: string };
@@ -134,7 +145,10 @@ export function checkPdfUrl(raw: string, policy: UrlPolicy): UrlCheck {
   if (PLATFORM_DOMAINS.some((domain) => host === domain || host.endsWith(`.${domain}`))) {
     return { Ok: false, Reason: "host is the platform's own domain" };
   }
-  if (policy.AllowedHosts.length > 0 && !matchesAllowed(host, policy.AllowedHosts)) {
+  const exact = policy.ExactHosts ?? new Set<string>();
+  const restricted =
+    policy.RequireAllowlist === true || policy.AllowedHosts.length > 0 || exact.size > 0;
+  if (restricted && !exact.has(host) && !matchesAllowed(host, policy.AllowedHosts)) {
     return { Ok: false, Reason: `host ${host} is not on the allowlist` };
   }
   return { Ok: true, Url: url };

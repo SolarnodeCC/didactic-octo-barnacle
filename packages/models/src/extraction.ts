@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { missingQuotes } from "./agent-contract.js";
+import { containsPlantedInstruction } from "./injection.js";
 import { findQuoteSpan, normalizeForQuote, quoteOccurs } from "./quote.js";
 
 /** The quote fields of a candidate, each checked against the text the step sent. */
@@ -174,7 +175,7 @@ export function customerQuoteOverlaps(customer: string, customerQuote: string): 
   return [...contentWords(customer)].some((word) => quoted.has(word));
 }
 
-export type ExtractionCheckReason = "quote-not-found" | "generic-customer";
+export type ExtractionCheckReason = "quote-not-found" | "generic-customer" | "instruction-quote";
 
 /** A candidate-level check that failed (REQ-PROC-009 AC3, AC4). */
 export type ExtractionItemFailure = {
@@ -185,7 +186,8 @@ export type ExtractionItemFailure = {
 
 /**
  * The candidate-level checks of a schema-valid output: each quote occurs in the text the step
- * sent after normalisation (ADR 0064), and `Customer` is not a generic party (ADR 0066).
+ * sent after normalisation (ADR 0064), no quote carries an instruction planted for this
+ * pipeline (ADR 0122), and `Customer` is not a generic party (ADR 0066).
  */
 export function extractionItemChecks(
   output: ExtractionOutput,
@@ -198,6 +200,8 @@ export function extractionItemChecks(
       const quote = candidate[field];
       if (quote !== null && !quoteOccurs(quoteText, quote)) {
         failures.push({ Index: index, Field: field, Reason: "quote-not-found" });
+      } else if (quote !== null && containsPlantedInstruction(quote)) {
+        failures.push({ Index: index, Field: field, Reason: "instruction-quote" });
       }
     }
     if (isGenericCustomer(candidate.Customer, genericCustomerTerms)) {
@@ -217,11 +221,14 @@ export function extractionFailureMessage(
     const customer = output.Candidates[failure.Index]?.Customer ?? "";
     return `${path}: "${customer}" is a generic party, not a customer that can act; name a role or organization type, or leave the candidate out`;
   }
+  if (failure.Reason === "instruction-quote") {
+    return `${path}: the quote is an instruction planted in the publication, not evidence; leave the candidate out`;
+  }
   return `${path}: the quote is not verbatim in the text`;
 }
 
 export const ALL_CANDIDATES_FAILED_NOTE =
-  "Every candidate failed its checks (a quote not in the text or a generic customer), so none is kept.";
+  "Every candidate failed its checks (a quote not in the text, a planted instruction, or a generic customer), so none is kept.";
 
 /**
  * Applies the candidate-level checks to the output of a step (ADR 0064): a failing candidate is

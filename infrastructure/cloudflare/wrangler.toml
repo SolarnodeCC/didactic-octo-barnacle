@@ -275,12 +275,12 @@ vars = { ENVIRONMENT = "staging", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo
 crons = ["0 6 * * *", "30 7 * * *", "0 8 * * 1", "0 11 * * *", "*/30 * * * *"]
 
 # Keep every log line and trace (REQ-NFR-008) so a run can be followed afterwards; the
-# same settings as the dashboard's Observability page (ADR 0077). Outbound query strings
-# carry no secrets (keys go in headers), so they are kept readable.
+# same settings as the dashboard's Observability page (ADR 0077). Query strings are
+# redacted: a publisher's PDF URL can carry a signed download token (ADR 0121).
 [env.staging.observability]
 enabled = true
 head_sampling_rate = 1
-redact_query_string = false
+redact_query_string = true
 
 [env.staging.observability.logs]
 enabled = true
@@ -419,12 +419,12 @@ vars = { ENVIRONMENT = "production", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-o
 crons = ["0 6 * * *", "30 7 * * *", "0 8 * * 1", "0 11 * * *", "*/30 * * * *"]
 
 # Keep every log line and trace (REQ-NFR-008) so a run can be followed afterwards; the
-# same settings as the dashboard's Observability page (ADR 0077). Outbound query strings
-# carry no secrets (keys go in headers), so they are kept readable.
+# same settings as the dashboard's Observability page (ADR 0077). Query strings are
+# redacted: a publisher's PDF URL can carry a signed download token (ADR 0121).
 [env.production.observability]
 enabled = true
 head_sampling_rate = 1
-redact_query_string = false
+redact_query_string = true
 
 [env.production.observability.logs]
 enabled = true
