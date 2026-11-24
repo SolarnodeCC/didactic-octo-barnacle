@@ -2,8 +2,8 @@
 title: Phase 2 schema, configuration, and bindings
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-11
-related: [REQ-NFR-020, REQ-NFR-011, REQ-PROC-001, REQ-PROC-006, REQ-PROC-009, REQ-DATA-006, REQ-DATA-008, REQ-PROC-007]
+last_reviewed: 2026-11-24
+related: [REQ-NFR-020, REQ-NFR-011, REQ-PROC-001, REQ-PROC-006, REQ-PROC-009, REQ-DATA-006, REQ-DATA-008, REQ-PROC-007, REQ-REV-003]
 ---
 
 # Phase 2 schema, configuration, and bindings
@@ -57,9 +57,13 @@ Migration 0011 is `infrastructure/cloudflare/migrations/0011_recovery.sql` (WP6;
 | `queue_message_log.replay_count`, `queue_message_log.dead_lettered_at` | | Automatic dead-letter replays, at most two per message ID, each `recovery.dead_letter_replay_hours` after the dead letter |
 | `step_pause` | `step`, `paused_at`, `last_probe_at`, `resumed_at`, `alerted_at` | The breaker: a step is paused while `resumed_at` is empty |
 
-## Migration 0012: thin slice
+## Migration 0013: output review
 
-ADR 0054 planned this migration as 0010; it became 0011 when migration 0010 went to cached input tokens (ADR 0078), and 0012 when migration 0011 went to recovery (WP6).
+`output_review` (`id`, `target_kind` (`triage`, `candidate`), `target_id`, `publication_id`, `verdict` (`correct`, `incorrect`, `unsure`), `corrected` (at most 2,000 characters), `note` (at most 500 characters), `reviewer_opaque`, `model`, `prompt_version`, `created_at`; index (`target_kind`, `target_id`, `created_at`) and (`publication_id`, `created_at`)): the verdicts of the owner review tool (ADR 0115, REQ-REV-003). The newest row per target is the current verdict. Only `apps/review` writes it; the pipeline never reads it. Migration 0013 is `infrastructure/cloudflare/migrations/0013_output_review.sql` and is expand-only.
+
+## Migration 0014: thin slice
+
+ADR 0054 planned this migration as 0010; it became 0011 when migration 0010 went to cached input tokens (ADR 0078), 0012 when migration 0011 went to recovery (WP6), and 0014 when 0012 went to the processing report (ADR 0114) and 0013 to output review (ADR 0115).
 
 The tables of schema migration 0001 for the pipeline, with these changes:
 

@@ -2,7 +2,7 @@
 title: Technology stack
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-24
 related: [REQ-NFR-002, REQ-NFR-003, REQ-AGENT-013]
 ---
 
@@ -14,6 +14,7 @@ related: [REQ-NFR-002, REQ-NFR-003, REQ-AGENT-013]
 | Cloud platform | Cloudflare Workers, Workflows, Queues, D1, R2, Vectorize, AI Gateway, Durable Objects (ADR 0017) |
 | AI and agents | Plain TypeScript agents in Workflow steps (ADR 0003); Workers AI models through AI Gateway for every pipeline step, Anthropic only as the eval judge (ADR 0049); a web search provider for two agents (ADR 0013, OQ-033) |
 | Frontend | Next.js on Workers through the OpenNext adapter (ADR 0012), Tailwind CSS |
+| Owner review tool | React single-page app built with Vite and Tailwind CSS, served as Workers static assets by one Worker (ADR 0115) |
 | Language and runtime | TypeScript (strict, ES modules); Node 24 LTS for tooling (ADR 0008) |
 | Package manager | pnpm workspaces (ADR 0008) |
 | Contract schemas | Zod in `packages/models` (ADR 0008) |

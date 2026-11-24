@@ -2,7 +2,7 @@
 title: Requirements index
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-24
 ---
 
 # Requirements
@@ -19,6 +19,7 @@ Every requirement has a unique ID and testable acceptance criteria. Pull request
 | API | [api.md](api.md) | Read API for the dashboard |
 | ACC | [accounts.md](accounts.md) | Invitations, sign-in links, roles, and account deletion |
 | ADM | [admin.md](admin.md) | Admin operations: hide, rerun, rescore, role matrix |
+| REV | [review.md](review.md) | Owner review tool for triage and extraction output (ADR 0115) |
 | NFR | [non-functional/](non-functional/README.md) | Platform, security, privacy, service levels, and documentation constraints |
 | TEST | [testing.md](testing.md) | Test strategy obligations |
 

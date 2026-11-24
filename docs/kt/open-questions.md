@@ -2,7 +2,7 @@
 title: Open questions
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-21
+last_reviewed: 2026-11-24
 ---
 
 # Open questions
@@ -19,7 +19,7 @@ Questions that block or shape the build. Each has a proposal and the phase by wh
 
 | ID | Question | Proposal | Decide before |
 |---|---|---|---|
-| OQ-035 | Which hostnames do staging and preview use under `wispel.cc`, and does the API or admin area get its own subdomain? | Keep one site per environment on one registrable domain (ADR 0016); name the hostnames when the first environment is deployed, then record them in operations. The owner confirmed on 2026-11-10 that this is decided in phase 4 | before phase 4 launch checklist |
+| OQ-035 | Which hostnames do staging and preview use under `wispel.cc`, and does the API or admin area get its own subdomain? | Keep one site per environment on one registrable domain (ADR 0016); name the hostnames when the first environment is deployed, then record them in operations. The owner confirmed on 2026-11-10 that this is decided in phase 4. The staging review tool uses `review.wispel.cc` (ADR 0115); the product hostnames stay open | before phase 4 launch checklist |
 
 ## Answered
 

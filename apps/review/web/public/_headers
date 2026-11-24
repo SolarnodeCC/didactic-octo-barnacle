@@ -1,0 +1,7 @@
+# Security headers for every static asset of the owner review tool (ADR 0016, ADR 0115,
+# REQ-REV-005). The API sends the same headers from src/http.ts.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  X-Robots-Tag: noindex, nofollow

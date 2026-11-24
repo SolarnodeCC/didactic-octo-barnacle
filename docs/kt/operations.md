@@ -2,8 +2,8 @@
 title: Operations
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-10
-related: [REQ-NFR-001, REQ-NFR-005, REQ-NFR-008, REQ-NFR-015, REQ-NFR-017, REQ-ADM-001, REQ-ADM-002]
+last_reviewed: 2026-11-24
+related: [REQ-NFR-001, REQ-NFR-005, REQ-NFR-008, REQ-NFR-015, REQ-NFR-017, REQ-ADM-001, REQ-ADM-002, REQ-REV-005]
 ---
 
 # Operations
@@ -54,6 +54,17 @@ The bootstrap script creates D1, R2, two Queues, one for pages and one for PDF d
 ## Deployment
 
 Staging is deployed by `.github/workflows/staging-deploy.yml`, run from `main` only. `.github/workflows/staging-pipeline.yml` starts it automatically, as a run of its own, when `CI` and `Configuration` are green for the newest commit of `main`; the deploy first stops if a resource is missing, and the pull request approval is the gate (ADR 0046). You can also run it by hand. It builds, applies pending database migrations (unless switched off), and uploads the Worker together with its secrets in one version (`wrangler deploy --secrets-file`), so the Worker never runs without its erasure key. The workflow then lists the live deployment. Production is released weekly by `.github/workflows/production-release.yml`: a planner picks the newest commit of `main` whose changes ran on staging for the soak time (`RELEASE_SOAK_HOURS`, default 48), have no open `Depends on #N`, no `hold` label, and no drop or rename migration without `contract-ok`, and it starts `production-deploy.yml` as a run of its own, which deploys that commit and tags it `release-<date>-<sha>` (ADR 0044, ADR 0046). A run by hand is a dry run unless `dry_run` is off, and nothing deploys until the variable `PRODUCTION_AUTO_RELEASE` is `true` after the launch checklist. A failed release opens an `alert` issue, which pauses releases until it is closed. Database migrations are plain SQL files that `wrangler d1 migrations` applies before the Worker that needs them (ADR 0020, REQ-NFR-020). A rollback redeploys the previous Worker version via Wrangler rollback or re-deploy of the prior git tag; migrations are written expand/contract so the previous version still works with the new schema. Vectorize index rebuilds are a separate runbook step after a restore.
+
+### Owner review tool
+
+The owner review tool (`apps/review`, ADR 0115, REQ-REV-001 to REQ-REV-005) is deployed to staging only, at `review.wispel.cc`, by `.github/workflows/review-deploy.yml` (by hand, from `main`, environment `staging`). It reads the staging D1 database and writes only `output_review`; migration 0013 ships with the normal staging deploy, so run `Staging deploy` first. Before the first deploy, the owner:
+
+1. Creates a self-hosted Cloudflare Access application for `review.wispel.cc` with one policy that allows only the owner's email address.
+2. Sets the variables `REVIEW_ACCESS_TEAM_DOMAIN` (for example `<team>.cloudflareaccess.com`) and `REVIEW_ACCESS_AUD` (the application's audience tag) in the GitHub environment `staging`. They are not secrets. The workflow stops when either is missing and passes both to the Worker as `ACCESS_TEAM_DOMAIN` and `ACCESS_AUD`; a Worker without them refuses every API request.
+3. Removes any custom domain on `wispel.cc` itself from `roi-pipeline-staging`; the pipeline Worker has no public route (REQ-NFR-021), and the bare domain is reserved for the product (ADR 0026).
+4. Gives the staging `CLOUDFLARE_API_TOKEN` the permission to edit Workers routes on the `wispel.cc` zone, so the deploy can attach the custom domain.
+
+The tool shows triage and extraction output only where processing is on (`PROCESSING_ENABLED`). Locally, `pnpm --filter @roi/review dev` builds the app, applies the migrations to the pipeline's local D1, and serves it on `wrangler dev` with a development bypass of the Access check that only the `local` environment allows; `pnpm --filter @roi/review seed:local` loads sample output (`apps/review/seed/local.sql`).
 
 Do not use Cloudflare Workers Builds to deploy `roi-pipeline-staging` (including Preview builds with `npx wrangler preview`). That path skips migrations and the secrets-file upload. Keep Workers Builds **Preview Builds** off for that Worker; staging stays on the GitHub Actions workflow above. The Wrangler `[env.preview]` environment in `infrastructure/cloudflare/wrangler.toml` is separate and remains for on-request preview deploys when that environment exists.
 
