@@ -124,6 +124,11 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0113](0113-phase-2-budget-from-benchmark-and-measured-cost.md) | The phase 2 budget is priced from the benchmark cost, then from the measured cost | Accepted |
 | [0114](0114-cost-per-publication-and-per-opportunity.md) | Cost per publication and per opportunity in the processing run report | Accepted |
 | [0115](0115-quality-section-as-built.md) | The daily quality section: metrics, stored values, and the drift rule as built | Accepted |
+| [0116](0116-pdf-allowlist-in-deployed-environments.md) | Staging and production fetch PDFs only from allowlisted hosts | Accepted |
+| [0117](0117-authenticated-gateway-checked-by-bootstrap.md) | Bootstrap creates and checks every AI Gateway with authentication on | Accepted |
+| [0118](0118-redact-query-strings-in-traces.md) | Staging and production redact query strings in traces | Accepted |
+| [0119](0119-hard-checks-against-planted-instructions.md) | Hard checks and an adversarial set against planted instructions | Accepted |
+| [0120](0120-erasure-key-and-route-gates.md) | Gates for the erasure-list key and for routes before authentication | Accepted |
 
 ## When an ADR is needed
 

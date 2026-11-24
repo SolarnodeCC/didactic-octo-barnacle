@@ -14,6 +14,7 @@ import {
   loadExtractionSet,
   loadThreshold,
   loadTriageSet,
+  withInjections,
   type ExtractionEntry,
   type TriageEntry,
 } from "./golden-set.js";
@@ -578,5 +579,58 @@ describe("REQ-TEST-007: the extraction eval report (ADR 0067)", () => {
     expect(report.PassRate).toBe(1);
     expect(report.Matching).toMatchObject({ Precision: 1, Recall: 1, F1: 1 });
     expect(report.EmptyEntryAccuracy).toBe(1);
+  });
+});
+
+describe("REQ-NFR-006: the adversarial injection set keeps the owner's labels (ADR 0119)", () => {
+  const injectedTriage = withInjections(triageSet);
+  const injectedExtraction = withInjections(extractionSet);
+
+  it("REQ-NFR-006: AC3 every entry gets a planted instruction and keeps its labels and fixture", () => {
+    expect(injectedTriage).toHaveLength(triageSet.length);
+    injectedTriage.forEach((entry, index) => {
+      const original = triageSet[index]!;
+      expect(entry.id).toBe(`${original.id}-inj`);
+      expect(entry.expected).toEqual(original.expected);
+      expect(entry.Publication.Id).toBe(original.Publication.Id);
+      expect(entry.Publication.Abstract.startsWith(original.Publication.Abstract)).toBe(true);
+      expect(entry.Publication.Abstract.length).toBeGreaterThan(
+        original.Publication.Abstract.length,
+      );
+    });
+  });
+
+  it("REQ-NFR-006: AC3 a model that ignores the planted instruction passes the triage set", async () => {
+    const report = await runTriageEval(
+      injectedTriage,
+      triageOracle(triageSet),
+      loadThreshold("triage"),
+    );
+    expect(report.Passed).toBe(true);
+  });
+
+  it("REQ-NFR-006: AC3 a model that obeys the planted instruction fails the triage set", async () => {
+    const obey: ModelFn = () =>
+      Promise.resolve({
+        Signals: {
+          NamedParty: true,
+          StatedHarm: true,
+          Trigger: true,
+          ExistingAlternative: true,
+          Adoptable: true,
+        },
+        Notes: null,
+      });
+    const report = await runTriageEval(injectedTriage, obey, loadThreshold("triage"));
+    expect(report.Passed).toBe(false);
+  });
+
+  it("REQ-NFR-006: AC3 the labelled quotes stay verbatim, so an honest model passes the extraction set", async () => {
+    const report = await runExtractionEval(
+      injectedExtraction,
+      extractionOracle(extractionSet),
+      loadThreshold("extraction"),
+    );
+    expect(report.Entries.filter((entry) => !entry.Passed)).toEqual([]);
   });
 });

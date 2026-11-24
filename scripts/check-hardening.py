@@ -25,6 +25,11 @@ here, in CI, on every pull request. Rules (see docs/kt/decisions/0033-repository
     even when the environment's branch policy is changed (ADR 0074).
 13. A job that uses an `environment` puts no secret in its job-level `env`: secrets go to
     the steps that need them, so dependency install scripts never see them (ADR 0074).
+14. `ERASURE_HASH_KEY` appears only in the deploy workflows, which upload it as a Worker
+    secret. No other workflow may read the key of the erasure list (REQ-NFR-016, ADR 0120).
+15. No Worker configuration gives a Worker a `route`, `routes`, or a custom domain outside
+    the `local` and `preview` environments, until the phase 4 authentication pull request
+    lifts this rule after its security review (REQ-NFR-007, ADR 0058, ADR 0120).
 """
 
 from __future__ import annotations
@@ -33,6 +38,7 @@ import json
 import pathlib
 import re
 import sys
+import tomllib
 
 import yaml
 
@@ -44,6 +50,13 @@ UNTRUSTED = re.compile(
 )
 
 MAIN_GUARD = "github.ref == 'refs/heads/main'"
+
+# Rule 14: the workflows that upload the erasure-list key as a Worker secret.
+ERASURE_KEY_WORKFLOWS = {"staging-deploy.yml", "production-deploy.yml"}
+
+# Rule 15: environments where a Worker may have a route before authentication exists.
+UNAUTHENTICATED_ROUTE_ENVIRONMENTS = {"local", "preview"}
+ROUTE_KEYS = ("route", "routes")
 
 errors: list[str] = []
 
@@ -101,6 +114,11 @@ def check_workflows() -> None:
                         "its secrets would be empty, so start it with `gh workflow run`"
                     )
             for index, step in enumerate(job.get("steps") or []):
+                if "ERASURE_HASH_KEY" in json.dumps(step) and name not in ERASURE_KEY_WORKFLOWS:
+                    fail(
+                        f"{name}: job {job_name}, step {index + 1} reads ERASURE_HASH_KEY; only "
+                        "the deploy workflows may (ADR 0120)"
+                    )
                 where = f"{name}: job {job_name}, step {index + 1}"
                 uses = step.get("uses")
                 if uses and not uses.startswith("./") and not SHA_PIN.match(uses):
@@ -138,6 +156,32 @@ def check_wrangler() -> None:
             fail(f"wrangler.toml: `{key} = true` is not allowed")
 
 
+def wrangler_configs() -> list[pathlib.Path]:
+    return sorted(
+        [ROOT / "infrastructure" / "cloudflare" / "wrangler.toml"]
+        + list((ROOT / "apps").glob("*/wrangler.toml"))
+    )
+
+
+def check_routes() -> None:
+    for path in wrangler_configs():
+        if not path.is_file():
+            continue
+        config = tomllib.loads(path.read_text())
+        # Top-level keys are what an environment without its own value inherits.
+        sections = {"(top level)": config}
+        for env_name, env in (config.get("env") or {}).items():
+            if env_name not in UNAUTHENTICATED_ROUTE_ENVIRONMENTS:
+                sections[f"env.{env_name}"] = env
+        for where, section in sections.items():
+            for key in ROUTE_KEYS:
+                if key in section:
+                    fail(
+                        f"{path.as_posix()}: `{key}` in {where} exposes a Worker before phase 4 "
+                        "authentication; routes are allowed only in local and preview (ADR 0120)"
+                    )
+
+
 def check_audit() -> None:
     package = json.loads((ROOT / "package.json").read_text())
     if "audit:ci" not in package.get("scripts", {}):
@@ -151,12 +195,15 @@ def main() -> None:
     check_dependabot()
     check_codeowners()
     check_wrangler()
+    check_routes()
     check_audit()
     if errors:
         for error in errors:
             print(f"hardening error: {error}")
         sys.exit(1)
-    print(f"hardening ok: {len(WORKFLOWS)} workflows, dependabot, CODEOWNERS, wrangler, audit")
+    print(
+        f"hardening ok: {len(WORKFLOWS)} workflows, dependabot, CODEOWNERS, wrangler, routes, audit"
+    )
 
 
 main()

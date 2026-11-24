@@ -15,14 +15,21 @@ const TOKEN = "secret-token-value";
 type Call = { method: string; path: string; auth: string | null; body: unknown };
 
 /** A Cloudflare account in memory that answers the endpoints the client uses. */
-function fakeAccount(seed: { d1?: string[]; queues?: string[]; other?: string[] } = {}) {
+function fakeAccount(
+  seed: {
+    d1?: string[];
+    queues?: string[];
+    other?: string[];
+    gateways?: Array<{ id: string; authentication?: boolean }>;
+  } = {},
+) {
   const store = {
     d1: [...(seed.d1 ?? []), ...(seed.other ?? [])],
     r2: [...(seed.other ?? [])],
     queues: [...(seed.queues ?? [])],
     vectorize: [] as string[],
     metadataIndexes: [] as Array<{ index: string; propertyName: string; indexType: string }>,
-    gateways: [] as string[],
+    gateways: [...(seed.gateways ?? [])] as Array<{ id: string; authentication?: boolean }>,
   };
   const calls: Call[] = [];
 
@@ -57,15 +64,15 @@ function fakeAccount(seed: { d1?: string[]; queues?: string[]; other?: string[] 
               .map(({ propertyName, indexType }) => ({ propertyName, indexType })),
           }),
         );
-      if (path === "/ai-gateway/gateways")
-        return Promise.resolve(ok(slice(store.gateways).map((id) => ({ id }))));
+      if (path === "/ai-gateway/gateways") return Promise.resolve(ok(slice(store.gateways)));
     } else {
       const name = body?.name ?? body?.queue_name ?? body?.id;
       if (path === "/d1/database") store.d1.push(name);
       else if (path === "/r2/buckets") store.r2.push(name);
       else if (path === "/queues") store.queues.push(name);
       else if (path === "/vectorize/v2/indexes") store.vectorize.push(name);
-      else if (path === "/ai-gateway/gateways") store.gateways.push(name);
+      else if (path === "/ai-gateway/gateways")
+        store.gateways.push({ id: name, authentication: body.authentication });
       else if (/^\/vectorize\/v2\/indexes\/[^/]+\/metadata_index\/create$/u.test(path))
         store.metadataIndexes.push({
           index: path.split("/")[4] ?? "",
@@ -281,5 +288,55 @@ describe("REQ-NFR-020: Cloudflare bootstrap client", () => {
         Fetch: fakeAccount().fetchFn,
       }),
     ).toThrow(/whitespace/);
+  });
+});
+
+describe("REQ-NFR-003: AI Gateways are created and checked with Authenticated Gateway on (ADR 0117)", () => {
+  const client = (account: ReturnType<typeof fakeAccount>) =>
+    createCloudflareClient({ AccountId: ACCOUNT, ApiToken: TOKEN, Fetch: account.fetchFn });
+
+  it("REQ-NFR-003: bootstrap creates the gateway with authentication on and reports no open gateway", async () => {
+    const account = fakeAccount();
+    const result = await bootstrapEnvironment({
+      Environment: "staging",
+      Mode: "apply",
+      Client: client(account),
+    });
+    const created = account.calls.find(
+      (call) => call.method === "POST" && call.path === "/ai-gateway/gateways",
+    );
+    expect(created?.body).toMatchObject({ id: "roi-staging", authentication: true });
+    expect(result.Drift.Unauthenticated).toEqual([]);
+  });
+
+  it.each([
+    ["off", { id: "roi-staging", authentication: false }],
+    ["not reported", { id: "roi-staging" }],
+  ])(
+    "REQ-NFR-003: a gateway whose authentication is %s is reported as drift",
+    async (_label, gateway) => {
+      const account = fakeAccount({ gateways: [gateway] });
+      const result = await bootstrapEnvironment({
+        Environment: "staging",
+        Mode: "plan",
+        Client: client(account),
+      });
+      expect(result.Drift.Unauthenticated).toEqual([{ Kind: "ai-gateway", Name: "roi-staging" }]);
+    },
+  );
+
+  it("REQ-NFR-003: another environment's open gateway is not drift for this one", async () => {
+    const account = fakeAccount({
+      gateways: [
+        { id: "roi-staging", authentication: true },
+        { id: "roi-preview", authentication: false },
+      ],
+    });
+    const result = await bootstrapEnvironment({
+      Environment: "staging",
+      Mode: "plan",
+      Client: client(account),
+    });
+    expect(result.Drift.Unauthenticated).toEqual([]);
   });
 });

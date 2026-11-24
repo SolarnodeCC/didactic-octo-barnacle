@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import {
   bootstrapEnvironment,
+  hasBlockingDrift,
   hasCloudflareCredentials,
   type EnvironmentName,
 } from "./bootstrap.js";
@@ -50,7 +51,8 @@ export type BootstrapCliDeps = {
 
 /**
  * Runs the CLI and returns its exit code: 0 on success, 1 on failure, 2 on bad usage, and 3
- * when `--fail-on-drift` is set and resources are missing.
+ * when `--fail-on-drift` is set and resources are missing or an AI Gateway has
+ * Authenticated Gateway off (ADR 0117).
  */
 export async function runBootstrapCli(
   args: readonly string[],
@@ -85,10 +87,17 @@ export async function runBootstrapCli(
   deps.Log(JSON.stringify(result, null, 2));
 
   // The automated staging pipeline stops before the deploy when resources are missing (REQ-NFR-020).
-  if (parsed.FailOnDrift && result.Drift.Missing.length > 0) {
-    deps.Error(
-      `Missing resources: ${result.Drift.Missing.length}. Run Staging bootstrap with apply.`,
-    );
+  if (parsed.FailOnDrift && hasBlockingDrift(result.Drift)) {
+    if (result.Drift.Missing.length > 0) {
+      deps.Error(
+        `Missing resources: ${result.Drift.Missing.length}. Run Staging bootstrap with apply.`,
+      );
+    }
+    for (const gateway of result.Drift.Unauthenticated) {
+      deps.Error(
+        `AI Gateway ${gateway.Name} has Authenticated Gateway off. Turn it on in the Cloudflare dashboard (AI > AI Gateway > ${gateway.Name} > Settings); see docs/kt/operations.md.`,
+      );
+    }
     return 3;
   }
   return 0;

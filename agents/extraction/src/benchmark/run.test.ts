@@ -361,6 +361,37 @@ describe("REQ-TEST-006: the benchmark command", () => {
     );
   });
 
+  it("REQ-NFR-006: --injection runs the adversarial set and is part of the stored plan (ADR 0119)", async () => {
+    expect(parseBenchmarkArgs(["--injection"])).toMatchObject({ Injection: true });
+    expect(parseBenchmarkArgs([])).toMatchObject({ Injection: false });
+    expect(parseBenchmarkArgs(["--resume", "bench-1", "--injection"])).toBeNull();
+
+    const out = mkdtempSync(join(tmpdir(), "roi-bench-"));
+    dirs.push(out);
+    const args = parseBenchmarkArgs([
+      "--dry-run",
+      "--injection",
+      "--step",
+      "triage",
+      "--runs",
+      "1",
+      "--limit",
+      "8",
+      "--out",
+      out,
+    ])!;
+    const result = await runBenchmarkCommand(
+      args,
+      {},
+      { Now: () => new Date("2026-11-24T12:00:00Z") },
+    );
+    expect(result.Summaries.every((summary) => summary.MeanPassRate === 1)).toBe(true);
+    const stored = JSON.parse(readFileSync(join(out, result.BenchmarkId, "run.json"), "utf8")) as {
+      Injection?: boolean;
+    };
+    expect(stored.Injection).toBe(true);
+  });
+
   it("REQ-TEST-006: --resume takes a benchmark ID and no plan flags", () => {
     expect(parseBenchmarkArgs(["--resume", "bench-2026-11-10T12-21-14-407Z"])).toMatchObject({
       Resume: "bench-2026-11-10T12-21-14-407Z",

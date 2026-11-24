@@ -208,6 +208,32 @@ describe("REQ-DATA-010: PDF fetcher", () => {
     expect(error.message).toMatch(/allowlist/);
     expect(fetchFn).toHaveBeenCalledTimes(1);
   });
+
+  it("REQ-DATA-010: a redirect from a proven host to an unlisted host is refused and names that host (ADR 0116)", async () => {
+    const fetchFn = vi.fn(() => Promise.resolve(redirect("https://attacker.example/a.pdf")));
+    const fetchPdf = createPdfFetcher({
+      Fetch: fetchFn as unknown as typeof fetch,
+      Limits: {
+        ...limits,
+        ExactHosts: new Set(["doi.org"]),
+        RequireAllowlist: true,
+      },
+    });
+    const error = await failure(fetchPdf("https://doi.org/10.1000/1"));
+    expect(error).toMatchObject({ Code: "blocked-url", Permanent: true, Host: "attacker.example" });
+    expect(fetchFn).toHaveBeenCalledTimes(1);
+  });
+
+  it("REQ-DATA-010: a required allowlist refuses before any request is sent (ADR 0116)", async () => {
+    const fetchFn = vi.fn();
+    const fetchPdf = createPdfFetcher({
+      Fetch: fetchFn as unknown as typeof fetch,
+      Limits: { ...limits, RequireAllowlist: true },
+    });
+    const error = await failure(fetchPdf("https://repo.example.org/a.pdf"));
+    expect(error).toMatchObject({ Code: "blocked-url", Host: "repo.example.org" });
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
 });
 
 describe("REQ-DATA-010: the PDF body is read into one buffer when its size is declared", () => {

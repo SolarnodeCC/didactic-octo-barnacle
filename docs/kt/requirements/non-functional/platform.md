@@ -2,7 +2,7 @@
 title: Platform and cost requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-24
 ---
 
 # Platform and cost requirements
@@ -47,7 +47,8 @@ All calls to model providers, including embedding calls, go through Cloudflare A
 - Acceptance criteria:
   1. No component calls OpenAI, Anthropic, or another model provider directly.
   2. Tokens, cost, and latency per agent and per pipeline run can be read from the gateway.
-- Verification: code review and integration test
+  3. Every environment's gateway has Authenticated Gateway on. Bootstrap creates it that way, and the drift check fails `Staging deploy` and `Staging scheduled checks` when a gateway of the environment reports it off or does not report it (ADR 0117).
+- Verification: code review, integration test, and the bootstrap drift check
 
 ### REQ-NFR-005: Cost budget
 

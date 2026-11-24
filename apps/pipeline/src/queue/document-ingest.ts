@@ -67,6 +67,8 @@ async function ingest(
         publicationId,
         code: error.Code,
         host: new URL(source.Url).hostname,
+        // A redirect target can be refused while the first host is allowed (ADR 0116).
+        ...(error.Host ? { refusedHost: error.Host } : {}),
       });
       return finish(deps, messageId, "refused", `${error.Code}: ${error.message}`);
     }

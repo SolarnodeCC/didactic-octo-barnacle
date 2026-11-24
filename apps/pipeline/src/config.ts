@@ -1,3 +1,4 @@
+import PDF_PROVEN_HOSTS from "./documents/pdf-proven-hosts.json" with { type: "json" };
 import { SCOPE_OPENALEX_SUBFIELD_IDS, SCOPE_OPENALEX_TOPIC_NAMES } from "./normalize/scope.js";
 
 /**
@@ -42,7 +43,11 @@ export type IngestConfig = {
     MaxBytes: number;
     TimeoutMs: number;
     MaxRedirects: number;
-    /** Empty means any public host; a list limits fetching to those hosts (REQ-DATA-010 AC4). */
+    /**
+     * Hosts allowed with their subdomains. Empty means no suffix rule; whether any other
+     * public host may be fetched depends on the environment, see `pdfHostPolicy`
+     * (REQ-DATA-010 AC4, ADR 0116).
+     */
     AllowedHosts: readonly string[];
     /**
      * `max_retries` of the document queue in wrangler.toml. On the delivery after the last
@@ -75,6 +80,32 @@ export const DEFAULT_INGEST_CONFIG: IngestConfig = {
     MaxRetries: 3,
   },
 };
+
+/**
+ * Environments where the PDF fetcher may reach any public host: the developer's machine
+ * and the preview Worker, which is not deployed (ADR 0116). Any other name, including a
+ * misspelled one, gets the allowlist and fails closed.
+ */
+const OPEN_PDF_ENVIRONMENTS: ReadonlySet<string> = new Set(["local", "preview"]);
+
+/** Built once per isolate; the Worker builds its dependencies on every invocation. */
+const PROVEN_PDF_HOSTS: ReadonlySet<string> = new Set(PDF_PROVEN_HOSTS);
+
+/**
+ * The PDF host rules of an environment (REQ-DATA-010 AC4, ADR 0116). Staging and
+ * production fetch only from hosts that have already served a stored PDF
+ * (`documents/pdf-proven-hosts.json`, exact names) and from `pdf.allowed_hosts`; every
+ * other host is refused and logged by name, so it can be reviewed and added.
+ */
+export function pdfHostPolicy(environment: string): {
+  ExactHosts: ReadonlySet<string>;
+  RequireAllowlist: boolean;
+} {
+  if (OPEN_PDF_ENVIRONMENTS.has(environment)) {
+    return { ExactHosts: new Set(), RequireAllowlist: false };
+  }
+  return { ExactHosts: PROVEN_PDF_HOSTS, RequireAllowlist: true };
+}
 
 /** Cron expressions (UTC) of docs/kt/architecture/defaults.md, one per source. */
 export const CRON_SOURCES: Readonly<Record<string, "openalex" | "arxiv">> = {

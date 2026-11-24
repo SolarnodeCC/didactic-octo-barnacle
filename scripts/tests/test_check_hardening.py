@@ -89,6 +89,39 @@ class HardeningTest(ScriptTestCase):
         self.write("package.json", json.dumps(package))
         self.assert_fails_with("package.json: add the `audit:ci` script")
 
+    def test_req_nfr_016_fails_when_another_workflow_reads_the_erasure_key(self) -> None:
+        self.replace(
+            ".github/workflows/staging-measure.yml",
+            "    steps:\n",
+            "    steps:\n      - name: Leak\n        env:\n"
+            "          KEY: ${{ secrets.ERASURE_HASH_KEY }}\n        run: echo ok\n",
+        )
+        self.assert_fails_with("staging-measure.yml: job measure, step 1 reads ERASURE_HASH_KEY")
+
+    def test_req_nfr_007_fails_on_a_route_in_staging_before_authentication(self) -> None:
+        self.replace(
+            "infrastructure/cloudflare/wrangler.toml",
+            "[env.staging]\n",
+            '[env.staging]\nroutes = [{ pattern = "api.example.org/*", zone_name = "example.org" }]\n',
+        )
+        self.assert_fails_with("`routes` in env.staging exposes a Worker before phase 4 authentication")
+
+    def test_req_nfr_007_fails_on_a_top_level_route_that_environments_inherit(self) -> None:
+        self.replace(
+            "infrastructure/cloudflare/wrangler.toml",
+            "workers_dev = false\n",
+            'workers_dev = false\nroute = "api.example.org/*"\n',
+        )
+        self.assert_fails_with("`route` in (top level) exposes a Worker")
+
+    def test_req_nfr_007_allows_a_route_in_preview(self) -> None:
+        self.replace(
+            "infrastructure/cloudflare/wrangler.toml",
+            "[env.preview]\n",
+            '[env.preview]\nroute = "preview.example.org/*"\n',
+        )
+        self.assert_passes()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -3,7 +3,7 @@ import { type VectorIndex } from "@roi/vector-store";
 
 import { fetchArxivByIds, fetchArxivPage } from "./collectors/arxiv/client.js";
 import { fetchOpenAlexPage } from "./collectors/openalex/client.js";
-import { DEFAULT_INGEST_CONFIG } from "./config.js";
+import { DEFAULT_INGEST_CONFIG, pdfHostPolicy } from "./config.js";
 import { createAlertSink } from "./alerts/sink.js";
 import { notify } from "./alerts/notify.js";
 import { budgetStopAlert, environmentBudget } from "./budget/budget-stop.js";
@@ -171,6 +171,7 @@ function buildDeps(env: Env): PipelineDeps {
         TimeoutMs: config.Pdf.TimeoutMs,
         MaxRedirects: config.Pdf.MaxRedirects,
         AllowedHosts: config.Pdf.AllowedHosts,
+        ...pdfHostPolicy(env.ENVIRONMENT),
       },
     }),
     Log: log,

@@ -7,6 +7,10 @@ export type PdfFetchLimits = {
   TimeoutMs: number;
   MaxRedirects: number;
   AllowedHosts: readonly string[];
+  /** Hosts allowed by exact name: those that have served a stored PDF (ADR 0116). */
+  ExactHosts?: ReadonlySet<string>;
+  /** Refuse hosts that no list names, even when the lists are empty (ADR 0116). */
+  RequireAllowlist?: boolean;
 };
 
 export type PdfFetchErrorCode =
@@ -31,9 +35,23 @@ export class PdfFetchError extends Error {
     readonly Status: number | null = null,
     /** Seconds from the `Retry-After` header of that response, when it had one. */
     readonly RetryAfterSeconds: number | null = null,
+    /**
+     * The host a `blocked-url` refusal was about: the first URL's host or a redirect
+     * target's. Logged by name so the allowlist can be reviewed (ADR 0029, ADR 0116).
+     */
+    readonly Host: string | null = null,
   ) {
     super(message);
     this.name = "PdfFetchError";
+  }
+}
+
+/** The lower-case host of a URL, or null when it does not parse. */
+function hostOf(raw: string): string | null {
+  try {
+    return new URL(raw).hostname.toLowerCase();
+  } catch {
+    return null;
   }
 }
 
@@ -133,9 +151,20 @@ export function createPdfFetcher(options: {
     try {
       let current = startUrl;
       for (let hop = 0; hop <= limits.MaxRedirects; hop += 1) {
-        const check = checkPdfUrl(current, { AllowedHosts: limits.AllowedHosts });
+        const check = checkPdfUrl(current, {
+          AllowedHosts: limits.AllowedHosts,
+          ...(limits.ExactHosts ? { ExactHosts: limits.ExactHosts } : {}),
+          ...(limits.RequireAllowlist ? { RequireAllowlist: true } : {}),
+        });
         if (!check.Ok) {
-          throw new PdfFetchError(`URL refused: ${check.Reason}`, "blocked-url", true);
+          throw new PdfFetchError(
+            `URL refused: ${check.Reason}`,
+            "blocked-url",
+            true,
+            null,
+            null,
+            hostOf(current),
+          );
         }
 
         let response: Response;

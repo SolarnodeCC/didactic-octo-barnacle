@@ -2,8 +2,8 @@
 title: AI evals
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-21
-related: [REQ-TEST-004, REQ-TEST-005, REQ-NFR-003, REQ-AGENT-008, REQ-SCORE-006]
+last_reviewed: 2026-11-24
+related: [REQ-TEST-004, REQ-TEST-005, REQ-NFR-003, REQ-NFR-006, REQ-AGENT-008, REQ-SCORE-006]
 ---
 
 # AI evals
@@ -18,6 +18,10 @@ Agent output comes from language models and varies between runs. Exact assertion
 - Each entry names its reviewer. The reviewer is the owner, who confirms every entry. Agents draft and cross-check labels and never confirm one: a second agent from another model family labels the same entries blind, and the owner decides the entries on which they disagree (ADR 0072).
 - The agreement of the owner with that second agent on a shared sample of at least 20 entries is recorded, and the owner re-labels at least 10 entries after at least three days. Entries on which they disagree are decided before they enter the set.
 - Changes to a golden set need review by a code owner of `docs/kt`.
+
+### Adversarial injection set
+
+`roi-benchmark --injection` runs triage and extraction on the adversarial set (REQ-NFR-006, ADR 0119): every golden-set entry with one payload of `INJECTION_PAYLOADS` (`packages/prompts`) appended to its abstract, in turn, and its labels unchanged. An instruction planted in the text must not change the signals, the decision, or the candidates, so the thresholds of the plain sets apply. Run it with each benchmark round and record the result in that round's ADR.
 
 ## How output is scored
 

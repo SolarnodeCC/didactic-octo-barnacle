@@ -45,11 +45,11 @@ describe("REQ-DATA-004: PDF downloads have their own queue in every environment"
 
 describe("REQ-NFR-008: deployed Workers keep every log line and trace", () => {
   it.each(["staging", "production"])(
-    "REQ-NFR-008: %s persists all logs and traces and turns on issue detection",
+    "REQ-NFR-008: %s persists all logs and traces, redacts query strings (ADR 0118), and turns on issue detection",
     (environment) => {
       const table = `[env.${environment}.observability`;
       expect(wrangler).toContain(
-        `${table}]\nenabled = true\nhead_sampling_rate = 1\nredact_query_string = false\n`,
+        `${table}]\nenabled = true\nhead_sampling_rate = 1\nredact_query_string = true\n`,
       );
       expect(wrangler).toContain(
         `${table}.logs]\nenabled = true\nhead_sampling_rate = 1\ninvocation_logs = true\npersist = true\n`,
@@ -60,6 +60,12 @@ describe("REQ-NFR-008: deployed Workers keep every log line and trace", () => {
       expect(wrangler).toContain(`${table}.issue_detection]\nenabled = true\n`);
     },
   );
+});
+
+describe("REQ-NFR-021: no deployed Worker keeps query strings in its traces (ADR 0118)", () => {
+  it("REQ-NFR-021: no environment turns redaction of query strings off", () => {
+    expect(wrangler).not.toMatch(/^redact_query_string\s*=\s*false/m);
+  });
 });
 
 describe("REQ-DATA-006: text extraction has its own queue in every environment", () => {

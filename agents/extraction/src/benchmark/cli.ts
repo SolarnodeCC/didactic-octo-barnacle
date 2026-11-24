@@ -22,6 +22,7 @@ import {
   loadExtractionSet,
   loadThreshold,
   loadTriageSet,
+  withInjections,
   type ExtractionEntry,
   type TriageEntry,
 } from "../golden-set.js";
@@ -97,7 +98,7 @@ export const BENCHMARK_USAGE = [
   "                     [--budget-eur <n>] [--gateway <id>] [--out <dir>] [--limit <n>]",
   "                     [--output-mode json-schema|prompt-only] [--prices <file>]",
   "                     [--r2-bucket <name>] [--min-interval-ms <n>] [--timeout-ms <n>]",
-  "                     [--no-stream] [--dry-run]",
+  "                     [--no-stream] [--dry-run] [--injection]",
   "       roi-benchmark --resume <benchmark id> [--out <dir>] [--gateway <id>] [--prices <file>] ...",
   "",
   "Every finished run is appended to <out>/<benchmark id>/checkpoint.jsonl. --resume continues",
@@ -109,6 +110,8 @@ export const BENCHMARK_USAGE = [
   "gateway, paid by its Unified Billing (EVAL_ANTHROPIC_API_KEY only for a gateway without it).",
   "--dry-run answers with the golden-set labels",
   "and needs no credentials. `all` is triage and extraction; `analysis` is the three analysis steps.",
+  "--injection runs triage and extraction on the adversarial set: every entry with a planted",
+  "instruction appended to its abstract and its labels unchanged (REQ-NFR-006, ADR 0119).",
 ].join("\n");
 
 export type BenchmarkArgs = {
@@ -128,6 +131,8 @@ export type BenchmarkArgs = {
   /** Stream responses, so a slow reasoning model is not cut off by a proxy (ADR 0076). */
   Stream: boolean;
   DryRun: boolean;
+  /** Triage and extraction on the adversarial injection set (REQ-NFR-006, ADR 0119). */
+  Injection: boolean;
   /** The benchmark ID of a stopped round to continue, or null for a new round. */
   Resume: string | null;
 };
@@ -137,6 +142,8 @@ export type StoredRun = {
   Plan: BenchmarkPlan;
   Limit: number | null;
   PriceTableVersion: string;
+  /** Absent in rounds stored before ADR 0119, which ran on the plain sets. */
+  Injection?: boolean;
 };
 
 const PLAN_FLAGS = new Set([
@@ -177,6 +184,7 @@ export function parseBenchmarkArgs(args: readonly string[]): BenchmarkArgs | nul
     TimeoutMs: 600_000,
     Stream: true,
     DryRun: false,
+    Injection: false,
     Resume: null,
   };
   let planFlags = false;
@@ -188,6 +196,12 @@ export function parseBenchmarkArgs(args: readonly string[]): BenchmarkArgs | nul
     }
     if (flag === "--no-stream") {
       parsed.Stream = false;
+      continue;
+    }
+    if (flag === "--injection") {
+      // Part of the plan: a resumed round keeps the set it started with.
+      parsed.Injection = true;
+      planFlags = true;
       continue;
     }
     const value = args[i + 1];
@@ -467,6 +481,7 @@ export async function runBenchmarkCommand(
       },
       Limit: args.Limit,
       PriceTableVersion: prices.Version,
+      ...(args.Injection ? { Injection: true } : {}),
     };
   }
   const plan = stored.Plan;
@@ -475,9 +490,12 @@ export async function runBenchmarkCommand(
   const runs = plan.Runs;
   const limit = stored.Limit ?? undefined;
   const has = (step: BenchmarkStep): boolean => plan.Steps.includes(step);
+  // The adversarial set keeps the labels and appends a planted instruction (ADR 0119).
+  const planted = <T extends TriageEntry | ExtractionEntry>(entries: T[]): T[] =>
+    stored.Injection === true ? withInjections(entries) : entries;
   const sets: GoldenSets = {
-    triage: has("triage") ? loadTriageSet().slice(0, limit) : [],
-    extraction: has("extraction") ? loadExtractionSet().slice(0, limit) : [],
+    triage: has("triage") ? planted(loadTriageSet().slice(0, limit)) : [],
+    extraction: has("extraction") ? planted(loadExtractionSet().slice(0, limit)) : [],
     researchAnalyst: has("research-analyst") ? loadResearchAnalystSet().slice(0, limit) : [],
     problemDiscovery: has("problem-discovery") ? loadProblemDiscoverySet().slice(0, limit) : [],
     relevance: has("relevance") ? loadRelevanceSet().slice(0, limit) : [],

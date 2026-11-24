@@ -28,13 +28,26 @@ export type DesiredResource = {
   Name: string;
 };
 
-export type ExistingResource = DesiredResource;
+export type ExistingResource = DesiredResource & {
+  /**
+   * AI Gateways only: whether Authenticated Gateway is on. The Cloudflare client reports
+   * `false` unless the API says `true`, so an unknown setting counts as off (ADR 0117).
+   */
+  Authenticated?: boolean;
+};
 
 export type DriftReport = {
   Environment: EnvironmentName;
   Missing: DesiredResource[];
   Extra: DesiredResource[];
   Ok: DesiredResource[];
+  /**
+   * AI Gateways of this environment that exist with Authenticated Gateway off. Anyone with
+   * access to the account could then spend through them without a gateway token
+   * (REQ-NFR-003, ADR 0117). Bootstrap does not turn it on: once on, Cloudflare does not
+   * let it be turned off, so the owner does it in the dashboard.
+   */
+  Unauthenticated: DesiredResource[];
 };
 
 /**
@@ -92,7 +105,20 @@ export function reportDrift(
     Missing: desired.filter((resource) => !existingKeys.has(keyOf(resource))),
     Extra: existing.filter((resource) => !desiredKeys.has(keyOf(resource))),
     Ok: desired.filter((resource) => existingKeys.has(keyOf(resource))),
+    Unauthenticated: existing
+      .filter(
+        (resource) =>
+          resource.Kind === "ai-gateway" &&
+          desiredKeys.has(keyOf(resource)) &&
+          resource.Authenticated === false,
+      )
+      .map(({ Kind, Name }) => ({ Kind, Name })),
   };
+}
+
+/** True when drift should stop a deploy: a resource is missing or a gateway is open. */
+export function hasBlockingDrift(drift: DriftReport): boolean {
+  return drift.Missing.length > 0 || drift.Unauthenticated.length > 0;
 }
 
 export type BootstrapResult = {
