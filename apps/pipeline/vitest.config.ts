@@ -1,9 +1,19 @@
+import { fileURLToPath } from "node:url";
+
 import { defineConfig } from "vitest/config";
 
 // Unit tests are `*.test.ts`; integration tests (`*.int.test.ts`) run the real
 // migrations on in-memory SQLite and use the in-memory queue, bucket, and alert
 // fakes. Both run without network access (test-support/no-network.ts).
 export default defineConfig({
+  // The Workers runtime module is not available in Node; tests use a stand-in (ADR 0117).
+  resolve: {
+    alias: {
+      "cloudflare:workers": fileURLToPath(
+        new URL("./src/test/cloudflare-workers.ts", import.meta.url),
+      ),
+    },
+  },
   test: {
     environment: "node",
     setupFiles: ["../../test-support/no-network.ts"],

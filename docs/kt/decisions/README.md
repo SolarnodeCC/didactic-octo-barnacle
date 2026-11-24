@@ -125,6 +125,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0114](0114-cost-per-publication-and-per-opportunity.md) | Cost per publication and per opportunity in the processing run report | Accepted |
 | [0115](0115-quality-section-as-built.md) | The daily quality section: metrics, stored values, and the drift rule as built | Accepted |
 | [0116](0116-owner-review-frontend.md) | An owner review tool on Workers behind Cloudflare Access | Accepted |
+| [0117](0117-thin-slice-runs-in-process.md) | The thin slice runs in-process with stub steps and a placeholder score model | Accepted |
 
 ## When an ADR is needed
 

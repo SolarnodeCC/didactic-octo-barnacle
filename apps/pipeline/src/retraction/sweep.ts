@@ -17,6 +17,8 @@ export type SweepCounts = {
   DecisionsWithdrawn: number;
   /** Publications whose vectors were deleted from every index (REQ-DATA-008 AC3). */
   VectorsDeleted: number;
+  /** Opportunities of their candidates, hidden with reason `retracted` (ADR 0015). */
+  OpportunitiesHidden: number;
 };
 
 /**
@@ -30,8 +32,10 @@ export type SweepCounts = {
  *
  * - has its vectors deleted from every index of the registry, first (REQ-DATA-008 AC3).
  *
- * Its opportunities are hidden the same way once the `opportunity` table exists (WP10). The
- * embedding consumer never embeds a retracted publication.
+ * - has the opportunities of its candidates hidden: `pipeline_status = hidden` with
+ *   `hidden_reason = retracted`, so they leave every ranking (ADR 0015).
+ *
+ * The embedding consumer never embeds a retracted publication.
  */
 export async function sweepRetractions(deps: PipelineDeps, day: string): Promise<SweepCounts> {
   const db = deps.Db;
@@ -41,6 +45,7 @@ export async function sweepRetractions(deps: PipelineDeps, day: string): Promise
     CandidatesHidden: 0,
     DecisionsWithdrawn: 0,
     VectorsDeleted: 0,
+    OpportunitiesHidden: 0,
   };
   const vectorIndexes = Object.values(deps.Embedding?.Indexes ?? {});
   const { results } = await db
@@ -56,6 +61,13 @@ export async function sweepRetractions(deps: PipelineDeps, day: string): Promise
     const hidden = await db
       .prepare(
         `SELECT COUNT(*) AS n FROM candidate WHERE hidden_reason IS NULL AND publication_id IN (${marks})`,
+      )
+      .bind(...slice)
+      .first<{ n: number }>();
+    const opportunities = await db
+      .prepare(
+        `SELECT COUNT(*) AS n FROM opportunity WHERE hidden_reason IS NULL
+           AND candidate_id IN (SELECT id FROM candidate WHERE publication_id IN (${marks}))`,
       )
       .bind(...slice)
       .first<{ n: number }>();
@@ -81,6 +93,13 @@ export async function sweepRetractions(deps: PipelineDeps, day: string): Promise
         .bind(...slice),
       db
         .prepare(
+          `UPDATE opportunity SET pipeline_status = 'hidden', hidden_reason = 'retracted', updated_at = ?
+           WHERE hidden_reason IS NULL
+             AND candidate_id IN (SELECT id FROM candidate WHERE publication_id IN (${marks}))`,
+        )
+        .bind(now, ...slice),
+      db
+        .prepare(
           `UPDATE triage_decision SET status = 'decided', reason = 'retracted', updated_at = ?
            WHERE status = 'awaiting-admission' AND publication_id IN (${marks})`,
         )
@@ -96,6 +115,7 @@ export async function sweepRetractions(deps: PipelineDeps, day: string): Promise
     counts.RetractionsHandled += slice.length;
     counts.CandidatesHidden += hidden?.n ?? 0;
     counts.DecisionsWithdrawn += waiting?.n ?? 0;
+    counts.OpportunitiesHidden += opportunities?.n ?? 0;
   }
 
   if (ids.length > 0) {

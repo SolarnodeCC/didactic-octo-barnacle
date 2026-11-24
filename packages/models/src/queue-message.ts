@@ -14,6 +14,7 @@ export const QueueMessageTypeSchema = z.enum([
   "publication.extract",
   "retraction.check_page",
   "publication.embed",
+  "candidate.run",
 ]);
 
 export type QueueMessageType = z.infer<typeof QueueMessageTypeSchema>;

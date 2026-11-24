@@ -1,3 +1,5 @@
+import { WorkflowEntrypoint } from "cloudflare:workers";
+
 import { type CallModelDeps } from "@roi/models";
 import { type VectorIndex } from "@roi/vector-store";
 
@@ -18,9 +20,16 @@ import { createModelUsageStore, type ModelBudget } from "./store/model-usage.js"
 import { type ObjectStore } from "./documents/object-store.js";
 import { ARXIV_MIN_REQUEST_INTERVAL_MS, createRateLimiter } from "./http/rate-limit.js";
 import { consumeBatch } from "./queue/consume.js";
-import { type PipelineDeps } from "./queue/deps.js";
+import { type CandidateWorkflowBinding, type PipelineDeps } from "./queue/deps.js";
 import { type QueueBatchLike, type QueueSender } from "./queue/types.js";
 import { runScheduled } from "./schedule/run-scheduled.js";
+import {
+  runCandidatePipeline,
+  type CandidatePipelineOutcome,
+  type CandidateRunParams,
+  type StepRunner,
+} from "./candidate/pipeline.js";
+import { STUB_STEPS } from "./candidate/steps.js";
 import { type SqlDatabase } from "./store/sql.js";
 
 /** Bindings declared in infrastructure/cloudflare/wrangler.toml. */
@@ -63,6 +72,8 @@ export type Env = {
   /** `budget.expected_daily_triaged` and `budget.expected_daily_embeddings` of the environment (ADR 0059). */
   BUDGET_EXPECTED_DAILY_TRIAGED?: string;
   BUDGET_EXPECTED_DAILY_EMBEDDINGS?: string;
+  /** The candidate Workflow of the thin slice; bound in local and preview only (ADR 0117). */
+  CANDIDATE_WORKFLOW?: CandidateWorkflowBinding;
 };
 
 type WorkersAiBinding = CallModelDeps["Ai"];
@@ -187,6 +198,9 @@ function buildDeps(env: Env): PipelineDeps {
       },
     },
     ...(env.AI ? modelSteps(env, env.AI, processing, budget) : {}),
+    ...(env.CANDIDATE_WORKFLOW
+      ? { Candidate: { Workflow: env.CANDIDATE_WORKFLOW, Steps: STUB_STEPS } }
+      : {}),
     Retraction: { LookbackDays: processing.RetractionLookbackDays },
     Monitor: {
       BaselineDays: processing.MonitorBaselineDays,
@@ -274,6 +288,21 @@ function buildDeps(env: Env): PipelineDeps {
  * run (REQ-DATA-009), and the queue handler for pages, PDFs, texts, triage, and dead
  * letters (REQ-DATA-011, REQ-DATA-006, REQ-PROC-005).
  */
+/**
+ * The candidate Workflow (ADR 0003, REQ-PROC-007): one instance per pipeline run, one durable
+ * step per agent, then scoring. In phase 2 every agent is a stub (ADR 0117).
+ */
+export class CandidateWorkflow extends WorkflowEntrypoint<Env, CandidateRunParams> {
+  async run(
+    event: { payload: Readonly<CandidateRunParams> },
+    step: StepRunner,
+  ): Promise<CandidatePipelineOutcome> {
+    return runCandidatePipeline({ ...buildDeps(this.env), Steps: STUB_STEPS }, step, {
+      PipelineRunId: event.payload.PipelineRunId,
+    });
+  }
+}
+
 export default {
   async fetch(_request: Request, env: Env): Promise<Response> {
     return Response.json({ service: "roi-pipeline", environment: env.ENVIRONMENT });

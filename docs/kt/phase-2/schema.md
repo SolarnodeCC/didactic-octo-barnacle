@@ -74,11 +74,12 @@ Migration 0011 is `infrastructure/cloudflare/migrations/0011_recovery.sql` (WP6;
 
 ADR 0054 planned this migration as 0010; it became 0011 when migration 0010 went to cached input tokens (ADR 0078), 0012 when migration 0011 went to recovery (WP6), 0014 when migrations 0012 and 0013 went to the processing report and quality monitoring (WP9), and 0015 when 0014 went to output review (ADR 0116).
 
-The tables of schema migration 0001 for the pipeline, with these changes:
+Migration 0015 is `infrastructure/cloudflare/migrations/0015_thin_slice.sql` (WP10; REQ-PROC-007, ADR 0117). It is expand-only. It adds the tables of schema migration 0001 for the pipeline, with these changes:
 
-- `pipeline_run`, with `cost_eur` stored as `cost_amount` and `cost_currency`.
-- `pipeline_step`, `agent_output`, `evidence`.
-- `opportunity`, `score_model`, `score`.
+- `pipeline_run`, with `cost_eur` stored as `cost_amount` and `cost_currency`, and `processing_run_id` for the run that started it.
+- `pipeline_step` (status `running`, `complete`, `failed`; UNIQUE `pipeline_run_id`, `step_name`), `agent_output`, and `evidence` with the contract's `publication_id` and `note`.
+- `opportunity` (UNIQUE `candidate_id`; `hidden_reason` is `retracted`; `created_at`, `updated_at`), `score_model`, and `score` with `weighted_sum`.
+- The seed row of `score_model` version `placeholder-0`: the ADR 0005 rules with equal weights, not active.
 
 It adds no organization-scoped table. Those arrive with phase 4 (ADR 0019).
 

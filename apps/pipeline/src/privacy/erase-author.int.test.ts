@@ -314,6 +314,7 @@ describe("REQ-NFR-009: only public author metadata is stored", () => {
       "embedding_index.model_name": "embedding model of a Vectorize index",
       "embedding_index.vectorize_name": "Vectorize index name",
       "model_call.step_name": "pipeline step, for example triage",
+      "pipeline_step.step_name": "candidate Workflow step, for example research_analyst",
       "triage_decision.signal_named_party":
         "0/1 triage signal that the abstract names a customer group, never a person",
     };

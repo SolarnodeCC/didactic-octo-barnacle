@@ -135,6 +135,13 @@ index_name = "roi-publications-local"
 [ai]
 binding = "AI"
 
+# The candidate Workflow of the thin slice (REQ-PROC-007, ADR 0117): local and preview only in
+# phase 2. Staging and production get it with the phase 3 agents.
+[[workflows]]
+name = "roi-candidate-local"
+binding = "CANDIDATE_WORKFLOW"
+class_name = "CandidateWorkflow"
+
 [env.preview]
 name = "roi-pipeline-preview"
 vars = { ENVIRONMENT = "preview", BUDGET_EXPECTED_DAILY_TRIAGED = "100", BUDGET_EXPECTED_DAILY_EMBEDDINGS = "100" }
@@ -253,6 +260,11 @@ index_name = "roi-publications-preview"
 # Workers AI, called only through the environment's AI Gateway `roi-preview` (REQ-NFR-003).
 [env.preview.ai]
 binding = "AI"
+
+[[env.preview.workflows]]
+name = "roi-candidate-preview"
+binding = "CANDIDATE_WORKFLOW"
+class_name = "CandidateWorkflow"
 
 [env.staging]
 name = "roi-pipeline-staging"
