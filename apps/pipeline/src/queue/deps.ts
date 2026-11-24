@@ -138,7 +138,7 @@ export type PipelineDeps = {
   };
   /** The daily quality section and its drift alert (REQ-NFR-023, ADR 0071). */
   /**
-   * The candidate pipeline of the thin slice (REQ-PROC-007, ADR 0116): `candidate.run` starts one
+   * The candidate pipeline of the thin slice (REQ-PROC-007, ADR 0117): `candidate.run` starts one
    * Workflow instance per candidate, whose steps are these. Phase 2 binds it in local and
    * preview only.
    */

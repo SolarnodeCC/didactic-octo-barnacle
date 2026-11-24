@@ -14,7 +14,7 @@ import { type SqlDatabase, type SqlStatement } from "../store/sql.js";
 
 /**
  * The durable step runner of a Workflow: Cloudflare's `WorkflowStep` satisfies it, and the
- * thin slice and the tests run steps inline (ADR 0116). A step returns small serializable
+ * thin slice and the tests run steps inline (ADR 0117). A step returns small serializable
  * values: IDs, not payloads (orchestration.md).
  */
 export type StepRunner = {
@@ -232,7 +232,7 @@ async function agentStep(
   }
 }
 
-/** The scoring step: the placeholder score model over the stored outputs (ADR 0116). */
+/** The scoring step: the placeholder score model over the stored outputs (ADR 0117). */
 async function scoringStep(
   deps: CandidatePipelineDeps,
   run: RunRow,

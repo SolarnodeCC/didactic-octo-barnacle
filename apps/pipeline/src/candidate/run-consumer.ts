@@ -7,7 +7,7 @@ export type CandidateRunOutcome =
   "started" | "already-scored" | "hidden" | "no-candidate" | "duplicate" | "dead-lettered";
 
 /**
- * Consumer of `candidate.run` (REQ-PROC-007, ADR 0053, ADR 0116). It writes the candidate's
+ * Consumer of `candidate.run` (REQ-PROC-007, ADR 0053, ADR 0117). It writes the candidate's
  * pipeline run and its opportunity, `incomplete` until scored, and starts one Workflow instance
  * with the run's ID. One opportunity per candidate (ADR 0015): a scored candidate is not run
  * again, and a hidden or retracted one is not run. The pipeline run ID is fixed per candidate,

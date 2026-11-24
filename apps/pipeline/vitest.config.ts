@@ -6,7 +6,7 @@ import { defineConfig } from "vitest/config";
 // migrations on in-memory SQLite and use the in-memory queue, bucket, and alert
 // fakes. Both run without network access (test-support/no-network.ts).
 export default defineConfig({
-  // The Workers runtime module is not available in Node; tests use a stand-in (ADR 0116).
+  // The Workers runtime module is not available in Node; tests use a stand-in (ADR 0117).
   resolve: {
     alias: {
       "cloudflare:workers": fileURLToPath(

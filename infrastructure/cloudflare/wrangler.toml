@@ -135,7 +135,7 @@ index_name = "roi-publications-local"
 [ai]
 binding = "AI"
 
-# The candidate Workflow of the thin slice (REQ-PROC-007, ADR 0116): local and preview only in
+# The candidate Workflow of the thin slice (REQ-PROC-007, ADR 0117): local and preview only in
 # phase 2. Staging and production get it with the phase 3 agents.
 [[workflows]]
 name = "roi-candidate-local"

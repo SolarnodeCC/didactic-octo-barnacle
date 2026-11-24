@@ -178,7 +178,7 @@ export function createHarness(
     };
     /** Recovery settings (REQ-PROC-010, REQ-DATA-012); the configured defaults when left out. */
     Recovery?: Partial<NonNullable<PipelineDeps["Recovery"]>>;
-    /** The candidate Workflow, run inline; the stub steps unless a test replaces one (ADR 0116). */
+    /** The candidate Workflow, run inline; the stub steps unless a test replaces one (ADR 0117). */
     Candidate?: { Steps?: Partial<CandidateSteps> };
   } = {},
 ): Harness {
@@ -217,7 +217,7 @@ export function createHarness(
     Now: () => clock.Now,
   });
   // The candidate Workflow binding, run inline: each step runs once, in the order the pipeline
-  // asks for it, as a Workflow step does (ADR 0116).
+  // asks for it, as a Workflow step does (ADR 0117).
   const workflows: Harness["Workflows"] = [];
   const steps: CandidateSteps = { ...STUB_STEPS, ...overrides.Candidate?.Steps };
   const deps: PipelineDeps = {

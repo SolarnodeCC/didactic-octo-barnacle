@@ -72,7 +72,7 @@ export type Env = {
   /** `budget.expected_daily_triaged` and `budget.expected_daily_embeddings` of the environment (ADR 0059). */
   BUDGET_EXPECTED_DAILY_TRIAGED?: string;
   BUDGET_EXPECTED_DAILY_EMBEDDINGS?: string;
-  /** The candidate Workflow of the thin slice; bound in local and preview only (ADR 0116). */
+  /** The candidate Workflow of the thin slice; bound in local and preview only (ADR 0117). */
   CANDIDATE_WORKFLOW?: CandidateWorkflowBinding;
 };
 
@@ -290,7 +290,7 @@ function buildDeps(env: Env): PipelineDeps {
  */
 /**
  * The candidate Workflow (ADR 0003, REQ-PROC-007): one instance per pipeline run, one durable
- * step per agent, then scoring. In phase 2 every agent is a stub (ADR 0116).
+ * step per agent, then scoring. In phase 2 every agent is a stub (ADR 0117).
  */
 export class CandidateWorkflow extends WorkflowEntrypoint<Env, CandidateRunParams> {
   async run(

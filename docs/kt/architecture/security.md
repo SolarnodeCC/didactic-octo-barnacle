@@ -2,8 +2,8 @@
 title: Security and data protection
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-10
-related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-NFR-009, REQ-NFR-011, REQ-NFR-012, REQ-NFR-013, REQ-NFR-014, REQ-NFR-015, REQ-NFR-016, REQ-NFR-021, REQ-DATA-010, REQ-AGENT-013]
+last_reviewed: 2026-11-24
+related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-NFR-009, REQ-NFR-011, REQ-NFR-012, REQ-NFR-013, REQ-NFR-014, REQ-NFR-015, REQ-NFR-016, REQ-NFR-021, REQ-DATA-010, REQ-AGENT-013, REQ-REV-005]
 ---
 
 # Security and data protection
@@ -20,6 +20,7 @@ related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-N
 | A leaked API key or Cloudflare token | Secrets only in Cursor environment secrets or GitHub Actions secrets; secret scanning with push protection; least-privilege tokens per environment | REQ-NFR-001 |
 | Model spending runs away | Daily budget and per-run cost reporting through AI Gateway | REQ-NFR-005 |
 | Unauthorized access to opportunities | Invitation-only accounts and authentication in front of the dashboard and the API | REQ-NFR-007, REQ-ACC-001 |
+| Unauthorized access to the owner review tool | Cloudflare Access allows only the owner on `review.wispel.cc`, and the Worker verifies the Access token (signature, audience, issuer, expiry) on every API request; it refuses all requests while unconfigured (ADR 0116) | REQ-REV-005 |
 | Mass signup or token guessing | No public registration; rate limits; 128-bit tokens stored as hashes | REQ-ACC-002, REQ-ACC-005 |
 | Secrets exposed to untrusted code in CI | Pull request jobs run without secrets; live evals only for branches in this repository, in a protected `evals` environment that requires reviewer approval (ADR 0006) | REQ-TEST-003, REQ-TEST-004 |
 | Redistribution of copyrighted papers | License recorded per document; PDFs stored and served only when the license allows it | REQ-DATA-010 |
@@ -54,7 +55,7 @@ Users have one of three roles, viewer, analyst, or admin, set on the invitation 
 
 ## Content Security Policy
 
-The dashboard sends this CSP (REQ-NFR-013, ADR 0016):
+The dashboard and the owner review tool (REQ-REV-005, ADR 0116) send this CSP (REQ-NFR-013, ADR 0016):
 
 ```text
 default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'

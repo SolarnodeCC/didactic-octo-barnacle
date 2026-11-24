@@ -1,0 +1,52 @@
+# The owner review tool (ADR 0116, REQ-REV-001 to REQ-REV-005): a single-page app served as
+# Workers static assets, and the `/api/review/` routes of src/worker.ts. Run `pnpm build` first,
+# so dist/client exists.
+name = "roi-review"
+main = "src/worker.ts"
+compatibility_date = "2026-10-01"
+
+# No workers.dev address and no preview URLs; environments inherit both settings
+# (REQ-NFR-021). Only staging has a route.
+workers_dev = false
+preview_urls = false
+
+# Only `/api/*` runs the Worker; every other path is a static asset, and unknown paths serve
+# index.html so the app's own routes work on reload. web/public/_headers sets the headers.
+[assets]
+directory = "./dist/client"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
+
+# Local: `wrangler dev` with the pipeline's local database. ACCESS_DEV_SUBJECT replaces the
+# Access token, and only where ENVIRONMENT is `local` (src/worker.ts).
+[vars]
+ENVIRONMENT = "local"
+ACCESS_DEV_SUBJECT = "local-owner"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "roi-local"
+database_id = "00000000-0000-0000-0000-000000000001"
+migrations_dir = "../../infrastructure/cloudflare/migrations"
+
+[env.staging]
+name = "roi-review-staging"
+routes = [{ pattern = "review.wispel.cc", custom_domain = true }]
+# ACCESS_TEAM_DOMAIN and ACCESS_AUD come from the Access application that allows only the owner;
+# `Review deploy` passes them from the GitHub environment variables REVIEW_ACCESS_TEAM_DOMAIN and
+# REVIEW_ACCESS_AUD (operations). They are not secrets. While either is empty, the API refuses
+# every request.
+# ACCESS_DEV_SUBJECT stays empty: the development bypass works only in `local`.
+vars = { ENVIRONMENT = "staging", ACCESS_TEAM_DOMAIN = "", ACCESS_AUD = "", ACCESS_DEV_SUBJECT = "" }
+
+[env.staging.observability]
+enabled = true
+head_sampling_rate = 1
+
+# The staging database the pipeline writes. Migrations are applied by `Staging deploy`.
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "roi-staging"
+database_id = "e613e0ae-e79e-43c4-83e1-a44eb7307c7e"
+migrations_dir = "../../infrastructure/cloudflare/migrations"

@@ -1,16 +1,16 @@
 ---
-title: "0116: The thin slice runs in-process with stub steps and a placeholder score model"
+title: "0117: The thin slice runs in-process with stub steps and a placeholder score model"
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-11-23
 related: [REQ-PROC-007, REQ-DATA-008, REQ-AGENT-007, REQ-SCORE-001]
 ---
 
-# 0116: The thin slice runs in-process with stub steps and a placeholder score model
+# 0117: The thin slice runs in-process with stub steps and a placeholder score model
 
 - Decision status: Accepted
 - Date: 2026-11-23
-- Changes: how the thin slice of the [phase 2 design](../phase-2/design.md#thin-slice) runs, what its placeholder score model computes, and which tables migration 0014 adds beyond [schema migration 0001](../architecture/schema-migration-0001.md)
+- Changes: how the thin slice of the [phase 2 design](../phase-2/design.md#thin-slice) runs, what its placeholder score model computes, and which tables migration 0015 adds beyond [schema migration 0001](../architecture/schema-migration-0001.md)
 
 ## Context
 
@@ -41,11 +41,11 @@ The phase 2 design starts the slice with `wrangler dev` and a local `slice` cron
 - **Stub steps.** Each agent step returns its section of the [example](../examples/context-switching-opportunity.yaml), with its evidence, inside a valid envelope (model `stub`, prompt version `example`). A publication quote names the run's publication.
   - The steps are a registry keyed by step name, so phase 3 replaces one entry (REQ-PROC-007 AC4).
   - Every output is checked against its contract before it is stored.
-- **Placeholder score model.** `placeholder-0` (seeded by migration 0014, not active) derives the five categories with the rules of [ADR 0005](0005-derive-category-scores.md) and weights them equally.
+- **Placeholder score model.** `placeholder-0` (seeded by migration 0015, not active) derives the five categories with the rules of [ADR 0005](0005-derive-category-scores.md) and weights them equally.
   - The weighted sum is computed in basis points and rounded half up.
   - The example scores 71, High, with the label `estimate-based`.
   - A category that cannot be derived gives no score, and the opportunity stays incomplete. Phase 4 adds score model version 1 with the weights of [scoring](../scoring.md).
-- **Tables beyond schema migration 0001.** Migration 0014 also adds:
+- **Tables beyond schema migration 0001.** Migration 0015 also adds:
   - `pipeline_run.processing_run_id`;
   - `evidence.publication_id` and `evidence.note`, which the evidence contract needs;
   - `opportunity.created_at` and `updated_at`;

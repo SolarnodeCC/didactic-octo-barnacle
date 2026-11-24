@@ -42,4 +42,4 @@ Option 2.
 
 ## Later changes
 
-- 2026-11-23: The pipeline tables arrived in migration 0014, not 0010, because migrations 0010 to 0013 went to cached input tokens, recovery, the processing report, and quality monitoring ([ADR 0116](0116-thin-slice-runs-in-process.md)).
+- 2026-11-23: The pipeline tables arrived in migration 0015, not 0010, because migrations 0010 to 0014 went to cached input tokens, recovery, the processing report, quality monitoring, and output review ([ADR 0117](0117-thin-slice-runs-in-process.md)).

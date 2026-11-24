@@ -12,7 +12,7 @@ import {
 } from "@roi/models";
 
 /**
- * Scoring of the thin slice (REQ-PROC-007 AC1, ADR 0116). The score model `placeholder-0` uses
+ * Scoring of the thin slice (REQ-PROC-007 AC1, ADR 0117). The score model `placeholder-0` uses
  * the derivation rules of ADR 0005 with equal weights; phase 4 adds score model version 1 with
  * the weights of scoring.md (REQ-SCORE-001).
  */

@@ -148,7 +148,7 @@ describe("REQ-PROC-007: the candidate Workflow of the thin slice", () => {
     }
   });
 
-  it("REQ-PROC-007: staging and production have no Workflow in phase 2 (ADR 0116)", () => {
+  it("REQ-PROC-007: staging and production have no Workflow in phase 2 (ADR 0117)", () => {
     expect(wrangler).not.toMatch(/^\[\[env\.(staging|production)\.workflows\]\]/m);
   });
 });

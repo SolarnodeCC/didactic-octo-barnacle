@@ -1,5 +1,5 @@
--- Migration 0014: the candidate pipeline and its opportunity, for the thin slice (WP10;
--- docs/kt/phase-2/schema.md; REQ-PROC-007, ADR 0015, ADR 0054, ADR 0116). The pipeline tables of
+-- Migration 0015: the candidate pipeline and its opportunity, for the thin slice (WP10;
+-- docs/kt/phase-2/schema.md; REQ-PROC-007, ADR 0015, ADR 0054, ADR 0117). The pipeline tables of
 -- schema migration 0001, with cost stored as `cost_amount` and `cost_currency` (ADR 0054) and
 -- the evidence columns of the agent contract. No organization-scoped table (ADR 0019).
 -- Additive (expand only): new tables and one seed row (REQ-NFR-020, ADR 0028).
@@ -107,7 +107,7 @@ CREATE TABLE score (
 
 CREATE INDEX score_opportunity_idx ON score (opportunity_id);
 
--- The placeholder score model of the thin slice (ADR 0116): the derivation rules of ADR 0005
+-- The placeholder score model of the thin slice (ADR 0117): the derivation rules of ADR 0005
 -- with equal weights. It is not active; phase 4 adds score model version 1 (REQ-SCORE-003).
 INSERT INTO score_model (id, version, weights_json, derivation_rule_version, currency_rates_json, active)
 VALUES (

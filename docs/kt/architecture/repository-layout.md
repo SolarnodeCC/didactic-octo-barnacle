@@ -2,7 +2,7 @@
 title: Repository layout
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-10-29
+last_reviewed: 2026-11-24
 ---
 
 # Repository layout
@@ -13,7 +13,8 @@ The planned layout once code exists:
 ├── apps
 │   ├── dashboard
 │   ├── api
-│   └── pipeline
+│   ├── pipeline
+│   └── review
 ├── agents
 │   ├── extraction
 │   ├── analysis
@@ -31,7 +32,7 @@ The planned layout once code exists:
 └── scripts
 ```
 
-`docs/kt`, `scripts`, `packages/models`, `infrastructure/cloudflare`, and `apps/pipeline` (fixture-based OpenAlex/arXiv mappers) exist today. The dashboard, API, and agents directories are not implemented yet. The root is a pnpm workspace (ADR 0008) with ESLint and Prettier at the root (ADR 0020). When an application is added, extend the `install` command in `.cursor/environment.json` and the `setup-worktree` commands in `.cursor/worktrees.json`.
+`docs/kt`, `scripts`, `packages/models`, `infrastructure/cloudflare`, `apps/pipeline` (fixture-based OpenAlex/arXiv mappers), and `apps/review` (owner review tool, ADR 0116) exist today. The dashboard, API, and agents directories are not implemented yet. The root is a pnpm workspace (ADR 0008) with ESLint and Prettier at the root (ADR 0020). When an application is added, extend the `install` command in `.cursor/environment.json` and the `setup-worktree` commands in `.cursor/worktrees.json`.
 
 ## What goes where
 
@@ -39,6 +40,7 @@ The planned layout once code exists:
 |---|---|---|
 | `apps/dashboard` | Next.js dashboard on Workers (OpenNext, ADR 0012) | REQ-DASH-001, REQ-DASH-002, REQ-DASH-003 |
 | `apps/api` | Data API (read-only plus score review and opportunity status), auth and admin routes, and the global-limits Durable Object (ADR 0017, ADR 0018, ADR 0021) | REQ-API-001, REQ-API-002, REQ-API-003, REQ-API-004, REQ-API-005, REQ-DASH-004, REQ-ADM-001 |
+| `apps/review` | Owner review tool for triage and extraction output: one Worker with static assets and `/api/review/` routes, behind Cloudflare Access (ADR 0116) | REQ-REV-001, REQ-REV-002, REQ-REV-003, REQ-REV-004, REQ-REV-005 |
 | `apps/pipeline` | Collector, document processing, pipeline workflow (it composes the agents and `packages/scoring`) | REQ-DATA-001, REQ-DATA-002, REQ-DATA-004, REQ-DATA-006, REQ-AGENT-007 |
 | `agents/extraction` | Triage and opportunity extraction | REQ-PROC-005, REQ-PROC-006, REQ-PROC-004 |
 | `agents/analysis` | Research Analyst, Problem Discovery, Relevance | REQ-AGENT-001, REQ-AGENT-002, REQ-AGENT-006 |
