@@ -10,13 +10,13 @@ export type UrlPolicy = {
   AllowedHosts: readonly string[];
   /**
    * Hosts allowed by their exact name, without subdomains: the hosts that have already
-   * served a stored PDF (ADR 0116). Exact, because some are shared storage such as
+   * served a stored PDF (ADR 0119). Exact, because some are shared storage such as
    * `<bucket>.s3.amazonaws.com`, where anyone can create a name below the listed one.
    */
   ExactHosts?: ReadonlySet<string>;
   /**
    * Refuse every host that neither list names, even when both are empty. Set in every
-   * deployed environment, so a missing list fails closed instead of open (ADR 0116).
+   * deployed environment, so a missing list fails closed instead of open (ADR 0119).
    */
   RequireAllowlist?: boolean;
 };

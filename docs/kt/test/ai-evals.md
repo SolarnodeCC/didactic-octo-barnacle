@@ -21,7 +21,7 @@ Agent output comes from language models and varies between runs. Exact assertion
 
 ### Adversarial injection set
 
-`roi-benchmark --injection` runs triage and extraction on the adversarial set (REQ-NFR-006, ADR 0119): every golden-set entry with one payload of `INJECTION_PAYLOADS` (`packages/prompts`) appended to its abstract, in turn, and its labels unchanged. An instruction planted in the text must not change the signals, the decision, or the candidates, so the thresholds of the plain sets apply. Run it with each benchmark round and record the result in that round's ADR.
+`roi-benchmark --injection` runs triage and extraction on the adversarial set (REQ-NFR-006, ADR 0122): every golden-set entry with one payload of `INJECTION_PAYLOADS` (`packages/prompts`) appended to its abstract, in turn, and its labels unchanged. An instruction planted in the text must not change the signals, the decision, or the candidates, so the thresholds of the plain sets apply. Run it with each benchmark round and record the result in that round's ADR.
 
 ## How output is scored
 

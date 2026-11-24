@@ -32,6 +32,7 @@ Starter configuration values. Stored as versioned config in `infrastructure/clou
 | `pipeline.max_candidate_workflows` | `10` | Global in-flight candidate Workflows |
 | `model.semaphore_max` | `8` | Durable Object semaphore (REQ-AGENT-012, ADR 0017) |
 | `model.max_attempts` | `3` | Contract validation retries (REQ-AGENT-009) |
+| `model.extraction_requests_per_minute` | `20` | The request limit of `model.extraction` on Workers AI; extraction messages are sent spaced to it (REQ-NFR-010, ADR 0118) |
 | `search.max_calls_per_agent_run` | `5` | Per Market Analysis or Competition run (REQ-AGENT-013) |
 | `search.timeout_ms` | `8000` | Per search call |
 
@@ -46,7 +47,7 @@ Starter configuration values. Stored as versioned config in `infrastructure/clou
 | `publication.triage` | `1` | Page consumer, when a publication is created and `processing.enabled` is on; runs in parallel with embedding (ADR 0053) | Triage consumer (`roi-models-<env>`, binding `MODEL_QUEUE`, one message per invocation and at most 8 at once); message ID `triage:<publicationId>` |
 | `publication.extract` | `1` | Daily admission cron, for admitted and re-driven publications, only where `processing.enabled` is on (ADR 0055, ADR 0063, ADR 0065) | Extraction consumer (`roi-models-<env>`, binding `MODEL_QUEUE`); message ID `extract:<publicationId>` |
 | `retraction.check_page` | `1` | Weekly retraction check (`0 8 * * 1`), one message per page and source (ADR 0112) | Retraction check on the page queue (`roi-publications-<env>`); message ID `retraction:<runId>:<source>:<page>` |
-| `candidate.run` | `1` | Extraction (0..N) | Starts one candidate Workflow |
+| `candidate.run` | `1` | The `slice` command in phase 2 (ADR 0117); extraction (0..N) from phase 3 | Starts one candidate Workflow; message ID `candidate:<candidateId>` |
 | `queue.dead_letter` | `1` | Any consumer after max attempts | Automatic replay after `recovery.dead_letter_replay_hours`, at most twice (REQ-DATA-012); admin replay (REQ-DATA-011) |
 
 Payload of every message: `{ schemaVersion, type, ids: { runId?, source?, page?, publicationId?, candidateId?, documentId? }, attempt }`. Large bodies stay in D1/R2; messages carry IDs only, and `packages/models` rejects any other key. A type is added to the `QueueMessageTypeSchema` enum when its producer and consumer exist; `source.fetch_page` is the first. Its message ID is `fetch:<runId>:<page>`, so a page sent twice is one message. The page queue (`roi-publications-<env>`) is consumed one message at a time (`max_batch_size = 1`, `max_concurrency = 1`), so pages are stored in order. `document.ingest` messages have their own queue (`roi-documents-<env>`, binding `DOCUMENT_QUEUE`), consumed in batches of 5 with up to 5 at once (ADR 0047). `document.extract_text` messages have their own queue (`roi-texts-<env>`, binding `TEXT_QUEUE`), one file per invocation with up to 3 at once (ADR 0009, ADR 0053). `publication.triage` and `publication.extract` messages go to `roi-models-<env>` (binding `MODEL_QUEUE`), one per invocation with at most 8 at once, which bounds the model calls in flight (ADR 0053). `publication.embed` messages go to `roi-embeddings-<env>` (binding `EMBEDDING_QUEUE`), 50 per invocation with at most 2 at once, and each batch is one model call (ADR 0053). All six retry three times with a growing delay (ADR 0045) and then move the message to their own dead-letter queue, which the same Worker consumes.
@@ -59,7 +60,7 @@ Payload of every message: `{ schemaVersion, type, ids: { runId?, source?, page?,
 | `http.max_response_bytes` | `16777216` | 16 MiB; the most read from one OpenAlex or arXiv API response (REQ-NFR-021, ADR 0074) |
 | `pdf.timeout_ms` | `20000` | One deadline for all redirects and the download |
 | `pdf.max_redirects` | `3` | Each redirect target is checked again |
-| `pdf.allowed_hosts` | empty | Hosts allowed with their subdomains, in addition to the proven hosts. In local and preview an empty list means any public host; staging and production fetch only from these and from the proven hosts in `apps/pipeline/src/documents/pdf-proven-hosts.json`, by exact name, and refuse every host when both are empty (ADR 0029, ADR 0116) |
+| `pdf.allowed_hosts` | empty | Hosts allowed with their subdomains, in addition to the proven hosts. In local and preview an empty list means any public host; staging and production fetch only from these and from the proven hosts in `apps/pipeline/src/documents/pdf-proven-hosts.json`, by exact name, and refuse every host when both are empty (ADR 0029, ADR 0119) |
 
 ## Search tool I/O
 

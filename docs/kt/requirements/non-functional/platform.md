@@ -47,7 +47,7 @@ All calls to model providers, including embedding calls, go through Cloudflare A
 - Acceptance criteria:
   1. No component calls OpenAI, Anthropic, or another model provider directly.
   2. Tokens, cost, and latency per agent and per pipeline run can be read from the gateway.
-  3. Every environment's gateway has Authenticated Gateway on. Bootstrap creates it that way, and the drift check fails `Staging deploy` and `Staging scheduled checks` when a gateway of the environment reports it off or does not report it (ADR 0117).
+  3. Every environment's gateway has Authenticated Gateway on. Bootstrap creates it that way, and the drift check fails `Staging deploy` and `Staging scheduled checks` when a gateway of the environment reports it off or does not report it (ADR 0120).
 - Verification: code review, integration test, and the bootstrap drift check
 
 ### REQ-NFR-005: Cost budget

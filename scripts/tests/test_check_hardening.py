@@ -12,7 +12,12 @@ CI = ".github/workflows/ci.yml"
 
 class HardeningTest(ScriptTestCase):
     SCRIPT = "check-hardening.py"
-    PATHS = (".github", "infrastructure/cloudflare/wrangler.toml", "package.json")
+    PATHS = (
+        ".github",
+        "infrastructure/cloudflare/wrangler.toml",
+        "apps/review/wrangler.toml",
+        "package.json",
+    )
 
     def test_req_nfr_021_passes_on_the_repository(self) -> None:
         result = self.assert_passes()
@@ -83,6 +88,10 @@ class HardeningTest(ScriptTestCase):
         self.replace("infrastructure/cloudflare/wrangler.toml", "workers_dev = false", "workers_dev = true")
         self.assert_fails_with("wrangler.toml: `workers_dev = true` is not allowed")
 
+    def test_req_nfr_021_fails_when_an_app_wrangler_turns_on_preview_urls(self) -> None:
+        self.replace("apps/review/wrangler.toml", "preview_urls = false", "preview_urls = true")
+        self.assert_fails_with("apps/review/wrangler.toml: `preview_urls = true` is not allowed")
+
     def test_req_nfr_021_fails_without_the_audit_script(self) -> None:
         package = json.loads(self.read("package.json"))
         del package["scripts"]["audit:ci"]
@@ -104,7 +113,7 @@ class HardeningTest(ScriptTestCase):
             "[env.staging]\n",
             '[env.staging]\nroutes = [{ pattern = "api.example.org/*", zone_name = "example.org" }]\n',
         )
-        self.assert_fails_with("`routes` in env.staging exposes a Worker before phase 4 authentication")
+        self.assert_fails_with("`routes` in env.staging exposes a Worker without authentication")
 
     def test_req_nfr_007_fails_on_a_top_level_route_that_environments_inherit(self) -> None:
         self.replace(
@@ -113,6 +122,20 @@ class HardeningTest(ScriptTestCase):
             'workers_dev = false\nroute = "api.example.org/*"\n',
         )
         self.assert_fails_with("`route` in (top level) exposes a Worker")
+
+    def test_req_nfr_007_fails_on_a_route_of_an_unlisted_app_worker(self) -> None:
+        self.write(
+            "apps/api/wrangler.toml",
+            'name = "api"\n\n[env.production]\nroutes = [{ pattern = "api.example.org", custom_domain = true }]\n',
+        )
+        self.assert_fails_with("apps/api/wrangler.toml: `routes` in env.production exposes a Worker")
+
+    def test_req_nfr_007_allows_the_route_of_a_worker_listed_as_authenticated(self) -> None:
+        self.write(
+            "apps/review/wrangler.toml",
+            'name = "review"\nworkers_dev = false\npreview_urls = false\n\n[env.staging]\nroutes = [{ pattern = "review.example.org", custom_domain = true }]\n',
+        )
+        self.assert_passes()
 
     def test_req_nfr_007_allows_a_route_in_preview(self) -> None:
         self.replace(

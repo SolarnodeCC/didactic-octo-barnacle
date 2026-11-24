@@ -187,7 +187,7 @@ export type ExtractionItemFailure = {
 /**
  * The candidate-level checks of a schema-valid output: each quote occurs in the text the step
  * sent after normalisation (ADR 0064), no quote carries an instruction planted for this
- * pipeline (ADR 0119), and `Customer` is not a generic party (ADR 0066).
+ * pipeline (ADR 0122), and `Customer` is not a generic party (ADR 0066).
  */
 export function extractionItemChecks(
   output: ExtractionOutput,

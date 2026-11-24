@@ -1,12 +1,12 @@
 ---
-title: "0120: Gates for the erasure-list key and for routes before authentication"
+title: "0123: Gates for the erasure-list key and for routes before authentication"
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-11-24
 related: [REQ-NFR-016, REQ-NFR-007, REQ-NFR-021]
 ---
 
-# 0120: Gates for the erasure-list key and for routes before authentication
+# 0123: Gates for the erasure-list key and for routes before authentication
 
 - Decision status: Accepted
 - Date: 2026-11-24
@@ -31,8 +31,9 @@ The security review of 2026-11-23 raised three medium issues that ADR 0074 had a
 Option 1.
 
 - Rule 14: only `staging-deploy.yml` and `production-deploy.yml` may read `ERASURE_HASH_KEY`. Rule 13 already keeps it in step-level `env`.
-- Rule 15: no Worker configuration (`infrastructure/cloudflare/wrangler.toml`, `apps/*/wrangler.toml`) has `route` or `routes` at the top level or in any environment other than `local` and `preview`. With `workers_dev` and preview URLs off (rule 8), no Worker is reachable from the internet in staging or production.
-- The first authentication pull request lifts rule 15 only for routes behind authentication. `scripts/**` has a code owner, and the pull request is held to the checklist in [security](../architecture/security.md#before-the-first-authentication-pull-request-merges).
+- Rule 15: no Worker configuration (`infrastructure/cloudflare/wrangler.toml`, `apps/*/wrangler.toml`) has `route` or `routes` at the top level or in any environment other than `local` and `preview`, unless `AUTHENTICATED_ROUTES` in the script names that Worker with the ADR of the authentication in front of it. With `workers_dev` and preview URLs off (rule 8), no other Worker is reachable from the internet in staging or production.
+- The owner review tool (`apps/review`) is listed: Cloudflare Access is in front of it, and the Worker verifies the Access token on every API request and refuses all requests while unconfigured (ADR 0116, REQ-REV-005).
+- The first authentication pull request adds the dashboard and API to `AUTHENTICATED_ROUTES`. `scripts/**` has a code owner, and the pull request is held to the checklist in [security](../architecture/security.md#before-the-first-authentication-pull-request-merges).
 - Who can read the key or the erasure list is part of the quarterly access review in [operations](../operations.md#secrets).
 
 ## Consequences

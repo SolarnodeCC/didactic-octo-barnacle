@@ -209,7 +209,7 @@ describe("REQ-DATA-010: PDF fetcher", () => {
     expect(fetchFn).toHaveBeenCalledTimes(1);
   });
 
-  it("REQ-DATA-010: a redirect from a proven host to an unlisted host is refused and names that host (ADR 0116)", async () => {
+  it("REQ-DATA-010: a redirect from a proven host to an unlisted host is refused and names that host (ADR 0119)", async () => {
     const fetchFn = vi.fn(() => Promise.resolve(redirect("https://attacker.example/a.pdf")));
     const fetchPdf = createPdfFetcher({
       Fetch: fetchFn as unknown as typeof fetch,
@@ -224,7 +224,7 @@ describe("REQ-DATA-010: PDF fetcher", () => {
     expect(fetchFn).toHaveBeenCalledTimes(1);
   });
 
-  it("REQ-DATA-010: a required allowlist refuses before any request is sent (ADR 0116)", async () => {
+  it("REQ-DATA-010: a required allowlist refuses before any request is sent (ADR 0119)", async () => {
     const fetchFn = vi.fn();
     const fetchPdf = createPdfFetcher({
       Fetch: fetchFn as unknown as typeof fetch,

@@ -31,7 +31,7 @@ export type DesiredResource = {
 export type ExistingResource = DesiredResource & {
   /**
    * AI Gateways only: whether Authenticated Gateway is on. The Cloudflare client reports
-   * `false` unless the API says `true`, so an unknown setting counts as off (ADR 0117).
+   * `false` unless the API says `true`, so an unknown setting counts as off (ADR 0120).
    */
   Authenticated?: boolean;
 };
@@ -44,7 +44,7 @@ export type DriftReport = {
   /**
    * AI Gateways of this environment that exist with Authenticated Gateway off. Anyone with
    * access to the account could then spend through them without a gateway token
-   * (REQ-NFR-003, ADR 0117). Bootstrap does not turn it on: once on, Cloudflare does not
+   * (REQ-NFR-003, ADR 0120). Bootstrap does not turn it on: once on, Cloudflare does not
    * let it be turned off, so the owner does it in the dashboard.
    */
   Unauthenticated: DesiredResource[];

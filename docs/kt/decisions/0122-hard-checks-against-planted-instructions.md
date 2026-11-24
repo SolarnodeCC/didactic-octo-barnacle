@@ -1,12 +1,12 @@
 ---
-title: "0119: Hard checks and an adversarial set against planted instructions"
+title: "0122: Hard checks and an adversarial set against planted instructions"
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-11-24
 related: [REQ-NFR-006, REQ-PROC-009, REQ-AGENT-008, REQ-TEST-006]
 ---
 
-# 0119: Hard checks and an adversarial set against planted instructions
+# 0122: Hard checks and an adversarial set against planted instructions
 
 - Decision status: Accepted
 - Date: 2026-11-24

@@ -210,7 +210,7 @@ async function extract(
     DroppedQuote: result.Dropped.filter((item) => item.Reason === "quote-not-found").length,
     DroppedGenericCustomer: result.Dropped.filter((item) => item.Reason === "generic-customer")
       .length,
-    // A quote carrying an instruction planted for this pipeline (ADR 0119).
+    // A quote carrying an instruction planted for this pipeline (ADR 0122).
     DroppedInstruction: result.Dropped.filter((item) => item.Reason === "instruction-quote").length,
     // Report-only check of ADR 0066: counted, never blocking.
     CustomerQuoteNoOverlap: candidates.filter(

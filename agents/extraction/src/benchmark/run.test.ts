@@ -361,7 +361,7 @@ describe("REQ-TEST-006: the benchmark command", () => {
     );
   });
 
-  it("REQ-NFR-006: --injection runs the adversarial set and is part of the stored plan (ADR 0119)", async () => {
+  it("REQ-NFR-006: --injection runs the adversarial set and is part of the stored plan (ADR 0122)", async () => {
     expect(parseBenchmarkArgs(["--injection"])).toMatchObject({ Injection: true });
     expect(parseBenchmarkArgs([])).toMatchObject({ Injection: false });
     expect(parseBenchmarkArgs(["--resume", "bench-1", "--injection"])).toBeNull();

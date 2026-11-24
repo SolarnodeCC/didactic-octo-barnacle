@@ -7,9 +7,9 @@ export type PdfFetchLimits = {
   TimeoutMs: number;
   MaxRedirects: number;
   AllowedHosts: readonly string[];
-  /** Hosts allowed by exact name: those that have served a stored PDF (ADR 0116). */
+  /** Hosts allowed by exact name: those that have served a stored PDF (ADR 0119). */
   ExactHosts?: ReadonlySet<string>;
-  /** Refuse hosts that no list names, even when the lists are empty (ADR 0116). */
+  /** Refuse hosts that no list names, even when the lists are empty (ADR 0119). */
   RequireAllowlist?: boolean;
 };
 
@@ -37,7 +37,7 @@ export class PdfFetchError extends Error {
     readonly RetryAfterSeconds: number | null = null,
     /**
      * The host a `blocked-url` refusal was about: the first URL's host or a redirect
-     * target's. Logged by name so the allowlist can be reviewed (ADR 0029, ADR 0116).
+     * target's. Logged by name so the allowlist can be reviewed (ADR 0029, ADR 0119).
      */
     readonly Host: string | null = null,
   ) {

@@ -17,7 +17,16 @@ import { type AuthorGuard } from "../privacy/author-guard.js";
 import { type FetchedPdf } from "../documents/safe-fetch.js";
 import { type PdfTextExtractor, type PdfTextLimits } from "../documents/pdf-text.js";
 import { type SqlDatabase } from "../store/sql.js";
+import { type CandidateSteps } from "../candidate/steps.js";
 import { type QueueSender } from "./types.js";
+
+/**
+ * The slice of a Workflow binding the pipeline uses (`CANDIDATE_WORKFLOW`): creating one
+ * instance per pipeline run. The real binding satisfies it structurally.
+ */
+export type CandidateWorkflowBinding = {
+  create(options: { id: string; params: { PipelineRunId: string } }): Promise<unknown>;
+};
 
 export type PipelineDeps = {
   Db: SqlDatabase;
@@ -111,6 +120,12 @@ export type PipelineDeps = {
     FullTextMaxChars: number;
     /** `extraction.generic_customer_terms` (ADR 0066). */
     GenericCustomerTerms: readonly string[];
+    /**
+     * `model.extraction_requests_per_minute`: the extraction model's request limit. Extraction
+     * messages are sent spaced to it, so the model queue's concurrency does not run into 429s
+     * (REQ-NFR-010, ADR 0118). Left out, they are sent at once.
+     */
+    RequestsPerMinute?: number;
   };
   /**
    * Embeddings (REQ-PROC-001, REQ-PROC-002, ADR 0053, ADR 0056). The consumer needs `Call` and
@@ -128,6 +143,15 @@ export type PipelineDeps = {
     Indexes: Record<string, VectorIndex>;
   };
   /** The daily quality section and its drift alert (REQ-NFR-023, ADR 0071). */
+  /**
+   * The candidate pipeline of the thin slice (REQ-PROC-007, ADR 0117): `candidate.run` starts one
+   * Workflow instance per candidate, whose steps are these. Phase 2 binds it in local and
+   * preview only.
+   */
+  Candidate?: {
+    Workflow: CandidateWorkflowBinding;
+    Steps: CandidateSteps;
+  };
   Monitor?: {
     /** `monitor.baseline_days`: days in each metric's median; no alert before that many. */
     BaselineDays: number;
@@ -251,4 +275,26 @@ export function embedEnvelope(publicationId: string, indexId: string): QueueMess
     Ids: { PublicationId: publicationId, IndexId: indexId },
     Attempt: 0,
   };
+}
+
+/** Deterministic ID: a candidate is run once (`candidate:<candidateId>`, design.md). */
+export function candidateRunEnvelope(candidateId: string, runId?: string): QueueMessageEnvelope {
+  return {
+    MessageId: `candidate:${candidateId}`,
+    Type: "candidate.run",
+    SchemaVersion: QUEUE_SCHEMA_VERSION,
+    Ids: { CandidateId: candidateId, ...(runId ? { RunId: runId } : {}) },
+    Attempt: 0,
+  };
+}
+
+/**
+ * The send delay, in whole seconds, of the `index`-th message of a run that is paced to
+ * `requestsPerMinute` (ADR 0118): 3 s apart at 20 a minute. Unpaced, every message is sent at once.
+ */
+export function pacedDelaySeconds(index: number, requestsPerMinute: number | undefined): number {
+  if (requestsPerMinute === undefined || requestsPerMinute <= 0) {
+    return 0;
+  }
+  return index * Math.ceil(60 / requestsPerMinute);
 }

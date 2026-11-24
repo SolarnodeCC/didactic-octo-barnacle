@@ -3,7 +3,7 @@ title: Security and data protection
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-11-24
-related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-NFR-009, REQ-NFR-011, REQ-NFR-012, REQ-NFR-013, REQ-NFR-014, REQ-NFR-015, REQ-NFR-016, REQ-NFR-021, REQ-DATA-010, REQ-AGENT-013]
+related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-NFR-009, REQ-NFR-011, REQ-NFR-012, REQ-NFR-013, REQ-NFR-014, REQ-NFR-015, REQ-NFR-016, REQ-NFR-021, REQ-DATA-010, REQ-AGENT-013, REQ-REV-005]
 ---
 
 # Security and data protection
@@ -12,20 +12,21 @@ related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-N
 
 | Threat | Control | Requirement |
 |---|---|---|
-| Instructions hidden in a paper or search result steer an agent (prompt injection) | Paper text and search results are delimited data; agents have no write tools; the search tool is bounded and read-only; output is validated against the contract; quotes must be verbatim, and code drops a candidate that quotes a planted instruction; every prompt is tested with the injection corpus, and the benchmark has an adversarial set (ADR 0119) | REQ-NFR-006, REQ-AGENT-013 |
+| Instructions hidden in a paper or search result steer an agent (prompt injection) | Paper text and search results are delimited data; agents have no write tools; the search tool is bounded and read-only; output is validated against the contract; quotes must be verbatim, and code drops a candidate that quotes a planted instruction; every prompt is tested with the injection corpus, and the benchmark has an adversarial set (ADR 0122) | REQ-NFR-006, REQ-AGENT-013 |
 | Model output runs script or links to a hostile site in the dashboard | Plain-text rendering, https-only links, strict CSP (ADR 0016) | REQ-NFR-013 |
 | A cross-site page triggers a state-changing request | CSRF token, `Origin` check, one site for dashboard and API, no CORS (ADR 0016) | REQ-NFR-014 |
-| Fetching a PDF or page reaches an internal address or a hostile file | The one PDF fetcher (ADR 0029): `https` and public host names only, each redirect checked, size and time limits, content-type and magic-byte check; in staging and production only allowlisted hosts, failing closed (ADR 0116) | REQ-DATA-010, REQ-AGENT-013 |
+| Fetching a PDF or page reaches an internal address or a hostile file | The one PDF fetcher (ADR 0029): `https` and public host names only, each redirect checked, size and time limits, content-type and magic-byte check; in staging and production only allowlisted hosts, failing closed (ADR 0119) | REQ-DATA-010, REQ-AGENT-013 |
 | A forged bounce or complaint event from the email provider | Webhook signature verification and replay window | REQ-ACC-007 |
-| A leaked API key or Cloudflare token | Secrets only in Cursor environment secrets or GitHub Actions secrets; secret scanning with push protection; least-privilege tokens per environment; only the deploy workflows read `ERASURE_HASH_KEY` (rule 14, ADR 0120) | REQ-NFR-001, REQ-NFR-016 |
-| Model spending runs away | Daily budget and per-run cost reporting through AI Gateway; Authenticated Gateway on every gateway, checked by the bootstrap drift check before each staging deploy (ADR 0117) | REQ-NFR-005, REQ-NFR-003 |
-| Unauthorized access to opportunities | Invitation-only accounts and authentication in front of the dashboard and the API; until that exists, no Worker route outside local and preview (`check-hardening` rule 15, ADR 0120) | REQ-NFR-007, REQ-ACC-001 |
+| A leaked API key or Cloudflare token | Secrets only in Cursor environment secrets or GitHub Actions secrets; secret scanning with push protection; least-privilege tokens per environment; only the deploy workflows read `ERASURE_HASH_KEY` (rule 14, ADR 0123) | REQ-NFR-001, REQ-NFR-016 |
+| Model spending runs away | Daily budget and per-run cost reporting through AI Gateway; Authenticated Gateway on every gateway, checked by the bootstrap drift check before each staging deploy (ADR 0120) | REQ-NFR-005, REQ-NFR-003 |
+| Unauthorized access to opportunities | Invitation-only accounts and authentication in front of the dashboard and the API; until that exists, no route outside local and preview for a Worker without authentication (`check-hardening` rule 15, ADR 0123) | REQ-NFR-007, REQ-ACC-001 |
+| Unauthorized access to the owner review tool | Cloudflare Access allows only the owner on `review.wispel.cc`, and the Worker verifies the Access token (signature, audience, issuer, expiry) on every API request; it refuses all requests while unconfigured (ADR 0116) | REQ-REV-005 |
 | Mass signup or token guessing | No public registration; rate limits; 128-bit tokens stored as hashes | REQ-ACC-002, REQ-ACC-005 |
 | Secrets exposed to untrusted code in CI | Pull request jobs run without secrets; live evals only for branches in this repository, in a protected `evals` environment that requires reviewer approval (ADR 0006) | REQ-TEST-003, REQ-TEST-004 |
 | Redistribution of copyrighted papers | License recorded per document; PDFs stored and served only when the license allows it | REQ-DATA-010 |
 | Vulnerable dependencies | Dependabot for npm, pip, and GitHub Actions; pinned versions; `pnpm audit:ci` in CI (ADR 0033) | REQ-NFR-021, see [CI gates](../test/ci-gates.md) |
 | A CI or deploy change weakens the pipeline's own security | `scripts/check-hardening.py` fails the pull request: SHA-pinned actions, no stored checkout token, least-privilege `permissions`, no `pull_request_target`, no script injection, default code owner, environment jobs only on `main` with secrets scoped to steps; staging deploys only after green checks (ADR 0074) | REQ-NFR-021 |
-| A signed download token in a PDF URL is kept in traces | Staging and production redact query strings in Workers Observability; log lines name the host only (ADR 0118) | REQ-NFR-008, REQ-NFR-021 |
+| A signed download token in a PDF URL is kept in traces | Staging and production redact query strings in Workers Observability; log lines name the host only (ADR 0121) | REQ-NFR-008, REQ-NFR-021 |
 | A hung or hostile upstream stalls the Worker, or a retry duplicates an alert | Timeout per request, capped `Retry-After`, capped response size, no XML document type declarations, no retry of a non-idempotent request after an unclear outcome, Resend idempotency key (ADR 0074) | REQ-NFR-021 |
 | A hijacked release of a dependency or of pnpm reaches CI or the Worker | Dependabot cooldown of seven days, pnpm `minimumReleaseAge` of three days, `packageManager` pinned with its hash, lockfile installs only (ADR 0074) | REQ-NFR-021 |
 
@@ -33,7 +34,7 @@ related: [REQ-ACC-001, REQ-ACC-004, REQ-NFR-001, REQ-NFR-006, REQ-NFR-007, REQ-N
 
 `apps/pipeline/src/documents` holds the only code that downloads PDFs. It accepts `https` on port 443 and public host names; it refuses IP addresses in any notation, names that embed an IP address (dotted or dashed IPv4, an 8-digit hex label that decodes to a non-public IPv4 address, or IPv6 written with dashes), public wildcard-DNS and DNS-rebinding services such as `nip.io` and `rbndr.us`, the platform's own domain `wispel.cc` and its subdomains (ADR 0026; refused even when allowlisted, because a PDF URL comes from metadata that outside authors control), any name with a `localhost` label (such as `localhost.example.org`), single-label names, and names ending in `.local`, `.internal`, `.lan`, or `.home.arpa`. It follows at most three redirects and checks each target again, reads at most `pdf.max_bytes`, stops at `pdf.timeout_ms`, and accepts a file only when it is served as `application/pdf` and starts with `%PDF-`. Workers cannot resolve DNS, so a public name that points to a private address is not detected by the Worker; Cloudflare does not route a Worker's requests to its own internal network. The URL and license always come from the stored source record, never from a queue message.
 
-In staging and production the fetcher also needs the host to be on an allowlist (ADR 0116): the proven hosts in `apps/pipeline/src/documents/pdf-proven-hosts.json`, which have each served a stored PDF and match by exact name only (some are shared storage such as `<bucket>.s3.amazonaws.com`), and `pdf.allowed_hosts`, which matches subdomains too. The check applies to the first URL and to every redirect target. A refused host is logged as `document.refused` with `host` and, for a redirect, `refusedHost`; review those names and add a host through a pull request ([operations](../operations.md#runbooks)). Any environment name other than `local` or `preview` gets the allowlist, and an empty one refuses every host. Local and preview fetch any public host.
+In staging and production the fetcher also needs the host to be on an allowlist (ADR 0119): the proven hosts in `apps/pipeline/src/documents/pdf-proven-hosts.json`, which have each served a stored PDF and match by exact name only (some are shared storage such as `<bucket>.s3.amazonaws.com`), and `pdf.allowed_hosts`, which matches subdomains too. The check applies to the first URL and to every redirect target. A refused host is logged as `document.refused` with `host` and, for a redirect, `refusedHost`; review those names and add a host through a pull request ([operations](../operations.md#runbooks)). Any environment name other than `local` or `preview` gets the allowlist, and an empty one refuses every host. Local and preview fetch any public host.
 
 ## Authentication
 
@@ -57,17 +58,17 @@ Users have one of three roles, viewer, analyst, or admin, set on the invitation 
 
 ### Before the first authentication pull request merges
 
-The sign-in, session, and CSRF code is written without a library (ADR 0011), so the first pull request that adds it gets a dedicated security review (ADR 0120). It merges only when:
+The sign-in, session, and CSRF code is written without a library (ADR 0011), so the first pull request that adds it gets a dedicated security review (ADR 0123). It merges only when:
 
 - tests show the same response and similar timing for known and unknown email addresses, and a constant-time comparison of token hashes (REQ-ACC-004);
 - a token is consumed only by the explicit Continue, never by a GET that a mail scanner can prefetch, and the session is rotated on Continue (REQ-ACC-004);
 - the session cookie uses the `__Host-` prefix with `Secure`, `HttpOnly`, and `SameSite=Lax`, and every state-changing route checks `Origin` and the CSRF token (REQ-NFR-014);
 - rate limits on link requests and token use are tested (REQ-ACC-005);
-- the read route of ADR 0058 stays out of staging and production, and the pull request lifts `check-hardening` rule 15 only for routes behind authentication.
+- the read route of ADR 0058 stays out of staging and production, and the pull request adds only Workers behind authentication to `AUTHENTICATED_ROUTES` of `check-hardening` rule 15.
 
 ## Content Security Policy
 
-The dashboard sends this CSP (REQ-NFR-013, ADR 0016):
+The dashboard and the owner review tool (REQ-REV-005, ADR 0116) send this CSP (REQ-NFR-013, ADR 0016):
 
 ```text
 default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
@@ -84,5 +85,5 @@ default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src
 ## Model providers
 
 - All calls go through AI Gateway (REQ-NFR-003), which is the single place to log, rate-limit, and switch providers.
-- Each gateway has Authenticated Gateway turned on (ADR 0074), so a request over HTTP needs a gateway token in `cf-aig-authorization`. The Worker calls through its Workers AI binding, which Cloudflare authenticates within the account, so the Worker holds no gateway token. Bootstrap creates each gateway with authentication on, and its drift check fails `Staging deploy` and `Staging scheduled checks` when a gateway of the environment has it off or does not report it (ADR 0117). Cloudflare does not let authentication be turned off again once it is on.
+- Each gateway has Authenticated Gateway turned on (ADR 0074), so a request over HTTP needs a gateway token in `cf-aig-authorization`. The Worker calls through its Workers AI binding, which Cloudflare authenticates within the account, so the Worker holds no gateway token. Bootstrap creates each gateway with authentication on, and its drift check fails `Staging deploy` and `Staging scheduled checks` when a gateway of the environment has it off or does not report it (ADR 0120). Cloudflare does not let authentication be turned off again once it is on.
 - Provider keys are stored as secrets of the gateway or the Worker, never in code.

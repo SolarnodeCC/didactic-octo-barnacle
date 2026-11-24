@@ -131,7 +131,7 @@ describe("REQ-DATA-010: PDF URL policy", () => {
     expect(refused("https://europepmc.org.evil.com/a.pdf", policy)).toMatch(/allowlist/);
   });
 
-  it("REQ-DATA-010: exact hosts allow only the listed names, not names below them (ADR 0116)", () => {
+  it("REQ-DATA-010: exact hosts allow only the listed names, not names below them (ADR 0119)", () => {
     const policy = {
       AllowedHosts: [],
       ExactHosts: new Set(["arxiv.org", "jmcms.s3.amazonaws.com"]),
@@ -147,19 +147,19 @@ describe("REQ-DATA-010: PDF URL policy", () => {
     );
   });
 
-  it("REQ-DATA-010: exact hosts and the suffix allowlist both admit a host (ADR 0116)", () => {
+  it("REQ-DATA-010: exact hosts and the suffix allowlist both admit a host (ADR 0119)", () => {
     const policy = { AllowedHosts: ["europepmc.org"], ExactHosts: new Set(["arxiv.org"]) };
     expect(checkPdfUrl("https://arxiv.org/a.pdf", policy).Ok).toBe(true);
     expect(checkPdfUrl("https://files.europepmc.org/a.pdf", policy).Ok).toBe(true);
     expect(refused("https://example.org/a.pdf", policy)).toMatch(/allowlist/);
   });
 
-  it("REQ-DATA-010: a required allowlist that is empty fails closed (ADR 0116)", () => {
+  it("REQ-DATA-010: a required allowlist that is empty fails closed (ADR 0119)", () => {
     const policy = { AllowedHosts: [], ExactHosts: new Set<string>(), RequireAllowlist: true };
     expect(refused("https://repository.example.org/a.pdf", policy)).toMatch(/allowlist/);
   });
 
-  it("REQ-DATA-010: exact hosts never override the hard rules (ADR 0116)", () => {
+  it("REQ-DATA-010: exact hosts never override the hard rules (ADR 0119)", () => {
     const policy = {
       AllowedHosts: [],
       ExactHosts: new Set(["wispel.cc", "10.0.0.1.nip.io", "localhost.example.org"]),

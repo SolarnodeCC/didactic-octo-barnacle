@@ -13,7 +13,8 @@ here, in CI, on every pull request. Rules (see docs/kt/decisions/0033-repository
 5. No `run:` script interpolates event data or workflow inputs (script injection).
 6. Dependabot covers github-actions, pip, and npm.
 7. CODEOWNERS has a default owner (`*`).
-8. `wrangler.toml` turns off workers.dev and preview URLs and never turns them on.
+8. Every `wrangler.toml` (the pipeline's and each app's) turns off workers.dev and preview URLs
+   and never turns them on.
 9. CI audits the dependencies (`audit:ci` in package.json and in ci.yml).
 10. A workflow that runs on `workflow_run` limits it to `branches: [main]`, and no job passes
     `secrets: inherit` to a called workflow (ADR 0046).
@@ -26,10 +27,12 @@ here, in CI, on every pull request. Rules (see docs/kt/decisions/0033-repository
 13. A job that uses an `environment` puts no secret in its job-level `env`: secrets go to
     the steps that need them, so dependency install scripts never see them (ADR 0074).
 14. `ERASURE_HASH_KEY` appears only in the deploy workflows, which upload it as a Worker
-    secret. No other workflow may read the key of the erasure list (REQ-NFR-016, ADR 0120).
+    secret. No other workflow may read the key of the erasure list (REQ-NFR-016, ADR 0123).
 15. No Worker configuration gives a Worker a `route`, `routes`, or a custom domain outside
-    the `local` and `preview` environments, until the phase 4 authentication pull request
-    lifts this rule after its security review (REQ-NFR-007, ADR 0058, ADR 0120).
+    the `local` and `preview` environments, unless `AUTHENTICATED_ROUTES` names the Worker
+    and the ADR of the authentication in front of it. The phase 4 authentication pull request
+    adds the dashboard and API there after its security review (REQ-NFR-007, ADR 0058,
+    ADR 0123).
 """
 
 from __future__ import annotations
@@ -57,6 +60,14 @@ ERASURE_KEY_WORKFLOWS = {"staging-deploy.yml", "production-deploy.yml"}
 # Rule 15: environments where a Worker may have a route before authentication exists.
 UNAUTHENTICATED_ROUTE_ENVIRONMENTS = {"local", "preview"}
 ROUTE_KEYS = ("route", "routes")
+
+# Rule 15: Workers that may have a route because every request is authenticated, with the
+# ADR that says how. Adding one is a reviewed change of this code-owned file (ADR 0123).
+AUTHENTICATED_ROUTES = {
+    # Cloudflare Access in front, and the Worker verifies the Access token on every API
+    # request and refuses all requests while unconfigured (REQ-REV-005).
+    "apps/review/wrangler.toml": "ADR 0116",
+}
 
 errors: list[str] = []
 
@@ -117,7 +128,7 @@ def check_workflows() -> None:
                 if "ERASURE_HASH_KEY" in json.dumps(step) and name not in ERASURE_KEY_WORKFLOWS:
                     fail(
                         f"{name}: job {job_name}, step {index + 1} reads ERASURE_HASH_KEY; only "
-                        "the deploy workflows may (ADR 0120)"
+                        "the deploy workflows may (ADR 0123)"
                     )
                 where = f"{name}: job {job_name}, step {index + 1}"
                 uses = step.get("uses")
@@ -146,14 +157,27 @@ def check_codeowners() -> None:
         fail("CODEOWNERS: add a default owner line `* @owner` so no path is unowned")
 
 
+def wrangler_configs() -> list[pathlib.Path]:
+    """Every Wrangler configuration of the repository: the pipeline's and each app's (ADR 0115)."""
+    found = {ROOT / "infrastructure" / "cloudflare" / "wrangler.toml"}
+    for pattern in ("apps/*/wrangler.toml", "infrastructure/*/wrangler.toml"):
+        found.update(ROOT.glob(pattern))
+    return sorted(found)
+
+
 def check_wrangler() -> None:
-    text = (ROOT / "infrastructure" / "cloudflare" / "wrangler.toml").read_text()
-    for key in ("workers_dev", "preview_urls"):
-        top = re.search(rf"^{key}\s*=\s*(\w+)", text, re.M)
-        if not top or top.group(1) != "false":
-            fail(f"wrangler.toml: set `{key} = false` at the top level")
-        if re.search(rf"^\s*{key}\s*=\s*true", text, re.M):
-            fail(f"wrangler.toml: `{key} = true` is not allowed")
+    for path in wrangler_configs():
+        name = path.as_posix()
+        if not path.is_file():
+            fail(f"{name}: missing")
+            continue
+        text = path.read_text()
+        for key in ("workers_dev", "preview_urls"):
+            top = re.search(rf"^{key}\s*=\s*(\w+)", text, re.M)
+            if not top or top.group(1) != "false":
+                fail(f"{name}: set `{key} = false` at the top level")
+            if re.search(rf"^\s*{key}\s*=\s*true", text, re.M):
+                fail(f"{name}: `{key} = true` is not allowed")
 
 
 def wrangler_configs() -> list[pathlib.Path]:
@@ -165,7 +189,7 @@ def wrangler_configs() -> list[pathlib.Path]:
 
 def check_routes() -> None:
     for path in wrangler_configs():
-        if not path.is_file():
+        if not path.is_file() or path.as_posix() in AUTHENTICATED_ROUTES:
             continue
         config = tomllib.loads(path.read_text())
         # Top-level keys are what an environment without its own value inherits.
@@ -177,8 +201,9 @@ def check_routes() -> None:
             for key in ROUTE_KEYS:
                 if key in section:
                     fail(
-                        f"{path.as_posix()}: `{key}` in {where} exposes a Worker before phase 4 "
-                        "authentication; routes are allowed only in local and preview (ADR 0120)"
+                        f"{path.as_posix()}: `{key}` in {where} exposes a Worker without "
+                        "authentication; routes are allowed only in local and preview, or for a "
+                        "Worker listed in AUTHENTICATED_ROUTES (ADR 0123)"
                     )
 
 

@@ -39,5 +39,5 @@ Query strings stay readable because the outbound requests carry no secrets in th
 
 - A run can be followed through its traces as well as its structured log lines.
 - Wrangler 4.156 does not know `issue_detection` yet and prints `Unexpected fields found in observability field`. It still sends the table with the upload, and the deploy goes on. The warning goes away once Wrangler's schema has the key.
-- A PDF URL from a publisher can carry a signed token in its query string; such a URL is visible in the traces. Set `redact_query_string = true` if a token must not be stored, and record that in a new ADR. Done on 2026-11-24: [ADR 0118](0118-redact-query-strings-in-traces.md) sets it in staging and production.
+- A PDF URL from a publisher can carry a signed token in its query string; such a URL is visible in the traces. Set `redact_query_string = true` if a token must not be stored, and record that in a new ADR. Done on 2026-11-24: [ADR 0121](0121-redact-query-strings-in-traces.md) sets it in staging and production.
 - `infrastructure/cloudflare/src/wrangler-config.test.ts` checks these settings for both environments.

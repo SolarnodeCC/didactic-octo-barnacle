@@ -52,7 +52,7 @@ export type BootstrapCliDeps = {
 /**
  * Runs the CLI and returns its exit code: 0 on success, 1 on failure, 2 on bad usage, and 3
  * when `--fail-on-drift` is set and resources are missing or an AI Gateway has
- * Authenticated Gateway off (ADR 0117).
+ * Authenticated Gateway off (ADR 0120).
  */
 export async function runBootstrapCli(
   args: readonly string[],

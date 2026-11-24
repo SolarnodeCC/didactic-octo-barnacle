@@ -2,8 +2,8 @@
 title: Phase 2 schema, configuration, and bindings
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-11
-related: [REQ-NFR-020, REQ-NFR-011, REQ-PROC-001, REQ-PROC-006, REQ-PROC-009, REQ-DATA-006, REQ-DATA-008, REQ-PROC-007]
+last_reviewed: 2026-11-24
+related: [REQ-NFR-020, REQ-NFR-011, REQ-PROC-001, REQ-PROC-006, REQ-PROC-009, REQ-DATA-006, REQ-DATA-008, REQ-PROC-007, REQ-REV-003]
 ---
 
 # Phase 2 schema, configuration, and bindings
@@ -66,15 +66,20 @@ Migration 0011 is `infrastructure/cloudflare/migrations/0011_recovery.sql` (WP6;
 | `queue_message_log.replay_count`, `queue_message_log.dead_lettered_at` | | Automatic dead-letter replays, at most two per message ID, each `recovery.dead_letter_replay_hours` after the dead letter |
 | `step_pause` | `step`, `paused_at`, `last_probe_at`, `resumed_at`, `alerted_at` | The breaker: a step is paused while `resumed_at` is empty |
 
-## Migration 0014: thin slice
+## Migration 0014: output review
 
-ADR 0054 planned this migration as 0010; it became 0011 when migration 0010 went to cached input tokens (ADR 0078), 0012 when migration 0011 went to recovery (WP6), and 0014 when migrations 0012 and 0013 went to the processing report and quality monitoring (WP9).
+`output_review` (`id`, `target_kind` (`triage`, `candidate`), `target_id`, `publication_id`, `verdict` (`correct`, `incorrect`, `unsure`), `corrected` (at most 2,000 characters), `note` (at most 500 characters), `reviewer_opaque`, `model`, `prompt_version`, `created_at`; index (`target_kind`, `target_id`, `created_at`) and (`publication_id`, `created_at`)): the verdicts of the owner review tool (ADR 0116, REQ-REV-003). The newest row per target is the current verdict. Only `apps/review` writes it; the pipeline never reads it. Migration 0014 is `infrastructure/cloudflare/migrations/0014_output_review.sql` and is expand-only.
 
-The tables of schema migration 0001 for the pipeline, with these changes:
+## Migration 0015: thin slice
 
-- `pipeline_run`, with `cost_eur` stored as `cost_amount` and `cost_currency`.
-- `pipeline_step`, `agent_output`, `evidence`.
-- `opportunity`, `score_model`, `score`.
+ADR 0054 planned this migration as 0010; it became 0011 when migration 0010 went to cached input tokens (ADR 0078), 0012 when migration 0011 went to recovery (WP6), 0014 when migrations 0012 and 0013 went to the processing report and quality monitoring (WP9), and 0015 when 0014 went to output review (ADR 0116).
+
+Migration 0015 is `infrastructure/cloudflare/migrations/0015_thin_slice.sql` (WP10; REQ-PROC-007, ADR 0117). It is expand-only. It adds the tables of schema migration 0001 for the pipeline, with these changes:
+
+- `pipeline_run`, with `cost_eur` stored as `cost_amount` and `cost_currency`, and `processing_run_id` for the run that started it.
+- `pipeline_step` (status `running`, `complete`, `failed`; UNIQUE `pipeline_run_id`, `step_name`), `agent_output`, and `evidence` with the contract's `publication_id` and `note`.
+- `opportunity` (UNIQUE `candidate_id`; `hidden_reason` is `retracted`; `created_at`, `updated_at`), `score_model`, and `score` with `weighted_sum`.
+- The seed row of `score_model` version `placeholder-0`: the ADR 0005 rules with equal weights, not active.
 
 It adds no organization-scoped table. Those arrive with phase 4 (ADR 0019).
 
@@ -111,7 +116,7 @@ New keys for [defaults](../architecture/defaults.md). They are added there in th
 | `monitor.min_daily_items` | `20` | Fewest items behind a rate before it can alert (ADR 0071) |
 | `monitor.near_duplicate_cosine` | `0.92` | Publication-vector cosine for counting possible near-duplicate opportunities (ADR 0071) |
 
-Schedules: admission at `0 11 * * *` UTC, after both ingestion crons, with the re-drive before it; the recovery check (dead-letter replay and breaker probe) every 30 minutes, `*/30 * * * *`. The retraction check stays `0 8 * * 1`. The slice trigger exists only in the local environment.
+Schedules: admission at `0 11 * * *` UTC, after both ingestion crons, with the re-drive before it; the recovery check (dead-letter replay and breaker probe) every 30 minutes, `*/30 * * * *`. The retraction check stays `0 8 * * 1`. The thin slice has no cron: it runs from `pnpm --filter @roi/pipeline slice` (ADR 0117).
 
 ## Bindings
 

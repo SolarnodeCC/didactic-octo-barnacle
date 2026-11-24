@@ -1,12 +1,12 @@
 ---
-title: "0117: Bootstrap creates and checks every AI Gateway with authentication on"
+title: "0120: Bootstrap creates and checks every AI Gateway with authentication on"
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-11-24
 related: [REQ-NFR-003, REQ-NFR-005, REQ-NFR-020]
 ---
 
-# 0117: Bootstrap creates and checks every AI Gateway with authentication on
+# 0120: Bootstrap creates and checks every AI Gateway with authentication on
 
 - Decision status: Accepted
 - Date: 2026-11-24

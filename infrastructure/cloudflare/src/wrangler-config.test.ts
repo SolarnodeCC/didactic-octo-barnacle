@@ -45,7 +45,7 @@ describe("REQ-DATA-004: PDF downloads have their own queue in every environment"
 
 describe("REQ-NFR-008: deployed Workers keep every log line and trace", () => {
   it.each(["staging", "production"])(
-    "REQ-NFR-008: %s persists all logs and traces, redacts query strings (ADR 0118), and turns on issue detection",
+    "REQ-NFR-008: %s persists all logs and traces, redacts query strings (ADR 0121), and turns on issue detection",
     (environment) => {
       const table = `[env.${environment}.observability`;
       expect(wrangler).toContain(
@@ -62,7 +62,7 @@ describe("REQ-NFR-008: deployed Workers keep every log line and trace", () => {
   );
 });
 
-describe("REQ-NFR-021: no deployed Worker keeps query strings in its traces (ADR 0118)", () => {
+describe("REQ-NFR-021: no deployed Worker keeps query strings in its traces (ADR 0121)", () => {
   it("REQ-NFR-021: no environment turns redaction of query strings off", () => {
     expect(wrangler).not.toMatch(/^redact_query_string\s*=\s*false/m);
   });
@@ -140,4 +140,21 @@ describe("REQ-PROC-005: the daily admission runs in the deployed environments", 
       );
     },
   );
+});
+
+describe("REQ-PROC-007: the candidate Workflow of the thin slice", () => {
+  it("REQ-PROC-007: local and preview bind CANDIDATE_WORKFLOW to the CandidateWorkflow class", () => {
+    for (const [table, environment] of [
+      ["[[workflows]]", "local"],
+      ["[[env.preview.workflows]]", "preview"],
+    ] as const) {
+      expect(wrangler).toContain(
+        `${table}\nname = "roi-candidate-${environment}"\nbinding = "CANDIDATE_WORKFLOW"\nclass_name = "CandidateWorkflow"`,
+      );
+    }
+  });
+
+  it("REQ-PROC-007: staging and production have no Workflow in phase 2 (ADR 0117)", () => {
+    expect(wrangler).not.toMatch(/^\[\[env\.(staging|production)\.workflows\]\]/m);
+  });
 });

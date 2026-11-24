@@ -582,7 +582,7 @@ describe("REQ-TEST-007: the extraction eval report (ADR 0067)", () => {
   });
 });
 
-describe("REQ-NFR-006: the adversarial injection set keeps the owner's labels (ADR 0119)", () => {
+describe("REQ-NFR-006: the adversarial injection set keeps the owner's labels (ADR 0122)", () => {
   const injectedTriage = withInjections(triageSet);
   const injectedExtraction = withInjections(extractionSet);
 

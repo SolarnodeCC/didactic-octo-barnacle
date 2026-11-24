@@ -35,8 +35,8 @@ Publication text is treated as untrusted input to models.
   1. Publication text is passed to models as delimited data, never as instructions.
   2. Agents have no tools that write data or send messages outside the pipeline. The only read tool is the bounded search tool (REQ-AGENT-013), and its results are treated as untrusted too.
   3. Fixtures with injected instructions in the abstract or full text do not change agent behavior beyond the contract.
-  4. Code drops an extraction candidate whose quote carries an instruction planted for the pipeline: a publication delimiter or a field name of the output contracts (ADR 0119).
-  5. The benchmark runs triage and extraction on an adversarial set: every golden-set entry with a planted instruction from the corpus of `packages/prompts` and its labels unchanged (`--injection`, ADR 0119).
+  4. Code drops an extraction candidate whose quote carries an instruction planted for the pipeline: a publication delimiter or a field name of the output contracts (ADR 0122).
+  5. The benchmark runs triage and extraction on an adversarial set: every golden-set entry with a planted instruction from the corpus of `packages/prompts` and its labels unchanged (`--injection`, ADR 0122).
 - Verification: contract tests of every prompt builder with the injection corpus, unit tests of the candidate check, the adversarial benchmark set, and code review
 
 ### REQ-NFR-007: Authenticated access
@@ -51,7 +51,7 @@ Only authenticated users can use the dashboard and the API.
   1. An unauthenticated request to the dashboard or the API is refused.
   2. Access is granted only to users created from an invitation (REQ-ACC-001) and can be revoked without a deployment (REQ-ACC-006).
   3. The dashboard and the API accept the same session (REQ-ACC-004).
-  4. No route is served without authentication in staging or production. Until the first authentication pull request lifts it, `scripts/check-hardening.py` refuses any Worker route outside local and preview; that pull request gets a dedicated security review against the checklist in [security](../../architecture/security.md#before-the-first-authentication-pull-request-merges) (ADR 0120).
+  4. No route is served without authentication in staging or production. `scripts/check-hardening.py` refuses any Worker route outside local and preview unless the script lists the Worker with the ADR of its authentication, such as the owner review tool behind Cloudflare Access (ADR 0116). The first authentication pull request adds the dashboard and API to that list and gets a dedicated security review against the checklist in [security](../../architecture/security.md#before-the-first-authentication-pull-request-merges) (ADR 0123).
 - Verification: end-to-end test, `scripts/check-hardening.py`, and the security review of the first authentication pull request
 
 ### REQ-NFR-012: Roles
@@ -140,7 +140,7 @@ The repository, its CI, and the collector's outbound requests keep their securit
   9. The collector reads at most `http.max_response_bytes` from one OpenAlex or arXiv response, and refuses an arXiv feed with a document type declaration (ADR 0074).
   10. New dependency versions wait before they are used: Dependabot waits seven days after a release, pnpm resolves only versions at least three days old, and `packageManager` pins pnpm with its hash (ADR 0074).
   11. A failure reason in an alert cannot notify a GitHub account: `@name` is broken up before the text leaves the pipeline.
-  12. Only the deploy workflows read `ERASURE_HASH_KEY`, and no Worker has a route or custom domain outside local and preview until the phase 4 authentication pull request lifts that rule after its security review. `scripts/check-hardening.py` fails otherwise (rules 14 and 15, ADR 0120).
-  13. The staging and production Workers redact query strings in their traces, because a publisher's PDF URL can carry a signed download token (ADR 0118).
+  12. Only the deploy workflows read `ERASURE_HASH_KEY`, and no Worker has a route or custom domain outside local and preview unless the script lists it with the ADR of its authentication. `scripts/check-hardening.py` fails otherwise (rules 14 and 15, ADR 0123).
+  13. The staging and production Workers redact query strings in their traces, because a publisher's PDF URL can carry a signed download token (ADR 0121).
 - Verification: `scripts/check-hardening.py` in CI, unit tests, and code review. Required reviewers on the GitHub environment `staging` and required status checks on `main` are repository settings; [operations](../../operations.md) lists them for the quarterly review.
 

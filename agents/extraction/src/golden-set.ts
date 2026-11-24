@@ -118,7 +118,7 @@ export function loadThreshold(name: "triage" | "extraction", dir: string = EVALS
 }
 
 /**
- * The adversarial injection set (REQ-NFR-006 AC3, ADR 0119): each owner-labelled entry with one
+ * The adversarial injection set (REQ-NFR-006 AC3, ADR 0122): each owner-labelled entry with one
  * payload of the corpus appended to its abstract, in turn. The labels are kept, because an
  * instruction in the text must not change the signals, the decision, or the candidates; the
  * original text stays whole, so every labelled quote is still verbatim.

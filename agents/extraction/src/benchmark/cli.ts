@@ -111,7 +111,7 @@ export const BENCHMARK_USAGE = [
   "--dry-run answers with the golden-set labels",
   "and needs no credentials. `all` is triage and extraction; `analysis` is the three analysis steps.",
   "--injection runs triage and extraction on the adversarial set: every entry with a planted",
-  "instruction appended to its abstract and its labels unchanged (REQ-NFR-006, ADR 0119).",
+  "instruction appended to its abstract and its labels unchanged (REQ-NFR-006, ADR 0122).",
 ].join("\n");
 
 export type BenchmarkArgs = {
@@ -131,7 +131,7 @@ export type BenchmarkArgs = {
   /** Stream responses, so a slow reasoning model is not cut off by a proxy (ADR 0076). */
   Stream: boolean;
   DryRun: boolean;
-  /** Triage and extraction on the adversarial injection set (REQ-NFR-006, ADR 0119). */
+  /** Triage and extraction on the adversarial injection set (REQ-NFR-006, ADR 0122). */
   Injection: boolean;
   /** The benchmark ID of a stopped round to continue, or null for a new round. */
   Resume: string | null;
@@ -142,7 +142,7 @@ export type StoredRun = {
   Plan: BenchmarkPlan;
   Limit: number | null;
   PriceTableVersion: string;
-  /** Absent in rounds stored before ADR 0119, which ran on the plain sets. */
+  /** Absent in rounds stored before ADR 0122, which ran on the plain sets. */
   Injection?: boolean;
 };
 
@@ -490,7 +490,7 @@ export async function runBenchmarkCommand(
   const runs = plan.Runs;
   const limit = stored.Limit ?? undefined;
   const has = (step: BenchmarkStep): boolean => plan.Steps.includes(step);
-  // The adversarial set keeps the labels and appends a planted instruction (ADR 0119).
+  // The adversarial set keeps the labels and appends a planted instruction (ADR 0122).
   const planted = <T extends TriageEntry | ExtractionEntry>(entries: T[]): T[] =>
     stored.Injection === true ? withInjections(entries) : entries;
   const sets: GoldenSets = {

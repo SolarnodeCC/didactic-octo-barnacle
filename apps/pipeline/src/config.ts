@@ -46,7 +46,7 @@ export type IngestConfig = {
     /**
      * Hosts allowed with their subdomains. Empty means no suffix rule; whether any other
      * public host may be fetched depends on the environment, see `pdfHostPolicy`
-     * (REQ-DATA-010 AC4, ADR 0116).
+     * (REQ-DATA-010 AC4, ADR 0119).
      */
     AllowedHosts: readonly string[];
     /**
@@ -83,7 +83,7 @@ export const DEFAULT_INGEST_CONFIG: IngestConfig = {
 
 /**
  * Environments where the PDF fetcher may reach any public host: the developer's machine
- * and the preview Worker, which is not deployed (ADR 0116). Any other name, including a
+ * and the preview Worker, which is not deployed (ADR 0119). Any other name, including a
  * misspelled one, gets the allowlist and fails closed.
  */
 const OPEN_PDF_ENVIRONMENTS: ReadonlySet<string> = new Set(["local", "preview"]);
@@ -92,7 +92,7 @@ const OPEN_PDF_ENVIRONMENTS: ReadonlySet<string> = new Set(["local", "preview"])
 const PROVEN_PDF_HOSTS: ReadonlySet<string> = new Set(PDF_PROVEN_HOSTS);
 
 /**
- * The PDF host rules of an environment (REQ-DATA-010 AC4, ADR 0116). Staging and
+ * The PDF host rules of an environment (REQ-DATA-010 AC4, ADR 0119). Staging and
  * production fetch only from hosts that have already served a stored PDF
  * (`documents/pdf-proven-hosts.json`, exact names) and from `pdf.allowed_hosts`; every
  * other host is refused and logged by name, so it can be reviewed and added.

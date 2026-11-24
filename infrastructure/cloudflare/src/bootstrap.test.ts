@@ -77,7 +77,7 @@ describe("REQ-NFR-020: Durable Object namespaces are left to the Worker deploy",
   });
 });
 
-describe("REQ-NFR-003: drift includes AI Gateways with authentication off (ADR 0117)", () => {
+describe("REQ-NFR-003: drift includes AI Gateways with authentication off (ADR 0120)", () => {
   it("REQ-NFR-003: an existing gateway with Authenticated false is unauthenticated drift", () => {
     const drift = reportDrift("production", [
       { Kind: "ai-gateway", Name: "roi-production", Authenticated: false },

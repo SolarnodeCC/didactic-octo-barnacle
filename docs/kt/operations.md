@@ -3,7 +3,7 @@ title: Operations
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-11-24
-related: [REQ-NFR-001, REQ-NFR-005, REQ-NFR-008, REQ-NFR-015, REQ-NFR-017, REQ-ADM-001, REQ-ADM-002]
+related: [REQ-NFR-001, REQ-NFR-005, REQ-NFR-008, REQ-NFR-015, REQ-NFR-017, REQ-ADM-001, REQ-ADM-002, REQ-REV-005]
 ---
 
 # Operations
@@ -55,6 +55,17 @@ The bootstrap script creates D1, R2, two Queues, one for pages and one for PDF d
 
 Staging is deployed by `.github/workflows/staging-deploy.yml`, run from `main` only. `.github/workflows/staging-pipeline.yml` starts it automatically, as a run of its own, when `CI` and `Configuration` are green for the newest commit of `main`; the deploy first stops if a resource is missing, and the pull request approval is the gate (ADR 0046). You can also run it by hand. It builds, applies pending database migrations (unless switched off), and uploads the Worker together with its secrets in one version (`wrangler deploy --secrets-file`), so the Worker never runs without its erasure key. The workflow then lists the live deployment. Production is released weekly by `.github/workflows/production-release.yml`: a planner picks the newest commit of `main` whose changes ran on staging for the soak time (`RELEASE_SOAK_HOURS`, default 48), have no open `Depends on #N`, no `hold` label, and no drop or rename migration without `contract-ok`, and it starts `production-deploy.yml` as a run of its own, which deploys that commit and tags it `release-<date>-<sha>` (ADR 0044, ADR 0046). A run by hand is a dry run unless `dry_run` is off, and nothing deploys until the variable `PRODUCTION_AUTO_RELEASE` is `true` after the launch checklist. A failed release opens an `alert` issue, which pauses releases until it is closed. Database migrations are plain SQL files that `wrangler d1 migrations` applies before the Worker that needs them (ADR 0020, REQ-NFR-020). A rollback redeploys the previous Worker version via Wrangler rollback or re-deploy of the prior git tag; migrations are written expand/contract so the previous version still works with the new schema. Vectorize index rebuilds are a separate runbook step after a restore.
 
+### Owner review tool
+
+The owner review tool (`apps/review`, ADR 0116, REQ-REV-001 to REQ-REV-005) is deployed to staging only, at `review.wispel.cc`, by `.github/workflows/review-deploy.yml` (by hand, from `main`, environment `staging`). It reads the staging D1 database and writes only `output_review`; migration 0014 ships with the normal staging deploy, so run `Staging deploy` first. Before the first deploy, the owner:
+
+1. Creates a self-hosted Cloudflare Access application for `review.wispel.cc` with one policy that allows only the owner's email address.
+2. Sets the variables `REVIEW_ACCESS_TEAM_DOMAIN` (for example `<team>.cloudflareaccess.com`) and `REVIEW_ACCESS_AUD` (the application's audience tag) in the GitHub environment `staging`. They are not secrets. The workflow stops when either is missing and passes both to the Worker as `ACCESS_TEAM_DOMAIN` and `ACCESS_AUD`; a Worker without them refuses every API request.
+3. Removes any custom domain on `wispel.cc` itself from `roi-pipeline-staging`; the pipeline Worker has no public route (REQ-NFR-021), and the bare domain is reserved for the product (ADR 0026).
+4. Gives the staging `CLOUDFLARE_API_TOKEN` the permission to edit Workers routes on the `wispel.cc` zone, so the deploy can attach the custom domain.
+
+The tool shows triage and extraction output only where processing is on (`PROCESSING_ENABLED`). Locally, `pnpm --filter @roi/review dev` builds the app, applies the migrations to the pipeline's local D1, and serves it on `wrangler dev` with a development bypass of the Access check that only the `local` environment allows; `pnpm --filter @roi/review seed:local` loads sample output (`apps/review/seed/local.sql`).
+
 Do not use Cloudflare Workers Builds to deploy `roi-pipeline-staging` (including Preview builds with `npx wrangler preview`). That path skips migrations and the secrets-file upload. Keep Workers Builds **Preview Builds** off for that Worker; staging stays on the GitHub Actions workflow above. The Wrangler `[env.preview]` environment in `infrastructure/cloudflare/wrangler.toml` is separate and remains for on-request preview deploys when that environment exists.
 
 Settings outside the repository cannot be checked by `scripts/check-hardening.py`. Review them every quarter and after any change of owners (REQ-NFR-021, ADR 0033). The owner last confirmed the environment branch limits, secret scanning with push protection, private vulnerability reporting, and the private repository on 2026-11-10:
@@ -71,8 +82,8 @@ Settings outside the repository cannot be checked by `scripts/check-hardening.py
 | Cloudflare API token | Least permissions for the environment (see the secrets table); one token per environment (ADR 0046, ADR 0074) |
 | Repository visibility | Private while alert issues are opened here: they hold run IDs, failure reasons, and host names (REQ-NFR-019). Move `ALERT_GITHUB_REPO` to a private operations repository before this one is made public |
 | Workers Builds on `roi-pipeline-staging` | Preview Builds off; no automatic deploy that replaces Staging deploy |
-| Authenticated Gateway on `roi-staging` and `roi-production` | On; the bootstrap drift check fails when it is off (ADR 0117), so a failed `Staging deploy` names the gateway to fix |
-| Who can read `ERASURE_HASH_KEY` and the erasure list | Admins of the GitHub environments, holders of the offline copy, and Cloudflare account members with D1 read: list them and remove anyone who no longer needs it (ADR 0120) |
+| Authenticated Gateway on `roi-staging` and `roi-production` | On; the bootstrap drift check fails when it is off (ADR 0120), so a failed `Staging deploy` names the gateway to fix |
+| Who can read `ERASURE_HASH_KEY` and the erasure list | Admins of the GitHub environments, holders of the offline copy, and Cloudflare account members with D1 read: list them and remove anyone who no longer needs it (ADR 0123) |
 
 Set these in the GitHub environment `staging` before the first run:
 
@@ -108,8 +119,8 @@ Cron expressions (UTC) are in [defaults](architecture/defaults.md).
 - Every ingestion and pipeline run writes a run report with counts and failures (REQ-NFR-008).
 - A failed scheduled run, a run that exceeds its time window, a budget stop, a dead-lettered message, or a breach of the availability target (REQ-NFR-017) raises an alert (REQ-NFR-019). An alert sends an email to the ops address and opens a GitHub issue labeled `alert`; repeats within 24 hours comment on the open issue.
 - The staging and production Workers keep every log line and trace in Workers Observability, with issue detection on (REQ-NFR-008, ADR 0077).
-- AI Gateway shows tokens, cost, and latency per agent (REQ-NFR-003). The Worker calls it through its Workers AI binding, which needs no gateway token; every gateway has Authenticated Gateway on (ADR 0117).
-- Query strings are redacted in staging and production traces (ADR 0118); the pipeline's log lines name hosts, not URLs.
+- AI Gateway shows tokens, cost, and latency per agent (REQ-NFR-003). The Worker calls it through its Workers AI binding, which needs no gateway token; every gateway has Authenticated Gateway on (ADR 0120).
+- Query strings are redacted in staging and production traces (ADR 0121); the pipeline's log lines name hosts, not URLs.
 
 ## Runbooks
 
@@ -122,8 +133,8 @@ Severity: **SEV1** production down or data loss risk; **SEV2** ingestion or pipe
 | The daily budget is reached | SEV2 | Check cost per opportunity in AI Gateway before raising the budget (ADR 0023). |
 | Bad output reached the dashboard | SEV3 | Hide the opportunity in Operations (REQ-ADM-001), add the case to the golden set, and fix the prompt through a pull request with evals. |
 | Candidates failed or are incomplete | SEV3 | Open Pipeline health and rerun them from the first failed step (REQ-ADM-002). Check the budget first. |
-| PDFs of a new host are refused (`document.refused` with code `blocked-url`) | SEV3 | Staging and production fetch only allowlisted hosts (ADR 0116). Count the refusals by `host` and `refusedHost`; for a host that serves open access PDFs, add it to `apps/pipeline/src/documents/pdf-proven-hosts.json` (sorted, exact name) or a curated domain to `pdf.allowed_hosts`, through a pull request. The next run that stores the publication queues the PDF again. |
-| A deploy stops on an AI Gateway with authentication off | SEV2 | Turn on Authenticated Gateway for the named gateway in the Cloudflare dashboard (AI, AI Gateway, the gateway, Settings) and rerun `Staging deploy`. The Worker's binding keeps working; HTTP clients need a gateway token (ADR 0117). |
+| PDFs of a new host are refused (`document.refused` with code `blocked-url`) | SEV3 | Staging and production fetch only allowlisted hosts (ADR 0119). Count the refusals by `host` and `refusedHost`; for a host that serves open access PDFs, add it to `apps/pipeline/src/documents/pdf-proven-hosts.json` (sorted, exact name) or a curated domain to `pdf.allowed_hosts`, through a pull request. The next run that stores the publication queues the PDF again. |
+| A deploy stops on an AI Gateway with authentication off | SEV2 | Turn on Authenticated Gateway for the named gateway in the Cloudflare dashboard (AI, AI Gateway, the gateway, Settings) and rerun `Staging deploy`. The Worker's binding keeps working; HTTP clients need a gateway token (ADR 0120). |
 | A message is dead-lettered | SEV3 | An alert names the message and its run. Inspect `payload_json` and `last_error` in `queue_message_log`, fix the cause, and replay it with `replayDeadLetter` (REQ-DATA-011; the route `POST /admin/queue/replay` comes with the admin API in phase 4). |
 | An author asks for erasure | SEV3 | Follow the erasure process in [privacy](architecture/privacy.md) (REQ-NFR-016): find the author records, erase each with `eraseAuthor`, and answer within one month. The route `POST /admin/authors/:id/erase` comes with the admin API in phase 4. |
 | Availability below 99.5% (REQ-NFR-017) | SEV1 | Check Workers/D1 status, last deploy, and error rate; roll back Worker if the last deploy correlates; open a SEV1 issue. |

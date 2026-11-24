@@ -1,12 +1,12 @@
 ---
-title: "0116: Staging and production fetch PDFs only from allowlisted hosts"
+title: "0119: Staging and production fetch PDFs only from allowlisted hosts"
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-11-24
 related: [REQ-DATA-010, REQ-NFR-021]
 ---
 
-# 0116: Staging and production fetch PDFs only from allowlisted hosts
+# 0119: Staging and production fetch PDFs only from allowlisted hosts
 
 - Decision status: Accepted
 - Date: 2026-11-24

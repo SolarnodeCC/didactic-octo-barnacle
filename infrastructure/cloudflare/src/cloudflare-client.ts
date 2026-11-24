@@ -177,7 +177,7 @@ export function createCloudflareClient(options: CloudflareClientOptions): Resour
         }
       }
       // Authenticated Gateway is read with the gateway: anything but `true` counts as off,
-      // so a changed or missing field fails the drift check instead of passing it (ADR 0117).
+      // so a changed or missing field fails the drift check instead of passing it (ADR 0120).
       const gateways = await listPages(
         "/ai-gateway/gateways",
         (result) => (result as Array<{ id?: string; authentication?: unknown }>) ?? [],
@@ -226,7 +226,7 @@ export function createCloudflareClient(options: CloudflareClientOptions): Resour
         case "ai-gateway":
           await call("POST", "/ai-gateway/gateways", {
             id: resource.Name,
-            // Only callers with a gateway token, or a Worker binding, can spend (ADR 0117).
+            // Only callers with a gateway token, or a Worker binding, can spend (ADR 0120).
             authentication: true,
             cache_ttl: 0,
             cache_invalidate_on_update: false,

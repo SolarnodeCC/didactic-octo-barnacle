@@ -8,7 +8,7 @@ related: [REQ-API-001, REQ-API-002, REQ-API-003, REQ-API-004, REQ-API-005, REQ-A
 
 # API route catalog
 
-Concrete routes for `apps/api`. Request and response bodies are Zod schemas in `packages/models` (REQ-API-003). OpenAPI is generated from those schemas and committed (REQ-API-005). This catalog is the source of path and method names until the OpenAPI file exists in code.
+Concrete routes for `apps/api`. In phase 2 only `GET /api/v1/opportunities/:id` exists, without authentication and in local and preview only, with the shape of `OpportunityDetailSchema`: publication, candidate, agent outputs with evidence, and the current score (ADR 0058, ADR 0117). Phase 4 adds authentication, the other routes, and the remaining detail fields without changing that shape. Request and response bodies are Zod schemas in `packages/models` (REQ-API-003). OpenAPI is generated from those schemas and committed (REQ-API-005). This catalog is the source of path and method names until the OpenAPI file exists in code.
 
 ## Conventions
 

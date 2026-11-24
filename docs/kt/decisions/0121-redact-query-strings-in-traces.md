@@ -1,12 +1,12 @@
 ---
-title: "0118: Staging and production redact query strings in traces"
+title: "0121: Staging and production redact query strings in traces"
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-11-24
 related: [REQ-NFR-008, REQ-NFR-021]
 ---
 
-# 0118: Staging and production redact query strings in traces
+# 0121: Staging and production redact query strings in traces
 
 - Decision status: Accepted
 - Date: 2026-11-24

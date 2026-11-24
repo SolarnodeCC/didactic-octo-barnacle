@@ -12,9 +12,12 @@
     "test:coverage": "vitest run --coverage",
     "scope-lookup": "node ./dist/scope/lookup-cli.js",
     "scope-sync": "node ./dist/scope/sync-cli.js",
-    "measure:pdf-text": "node ./dist/documents/measure-pdf-text.js"
+    "measure:pdf-text": "node ./dist/documents/measure-pdf-text.js",
+    "slice": "node ./dist/slice/cli.js",
+    "load": "node ./dist/load/cli.js"
   },
   "dependencies": {
+    "@roi/api": "workspace:*",
     "@roi/models": "workspace:*",
     "@roi/prompts": "workspace:*",
     "@roi/vector-store": "workspace:*",
@@ -26,7 +29,8 @@
     "@types/better-sqlite3": "^7.6.13",
     "better-sqlite3": "^13.2.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.12"
+    "vitest": "^4.1.12",
+    "yaml": "^2.4.2"
   },
   "bin": {
     "roi-scope-lookup": "./dist/scope/lookup-cli.js",

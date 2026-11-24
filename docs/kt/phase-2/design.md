@@ -19,8 +19,8 @@ Tables, configuration keys, and bindings are in [schema](schema.md). Behavior th
 | `packages/vector-store` (new) | `upsertPublicationVectors`, `deletePublicationVectors`, `searchPublications`, `FakeVectorize` with exact cosine ranking, and the recall-at-10 corpus and evaluator (ADR 0056, ADR 0057). The embedding call itself is `callEmbedding` in `packages/models`, next to `callModel`. The registry rows are read and seeded by the pipeline, which owns the D1 binding; the package takes them as `IndexEntry` values (WP5) |
 | `agents/extraction` | `runExtractionStep`: a pure function from input to validated output through `callModel`; an eval command that runs the existing eval runner on `callModel` for the benchmark. `runTriageStep` and `runExtractionStep` live in `apps/pipeline/src/triage/step.ts` and `apps/pipeline/src/extraction/step.ts` instead, on `@roi/prompts` and `@roi/models`, so the Worker bundle stays free of the benchmark command's dependencies (WP6, WP7). The checks they share with the benchmark are in `packages/models` |
 | `apps/pipeline` | Consumers for embedding, triage, extraction, and text extraction; the admission cron; the retraction check; budget handling; the thin-slice Workflow with stub steps; run-report fields for processing |
-| `apps/api` (new, minimal) | One read-only route for the thin slice (ADR 0058) |
-| `infrastructure/cloudflare` | Migrations 0009, 0010, and 0011; Workers AI, Vectorize, Workflow, and queue bindings; new crons; bootstrap entries for the new queues and the Vectorize metadata indexes; the price table |
+| `apps/api` (new, minimal) | One read-only route for the thin slice (ADR 0058), `GET /api/v1/opportunities/:id`, local and preview only (`apps/api/wrangler.toml`) |
+| `infrastructure/cloudflare` | Migrations 0009 to 0015; Workers AI, Vectorize, Workflow, and queue bindings; new crons; bootstrap entries for the new queues and the Vectorize metadata indexes; the price table |
 
 ## Queues and message types
 
@@ -32,7 +32,7 @@ The queue layout is ADR 0053. Messages carry IDs only, as today.
 | `publication.embed` | `embed:<publicationId>:<indexId>` | Page consumer, for each new or changed publication; backfill command | `roi-embeddings-<env>` (batch up to 50) | Embedding consumer |
 | `publication.triage` | `triage:<publicationId>` | Page consumer, for each new publication | `roi-models-<env>` (batch 1, concurrency 8) | Triage consumer |
 | `publication.extract` | `extract:<publicationId>` | Admission cron | `roi-models-<env>` | Extraction consumer |
-| `candidate.run` | `candidate:<candidateId>` | Extraction consumer, thin slice only in phase 2 | `roi-models-<env>` | Starts one candidate Workflow |
+| `candidate.run` | `candidate:<candidateId>` | The `slice` command, thin slice only in phase 2 (ADR 0117) | `roi-models-<env>` | Starts one candidate Workflow |
 
 Every consumer uses the existing claim in `queue_message_log`, the growing retry delay of ADR 0045, and its queue's dead-letter queue. A message type joins `QueueMessageTypeSchema` in the pull request that adds its producer and consumer.
 
@@ -158,7 +158,7 @@ Memory grows with about twice the file size and with the amount of text. `text.m
   - OpenAlex list endpoints leave retracted works out unless the filter asks for them, so ingestion seldom sees a retraction. The check asks OpenAlex for the retracted works of the window, with the ingestion scope and `is_retracted:true`, paged by number, and flags the stored ones.
   - It looks up the stored arXiv preprints of the window by `id_list`, 100 a page.
   - Each page is a `retraction.check_page` message on the page queue. The run has kind `retraction-check` and ID `rc_<day>`, and counts `OpenAlexRetractedSeen`, `OpenAlexFlagged`, `ArxivChecked`, and `ArxivFlagged`.
-- The daily admission cron starts with a sweep of flagged publications not yet handled. It deletes their vectors from every index, hides their candidates and, from migration 0014 (WP10), their opportunities with `hidden_reason = retracted`, and stamps `retraction_handled_at` (REQ-DATA-008 AC2, AC3; REQ-PROC-002 AC2).
+- The daily admission cron starts with a sweep of flagged publications not yet handled. It deletes their vectors from every index, hides their candidates and, from migration 0015 (WP10), their opportunities with `hidden_reason = retracted`, and stamps `retraction_handled_at` (REQ-DATA-008 AC2, AC3; REQ-PROC-002 AC2).
 - **As built (WP8):** `sweepRetractions` in `apps/pipeline/src/retraction/sweep.ts` runs before the re-drives.
   - It hides the candidates of each flagged publication.
   - It decides a triage decision still awaiting admission as `retracted`, so the publication is never admitted.
@@ -169,11 +169,11 @@ Memory grows with about twice the file size and with the amount of text. `text.m
 
 ## Thin slice
 
-- `pnpm --filter @roi/pipeline slice` starts `wrangler dev` with local bindings and triggers the `slice` cron. The run ingests one fixture publication, triages and extracts it with recorded model responses, and starts one candidate Workflow (REQ-PROC-007 AC1, AC2).
+- `pnpm --filter @roi/pipeline slice` runs the slice in Node with a local SQLite database, the real consumers, and an inline Workflow runner (ADR 0117). The run ingests one fixture publication, triages and extracts it with recorded model responses, and starts one candidate Workflow (REQ-PROC-007 AC1, AC2).
 - The candidate Workflow has the step names of [orchestration](../architecture/orchestration.md). Each step is a stub that returns the matching section of the [examples](../examples/README.md) inside a valid envelope, so phase 3 replaces a step and nothing else (AC3, AC4).
-- The `scoring` step applies a placeholder score model (`score_model.version = placeholder-0`, equal weights) and writes `opportunity` and `score`.
+- The `scoring` step applies a placeholder score model (`score_model.version = placeholder-0`: the rules of ADR 0005 with equal weights) and writes `score`; `candidate.run` writes the `opportunity` (`apps/pipeline/src/candidate/`).
 - The read route returns the opportunity with its publication, candidate, agent outputs, and score. The slice writes a processing run report.
 
 ## Throughput
 
-The largest measured day is about 4,600 publications. The ingestion filters of ADR 0041 and ADR 0048 make most of them in scope, so most reach the triage model. At about 20 requests per minute per paid model ([benchmark plan](../test/model-benchmark-plan.md)), 4,600 triage calls take about four hours, and 100 extractions well under one. A day therefore finishes before the next run (REQ-NFR-010). WP11 checks this with a load test on recorded fixtures and stubbed models, and on the staging days.
+The largest measured day is about 4,600 publications, and most reach the triage model. Triage runs on Gemma at the default 300 requests a minute; the paid extraction model allows 20, so extraction messages are sent 3 s apart (`model.extraction_requests_per_minute`). The load test of ADR 0118 (`pnpm --filter @roi/pipeline load`) runs that day through the real consumers on a virtual clock. Every publication is triaged by 07:35, before the 11:00 admission run, and the 100 admitted are extracted by 11:06 (REQ-NFR-010). The staging days confirm the times.

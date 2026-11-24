@@ -1,5 +1,5 @@
 /**
- * Adversarial payloads for REQ-NFR-006 AC3 (ADR 0119): instructions an attacker could plant in
+ * Adversarial payloads for REQ-NFR-006 AC3 (ADR 0122): instructions an attacker could plant in
  * an abstract or full text. The contract tests send every payload through every prompt
  * builder, and the injection eval appends them to owner-labelled golden-set entries, whose
  * labels must not change.

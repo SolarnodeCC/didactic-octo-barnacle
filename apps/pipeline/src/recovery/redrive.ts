@@ -5,6 +5,7 @@ import { addRunCounts, addRunFailures } from "./redrive-repo.js";
 import {
   embedEnvelope,
   extractEnvelope,
+  pacedDelaySeconds,
   triageEnvelope,
   type PipelineDeps,
 } from "../queue/deps.js";
@@ -51,6 +52,8 @@ type RedriveSpec = {
   Usage: ModelUsageStore;
   /** Prefix of the run-report counts, so the steps do not add into the same keys. */
   CountPrefix: "" | "Extraction" | "Embedding";
+  /** The step model's request limit; re-driven messages are sent spaced to it (ADR 0118). */
+  RequestsPerMinute?: number;
 };
 
 /**
@@ -105,6 +108,9 @@ export async function redriveExtraction(deps: PipelineDeps, day: string): Promis
     Queue: extraction.Queue,
     Usage: extraction.Call.Usage,
     CountPrefix: "Extraction",
+    ...(extraction.RequestsPerMinute === undefined
+      ? {}
+      : { RequestsPerMinute: extraction.RequestsPerMinute }),
   });
 }
 
@@ -219,7 +225,8 @@ async function redriveStep(
         "UPDATE redrive SET count = count + 1, last_attempt_at = ?, updated_at = ? WHERE id = ?",
       ).bind(now, now, row.id),
     ]);
-    await spec.Queue.send(envelope);
+    const delaySeconds = pacedDelaySeconds(counts.Redriven, spec.RequestsPerMinute);
+    await spec.Queue.send(envelope, delaySeconds > 0 ? { delaySeconds } : undefined);
     counts.Redriven += 1;
   }
 

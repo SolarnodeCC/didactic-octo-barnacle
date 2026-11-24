@@ -2,7 +2,7 @@
 title: Decisions index
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-21
+last_reviewed: 2026-11-24
 ---
 
 # Architecture decision records
@@ -124,11 +124,14 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0113](0113-phase-2-budget-from-benchmark-and-measured-cost.md) | The phase 2 budget is priced from the benchmark cost, then from the measured cost | Accepted |
 | [0114](0114-cost-per-publication-and-per-opportunity.md) | Cost per publication and per opportunity in the processing run report | Accepted |
 | [0115](0115-quality-section-as-built.md) | The daily quality section: metrics, stored values, and the drift rule as built | Accepted |
-| [0116](0116-pdf-allowlist-in-deployed-environments.md) | Staging and production fetch PDFs only from allowlisted hosts | Accepted |
-| [0117](0117-authenticated-gateway-checked-by-bootstrap.md) | Bootstrap creates and checks every AI Gateway with authentication on | Accepted |
-| [0118](0118-redact-query-strings-in-traces.md) | Staging and production redact query strings in traces | Accepted |
-| [0119](0119-hard-checks-against-planted-instructions.md) | Hard checks and an adversarial set against planted instructions | Accepted |
-| [0120](0120-erasure-key-and-route-gates.md) | Gates for the erasure-list key and for routes before authentication | Accepted |
+| [0116](0116-owner-review-frontend.md) | An owner review tool on Workers behind Cloudflare Access | Accepted |
+| [0117](0117-thin-slice-runs-in-process.md) | The thin slice runs in-process with stub steps and a placeholder score model | Accepted |
+| [0118](0118-load-test-on-a-virtual-clock.md) | The throughput load test runs the real consumers on a virtual clock, and extraction is paced | Accepted |
+| [0119](0119-pdf-allowlist-in-deployed-environments.md) | Staging and production fetch PDFs only from allowlisted hosts | Accepted |
+| [0120](0120-authenticated-gateway-checked-by-bootstrap.md) | Bootstrap creates and checks every AI Gateway with authentication on | Accepted |
+| [0121](0121-redact-query-strings-in-traces.md) | Staging and production redact query strings in traces | Accepted |
+| [0122](0122-hard-checks-against-planted-instructions.md) | Hard checks and an adversarial set against planted instructions | Accepted |
+| [0123](0123-erasure-key-and-route-gates.md) | Gates for the erasure-list key and for routes before authentication | Accepted |
 
 ## When an ADR is needed
 

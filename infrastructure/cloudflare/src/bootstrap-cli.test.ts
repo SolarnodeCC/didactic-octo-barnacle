@@ -75,7 +75,7 @@ describe("REQ-NFR-020: bootstrap CLI", () => {
     expect(clean.errors).toEqual([]);
   });
 
-  it("REQ-NFR-003: --fail-on-drift exits 3 when an AI Gateway has Authenticated Gateway off (ADR 0117)", async () => {
+  it("REQ-NFR-003: --fail-on-drift exits 3 when an AI Gateway has Authenticated Gateway off (ADR 0120)", async () => {
     const h = harness();
     h.deps.Bootstrap = vi.fn(() =>
       Promise.resolve({

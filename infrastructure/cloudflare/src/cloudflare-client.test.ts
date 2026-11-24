@@ -291,7 +291,7 @@ describe("REQ-NFR-020: Cloudflare bootstrap client", () => {
   });
 });
 
-describe("REQ-NFR-003: AI Gateways are created and checked with Authenticated Gateway on (ADR 0117)", () => {
+describe("REQ-NFR-003: AI Gateways are created and checked with Authenticated Gateway on (ADR 0120)", () => {
   const client = (account: ReturnType<typeof fakeAccount>) =>
     createCloudflareClient({ AccountId: ACCOUNT, ApiToken: TOKEN, Fetch: account.fetchFn });
 

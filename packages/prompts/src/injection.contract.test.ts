@@ -84,7 +84,7 @@ const BUILDERS: Array<[string, (payload: string) => { System: string; User: stri
   ],
 ];
 
-describe("REQ-NFR-006: every prompt keeps the adversarial corpus inside one data block (ADR 0119)", () => {
+describe("REQ-NFR-006: every prompt keeps the adversarial corpus inside one data block (ADR 0122)", () => {
   it("REQ-NFR-006: the corpus covers tag break-out, field names, fabricated quotes, JSON, and plain overrides", () => {
     expect(INJECTION_PAYLOADS.length).toBeGreaterThanOrEqual(8);
     expect(INJECTION_PAYLOADS.some((p) => p.includes("</publication>"))).toBe(true);

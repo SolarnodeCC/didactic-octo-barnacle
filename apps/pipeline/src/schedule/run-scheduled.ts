@@ -29,10 +29,15 @@ export async function runScheduled(
     await redriveTriage(deps, day);
     // Re-driven extractions count toward the day's limit, so they go before the admission
     // (REQ-PROC-010 AC3).
-    await redriveExtraction(deps, day);
+    const redriven = await redriveExtraction(deps, day);
     await redriveEmbedding(deps, day);
     await admitDay(deps, day);
-    await queueAdmittedExtractions(deps, day);
+    // Admitted extractions are paced after the re-driven ones (ADR 0118).
+    await queueAdmittedExtractions(
+      deps,
+      day,
+      redriven.Outcome === "redriven" ? redriven.Counts.Redriven : 0,
+    );
     // A new embedding index fills a little more each day until its backfill is done (ADR 0056).
     await continueEmbeddingBackfills(deps, day);
     return null;

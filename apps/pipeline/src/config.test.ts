@@ -27,7 +27,7 @@ describe("REQ-DATA-011: the PDF give-up point matches the document queue", () =>
   });
 });
 
-describe("REQ-DATA-010: deployed environments fetch PDFs only from allowlisted hosts (ADR 0116)", () => {
+describe("REQ-DATA-010: deployed environments fetch PDFs only from allowlisted hosts (ADR 0119)", () => {
   it.each(["staging", "production"])(
     "REQ-DATA-010: %s requires the allowlist and allows the proven hosts",
     (environment) => {

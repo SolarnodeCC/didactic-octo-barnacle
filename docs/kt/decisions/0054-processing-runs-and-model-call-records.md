@@ -39,3 +39,7 @@ Option 2.
 - Cost per publication and per opportunity can be reported per processing run (REQ-NFR-005 AC3).
 - The planned `pipeline_run.cost_eur` becomes `cost_amount` and `cost_currency` in migration 0010, to match `Money`.
 - Neither table holds prompt or publication text (REQ-NFR-011 AC3).
+
+## Later changes
+
+- 2026-11-23: The pipeline tables arrived in migration 0015, not 0010, because migrations 0010 to 0014 went to cached input tokens, recovery, the processing report, quality monitoring, and output review ([ADR 0117](0117-thin-slice-runs-in-process.md)).

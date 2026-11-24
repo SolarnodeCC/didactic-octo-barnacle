@@ -1,5 +1,5 @@
 /**
- * Hard checks against instructions planted in publication text (REQ-NFR-006 AC3, ADR 0119).
+ * Hard checks against instructions planted in publication text (REQ-NFR-006 AC3, ADR 0122).
  *
  * The prompt tells the model that the delimited publication is data (soft control). These
  * checks are code: a candidate whose quote carries an instruction aimed at this pipeline is
@@ -65,7 +65,7 @@ function containsDelimiter(text: string): boolean {
   return false;
 }
 
-/** True when the text carries an instruction aimed at this pipeline (ADR 0119). */
+/** True when the text carries an instruction aimed at this pipeline (ADR 0122). */
 export function containsPlantedInstruction(text: string): boolean {
   return containsDelimiter(text) || FIELD_NAME.test(text);
 }
