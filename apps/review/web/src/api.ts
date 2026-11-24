@@ -1,4 +1,6 @@
 import type {
+  ReviewQueueResponse,
+  ReviewTargetKind,
   CurrentVerdict,
   RecordVerdictRequest,
   ReviewDetailResponse,
@@ -67,6 +69,21 @@ export function recordVerdict(body: RecordVerdictRequest): Promise<CurrentVerdic
 
 export function getStats(): Promise<ReviewStatsResponse> {
   return request("/api/review/stats");
+}
+
+export function getQueue(day?: string): Promise<ReviewQueueResponse> {
+  return request(`/api/review/queue${day ? `?day=${encodeURIComponent(day)}` : ""}`);
+}
+
+export function undoVerdict(
+  kind: ReviewTargetKind,
+  id: string,
+): Promise<{ Current: CurrentVerdict | null }> {
+  return request("/api/review/undo", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ TargetKind: kind, TargetId: id }),
+  });
 }
 
 export const EXPORT_PATH = "/api/review/export";

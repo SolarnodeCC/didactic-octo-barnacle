@@ -1,6 +1,7 @@
 import { AccessVerifier, normaliseTeamDomain } from "./access.js";
 import { handleApi, type Authenticator } from "./app.js";
 import { errorResponse } from "./http.js";
+import { sampleSize } from "./queue.js";
 import { type SqlDatabase } from "./sql.js";
 
 /**
@@ -15,6 +16,8 @@ export type Env = {
   ACCESS_AUD?: string;
   /** Local development only: a fixed reviewer subject instead of an Access token. */
   ACCESS_DEV_SUBJECT?: string;
+  /** `review.daily_sample`: publications in the daily review queue (REQ-REV-006). */
+  REVIEW_DAILY_SAMPLE?: string;
 };
 
 // Not `fetch` itself: calling it detached from the global scope fails in Workers.
@@ -60,6 +63,7 @@ export default {
       Authenticate: authenticator(env),
       NewId: () => crypto.randomUUID(),
       Now: () => new Date().toISOString(),
+      SampleSize: sampleSize(env.REVIEW_DAILY_SAMPLE),
     });
   },
 };

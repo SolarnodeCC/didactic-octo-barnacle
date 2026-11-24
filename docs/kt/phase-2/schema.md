@@ -70,9 +70,20 @@ Migration 0011 is `infrastructure/cloudflare/migrations/0011_recovery.sql` (WP6;
 
 `output_review` (`id`, `target_kind` (`triage`, `candidate`), `target_id`, `publication_id`, `verdict` (`correct`, `incorrect`, `unsure`), `corrected` (at most 2,000 characters), `note` (at most 500 characters), `reviewer_opaque`, `model`, `prompt_version`, `created_at`; index (`target_kind`, `target_id`, `created_at`) and (`publication_id`, `created_at`)): the verdicts of the owner review tool (ADR 0116, REQ-REV-003). The newest row per target is the current verdict. Only `apps/review` writes it; the pipeline never reads it. Migration 0014 is `infrastructure/cloudflare/migrations/0014_output_review.sql` and is expand-only.
 
-## Migration 0015: thin slice
+## Migration 0015: review queue
 
-ADR 0054 planned this migration as 0010; it became 0011 when migration 0010 went to cached input tokens (ADR 0078), 0012 when migration 0011 went to recovery (WP6), 0014 when migrations 0012 and 0013 went to the processing report and quality monitoring (WP9), and 0015 when 0014 went to output review (ADR 0116).
+Migration 0015 is `infrastructure/cloudflare/migrations/0015_review_queue.sql` (ADR 0117; REQ-REV-006 to REQ-REV-008). It is expand-only, and only `apps/review` reads or writes what it adds.
+
+| Table or column | Columns | Notes |
+|---|---|---|
+| `output_review.tags_json` | | Error tags of the verdict as a JSON array (`tags-v1`); `[]` for rows written before it |
+| `output_review.corrected_json` | | Structured correction as JSON: corrected triage signals or changed candidate fields |
+| `output_review.withdrawn_at` | | Set by undo; the newest verdict per target that is not withdrawn is current |
+| `review_sample` | `day`, `publication_id`, `stratum`, `position`, `created_at` | PRIMARY KEY (`day`, `publication_id`); index (`day`, `position`). The daily sample, drawn once and topped up, never reshuffled |
+
+## Migration 0016: thin slice
+
+ADR 0054 planned this migration as 0010; it became 0011 when migration 0010 went to cached input tokens (ADR 0078), 0012 when migration 0011 went to recovery (WP6), 0014 when migrations 0012 and 0013 went to the processing report and quality monitoring (WP9), 0015 when 0014 went to output review (ADR 0116), and 0016 when 0015 went to the review queue (ADR 0117).
 
 The tables of schema migration 0001 for the pipeline, with these changes:
 

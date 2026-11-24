@@ -1,7 +1,14 @@
-import { RecordVerdictRequestSchema, ReviewListQuerySchema } from "@roi/models";
+import {
+  RecordVerdictRequestSchema,
+  REVIEW_DAILY_SAMPLE_DEFAULT,
+  ReviewListQuerySchema,
+  ReviewQueueQuerySchema,
+  UndoVerdictRequestSchema,
+} from "@roi/models";
 
 import { ACCESS_HEADER, type AccessIdentity } from "./access.js";
 import { errorResponse, json, jsonLines, sameOrigin } from "./http.js";
+import { getQueue } from "./queue.js";
 import { type SqlDatabase } from "./sql.js";
 import {
   CursorError,
@@ -10,6 +17,7 @@ import {
   listPublications,
   recordVerdict,
   reviewStats,
+  undoVerdict,
 } from "./store.js";
 
 /**
@@ -25,6 +33,8 @@ export type AppDeps = {
   Authenticate: Authenticator | null;
   NewId: () => string;
   Now: () => string;
+  /** Publications in the daily review sample (REQ-REV-006). */
+  SampleSize?: number;
 };
 
 const PUBLICATION_PATH = /^\/api\/review\/publications\/([^/]+)$/u;
@@ -95,7 +105,7 @@ export async function handleApi(request: Request, deps: AppDeps): Promise<Respon
       : errorResponse("not-found", "no triaged publication with this ID");
   }
 
-  if (path === "/api/review/verdicts") {
+  if (path === "/api/review/verdicts" || path === "/api/review/undo") {
     if (method !== "POST") return errorResponse("method-not-allowed", "use POST");
     if (!sameOrigin(request)) {
       return errorResponse("forbidden", "the Origin header must match this site");
@@ -106,14 +116,42 @@ export async function handleApi(request: Request, deps: AppDeps): Promise<Respon
     } catch {
       return errorResponse("validation", "the body must be a JSON object of at most 16 KiB");
     }
+    if (path === "/api/review/undo") {
+      const undo = UndoVerdictRequestSchema.safeParse(body);
+      if (!undo.success) {
+        return errorResponse("validation", undo.error.issues.map((i) => i.message).join("; "));
+      }
+      const undone = await undoVerdict(deps, undo.data.TargetKind, undo.data.TargetId);
+      return undone ? json(undone) : errorResponse("not-found", "no verdict to undo");
+    }
     const parsed = RecordVerdictRequestSchema.safeParse(body);
     if (!parsed.success) {
       return errorResponse("validation", parsed.error.issues.map((i) => i.message).join("; "));
     }
-    const stored = await recordVerdict(deps, parsed.data, identity.Subject);
-    return stored
-      ? json(stored, 201)
-      : errorResponse("not-found", `no ${parsed.data.TargetKind} with this ID`);
+    const result = await recordVerdict(deps, parsed.data, identity.Subject);
+    if (result.Kind === "not-found") {
+      return errorResponse("not-found", `no ${parsed.data.TargetKind} with this ID`);
+    }
+    if (result.Kind === "invalid") {
+      return errorResponse("validation", result.Message);
+    }
+    return json(result.Current, 201);
+  }
+
+  if (path === "/api/review/queue") {
+    if (method !== "GET") return errorResponse("method-not-allowed", "use GET");
+    const day = url.searchParams.get("day");
+    const parsed = ReviewQueueQuerySchema.safeParse(day ? { Day: day } : {});
+    if (!parsed.success) {
+      return errorResponse("validation", "day must be YYYY-MM-DD");
+    }
+    return json(
+      await getQueue(deps.Db, {
+        Day: parsed.data.Day,
+        Size: deps.SampleSize ?? REVIEW_DAILY_SAMPLE_DEFAULT,
+        Now: deps.Now(),
+      }),
+    );
   }
 
   if (path === "/api/review/stats") {

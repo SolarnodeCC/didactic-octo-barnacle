@@ -2,7 +2,7 @@
 title: Runtime defaults
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-21
+last_reviewed: 2026-11-24
 related: [REQ-PROC-005, REQ-PROC-006, REQ-AGENT-007, REQ-AGENT-012, REQ-AGENT-013, REQ-DATA-011, REQ-NFR-005]
 ---
 
@@ -119,6 +119,14 @@ Read by `loadProcessingConfig` into `PipelineDeps.Monitor` (WP9, ADR 0071, ADR 0
 | `monitor.drift_band` | `0.5` | Relative move from the median that counts as drift; a median of 0 never alerts |
 | `monitor.min_daily_items` | `20` | Fewest items behind a rate before it can alert |
 | `monitor.near_duplicate_cosine` | `0.92` | Publication-vector cosine for counting possible near-duplicate opportunities |
+
+## Owner review tool (phase 2)
+
+Read by `apps/review` from the Worker variable `REVIEW_DAILY_SAMPLE` (ADR 0117).
+
+| Key | Default | Notes |
+|---|---|---|
+| `review.daily_sample` | `20` | Publications in the daily review queue, between 5 and 100 (REQ-REV-006) |
 
 ## Budgets
 
