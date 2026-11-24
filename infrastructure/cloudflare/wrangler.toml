@@ -135,6 +135,13 @@ index_name = "roi-publications-local"
 [ai]
 binding = "AI"
 
+# The candidate Workflow of the thin slice (REQ-PROC-007, ADR 0117): local and preview only in
+# phase 2. Staging and production get it with the phase 3 agents.
+[[workflows]]
+name = "roi-candidate-local"
+binding = "CANDIDATE_WORKFLOW"
+class_name = "CandidateWorkflow"
+
 [env.preview]
 name = "roi-pipeline-preview"
 vars = { ENVIRONMENT = "preview", BUDGET_EXPECTED_DAILY_TRIAGED = "100", BUDGET_EXPECTED_DAILY_EMBEDDINGS = "100" }
@@ -254,20 +261,26 @@ index_name = "roi-publications-preview"
 [env.preview.ai]
 binding = "AI"
 
+[[env.preview.workflows]]
+name = "roi-candidate-preview"
+binding = "CANDIDATE_WORKFLOW"
+class_name = "CandidateWorkflow"
+
 [env.staging]
 name = "roi-pipeline-staging"
-vars = { ENVIRONMENT = "staging", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo-barnacle", ALERT_EMAIL_FROM = "onboarding@resend.dev", BUDGET_EXPECTED_DAILY_TRIAGED = "4634", BUDGET_EXPECTED_DAILY_EMBEDDINGS = "4634" }
+# Processing is on in staging for the seven staging days of WP11 (ADR 0118); production stays off.
+vars = { ENVIRONMENT = "staging", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-octo-barnacle", ALERT_EMAIL_FROM = "onboarding@resend.dev", BUDGET_EXPECTED_DAILY_TRIAGED = "4634", BUDGET_EXPECTED_DAILY_EMBEDDINGS = "4634", PROCESSING_ENABLED = "true" }
 
 [env.staging.triggers]
 crons = ["0 6 * * *", "30 7 * * *", "0 8 * * 1", "0 11 * * *", "*/30 * * * *"]
 
 # Keep every log line and trace (REQ-NFR-008) so a run can be followed afterwards; the
-# same settings as the dashboard's Observability page (ADR 0077). Outbound query strings
-# carry no secrets (keys go in headers), so they are kept readable.
+# same settings as the dashboard's Observability page (ADR 0077). Query strings are
+# redacted: a publisher's PDF URL can carry a signed download token (ADR 0121).
 [env.staging.observability]
 enabled = true
 head_sampling_rate = 1
-redact_query_string = false
+redact_query_string = true
 
 [env.staging.observability.logs]
 enabled = true
@@ -406,12 +419,12 @@ vars = { ENVIRONMENT = "production", ALERT_GITHUB_REPO = "SolarnodeCC/didactic-o
 crons = ["0 6 * * *", "30 7 * * *", "0 8 * * 1", "0 11 * * *", "*/30 * * * *"]
 
 # Keep every log line and trace (REQ-NFR-008) so a run can be followed afterwards; the
-# same settings as the dashboard's Observability page (ADR 0077). Outbound query strings
-# carry no secrets (keys go in headers), so they are kept readable.
+# same settings as the dashboard's Observability page (ADR 0077). Query strings are
+# redacted: a publisher's PDF URL can carry a signed download token (ADR 0121).
 [env.production.observability]
 enabled = true
 head_sampling_rate = 1
-redact_query_string = false
+redact_query_string = true
 
 [env.production.observability.logs]
 enabled = true

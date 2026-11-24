@@ -1,5 +1,5 @@
--- Migration 0015: the daily review queue, error tags, structured corrections, and undo of the
--- owner review tool (ADR 0117; REQ-REV-006, REQ-REV-007, REQ-REV-008). Additive (expand only):
+-- Migration 0016: the daily review queue, error tags, structured corrections, and undo of the
+-- owner review tool (ADR 0124; REQ-REV-006, REQ-REV-007, REQ-REV-008). Additive (expand only):
 -- new columns with defaults and a new table; the pipeline never reads them (REQ-NFR-020).
 
 -- Error tags of the verdict as a JSON array of tag names (tag list `tags-v1`).

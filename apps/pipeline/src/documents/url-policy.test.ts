@@ -131,6 +131,45 @@ describe("REQ-DATA-010: PDF URL policy", () => {
     expect(refused("https://europepmc.org.evil.com/a.pdf", policy)).toMatch(/allowlist/);
   });
 
+  it("REQ-DATA-010: exact hosts allow only the listed names, not names below them (ADR 0119)", () => {
+    const policy = {
+      AllowedHosts: [],
+      ExactHosts: new Set(["arxiv.org", "jmcms.s3.amazonaws.com"]),
+      RequireAllowlist: true,
+    };
+    expect(checkPdfUrl("https://arxiv.org/pdf/2401.00001", policy).Ok).toBe(true);
+    expect(checkPdfUrl("https://ARXIV.ORG./pdf/2401.00001", policy).Ok).toBe(true);
+    // Anyone can create a bucket whose virtual host sits below a listed bucket.
+    expect(refused("https://evil.jmcms.s3.amazonaws.com/a.pdf", policy)).toMatch(/allowlist/);
+    expect(refused("https://export.arxiv.org/a.pdf", policy)).toMatch(/allowlist/);
+    expect(refused("https://attacker.example/a.pdf", policy)).toMatch(
+      /host attacker\.example is not on the allowlist/,
+    );
+  });
+
+  it("REQ-DATA-010: exact hosts and the suffix allowlist both admit a host (ADR 0119)", () => {
+    const policy = { AllowedHosts: ["europepmc.org"], ExactHosts: new Set(["arxiv.org"]) };
+    expect(checkPdfUrl("https://arxiv.org/a.pdf", policy).Ok).toBe(true);
+    expect(checkPdfUrl("https://files.europepmc.org/a.pdf", policy).Ok).toBe(true);
+    expect(refused("https://example.org/a.pdf", policy)).toMatch(/allowlist/);
+  });
+
+  it("REQ-DATA-010: a required allowlist that is empty fails closed (ADR 0119)", () => {
+    const policy = { AllowedHosts: [], ExactHosts: new Set<string>(), RequireAllowlist: true };
+    expect(refused("https://repository.example.org/a.pdf", policy)).toMatch(/allowlist/);
+  });
+
+  it("REQ-DATA-010: exact hosts never override the hard rules (ADR 0119)", () => {
+    const policy = {
+      AllowedHosts: [],
+      ExactHosts: new Set(["wispel.cc", "10.0.0.1.nip.io", "localhost.example.org"]),
+      RequireAllowlist: true,
+    };
+    expect(refused("https://wispel.cc/a.pdf", policy)).toMatch(/platform's own domain/);
+    expect(refused("https://10.0.0.1.nip.io/a.pdf", policy)).toMatch(/embeds an IP/);
+    expect(refused("https://localhost.example.org/a.pdf", policy)).toMatch(/public name/);
+  });
+
   it("REQ-DATA-010: refuses text that is not a URL", () => {
     expect(refused("not a url")).toMatch(/valid URL/);
     expect(refused("")).toMatch(/valid URL/);

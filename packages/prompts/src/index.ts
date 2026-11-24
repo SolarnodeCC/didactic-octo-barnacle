@@ -1,5 +1,7 @@
 export { CLOSE_TAG, DATA_NOT_INSTRUCTIONS, OPEN_TAG, defuseTags, delimit } from "./delimiters.js";
 
+export { INJECTION_PAYLOADS } from "./injection-corpus.js";
+
 export { modelConfig, type BuiltPrompt, type Sampling } from "./prompt.js";
 
 export {

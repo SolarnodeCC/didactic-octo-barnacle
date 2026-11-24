@@ -4,7 +4,8 @@ import { FakeBucket } from "./test/fake-bucket.js";
 import { FakeQueue } from "./test/fake-queue.js";
 import { makeWork } from "./test/harness.js";
 import { createTestDatabase, type TestDatabase } from "./test/sqlite-d1.js";
-import worker, { type Env } from "./worker.js";
+import worker, { CandidateWorkflow, type Env } from "./worker.js";
+import { candidateRunEnvelope } from "./queue/deps.js";
 
 // The Worker entry wires the real collectors, guard, alert sink, and queue consumer
 // to its bindings. These tests drive it as the runtime does: through the default
@@ -117,5 +118,86 @@ describe("REQ-NFR-002: collector Worker entry", () => {
     };
     expect(run.status).toBe("failed");
     expect(logs.some((line) => line.includes("ERASURE_HASH_KEY must be set"))).toBe(true);
+  });
+});
+
+describe("REQ-PROC-007: the candidate Workflow in the Worker", () => {
+  function seedCandidate(): void {
+    const now = "2026-11-23T10:00:00.000Z";
+    database.Raw.prepare(
+      `INSERT INTO publication (id, title, completeness, created_at, updated_at)
+       VALUES ('pub_w', 'Title', 'complete', ?, ?)`,
+    ).run(now, now);
+    database.Raw.prepare(
+      `INSERT INTO extraction_result (id, publication_id, run_id, model, prompt_version, input_mode,
+         confidence, candidate_count, created_at)
+       VALUES ('ext_w', 'pub_w', 'prun_w', 'm', 'extraction@4', 'abstract', 0.7, 1, ?)`,
+    ).run(now);
+    database.Raw.prepare(
+      `INSERT INTO candidate (id, publication_id, extraction_result_id, finding, evidence_quote,
+         customer, customer_quote, created_at)
+       VALUES ('cand_w', 'pub_w', 'ext_w', 'A finding.', 'A quote.', 'knowledge workers',
+         'knowledge workers', ?)`,
+    ).run(now);
+  }
+
+  it("REQ-PROC-007: AC1 a candidate.run message starts one instance of CANDIDATE_WORKFLOW", async () => {
+    seedCandidate();
+    const created: Array<{ id: string; params: { PipelineRunId: string } }> = [];
+    const env = makeEnv({
+      CANDIDATE_WORKFLOW: {
+        create: (options) => {
+          created.push(options);
+          return Promise.resolve({ id: options.id });
+        },
+      },
+    });
+    let acked = false;
+    await worker.queue(
+      {
+        queue: "roi-models-test",
+        messages: [
+          {
+            id: "m1",
+            body: candidateRunEnvelope("cand_w"),
+            attempts: 1,
+            ack: () => {
+              acked = true;
+            },
+            retry: () => undefined,
+          },
+        ],
+      },
+      env,
+    );
+    expect(acked).toBe(true);
+    expect(created).toEqual([{ id: "pr_cand_w", params: { PipelineRunId: "pr_cand_w" } }]);
+    expect(count("opportunity")).toBe(1);
+  });
+
+  it("REQ-PROC-007: AC1 the CandidateWorkflow class runs the stub pipeline with its step runner", async () => {
+    seedCandidate();
+    database.Raw.prepare(
+      `INSERT INTO pipeline_run (id, candidate_id, status, started_at)
+       VALUES ('pr_cand_w', 'cand_w', 'running', '2026-11-23T10:00:00.000Z')`,
+    ).run();
+    database.Raw.prepare(
+      `INSERT INTO opportunity (id, candidate_id, pipeline_status, created_at, updated_at)
+       VALUES ('opp_w', 'cand_w', 'incomplete', '2026-11-23T10:00:00.000Z', '2026-11-23T10:00:00.000Z')`,
+    ).run();
+    const steps: string[] = [];
+    const workflow = new CandidateWorkflow({}, makeEnv());
+    const outcome = await workflow.run(
+      { payload: { PipelineRunId: "pr_cand_w" } },
+      {
+        do(name, callback) {
+          steps.push(name);
+          return callback();
+        },
+      },
+    );
+    expect(outcome).toMatchObject({ PipelineRunId: "pr_cand_w", Status: "complete" });
+    expect(steps).toHaveLength(7);
+    expect(count("score")).toBe(1);
   });
 });

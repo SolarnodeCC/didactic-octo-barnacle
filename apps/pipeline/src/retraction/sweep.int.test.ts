@@ -107,6 +107,7 @@ describe("REQ-DATA-008: the daily retraction sweep", () => {
       CandidatesHidden: 1,
       DecisionsWithdrawn: 1,
       VectorsDeleted: 0,
+      OpportunitiesHidden: 0,
     });
 
     const candidate = h.Database.Raw.prepare(
@@ -134,6 +135,31 @@ describe("REQ-DATA-008: the daily retraction sweep", () => {
     });
   });
 
+  it("REQ-DATA-008 AC2: the opportunity of a retracted publication is hidden with the reason", async () => {
+    const { h, ids } = await setup(["accepted", "accepted"]);
+    const [retracted, kept] = ids as [string, string];
+    for (const id of [retracted, kept]) {
+      withCandidate(h, id);
+      h.Database.Raw.prepare(
+        `INSERT INTO opportunity (id, candidate_id, pipeline_status, created_at, updated_at)
+         VALUES (?, ?, 'complete', ?, ?)`,
+      ).run(`opp_${id}`, `cand_${id}`, `${DAY_1}T12:00:00.000Z`, `${DAY_1}T12:00:00.000Z`);
+    }
+    retract(h, retracted);
+    h.Clock.Now = `${DAY_2}T11:00:00.000Z`;
+    expect(await sweepRetractions(h.Deps, DAY_2)).toMatchObject({ OpportunitiesHidden: 1 });
+    const status = (id: string) =>
+      h.Database.Raw.prepare(
+        "SELECT pipeline_status, hidden_reason, updated_at FROM opportunity WHERE id = ?",
+      ).get(`opp_${id}`);
+    expect(status(retracted)).toEqual({
+      pipeline_status: "hidden",
+      hidden_reason: "retracted",
+      updated_at: `${DAY_2}T11:00:00.000Z`,
+    });
+    expect(status(kept)).toMatchObject({ pipeline_status: "complete", hidden_reason: null });
+  });
+
   it("REQ-DATA-008 AC2: a repeated sweep changes nothing", async () => {
     const { h, ids } = await setup(["accepted"]);
     const [id] = ids as [string];
@@ -148,6 +174,7 @@ describe("REQ-DATA-008: the daily retraction sweep", () => {
       CandidatesHidden: 0,
       DecisionsWithdrawn: 0,
       VectorsDeleted: 0,
+      OpportunitiesHidden: 0,
     });
     expect(h.Database.Raw.prepare("SELECT retraction_handled_at FROM publication").get()).toEqual(
       before,

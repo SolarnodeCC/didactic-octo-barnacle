@@ -94,11 +94,11 @@ The reviewer works through a small daily sample chosen to be informative.
 - Phase: 2
 - Priority: should
 - Status: in-progress
-- Source: owner request of 2026-11-24 (ADR 0117)
+- Source: owner request of 2026-11-24 (ADR 0124)
 - Depends on: REQ-REV-002
 - Acceptance criteria:
   1. Each decision day has a sample of `review.daily_sample` publications (default 20, between 5 and 100), drawn once with a generator seeded by the day, so every reload shows the same items in the same order.
-  2. Strata are filled in the order and shares of ADR 0117 (new prompt version, borderline triage within one signal of the cut, accepted with no candidates, extraction confidence below 0.5, model rejection), and random items fill the rest. Each item shows its stratum.
+  2. Strata are filled in the order and shares of ADR 0124 (new prompt version, borderline triage within one signal of the cut, accepted with no candidates, extraction confidence below 0.5, model rejection), and random items fill the rest. Each item shows its stratum.
   3. A sample smaller than its size is topped up when the day has more decisions later; items already in it never change.
   4. The queue opens the newest decision day by default, offers the 14 most recent days, and shows how many publications have a verdict on every item.
   5. When every item of a publication has a verdict, the queue moves to the next publication that does not.
@@ -111,10 +111,10 @@ An incorrect or unsure verdict says why.
 - Phase: 2
 - Priority: should
 - Status: in-progress
-- Source: owner request of 2026-11-24 (ADR 0117)
+- Source: owner request of 2026-11-24 (ADR 0124)
 - Depends on: REQ-REV-003
 - Acceptance criteria:
-  1. A verdict carries tags from the list `tags-v1` of ADR 0117 for its step; a tag of the other step, or a tag on a correct verdict, is refused with a validation error.
+  1. A verdict carries tags from the list `tags-v1` of ADR 0124 for its step; a tag of the other step, or a tag on a correct verdict, is refused with a validation error.
   2. Tags are stored with the verdict, returned with the current verdict, and included in the export.
   3. The reasons can be chosen with one key each while the reason picker is open.
 - Verification: unit test and integration test
@@ -126,7 +126,7 @@ The reviewer records what the right output is, and can take a verdict back.
 - Phase: 2
 - Priority: should
 - Status: in-progress
-- Source: owner request of 2026-11-24 (ADR 0117)
+- Source: owner request of 2026-11-24 (ADR 0124)
 - Depends on: REQ-REV-003
 - Acceptance criteria:
   1. A triage verdict can carry the five signals as the reviewer reads them, and the tool previews the score and decision with the pipeline's triage rule (REQ-PROC-008).

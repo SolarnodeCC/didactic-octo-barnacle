@@ -45,11 +45,11 @@ describe("REQ-DATA-004: PDF downloads have their own queue in every environment"
 
 describe("REQ-NFR-008: deployed Workers keep every log line and trace", () => {
   it.each(["staging", "production"])(
-    "REQ-NFR-008: %s persists all logs and traces and turns on issue detection",
+    "REQ-NFR-008: %s persists all logs and traces, redacts query strings (ADR 0121), and turns on issue detection",
     (environment) => {
       const table = `[env.${environment}.observability`;
       expect(wrangler).toContain(
-        `${table}]\nenabled = true\nhead_sampling_rate = 1\nredact_query_string = false\n`,
+        `${table}]\nenabled = true\nhead_sampling_rate = 1\nredact_query_string = true\n`,
       );
       expect(wrangler).toContain(
         `${table}.logs]\nenabled = true\nhead_sampling_rate = 1\ninvocation_logs = true\npersist = true\n`,
@@ -60,6 +60,12 @@ describe("REQ-NFR-008: deployed Workers keep every log line and trace", () => {
       expect(wrangler).toContain(`${table}.issue_detection]\nenabled = true\n`);
     },
   );
+});
+
+describe("REQ-NFR-021: no deployed Worker keeps query strings in its traces (ADR 0121)", () => {
+  it("REQ-NFR-021: no environment turns redaction of query strings off", () => {
+    expect(wrangler).not.toMatch(/^redact_query_string\s*=\s*false/m);
+  });
 });
 
 describe("REQ-DATA-006: text extraction has its own queue in every environment", () => {
@@ -134,4 +140,30 @@ describe("REQ-PROC-005: the daily admission runs in the deployed environments", 
       );
     },
   );
+});
+
+describe("REQ-PROC-007: the candidate Workflow of the thin slice", () => {
+  it("REQ-PROC-007: local and preview bind CANDIDATE_WORKFLOW to the CandidateWorkflow class", () => {
+    for (const [table, environment] of [
+      ["[[workflows]]", "local"],
+      ["[[env.preview.workflows]]", "preview"],
+    ] as const) {
+      expect(wrangler).toContain(
+        `${table}\nname = "roi-candidate-${environment}"\nbinding = "CANDIDATE_WORKFLOW"\nclass_name = "CandidateWorkflow"`,
+      );
+    }
+  });
+
+  it("REQ-PROC-007: staging and production have no Workflow in phase 2 (ADR 0117)", () => {
+    expect(wrangler).not.toMatch(/^\[\[env\.(staging|production)\.workflows\]\]/m);
+  });
+});
+
+describe("REQ-NFR-010: processing in staging for the seven staging days (WP11)", () => {
+  it("REQ-NFR-010: staging turns processing on and production leaves it off", () => {
+    const staging = /^vars = \{ ENVIRONMENT = "staging",.*\}$/m.exec(wrangler)?.[0] ?? "";
+    const production = /^vars = \{ ENVIRONMENT = "production",.*\}$/m.exec(wrangler)?.[0] ?? "";
+    expect(staging).toContain('PROCESSING_ENABLED = "true"');
+    expect(production).not.toContain("PROCESSING_ENABLED");
+  });
 });

@@ -4,7 +4,7 @@ import { type InputMode } from "./agent-contract.js";
 import { TriageSignalsSchema, type TriageReason, type TriageSignals } from "./triage.js";
 
 /**
- * Contracts of the owner review tool (`apps/review`, ADR 0116 and ADR 0117, REQ-REV-001 to
+ * Contracts of the owner review tool (`apps/review`, ADR 0116 and ADR 0124, REQ-REV-001 to
  * REQ-REV-008).
  * The request schemas are validated by the Worker; the response types are shared with the
  * single-page app, which imports them as types only.
@@ -25,7 +25,7 @@ export const REVIEW_PAGE_SIZE_MAX = 50;
 
 /**
  * Error tags of REQ-REV-007, per step. A tag says why output was judged incorrect or unsure; the
- * list is versioned so verdicts stay comparable when it changes (ADR 0117).
+ * list is versioned so verdicts stay comparable when it changes (ADR 0124).
  */
 export const REVIEW_TAGS_VERSION = "tags-v1";
 export const TRIAGE_TAGS = ["should-accept", "should-reject", "wrong-signal"] as const;

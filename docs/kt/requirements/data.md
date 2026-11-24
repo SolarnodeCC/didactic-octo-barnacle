@@ -2,7 +2,7 @@
 title: Data requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-24
 ---
 
 # Data requirements
@@ -161,7 +161,8 @@ The platform records the license of each document and respects it.
   2. A PDF without a recorded license that allows storage is not stored.
   3. The dashboard links to the source of a document instead of serving the PDF, unless the license allows redistribution.
   4. The PDF URL comes from a source record and is fetched by the one PDF fetcher (ADR 0029): `https` on port 443 only, public host names only (no IP addresses, `localhost`, or internal names; an optional host list limits it further), each redirect checked again with at most 3, a size limit, one overall timeout, and a check of the content type and of the file's first bytes.
-- Verification: unit tests on license rules and code review
+  5. In staging and production the fetcher reaches only allowlisted hosts: the hosts that have served a stored PDF, by exact name, and `pdf.allowed_hosts`. Any other host, also as a redirect target, is refused and logged by name, and an environment without a list refuses every host. Only local and preview may fetch any public host (ADR 0119).
+- Verification: unit tests on license rules and the host policy, and code review
 
 ### REQ-DATA-011: Idempotent queue processing
 

@@ -59,7 +59,7 @@ flowchart TD
 | Vectorize | Publication vectors | Index exists (ADR 0027); metadata indexes new | Checked on 2026-11-23 against the Cloudflare limits page: at most 10 metadata indexes per index; `topK` at most 100 without values or metadata and 50 with them; at most 1,000 vectors per upsert from a Worker; vector IDs at most 64 bytes; at most 1,536 dimensions. `searchPublications` returns no metadata, so its `topK` is capped at 100 |
 | Queues | Text, embedding, model queues | Three queues and their dead-letter queues | Batch size, delivery delay (maximum 12 hours), concurrency |
 | Workflows | Candidate Workflow, thin slice only | Yes | Steps per instance; local development support |
-| D1 | New tables | Migrations 0009, 0010, and 0011 | Rows written per batch; database size |
+| D1 | New tables | Migrations 0009 to 0015 | Rows written per batch; database size |
 | R2 | Extracted text under `texts/` | New prefix | none new |
 
 No new service outside the stack is added (REQ-NFR-002). The Cloudflare-hosted PDF conversion of ADR 0009 stays a fallback that would need its own ADR.

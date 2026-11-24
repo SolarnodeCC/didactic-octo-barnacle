@@ -1,12 +1,12 @@
 ---
-title: "0117: A daily review queue, error tags, and structured corrections"
+title: "0124: A daily review queue, error tags, and structured corrections"
 owner: "@SolarnodeCC"
 status: approved
 last_reviewed: 2026-11-24
 related: [REQ-REV-006, REQ-REV-007, REQ-REV-008, REQ-TEST-005, REQ-TEST-006, REQ-NFR-023]
 ---
 
-# 0117: A daily review queue, error tags, and structured corrections
+# 0124: A daily review queue, error tags, and structured corrections
 
 - Decision status: Accepted
 - Date: 2026-11-24
@@ -32,6 +32,6 @@ The first version of the owner review tool (ADR 0116) lists every triaged public
 
 ## Consequences
 
-- REQ-REV-006 to REQ-REV-008 describe the behaviour; migration 0015 adds `output_review.tags_json`, `output_review.corrected_json`, `output_review.withdrawn_at`, and the `review_sample` table. The planned thin-slice migration moves to 0016.
+- REQ-REV-006 to REQ-REV-008 describe the behaviour; migration 0016 adds `output_review.tags_json`, `output_review.corrected_json`, `output_review.withdrawn_at`, and the `review_sample` table.
 - The agreement rate of a day mixes strata on purpose. Insights per stratum, golden-set drafts from corrections, and agreement in the daily quality section (ADR 0115) are planned as REQ-REV-010 and REQ-REV-011.
 - The tag list and the triage rule are repeated in the browser bundle, which imports only types from `packages/models`; unit tests keep both copies equal.

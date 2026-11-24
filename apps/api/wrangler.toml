@@ -1,0 +1,30 @@
+# The data API of the thin slice (ADR 0058, REQ-PROC-007): one read-only route,
+# GET /api/v1/opportunities/:id, without authentication. It is deployed to local and preview
+# only, and preview holds fixture data only. Staging and production get no section until phase 4
+# adds authentication; the release plan checks that.
+name = "roi-api"
+main = "src/worker.ts"
+compatibility_date = "2026-10-01"
+
+# No workers.dev address and no preview URLs; environments inherit both settings (REQ-NFR-021).
+workers_dev = false
+preview_urls = false
+
+[vars]
+ENVIRONMENT = "local"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "roi-local"
+database_id = "00000000-0000-0000-0000-000000000001"
+migrations_dir = "../../infrastructure/cloudflare/migrations"
+
+[env.preview]
+name = "roi-api-preview"
+vars = { ENVIRONMENT = "preview" }
+
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "roi-preview"
+database_id = "REPLACE_WITH_PREVIEW_D1_ID"
+migrations_dir = "../../infrastructure/cloudflare/migrations"

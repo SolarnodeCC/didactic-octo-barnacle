@@ -70,8 +70,33 @@ importers:
         specifier: ^4.1.12
         version: 4.1.12(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(vite@7.3.7(@types/node@26.6.6)(jiti@2.7.0)(lightningcss@1.33.0)(yaml@2.9.1))
 
+  apps/api:
+    dependencies:
+      '@roi/models':
+        specifier: workspace:*
+        version: link:../../packages/models
+    devDependencies:
+      '@types/better-sqlite3':
+        specifier: ^7.6.13
+        version: 7.6.13
+      better-sqlite3:
+        specifier: ^13.2.0
+        version: 13.2.0
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.12
+        version: 4.1.12(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(vite@7.3.7(@types/node@26.6.6)(jiti@2.7.0)(lightningcss@1.33.0)(yaml@2.9.1))
+      wrangler:
+        specifier: ^4.163.0
+        version: 4.163.0(@types/node@26.6.6)
+
   apps/pipeline:
     dependencies:
+      '@roi/api':
+        specifier: workspace:*
+        version: link:../api
       '@roi/models':
         specifier: workspace:*
         version: link:../../packages/models
@@ -103,6 +128,9 @@ importers:
       vitest:
         specifier: ^4.1.12
         version: 4.1.12(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(vite@7.3.7(@types/node@26.6.6)(jiti@2.7.0)(lightningcss@1.33.0)(yaml@2.9.1))
+      yaml:
+        specifier: ^2.4.2
+        version: 2.9.1
 
   apps/review:
     dependencies:

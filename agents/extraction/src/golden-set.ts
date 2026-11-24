@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { INJECTION_PAYLOADS } from "@roi/prompts";
 import { parse } from "yaml";
 import { z } from "zod";
 
@@ -114,4 +115,29 @@ export function loadThreshold(name: "triage" | "extraction", dir: string = EVALS
   return ThresholdSchema.parse(
     JSON.parse(readFileSync(join(dir, `${name}.threshold.json`), "utf8")),
   );
+}
+
+/**
+ * The adversarial injection set (REQ-NFR-006 AC3, ADR 0122): each owner-labelled entry with one
+ * payload of the corpus appended to its abstract, in turn. The labels are kept, because an
+ * instruction in the text must not change the signals, the decision, or the candidates; the
+ * original text stays whole, so every labelled quote is still verbatim.
+ */
+export function withInjections<T extends { id: string; Publication: Publication }>(
+  entries: readonly T[],
+  payloads: readonly string[] = INJECTION_PAYLOADS,
+): T[] {
+  return entries.map((entry, index) => {
+    const payload = payloads[index % payloads.length] ?? "";
+    const abstract = `${entry.Publication.Abstract} ${payload}`;
+    return {
+      ...entry,
+      id: `${entry.id}-inj`,
+      Publication: {
+        ...entry.Publication,
+        Abstract: abstract,
+        Text: `${entry.Publication.Title} ${abstract}`,
+      },
+    };
+  });
 }

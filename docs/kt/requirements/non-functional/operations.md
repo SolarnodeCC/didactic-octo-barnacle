@@ -29,7 +29,7 @@ The platform keeps up with the configured ingestion scope.
 
 - Phase: 2
 - Priority: should
-- Status: planned
+- Status: in-progress
 - Source: overview (thousands of papers each day)
 - Acceptance criteria:
   1. A daily ingestion and triage run for the configured scope finishes before the next scheduled run.

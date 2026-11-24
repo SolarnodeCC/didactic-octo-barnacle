@@ -10,7 +10,7 @@ import { type SqlDatabase } from "./sql.js";
 import { CURRENT_REVIEW, VISIBLE_CANDIDATE } from "./store.js";
 
 /**
- * The daily review queue (REQ-REV-006, ADR 0117): a small sample of one decision day, drawn so
+ * The daily review queue (REQ-REV-006, ADR 0124): a small sample of one decision day, drawn so
  * that the items are informative (borderline decisions, empty or unsure extractions, new prompt
  * versions) with a random share that keeps the agreement rate honest.
  */
