@@ -32,5 +32,14 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // The owner review tool's single-page app runs in the browser (ADR 0115).
+    files: ["apps/review/web/**/*.{ts,tsx}"],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
+    },
+  },
   eslintConfigPrettier,
 );

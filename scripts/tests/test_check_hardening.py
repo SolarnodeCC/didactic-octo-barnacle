@@ -12,7 +12,12 @@ CI = ".github/workflows/ci.yml"
 
 class HardeningTest(ScriptTestCase):
     SCRIPT = "check-hardening.py"
-    PATHS = (".github", "infrastructure/cloudflare/wrangler.toml", "package.json")
+    PATHS = (
+        ".github",
+        "infrastructure/cloudflare/wrangler.toml",
+        "apps/review/wrangler.toml",
+        "package.json",
+    )
 
     def test_req_nfr_021_passes_on_the_repository(self) -> None:
         result = self.assert_passes()
@@ -82,6 +87,10 @@ class HardeningTest(ScriptTestCase):
     def test_req_nfr_021_fails_when_wrangler_turns_on_workers_dev(self) -> None:
         self.replace("infrastructure/cloudflare/wrangler.toml", "workers_dev = false", "workers_dev = true")
         self.assert_fails_with("wrangler.toml: `workers_dev = true` is not allowed")
+
+    def test_req_nfr_021_fails_when_an_app_wrangler_turns_on_preview_urls(self) -> None:
+        self.replace("apps/review/wrangler.toml", "preview_urls = false", "preview_urls = true")
+        self.assert_fails_with("apps/review/wrangler.toml: `preview_urls = true` is not allowed")
 
     def test_req_nfr_021_fails_without_the_audit_script(self) -> None:
         package = json.loads(self.read("package.json"))

@@ -35,6 +35,7 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
       "0011_recovery.sql",
       "0012_processing_report.sql",
       "0013_quality.sql",
+      "0014_output_review.sql",
     ]);
   });
 
@@ -57,6 +58,7 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
       "0011_recovery.sql",
       "0012_processing_report.sql",
       "0013_quality.sql",
+      "0014_output_review.sql",
     ]);
 
     for (const table of [...EXPECTED_PHASE1_TABLES, ...EXPECTED_PHASE2_TABLES]) {

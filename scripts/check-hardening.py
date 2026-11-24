@@ -13,7 +13,8 @@ here, in CI, on every pull request. Rules (see docs/kt/decisions/0033-repository
 5. No `run:` script interpolates event data or workflow inputs (script injection).
 6. Dependabot covers github-actions, pip, and npm.
 7. CODEOWNERS has a default owner (`*`).
-8. `wrangler.toml` turns off workers.dev and preview URLs and never turns them on.
+8. Every `wrangler.toml` (the pipeline's and each app's) turns off workers.dev and preview URLs
+   and never turns them on.
 9. CI audits the dependencies (`audit:ci` in package.json and in ci.yml).
 10. A workflow that runs on `workflow_run` limits it to `branches: [main]`, and no job passes
     `secrets: inherit` to a called workflow (ADR 0046).
@@ -128,14 +129,27 @@ def check_codeowners() -> None:
         fail("CODEOWNERS: add a default owner line `* @owner` so no path is unowned")
 
 
+def wrangler_configs() -> list[pathlib.Path]:
+    """Every Wrangler configuration of the repository: the pipeline's and each app's (ADR 0115)."""
+    found = {ROOT / "infrastructure" / "cloudflare" / "wrangler.toml"}
+    for pattern in ("apps/*/wrangler.toml", "infrastructure/*/wrangler.toml"):
+        found.update(ROOT.glob(pattern))
+    return sorted(found)
+
+
 def check_wrangler() -> None:
-    text = (ROOT / "infrastructure" / "cloudflare" / "wrangler.toml").read_text()
-    for key in ("workers_dev", "preview_urls"):
-        top = re.search(rf"^{key}\s*=\s*(\w+)", text, re.M)
-        if not top or top.group(1) != "false":
-            fail(f"wrangler.toml: set `{key} = false` at the top level")
-        if re.search(rf"^\s*{key}\s*=\s*true", text, re.M):
-            fail(f"wrangler.toml: `{key} = true` is not allowed")
+    for path in wrangler_configs():
+        name = path.as_posix()
+        if not path.is_file():
+            fail(f"{name}: missing")
+            continue
+        text = path.read_text()
+        for key in ("workers_dev", "preview_urls"):
+            top = re.search(rf"^{key}\s*=\s*(\w+)", text, re.M)
+            if not top or top.group(1) != "false":
+                fail(f"{name}: set `{key} = false` at the top level")
+            if re.search(rf"^\s*{key}\s*=\s*true", text, re.M):
+                fail(f"{name}: `{key} = true` is not allowed")
 
 
 def check_audit() -> None:
