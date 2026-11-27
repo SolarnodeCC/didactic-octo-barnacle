@@ -87,6 +87,7 @@ export async function runBootstrapCli(
   deps.Log(JSON.stringify(result, null, 2));
 
   // The automated staging pipeline stops before the deploy when resources are missing (REQ-NFR-020).
+  // With --apply, new Vectorize metadata indexes have already been waited for (bootstrap.ts).
   if (parsed.FailOnDrift && hasBlockingDrift(result.Drift)) {
     if (result.Drift.Missing.length > 0) {
       deps.Error(

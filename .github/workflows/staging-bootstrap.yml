@@ -29,7 +29,7 @@ jobs:
   bootstrap:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     environment: staging
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -64,6 +64,8 @@ jobs:
           if [ "$FAIL_ON_DRIFT" = "true" ] && [ "$APPLY" != "true" ]; then flag="--fail-on-drift"; fi
           node infrastructure/cloudflare/dist/bootstrap-cli.js --env staging $flag
 
+      # Vectorize creates metadata indexes asynchronously, so this step waits up to five
+      # minutes until each new one is listed before the next step checks for drift.
       - name: Create missing resources
         if: ${{ inputs.apply }}
         env:
