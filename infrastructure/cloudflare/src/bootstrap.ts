@@ -135,13 +135,35 @@ export type ResourceClient = {
 };
 
 /**
+ * How long apply waits for new Vectorize metadata indexes to be listed, and how often it
+ * looks. Vectorize applies `metadata_index/create` as an asynchronous mutation: the create
+ * call succeeds at once, but the index appears in `metadata_index/list` only after the
+ * mutation is processed, which took up to about 3.5 minutes on staging (REQ-NFR-020).
+ */
+export const METADATA_INDEX_WAIT_MS = 300_000;
+export const METADATA_INDEX_POLL_MS = 10_000;
+
+export type WaitOptions = {
+  TimeoutMs?: number;
+  IntervalMs?: number;
+  Sleep?: (ms: number) => Promise<void>;
+};
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
  * Plan or apply bootstrap. Apply creates only missing resources; a second run
- * creates nothing and reports no missing drift.
+ * creates nothing and reports no missing drift. After creating a Vectorize metadata
+ * index, apply lists again until the index is reported, for at most `Wait.TimeoutMs`;
+ * one still not listed then stays in `Drift.Missing`.
  */
 export async function bootstrapEnvironment(options: {
   Environment: EnvironmentName;
   Mode: "plan" | "apply";
   Client?: ResourceClient;
+  Wait?: WaitOptions;
 }): Promise<BootstrapResult> {
   const existing = options.Client ? await options.Client.list() : [];
   const drift = reportDrift(options.Environment, existing);
@@ -165,13 +187,36 @@ export async function bootstrapEnvironment(options: {
     created.push(resource);
   }
 
-  const after = reportDrift(options.Environment, await options.Client.list());
+  const pending = new Set(
+    created.filter((resource) => resource.Kind === "vectorize-metadata-index").map(keyOf),
+  );
+  const timeoutMs = options.Wait?.TimeoutMs ?? METADATA_INDEX_WAIT_MS;
+  const intervalMs = options.Wait?.IntervalMs ?? METADATA_INDEX_POLL_MS;
+  const sleepFn = options.Wait?.Sleep ?? sleep;
+  // One list when no metadata index was created; otherwise poll a bounded number of times.
+  const waits = pending.size === 0 ? 0 : Math.max(1, Math.ceil(timeoutMs / intervalMs));
+  const stillPending = (drift: DriftReport) =>
+    drift.Missing.filter((resource) => pending.has(keyOf(resource)));
+
+  let after = reportDrift(options.Environment, await options.Client.list());
+  for (let attempt = 0; attempt < waits && stillPending(after).length > 0; attempt += 1) {
+    await sleepFn(intervalMs);
+    after = reportDrift(options.Environment, await options.Client.list());
+  }
+
+  const unlisted = stillPending(after).length;
+  const waitNote =
+    pending.size === 0
+      ? ""
+      : unlisted === 0
+        ? ` (waited for ${pending.size} metadata index(es))`
+        : ` (${unlisted} metadata index(es) not listed after ${Math.round((waits * intervalMs) / 1000)} s)`;
   return {
     Environment: options.Environment,
     Mode: "apply",
     Drift: after,
     Created: created,
-    Message: `Applied ${created.length} resource(s) for ${options.Environment}; missing now ${after.Missing.length}.`,
+    Message: `Applied ${created.length} resource(s) for ${options.Environment}; missing now ${after.Missing.length}${waitNote}.`,
   };
 }
 

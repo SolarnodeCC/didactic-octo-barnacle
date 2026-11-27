@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   bootstrapEnvironment,
@@ -68,6 +68,85 @@ describe("REQ-NFR-020: environment bootstrap is idempotent", () => {
     expect(second.Created).toEqual([]);
     expect(second.Drift.Missing).toEqual([]);
     expect(second.Drift.Extra).toEqual([]);
+  });
+});
+
+/**
+ * Like Vectorize: a created metadata index shows up in `list()` only from the
+ * `listedAfter`-th list after its creation (Infinity: never).
+ */
+function asyncMetadataClient(listedAfter: number, seed: DesiredResource[] = []): ResourceClient {
+  const store = new Map(seed.map((resource) => [`${resource.Kind}:${resource.Name}`, resource]));
+  const listsLeft = new Map<string, number>();
+  return {
+    async list() {
+      const visible = [...store.entries()].filter(([key]) => (listsLeft.get(key) ?? 0) <= 1);
+      for (const [key, left] of listsLeft) {
+        listsLeft.set(key, left - 1);
+      }
+      return visible.map(([, resource]) => resource);
+    },
+    async create(resource) {
+      const key = `${resource.Kind}:${resource.Name}`;
+      store.set(key, resource);
+      if (resource.Kind === "vectorize-metadata-index") {
+        listsLeft.set(key, listedAfter);
+      }
+    },
+  };
+}
+
+const metadataIndexes = (environment: "staging") =>
+  desiredResources(environment).filter((resource) => resource.Kind === "vectorize-metadata-index");
+
+describe("REQ-NFR-020: apply waits for asynchronous Vectorize metadata indexes", () => {
+  it("REQ-NFR-020: apply waits until created Vectorize metadata indexes are listed", async () => {
+    const sleep = vi.fn(async () => {});
+    const result = await bootstrapEnvironment({
+      Environment: "staging",
+      Mode: "apply",
+      Client: asyncMetadataClient(3),
+      Wait: { TimeoutMs: 300_000, IntervalMs: 10_000, Sleep: sleep },
+    });
+
+    expect(result.Created).toEqual(desiredResources("staging"));
+    expect(result.Drift.Missing).toEqual([]);
+    expect(sleep).toHaveBeenCalledTimes(2);
+    expect(sleep).toHaveBeenCalledWith(10_000);
+    expect(result.Message).toBe(
+      "Applied 17 resource(s) for staging; missing now 0 (waited for 2 metadata index(es)).",
+    );
+  });
+
+  it("REQ-NFR-020: a metadata index never listed stays missing after the bounded wait", async () => {
+    const sleep = vi.fn(async () => {});
+    const result = await bootstrapEnvironment({
+      Environment: "staging",
+      Mode: "apply",
+      Client: asyncMetadataClient(Infinity),
+      Wait: { TimeoutMs: 30_000, IntervalMs: 10_000, Sleep: sleep },
+    });
+
+    expect(sleep).toHaveBeenCalledTimes(3);
+    expect(result.Drift.Missing).toEqual(metadataIndexes("staging"));
+    expect(result.Message).toBe(
+      "Applied 17 resource(s) for staging; missing now 2 (2 metadata index(es) not listed after 30 s).",
+    );
+  });
+
+  it("REQ-NFR-020: apply does not wait when no metadata index was created", async () => {
+    const sleep = vi.fn(async () => {});
+    const seed = desiredResources("staging").filter((resource) => resource.Kind !== "queue");
+    const result = await bootstrapEnvironment({
+      Environment: "staging",
+      Mode: "apply",
+      Client: asyncMetadataClient(Infinity, seed),
+      Wait: { Sleep: sleep },
+    });
+
+    expect(result.Created.every((resource) => resource.Kind === "queue")).toBe(true);
+    expect(result.Drift.Missing).toEqual([]);
+    expect(sleep).not.toHaveBeenCalled();
   });
 });
 
