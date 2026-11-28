@@ -13,7 +13,7 @@ Ten work packages. Each one is a pull request or a short series, and names its R
 | WP | Name | Requirements | Gate |
 |---|---|---|---|
 | WP0 | Readiness | (documents) | none |
-| WP1 | Search tool and provider benchmark | REQ-AGENT-013 | none: gate-enabling (OQ-033) |
+| WP1 | Search tool on Tavily | REQ-AGENT-013 | none: gate-enabling |
 | WP2 | Real orchestration | REQ-AGENT-007, REQ-AGENT-009, REQ-AGENT-010, REQ-AGENT-011, REQ-AGENT-012, REQ-AGENT-014, REQ-AGENT-016 | phase 2 exit |
 | WP3 | Research Analyst, Problem Discovery, Relevance | REQ-AGENT-001, REQ-AGENT-002, REQ-AGENT-006 | phase 2 exit |
 | WP4 | Market Analysis and Competition | REQ-AGENT-003, REQ-AGENT-004 | WP1, OQ-036 for both agents |
@@ -30,11 +30,12 @@ Ten work packages. Each one is a pull request or a short series, and names its R
 - Split `requirements/agents.md` into a directory before it grows further (258 lines; the check warns above 250).
 - **Exit:** every phase 3 document is `approved`, and the gates in [dependencies](dependencies.md) have an owner and a date.
 
-## WP1: Search tool and provider benchmark
+## WP1: Search tool on Tavily
 
-- Run the comparison of ADR 0022 on the competitor-recall set: Brave Search against Tavily, on recall, cost per call, terms for storing snippets, and the DPA. Record the winner in an ADR that supersedes ADR 0022. This closes OQ-033.
-- Build the search tool behind its provider interface, with recorded fixtures (ADR 0039) for tests and its usage recorded like a model call (`call_kind`, `search_query`, `search_result_count` in `model_call`).
-- **Exit:** the ADR for the winning provider is accepted, and the tool passes its tests with no live calls (REQ-TEST-003).
+- Tavily is the provider, chosen without a comparison (ADR 0126, closes OQ-033).
+- `agents/market` holds the search tool: `tavilySearch` calls the Tavily REST API with `fetch`, and `createSearchTool` bounds the calls per run, checks the budget, and records each call as a `model_call` row with `call_kind` `search`. `delimitSearchResults` in `packages/prompts` marks the results as untrusted data.
+- Built on 2026-11-28 for REQ-AGENT-013 AC1, AC2, AC3, and AC5. AC4 (a competitor `Verified` only when a result supports it) is checked by the Competition agent in WP4.
+- **Exit:** the tool passes its tests with no live calls (REQ-TEST-003), and WP4 uses it.
 
 ## WP2: Real orchestration
 

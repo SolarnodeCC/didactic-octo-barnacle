@@ -7,7 +7,6 @@
 export const OPEN_TAG = "<publication>";
 export const CLOSE_TAG = "</publication>";
 
-const TAG_NAME = "publication";
 const WHITESPACE = /\s/u;
 
 function skipWhitespace(text: string, from: number): number {
@@ -19,15 +18,31 @@ function skipWhitespace(text: string, from: number): number {
 }
 
 /**
- * Whether a publication tag starts at `index`: `<`, optional whitespace, an optional `/`,
- * optional whitespace, then `publication` in any letter case.
+ * Whether one of the named tags starts at `index`: `<`, optional whitespace, an optional `/`,
+ * optional whitespace, then the tag name in any letter case.
  */
-function tagStartsAt(text: string, index: number): boolean {
+function tagStartsAt(text: string, index: number, names: readonly string[]): boolean {
   let at = skipWhitespace(text, index + 1);
   if (text.charAt(at) === "/") {
     at = skipWhitespace(text, at + 1);
   }
-  return text.slice(at, at + TAG_NAME.length).toLowerCase() === TAG_NAME;
+  return names.some((name) => text.slice(at, at + name.length).toLowerCase() === name);
+}
+
+/**
+ * The text with every tag of the given lower-case names defused: its `<` becomes `‹` (U+2039).
+ * Used for publication text and for search results (REQ-NFR-006).
+ */
+export function defuseNamedTags(text: string, names: readonly string[]): string {
+  let result = "";
+  let copied = 0;
+  for (let index = text.indexOf("<"); index !== -1; index = text.indexOf("<", index + 1)) {
+    if (tagStartsAt(text, index, names)) {
+      result += `${text.slice(copied, index)}‹`;
+      copied = index + 1;
+    }
+  }
+  return result + text.slice(copied);
 }
 
 /**
@@ -39,15 +54,7 @@ function tagStartsAt(text: string, index: number): boolean {
  * adjacent whitespace runs backtracks quadratically on `<` followed by many spaces.
  */
 export function defuseTags(text: string): string {
-  let result = "";
-  let copied = 0;
-  for (let index = text.indexOf("<"); index !== -1; index = text.indexOf("<", index + 1)) {
-    if (tagStartsAt(text, index)) {
-      result += `${text.slice(copied, index)}‹`;
-      copied = index + 1;
-    }
-  }
-  return result + text.slice(copied);
+  return defuseNamedTags(text, ["publication"]);
 }
 
 /** The defused text wrapped in the delimiters. */

@@ -15,8 +15,8 @@ Phase 3 starts only when every gate below is closed ([Definition of Ready](../ro
 | Gate | State on 2026-11-28 | Owner | Evidence that closes it |
 |---|---|---|---|
 | Phase 2 exit | Open. The build is done; staging day 1 started on 2026-11-28 | Lead engineer | The [phase 2 exit evidence](../phase-2/exit-evidence.md) complete, and the phase 2 requirements `done` |
-| OQ-033: search provider | Candidates fixed (ADR 0022); benchmark not run | AI engineering lead | An ADR that supersedes ADR 0022 (WP1) |
-| OQ-036: models for the remaining agents | Answered for Problem Discovery and Relevance; Research Analyst provisional (ADR 0107); Market Analysis, Competition, and Startup Generator open, after OQ-033 | AI engineering lead | Benchmark ADRs on the golden sets |
+| OQ-033: search provider | Closed: Tavily, without a benchmark (ADR 0126) | `@SolarnodeCC` | ADR 0126 |
+| OQ-036: models for the remaining agents | Answered for Problem Discovery and Relevance; Research Analyst provisional (ADR 0107); Market Analysis, Competition, and Startup Generator open, on the Tavily search tool (ADR 0126) | AI engineering lead | Benchmark ADRs on the golden sets |
 | OQ-020: judges | Problem Discovery judge report-only (ADR 0111); judges for Market Analysis, Competition, and Startup Generator open | AI engineering lead | An ADR per judge, or code checks instead |
 | Golden sets and thresholds | Research Analyst, Problem Discovery, and Relevance in place; three agents missing | `@SolarnodeCC` | Entries confirmed by the owner, with thresholds written before the first run (REQ-TEST-005) |
 | Requirement and agent documents approved | `requirements/agents.md` approved on 2026-11-07; re-review needed after ADRs 0093 to 0111 | Product owner | WP0 |
@@ -27,7 +27,7 @@ Phase 3 starts only when every gate below is closed ([Definition of Ready](../ro
 ```mermaid
 flowchart TD
   WP0[WP0 Readiness] --> G{Phase 3 gates}
-  WP1[WP1 Search tool and benchmark] --> G
+  WP1[WP1 Search tool on Tavily] --> G
   WP7[WP7 Golden sets and evals in PRs] --> G
   G --> WP2[WP2 Real orchestration]
   G --> WP3[WP3 Research Analyst, Problem Discovery, Relevance]

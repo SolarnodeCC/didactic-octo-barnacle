@@ -34,6 +34,14 @@ export const ModelPriceSchema = z
   );
 export type ModelPrice = z.infer<typeof ModelPriceSchema>;
 
+/** The list price of one search call, for example a Tavily basic search (ADR 0126). */
+export const SearchPriceSchema = z
+  .object({
+    UsdPerCall: z.number().nonnegative().finite(),
+  })
+  .strict();
+export type SearchPrice = z.infer<typeof SearchPriceSchema>;
+
 export const PriceTableSchema = z
   .object({
     Version: IsoDateSchema,
@@ -42,6 +50,10 @@ export const PriceTableSchema = z
     ExchangeRateDate: IsoDateSchema,
     /** Exact, pinned model IDs (REQ-AGENT-014), for example `@cf/zai-org/glm-4.7-flash`. */
     Models: z.record(z.string().startsWith("@cf/"), ModelPriceSchema),
+    /** Where the search prices were read, when the table has any (ADR 0126). */
+    SearchSource: z.string().url().optional(),
+    /** Search calls by provider and depth, for example `tavily/search-basic` (ADR 0126). */
+    Search: z.record(z.string().min(1).max(200), SearchPriceSchema).optional(),
   })
   .strict();
 export type PriceTable = z.infer<typeof PriceTableSchema>;
@@ -76,5 +88,18 @@ export function estimateCost(table: PriceTable, model: string, usage: TokenUsage
     1_000_000;
   // Rounded to a millionth of a cent so sums stay stable in the database.
   const eur = Math.round((usd / table.UsdPerEur) * 1e8) / 1e8;
+  return { Amount: eur, Currency: BUDGET_CURRENCY };
+}
+
+/**
+ * Estimated cost of one search call in euro, or null when the table has no price for it
+ * (REQ-NFR-011 AC2, ADR 0126). A failed call is billed nothing by the caller.
+ */
+export function searchCost(table: PriceTable, search: string): Money | null {
+  const price = table.Search?.[search];
+  if (price === undefined) {
+    return null;
+  }
+  const eur = Math.round((price.UsdPerCall / table.UsdPerEur) * 1e8) / 1e8;
   return { Amount: eur, Currency: BUDGET_CURRENCY };
 }

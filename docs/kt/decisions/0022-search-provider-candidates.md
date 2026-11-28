@@ -8,7 +8,7 @@ related: [REQ-AGENT-013]
 
 # 0022: Benchmark Brave Search and Tavily for the search tool
 
-- Decision status: Accepted
+- Decision status: Superseded by 0126
 - Date: 2026-10-29
 
 ## Context

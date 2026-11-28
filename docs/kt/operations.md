@@ -165,8 +165,7 @@ Store OpenAlex, model-provider, and Cloudflare credentials in the Cursor environ
 | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` (benchmark) | Run model benchmark rounds through AI Gateway ([running a round](test/model-benchmark-run.md)); the token has Workers AI Read, and R2 Edit only when raw responses go to R2 | GitHub environment `evals` or Cursor environment secret | evals |
 | `SCOPE_PR_TOKEN` | Opens the draft pull request of `OpenAlex scope sync`; fine-grained token for this repository with Contents and Pull requests write, so the CI checks run on that pull request (ADR 0046) | GitHub environment secret | staging |
 | `OPENALEX_API_KEY` | OpenAlex requests by the collector (REQ-DATA-001); free key required for cursor paging (ADR 0034) | Worker secret, uploaded by `Staging deploy` from the GitHub environment secret; also Cursor environment secret for local agent work | preview, staging, production |
-| `SEARCH_PROVIDER_API_KEY` | Primary web search provider for Market Analysis and Competition (ADR 0022) | Worker secret | preview, staging, production |
-| `SEARCH_PROVIDER_FALLBACK_API_KEY` | Second search provider for benchmark and failover (ADR 0022) | Worker secret | preview, staging, production |
+| `SEARCH_PROVIDER_API_KEY` | Tavily, the web search provider of Market Analysis and Competition (ADR 0126); also a network secret for `api.tavily.com` in the `evals` and agent environments (ADR 0039) | Worker secret | preview, staging, production |
 | `ALERT_GITHUB_TOKEN` | Opens and comments on alert issues; a fine-grained token for this repository only, with the permission Issues: read and write and no other (REQ-NFR-019 AC5) | Cloudflare Worker secret | preview, staging, production |
 | `ERASURE_HASH_KEY` | Keys the erasure list of erased authors: at least 32 random characters. Ingestion stops without it. Losing or changing it makes the list useless: keep it with the other secrets and an offline copy in the owner's password manager, and never rotate it ([privacy](architecture/privacy.md), REQ-NFR-016, ADR 0031, ADR 0074) | Cloudflare Worker secret | staging, production |
 | `ALERT_EMAIL_TO` | Ops address that receives alert emails (REQ-NFR-019); kept out of the repository | Worker variable | preview, staging, production |
@@ -181,8 +180,8 @@ The first production launch is an invited pilot without billing (see the non-goa
 - Sending domain `wispel.cc` verified with SPF, DKIM, and DMARC (REQ-ACC-007, ADR 0026).
 - Author erasure reachable by an admin (`POST /admin/authors/:id/erase`), `ERASURE_HASH_KEY` set, and an erasure tested on staging (REQ-NFR-016).
 - Terms, privacy policy, author notice, and support contact published (REQ-ACC-011, [privacy](architecture/privacy.md)).
-- Data processing agreements signed with Cloudflare, the model providers, Resend, and the search provider.
-- Launch questions 6 to 12 of the [legal review brief](legal/review-brief.md) are answered in writing, among them the terms for transient processing of non-redistributable full text and the storage terms of the search providers (ADR 0039).
+- Data processing agreements signed with Cloudflare, the model providers, Resend, and Tavily (ADR 0126).
+- Launch questions 6 to 12 of the [legal review brief](legal/review-brief.md) are answered in writing, among them the terms for transient processing of non-redistributable full text and the storage terms of Tavily (ADR 0039).
 - Retention job running (REQ-NFR-015) and a restore drill done (REQ-NFR-017).
 - Calibrated daily budget set (ADR 0023), the GitHub label `alert` created, and the alert email address and GitHub issue creation tested (REQ-NFR-019).
 - At least one active admin and a tested admin recovery path (REQ-ADM-001, REQ-ADM-002).
