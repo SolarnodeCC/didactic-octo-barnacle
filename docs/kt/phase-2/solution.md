@@ -2,8 +2,8 @@
 title: Phase 2 solution
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-10
-related: [REQ-DATA-006, REQ-DATA-008, REQ-PROC-001, REQ-PROC-002, REQ-PROC-003, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-PROC-007, REQ-PROC-008, REQ-PROC-009, REQ-NFR-003, REQ-NFR-005, REQ-NFR-010, REQ-NFR-011, REQ-TEST-002]
+last_reviewed: 2026-11-28
+related: [REQ-DATA-006, REQ-DATA-008, REQ-PROC-001, REQ-PROC-002, REQ-PROC-003, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-PROC-007, REQ-PROC-008, REQ-PROC-009, REQ-NFR-003, REQ-NFR-005, REQ-NFR-010, REQ-NFR-011, REQ-TEST-002, REQ-PROC-010, REQ-PROC-011, REQ-DATA-012, REQ-NFR-023, REQ-TEST-006, REQ-TEST-007, REQ-REV-001, REQ-REV-008]
 ---
 
 # Phase 2 solution
@@ -27,9 +27,15 @@ Phase 2 is done when the [exit criteria](../roadmap.md#exit-criteria) hold: reca
 | Model calls and cost | REQ-NFR-003, REQ-NFR-005, REQ-NFR-011 | One model-call helper through AI Gateway, a usage record per call, a daily budget with a stop |
 | Throughput | REQ-NFR-010 | Queue sizing and a load test on recorded fixtures with stubbed models |
 | Contract tests | REQ-TEST-002 | Contract tests for triage and extraction that call no live model |
+| Admission readiness | REQ-PROC-011 | Admission waits for a final document state or the full-text wait (ADR 0065) |
+| Recovery | REQ-PROC-010, REQ-DATA-012 | Re-drives by failure class, the breaker, and dead-letter replay (ADR 0063) |
+| Quality monitoring | REQ-NFR-023 | The daily quality section, its baseline, and the `quality-drift` alert (ADR 0071, ADR 0115) |
+| Golden sets and eval report | REQ-TEST-006, REQ-TEST-007 | Triage and extraction golden sets and their eval report (ADR 0060, ADR 0067) |
+| Owner review tool | REQ-REV-001 to REQ-REV-008 | `apps/review`: list, detail, verdicts, daily queue, error tags, corrections (ADR 0116, ADR 0124) |
 
 ## Out of scope
 
+- Review-tool extensions REQ-REV-009 to REQ-REV-011: phase 3 (ADR 0125).
 - The six analysis agents, the search tool, and the per-candidate Workflow with real agents: phase 3. The thin slice uses stub steps in their place.
 - The scoring engine, data API, auth and admin API, and dashboard: phase 4. The thin slice gets one read-only route, local and preview only (ADR 0058).
 - User-facing opportunity search (REQ-API-006, REQ-DASH-015): phase 4. Phase 2 builds the search function it will call.

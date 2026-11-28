@@ -2,7 +2,7 @@
 title: Processing requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-28
 ---
 
 # Processing requirements
@@ -157,7 +157,7 @@ Triage, embedding, and extraction steps that end without a stored result are re-
 - Priority: must
 - Status: in-progress
 - Source: ADR 0063
-- Depends on: REQ-PROC-008, REQ-AGENT-009, REQ-NFR-005
+- Depends on: REQ-PROC-008, REQ-TEST-002, REQ-NFR-005
 - Acceptance criteria:
   1. The daily admission cron re-drives a failed step from the first failed step and reuses stored outputs. A transient failure (`provider-error`, `budget-exhausted`, dead letter) is re-driven at most once a day and at most `recovery.max_redrives` times.
   2. A content failure (`invalid-output`) is re-driven once on the next day, and again only after the step's model or prompt version has changed.

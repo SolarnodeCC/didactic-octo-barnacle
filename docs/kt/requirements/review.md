@@ -1,8 +1,8 @@
 ---
 title: Output review requirements
 owner: "@SolarnodeCC"
-status: draft
-last_reviewed: 2026-11-24
+status: approved
+last_reviewed: 2026-11-28
 related: [REQ-PROC-004, REQ-PROC-005, REQ-NFR-013, REQ-NFR-014, REQ-NFR-021, REQ-TEST-005, REQ-TEST-006]
 ---
 
@@ -139,10 +139,10 @@ The reviewer records what the right output is, and can take a verdict back.
 
 The reviewer sees full-text quotes in context.
 
-- Phase: 2
+- Phase: 3
 - Priority: could
 - Status: planned
-- Source: review tool plan of 2026-11-24
+- Source: review tool plan of 2026-11-24; phase 3 since ADR 0125
 - Depends on: REQ-REV-002
 - Acceptance criteria:
   1. When extraction read the full text, each quote is shown with about 300 characters around it from the stored text, and never the whole text (ADR 0014).
@@ -153,10 +153,10 @@ The reviewer sees full-text quotes in context.
 
 The reviewer sees where the model output goes wrong.
 
-- Phase: 2
+- Phase: 3
 - Priority: could
 - Status: planned
-- Source: review tool plan of 2026-11-24
+- Source: review tool plan of 2026-11-24; phase 3 since ADR 0125
 - Depends on: REQ-REV-004, REQ-REV-007
 - Acceptance criteria:
   1. Agreement is shown over time per step, prompt version, and stratum.
@@ -167,10 +167,10 @@ The reviewer sees where the model output goes wrong.
 
 Reviewed and corrected output becomes golden-set entries with little retyping.
 
-- Phase: 2
+- Phase: 3
 - Priority: could
 - Status: planned
-- Source: review tool plan of 2026-11-24; ADR 0072
+- Source: review tool plan of 2026-11-24; ADR 0072; phase 3 since ADR 0125
 - Depends on: REQ-REV-008, REQ-TEST-005, REQ-TEST-006
 - Acceptance criteria:
   1. A reviewed publication can be exported as a draft golden-set entry in the format of `agents/extraction/evals`, using the corrected values.

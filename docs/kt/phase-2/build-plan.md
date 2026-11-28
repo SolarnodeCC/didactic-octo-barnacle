@@ -2,13 +2,13 @@
 title: Phase 2 build plan
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-24
-related: [REQ-DATA-006, REQ-DATA-008, REQ-DATA-012, REQ-PROC-001, REQ-PROC-002, REQ-PROC-003, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-PROC-007, REQ-PROC-008, REQ-PROC-009, REQ-PROC-010, REQ-PROC-011, REQ-NFR-003, REQ-NFR-005, REQ-NFR-010, REQ-NFR-011, REQ-NFR-023, REQ-TEST-002, REQ-TEST-006, REQ-TEST-007, REQ-REV-001, REQ-REV-002, REQ-REV-003, REQ-REV-004, REQ-REV-005]
+last_reviewed: 2026-11-28
+related: [REQ-DATA-006, REQ-DATA-008, REQ-DATA-012, REQ-PROC-001, REQ-PROC-002, REQ-PROC-003, REQ-PROC-004, REQ-PROC-005, REQ-PROC-006, REQ-PROC-007, REQ-PROC-008, REQ-PROC-009, REQ-PROC-010, REQ-PROC-011, REQ-NFR-003, REQ-NFR-005, REQ-NFR-010, REQ-NFR-011, REQ-NFR-023, REQ-TEST-002, REQ-TEST-006, REQ-TEST-007, REQ-REV-001, REQ-REV-002, REQ-REV-003, REQ-REV-004, REQ-REV-005, REQ-REV-006, REQ-REV-007, REQ-REV-008]
 ---
 
 # Phase 2 build plan
 
-Twelve work packages. Each is one pull request or a short series, and names its REQ-IDs. Their order and the gates are in [dependencies](dependencies.md). The design is in [design](design.md) and [schema](schema.md). Tests are named after the requirement they verify (`check:traceability`).
+Thirteen work packages. Each is one pull request or a short series, and names its REQ-IDs. Their order and the gates are in [dependencies](dependencies.md). The design is in [design](design.md) and [schema](schema.md). Tests are named after the requirement they verify (`check:traceability`).
 
 | WP | Name | Requirements | Gate |
 |---|---|---|---|
@@ -24,6 +24,7 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 | WP9 | Budget and cost reporting | REQ-NFR-005, REQ-NFR-023 | phase 2 start |
 | WP10 | Thin slice | REQ-PROC-007 | phase 2 start |
 | WP11 | Throughput and exit | REQ-NFR-010, phase 2 exit | phase 2 start |
+| WP12 | Owner review tool (added by ADR 0116 and ADR 0124) | REQ-REV-001 to REQ-REV-008 | phase 2 start |
 
 ## WP0: Readiness
 
@@ -155,3 +156,10 @@ Twelve work packages. Each is one pull request or a short series, and names its 
 - Seven staging days with the switch on (`PROCESSING_ENABLED` in the staging vars). Collect the exit evidence of [approach](approach.md#exit-evidence) in [exit evidence](exit-evidence.md). Set every phase 2 requirement to `done` with its tests.
 - As built: the load test of ADR 0118 runs in CI at 4,634 publications, and extraction is sent paced to the model's request limit.
 - **Exit:** the phase 2 exit criteria of the [roadmap](../roadmap.md#exit-criteria) are met, and phase 3 can start.
+
+## WP12: Owner review tool
+
+- Added after the plan was approved: `apps/review` (ADR 0116), with migration 0014, then the daily review queue, error tags, structured corrections, and undo with migration 0016 (ADR 0124).
+- **Tests:** named after REQ-REV-001 to REQ-REV-008 in `apps/review`.
+- REQ-REV-009 to REQ-REV-011 moved to phase 3 (ADR 0125).
+- **Exit:** the tool is deployed to staging behind Access (`review.wispel.cc`) and used on staging output ([exit evidence](exit-evidence.md)).

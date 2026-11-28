@@ -3,7 +3,10 @@
 Run from the repository root: python3 scripts/check-kt.py
 
 Checks frontmatter, file size limits, the directory indexes, relative links,
-and the format and uniqueness of requirement IDs. Warnings do not fail the run.
+the format and uniqueness of requirement IDs, that no requirement depends on a
+requirement in a later phase, and that the roadmap's list of requirements per
+phase matches each requirement's Phase field (ADR 0125). Warnings do not fail
+the run.
 """
 
 import datetime
@@ -16,6 +19,7 @@ import yaml
 KT = pathlib.Path("docs/kt")
 REQUIREMENTS = KT / "requirements"
 DECISIONS = KT / "decisions"
+ROADMAP = KT / "roadmap.md"
 
 WARN_LINES = 250
 MAX_LINES = 400
@@ -38,9 +42,13 @@ REQ_HEADING = re.compile(r"^### (REQ-[A-Z]+-\d{3}): \S.*$", re.M)
 FIELD = re.compile(r"^- ([A-Za-z ]+):[ \t]*(.*)$", re.M)
 LINK = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
 FENCE = re.compile(r"^```.*?^```[ \t]*$", re.M | re.S)
+ROADMAP_ROW = re.compile(r"^\|\s*(1|2|3|4|later)\s*\|\s*(REQ-[^|]*)\|\s*$", re.M)
+PHASE_ORDER = {"1": 1, "2": 2, "3": 3, "4": 4, "later": 5}
 
 errors = []
 warnings = []
+phases = {}
+depends = {}
 
 
 def split_frontmatter(path, text):
@@ -120,12 +128,40 @@ def check_requirements(path, body):
                 errors.append(f"{path}: {req} {name} must be one of {sorted(allowed)}")
         if not re.search(r"^\s+1\. \S", section, re.M):
             errors.append(f"{path}: {req} has no numbered acceptance criteria")
+        phases.setdefault(req, fields.get("Phase", "").strip())
+        depends.setdefault(req, (path, REQ_ID.findall(fields.get("Depends on", ""))))
         found.append(req)
     if len(found) > MAX_REQS:
         errors.append(f"{path}: {len(found)} requirements; limit is {MAX_REQS}, split it")
     elif len(found) > WARN_REQS:
         warnings.append(f"{path}: {len(found)} requirements; split before it reaches {MAX_REQS}")
     return found
+
+
+def check_phases():
+    """No requirement depends on a later phase, and the roadmap lists match (ADR 0125)."""
+    for req, (path, needs) in depends.items():
+        own = PHASE_ORDER.get(phases.get(req, ""))
+        for need in needs:
+            other = PHASE_ORDER.get(phases.get(need, ""))
+            if own is not None and other is not None and other > own:
+                errors.append(
+                    f"{path}: {req} (phase {phases[req]}) depends on {need} "
+                    f"in a later phase ({phases[need]})"
+                )
+    if not ROADMAP.is_file():
+        return
+    listed = {}
+    for phase, ids in ROADMAP_ROW.findall(ROADMAP.read_text()):
+        for req in REQ_ID.findall(ids):
+            listed[req] = phase
+    for req, phase in sorted(phases.items()):
+        if req not in listed:
+            errors.append(f"{ROADMAP}: {req} (phase {phase}) is missing from Requirements per phase")
+        elif listed[req] != phase:
+            errors.append(
+                f"{ROADMAP}: {req} is listed in phase {listed[req]} but its Phase field is {phase}"
+            )
 
 
 def main():
@@ -152,6 +188,8 @@ def main():
                 if req in defined:
                     errors.append(f"{path}: {req} is already defined in {defined[req]}")
                 defined.setdefault(req, path)
+
+    check_phases()
 
     for path, req in referenced:
         if req not in defined:
