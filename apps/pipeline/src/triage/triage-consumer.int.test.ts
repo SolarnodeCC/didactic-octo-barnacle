@@ -119,7 +119,7 @@ async function triageAll(h: Harness, ids: string[]): Promise<void> {
 }
 
 describe("REQ-PROC-005: triage rules before any model call", () => {
-  it("REQ-PROC-005: AC1 rejects retracted, incomplete, and out-of-scope publications with their reason and no model call (REQ-PROC-006 AC1)", async () => {
+  it("REQ-PROC-005: AC1 rejects retracted, incomplete, and out-of-scope publications with their reason and no model call, so an incomplete publication never reaches the agents (REQ-PROC-006 AC1, REQ-DATA-005 AC2)", async () => {
     const ai = new FakeWorkersAi([]);
     const h = createHarness({}, { Triage: { Ai: ai, Send: false } });
     const [retracted, incomplete, outOfScope] = await storeWorks(h, 3);

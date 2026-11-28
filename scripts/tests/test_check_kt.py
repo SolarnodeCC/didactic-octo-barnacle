@@ -8,6 +8,7 @@ from support import ScriptTestCase
 
 GLOSSARY = "docs/kt/glossary.md"
 TESTING = "docs/kt/requirements/testing.md"
+ROADMAP = "docs/kt/roadmap.md"
 
 
 class KtTest(ScriptTestCase):
@@ -70,6 +71,23 @@ class KtTest(ScriptTestCase):
     def test_req_nfr_004_fails_on_a_reference_to_an_undefined_requirement(self) -> None:
         self.write(GLOSSARY, self.read(GLOSSARY) + "\nSee REQ-TEST-999.\n")
         self.assert_fails_with("glossary.md: REQ-TEST-999 is not defined")
+
+    def test_req_nfr_004_fails_on_a_dependency_in_a_later_phase(self) -> None:
+        self.replace(
+            "docs/kt/requirements/processing.md",
+            "- Depends on: REQ-PROC-008, REQ-TEST-002, REQ-NFR-005",
+            "- Depends on: REQ-PROC-008, REQ-AGENT-009, REQ-NFR-005",
+        )
+        self.assert_fails_with("REQ-PROC-010 (phase 2) depends on REQ-AGENT-009 in a later phase (3)")
+
+    def test_req_nfr_004_fails_when_the_roadmap_list_differs_from_the_phase_field(self) -> None:
+        self.replace(ROADMAP, ", REQ-AGENT-016,", ",")
+        self.assert_fails_with("REQ-AGENT-016 (phase 3) is missing from Requirements per phase")
+
+    def test_req_nfr_004_fails_when_the_roadmap_lists_a_requirement_in_another_phase(self) -> None:
+        self.replace(ROADMAP, ", REQ-REV-008 |", " |")
+        self.replace(ROADMAP, ", REQ-REV-009,", ", REQ-REV-008, REQ-REV-009,")
+        self.assert_fails_with("REQ-REV-008 is listed in phase 3 but its Phase field is 2")
 
 
 if __name__ == "__main__":

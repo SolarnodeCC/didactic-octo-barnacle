@@ -2,7 +2,7 @@
 title: Data requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-24
+last_reviewed: 2026-11-28
 ---
 
 # Data requirements
@@ -112,7 +112,7 @@ Structured metadata from the source APIs is normalized into one publication reco
 
 - Phase: 1
 - Priority: must
-- Status: in-progress
+- Status: done
 - Source: README roadmap phase 1
 - Acceptance criteria:
   1. Title, abstract, authors, publication date, source, and source identifier are stored for every publication.

@@ -2,7 +2,7 @@
 title: Phase 2 dependencies
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-11
+last_reviewed: 2026-11-28
 related: [REQ-NFR-005, REQ-NFR-002, REQ-NFR-020]
 ---
 
@@ -44,11 +44,14 @@ flowchart TD
   WP8 --> WP11[WP11 Throughput and exit]
   WP9 --> WP11
   WP10 --> WP11
+  WP7 --> WP12[WP12 Owner review tool]
+  WP12 --> WP11
 ```
 
 - WP4, WP5, WP6, and WP9 can run in parallel once the gates are closed.
 - WP7 does not wait for WP4. It reads full text only where WP4 has stored it, and the abstract otherwise.
 - WP8 needs the candidate rows of WP7. It was built before WP5, so WP5 adds the vector deletion for retracted publications. WP8 hides opportunities once WP10 adds that table.
+- WP12 reads the triage and extraction rows of WP6 and WP7. It was added after the plan (ADR 0116, ADR 0124), and its staging use is part of the exit evidence.
 
 ## Cloudflare services
 
