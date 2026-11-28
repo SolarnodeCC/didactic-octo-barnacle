@@ -6,8 +6,25 @@ triggers:
   frequency: everyPush
 
 review:
-  effort: default
-  smartPrompt: ""
+  effort: smart
+  smartPrompt: |
+    Choose Bugbot effort from the PR title, author, repository name, and diff only.
+
+    Use High when the diff touches any of:
+    - authentication, sessions, invitations, CSRF, Origin checks, roles, or admin/DSAR routes
+    - secrets handling, GitHub Actions workflows, Dependabot, CODEOWNERS, or hardening scripts
+    - wrangler.toml, Worker bindings, queues, workflows, Durable Objects, or Cloudflare deploy config
+    - PDF/page fetchers, outbound HTTP clients, SSRF/host allowlists, or retry/idempotency logic
+    - agent tools, prompt-injection boundaries, model/prompt version changes, or golden-set labels
+    - D1 schema migrations, organization-ID data access, or license/PDF serving rules
+    - budget, cost accounting, or alert sinks that can leak tokens or raw error text
+
+    Use Low when the diff is only documentation, comments, or formatting, and does not change
+    TypeScript/JavaScript/Python code, package manifests, lockfiles, workflows, wrangler.toml,
+    migrations, prompts, golden sets, or scripts. Examples: docs/kt prose-only edits, README text.
+
+    Use Default for everything else, including ordinary feature work, tests, and KT updates that
+    accompany non-security code changes.
   incremental: true
 
 prSummary:
