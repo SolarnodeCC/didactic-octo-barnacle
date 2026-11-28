@@ -94,6 +94,10 @@ Migration 0016 is `infrastructure/cloudflare/migrations/0016_review_queue.sql` (
 | `output_review.withdrawn_at` | | Set by undo; the newest verdict per target that is not withdrawn is current |
 | `review_sample` | `day`, `publication_id`, `stratum`, `position`, `created_at` | PRIMARY KEY (`day`, `publication_id`); index (`day`, `position`). The daily sample, drawn once and topped up, never reshuffled |
 
+## Migration 0017: retraction sweep index
+
+Migration 0017 is `infrastructure/cloudflare/migrations/0017_retraction_pending_index.sql` (ADR 0126; REQ-DATA-008). It adds the partial index `publication_retraction_pending_idx` on `publication (id)` where `retracted = 1 AND retraction_handled_at IS NULL`, so the retraction sweep of the admission cron no longer scans every publication. It is expand-only.
+
 ## Configuration keys
 
 New keys for [defaults](../architecture/defaults.md). They are added there in the pull request that first reads them. WP4 added the `text.*` keys. WP6 reads `triage.accept_score_cut`, `ingestion.daily_extraction_limit`, `extraction.full_text_wait_hours`, the `recovery.*` keys, and a provisional `budget.daily_eur` (see [defaults](../architecture/defaults.md)); WP9 replaces it with the computed limit and adds the `budget.expected_daily_*` and `budget.measured_cost_*` keys (ADR 0113). WP7 reads `extraction.max_candidates_per_publication` (an existing key, `3`) and adds `extraction.generic_customer_terms`. WP1 added `processing.enabled`, `triage.admission_pool_days`, `extraction.full_text_max_chars`, `embedding.batch_size`, `retraction.lookback_days`, and `model.price_table_version`; ADR 0088 added `model.triage` and ADR 0091 `model.extraction`.

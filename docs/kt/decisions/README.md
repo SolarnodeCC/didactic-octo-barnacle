@@ -134,6 +134,7 @@ One decision per file, numbered in order: `NNNN-short-title.md`. A decision is n
 | [0123](0123-erasure-key-and-route-gates.md) | Gates for the erasure-list key and for routes before authentication | Accepted |
 | [0124](0124-review-queue-tags-and-corrections.md) | A daily review queue, error tags, and structured corrections | Accepted |
 | [0125](0125-plan-validation-of-2026-11-28.md) | Plan and requirements validation of 2026-11-28 | Accepted |
+| [0126](0126-admission-cron-step-isolation.md) | Admission cron step isolation and the retraction sweep index | Accepted |
 
 ## When an ADR is needed
 

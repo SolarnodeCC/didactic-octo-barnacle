@@ -20,26 +20,7 @@ export async function runScheduled(
   cron: string,
 ): Promise<StartRunResult | null> {
   if (cron === ADMISSION_CRON) {
-    // Retracted publications are swept first, then failed steps are re-driven, then the day's
-    // admission, then extraction is queued for the admitted (REQ-DATA-008, ADR 0063, ADR 0055).
-    const day = deps.Now().slice(0, 10);
-    // Yesterday's daily run is closed and reported first, with its cost (REQ-NFR-005 AC3).
-    await reportProcessingRuns(deps, day);
-    await sweepRetractions(deps, day);
-    await redriveTriage(deps, day);
-    // Re-driven extractions count toward the day's limit, so they go before the admission
-    // (REQ-PROC-010 AC3).
-    const redriven = await redriveExtraction(deps, day);
-    await redriveEmbedding(deps, day);
-    await admitDay(deps, day);
-    // Admitted extractions are paced after the re-driven ones (ADR 0118).
-    await queueAdmittedExtractions(
-      deps,
-      day,
-      redriven.Outcome === "redriven" ? redriven.Counts.Redriven : 0,
-    );
-    // A new embedding index fills a little more each day until its backfill is done (ADR 0056).
-    await continueEmbeddingBackfills(deps, day);
+    await runAdmissionCron(deps, deps.Now().slice(0, 10));
     return null;
   }
   if (cron === RETRACTION_CRON) {
@@ -74,6 +55,60 @@ export async function runScheduled(
       Summary: `The scheduled start failed: ${error instanceof Error ? error.message : "unknown error"}`,
     });
     throw error;
+  }
+}
+
+/**
+ * The daily admission cron (ADR 0055, ADR 0063, ADR 0126). Yesterday's daily run is reported
+ * first (REQ-NFR-005 AC3), retracted publications are swept (REQ-DATA-008), failed steps are
+ * re-driven, then the day's admission runs and extraction is queued for the admitted.
+ *
+ * Each step runs on its own: a step that throws is logged and raises a `failed-run` alert, and
+ * the later steps still run, so one failing step does not hold back the day's admission. Only
+ * queueing the admitted extractions depends on the admission. The first error is thrown again
+ * at the end, so the cron invocation still shows as failed.
+ */
+export async function runAdmissionCron(deps: PipelineDeps, day: string): Promise<void> {
+  const errors: unknown[] = [];
+  const step = async <T>(name: string, work: () => Promise<T>): Promise<T | undefined> => {
+    try {
+      return await work();
+    } catch (error) {
+      errors.push(error);
+      const message = error instanceof Error ? error.message : "unknown error";
+      deps.Log?.("cron.step_failed", { cron: ADMISSION_CRON, step: name, day, error: message });
+      await notify(deps, {
+        Type: "failed-run",
+        Source: `admission:${name}`,
+        Summary: `The admission step ${name} failed on ${day}: ${message}`,
+      });
+      return undefined;
+    }
+  };
+
+  await step("report", () => reportProcessingRuns(deps, day));
+  await step("retraction-sweep", () => sweepRetractions(deps, day));
+  await step("redrive-triage", () => redriveTriage(deps, day));
+  // Re-driven extractions count toward the day's limit, so they go before the admission
+  // (REQ-PROC-010 AC3).
+  const redriven = await step("redrive-extraction", () => redriveExtraction(deps, day));
+  await step("redrive-embedding", () => redriveEmbedding(deps, day));
+  const admitted = await step("admission", () => admitDay(deps, day));
+  if (admitted !== undefined) {
+    // Admitted extractions are paced after the re-driven ones (ADR 0118).
+    await step("queue-extractions", () =>
+      queueAdmittedExtractions(
+        deps,
+        day,
+        redriven?.Outcome === "redriven" ? redriven.Counts.Redriven : 0,
+      ),
+    );
+  }
+  // A new embedding index fills a little more each day until its backfill is done (ADR 0056).
+  await step("embedding-backfill", () => continueEmbeddingBackfills(deps, day));
+
+  if (errors.length > 0) {
+    throw errors[0];
   }
 }
 

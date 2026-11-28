@@ -64,6 +64,7 @@ Daily admission cron (ADR 0055)
 ```
 
 - Publication-level steps (triage, extraction) are Queue consumers in `apps/pipeline`, not the per-candidate Workflow.
+- The admission cron runs each of its steps (report, retraction sweep, re-drives, admission, queueing extractions, embedding backfill) on its own: a failed step raises a `failed-run` alert and the later steps still run (ADR 0126).
 - Extraction enqueues at most `extraction.max_candidates_per_publication` `candidate.run` messages.
 - The Workflow step names match `pipeline_step.step_name` in [schema migration 0001](schema-migration-0001.md): `research_analyst`, `problem_discovery`, `market_analysis`, `competition`, `relevance`, `startup_generator`, `scoring`.
 - Idempotency key for a queue message is `message_id` in `queue_message_log`. Idempotency key for a Workflow step is `(pipeline_run_id, step_name)`.

@@ -38,6 +38,7 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
       "0014_output_review.sql",
       "0015_thin_slice.sql",
       "0016_review_queue.sql",
+      "0017_retraction_pending_index.sql",
     ]);
   });
 
@@ -63,6 +64,7 @@ describe("REQ-NFR-020: migrations hold columns required by packages/models", () 
       "0014_output_review.sql",
       "0015_thin_slice.sql",
       "0016_review_queue.sql",
+      "0017_retraction_pending_index.sql",
     ]);
 
     for (const table of [...EXPECTED_PHASE1_TABLES, ...EXPECTED_PHASE2_TABLES]) {
@@ -204,6 +206,25 @@ describe("REQ-NFR-010: deduplication lookups use an index", () => {
     const details = plan.map((row) => row.detail).join("\n");
     expect(details).toContain("source_record_openalex_lower_idx");
     expect(details).not.toMatch(/SCAN source_record/);
+  });
+});
+
+describe("REQ-DATA-008: the retraction sweep reads pending retractions through an index", () => {
+  it("REQ-DATA-008: finding unhandled retractions does not scan publication (ADR 0126)", () => {
+    const db = new Database(":memory:");
+    applyMigrations((sql) => {
+      db.exec(sql);
+    });
+    // The query of sweepRetractions in apps/pipeline/src/retraction/sweep.ts.
+    const plan = db
+      .prepare(
+        "EXPLAIN QUERY PLAN SELECT id FROM publication WHERE retracted = 1 AND retraction_handled_at IS NULL ORDER BY id",
+      )
+      .all() as Array<{ detail: string }>;
+    const details = plan.map((row) => row.detail).join("\n");
+    expect(details).toContain("publication_retraction_pending_idx");
+    expect(details).not.toMatch(/SCAN publication(?! USING)/);
+    expect(details).not.toMatch(/TEMP B-TREE/);
   });
 });
 
