@@ -2,7 +2,9 @@ import { FakeWorkersAi } from "@roi/models";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { admitDay } from "./admission.js";
+import { type AlertEvent } from "../alerts/types.js";
 import { ADMISSION_CRON } from "../config.js";
+import { type PipelineDeps } from "../queue/deps.js";
 import { runScheduled } from "../schedule/run-scheduled.js";
 import { createHarness, makeWork, openAlexPage, type Harness } from "../test/harness.js";
 
@@ -313,5 +315,72 @@ describe("REQ-PROC-011: admission waits for full text", () => {
     for (const run of runs) {
       expect(run.admitted).toEqual(run.expected);
     }
+  });
+});
+
+/** The same deps, with alerts collected and the retraction sweep's query failing like D1 did. */
+function withFailingSweep(h: Harness): { deps: PipelineDeps; alerts: AlertEvent[] } {
+  const alerts: AlertEvent[] = [];
+  const db = h.Deps.Db;
+  const failing = new Proxy(db, {
+    get(target, property) {
+      if (property === "prepare") {
+        return (sql: string) => {
+          if (sql.includes("retraction_handled_at IS NULL ORDER BY id")) {
+            throw new Error("D1_ERROR: D1 DB is overloaded.");
+          }
+          return target.prepare(sql);
+        };
+      }
+      const value: unknown = Reflect.get(target, property);
+      return typeof value === "function"
+        ? (value as (...args: unknown[]) => unknown).bind(target)
+        : value;
+    },
+  });
+  return {
+    deps: {
+      ...h.Deps,
+      Db: failing,
+      Alert: (event) => {
+        alerts.push(event);
+        return Promise.resolve();
+      },
+    },
+    alerts,
+  };
+}
+
+describe("REQ-PROC-010: one failing step does not hold back the day's admission (ADR 0126)", () => {
+  it("REQ-PROC-010: a retraction sweep that throws still admits, raises one alert, and fails the cron", async () => {
+    const { h } = await setup(3, { DailyLimit: 2 });
+    const { deps, alerts } = withFailingSweep(h);
+
+    await expect(runScheduled(deps, ADMISSION_CRON)).rejects.toThrow(/overloaded/);
+
+    expect(admittedIds(h)).toHaveLength(2);
+    expect(
+      h.Database.Raw.prepare("SELECT admitted FROM admission_day WHERE day = ?").get(DAY),
+    ).toEqual({ admitted: 2 });
+    expect(alerts).toEqual([
+      expect.objectContaining({ Type: "failed-run", Source: "admission:retraction-sweep" }),
+    ]);
+  });
+
+  it("REQ-PROC-010: a clean admission cron raises no alert", async () => {
+    const { h } = await setup(2);
+    const alerts: AlertEvent[] = [];
+    const deps: PipelineDeps = {
+      ...h.Deps,
+      Alert: (event) => {
+        alerts.push(event);
+        return Promise.resolve();
+      },
+    };
+
+    await runScheduled(deps, ADMISSION_CRON);
+
+    expect(admittedIds(h)).toHaveLength(2);
+    expect(alerts).toEqual([]);
   });
 });
