@@ -2,7 +2,7 @@
 title: Runtime defaults
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-24
+last_reviewed: 2026-11-28
 related: [REQ-PROC-005, REQ-PROC-006, REQ-AGENT-007, REQ-AGENT-012, REQ-AGENT-013, REQ-DATA-011, REQ-NFR-005]
 ---
 
@@ -35,6 +35,9 @@ Starter configuration values. Stored as versioned config in `infrastructure/clou
 | `model.extraction_requests_per_minute` | `20` | The request limit of `model.extraction` on Workers AI; extraction messages are sent spaced to it (REQ-NFR-010, ADR 0118) |
 | `search.max_calls_per_agent_run` | `5` | Per Market Analysis or Competition run (REQ-AGENT-013) |
 | `search.timeout_ms` | `8000` | Per search call |
+| `search.provider` | `tavily` | The only provider (ADR 0126) |
+| `search.depth` | `basic` | 1 API credit per call; `advanced` costs 2 (ADR 0126) |
+| `search.max_results` | `5` | Results per call, as in the search tool I/O below |
 
 ## Queue message types
 

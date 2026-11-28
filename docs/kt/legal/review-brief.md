@@ -2,7 +2,7 @@
 title: Legal review brief
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-10
+last_reviewed: 2026-11-28
 related: [REQ-DATA-010, REQ-ACC-011, REQ-NFR-016]
 ---
 
@@ -32,11 +32,11 @@ Answer yes/no with conditions for each:
 
 6. Draft or approve terms of use, privacy policy, author notice, and support contact text (REQ-ACC-011).
 7. Confirm retention periods in [privacy](../architecture/privacy.md).
-8. Confirm DPAs (or equivalent) for Cloudflare, OpenAI, Anthropic, Resend, Brave Search, and Tavily.
+8. Confirm DPAs (or equivalent) for Cloudflare, OpenAI, Anthropic, Resend, and Tavily (the search provider, ADR 0126).
 9. Confirm whether transient processing of non-redistributable full text (without storage) is allowed; if no, keep abstract-first permanently for those works.
 10. Confirm Semantic Scholar commercial use if REQ-DATA-003 is scheduled.
 11. Ask Tavily for written confirmation that storing API Output as private evaluation fixtures, used only to test our own agents, is allowed. The Platform Terms (2026-05-04) and Acceptable Use Policy (2026-10-21) do not address storage, evaluation, or publication of Output (ADR 0039).
-12. Ask Brave Search in writing for the right to store and evaluate results. Its terms (section 3(b)) forbid both by default.
+12. No longer needed: Brave Search was dropped as a provider (ADR 0126). Its terms (section 3(b)) forbid storing and evaluating results by default.
 
 ## Answers
 

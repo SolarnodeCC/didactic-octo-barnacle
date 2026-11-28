@@ -1,4 +1,18 @@
-export { CLOSE_TAG, DATA_NOT_INSTRUCTIONS, OPEN_TAG, defuseTags, delimit } from "./delimiters.js";
+export {
+  CLOSE_TAG,
+  DATA_NOT_INSTRUCTIONS,
+  OPEN_TAG,
+  defuseNamedTags,
+  defuseTags,
+  delimit,
+} from "./delimiters.js";
+
+export {
+  SEARCH_RESULTS_CLOSE_TAG,
+  SEARCH_RESULTS_NOT_INSTRUCTIONS,
+  SEARCH_RESULTS_OPEN_TAG,
+  delimitSearchResults,
+} from "./search-results.js";
 
 export { INJECTION_PAYLOADS } from "./injection-corpus.js";
 

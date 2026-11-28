@@ -2,7 +2,7 @@
 title: Agent requirements
 owner: "@SolarnodeCC"
 status: approved
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-28
 ---
 
 # Agent requirements
@@ -196,8 +196,8 @@ Market Analysis and Competition can search the web for sources, under bounds and
 
 - Phase: 3
 - Priority: must
-- Status: planned
-- Source: ADR 0013
+- Status: in-progress
+- Source: ADR 0013, ADR 0126
 - Depends on: REQ-AGENT-003, REQ-AGENT-004, REQ-NFR-006, REQ-NFR-005
 - Acceptance criteria:
   1. Only these two agents have the tool. It returns titles, URLs, and snippets through a Worker; the model never calls the search provider directly.

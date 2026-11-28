@@ -180,11 +180,16 @@ export {
   BUDGET_CURRENCY,
   ModelPriceSchema,
   PriceTableSchema,
+  SearchPriceSchema,
   estimateCost,
+  searchCost,
   type ModelPrice,
   type PriceTable,
+  type SearchPrice,
   type TokenUsage,
 } from "./price-table.js";
+
+export { SearchQuerySchema, SearchResultSchema, type SearchResult } from "./search.js";
 
 export {
   ProviderCallError,
